@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publications & Works | C4 Model Study Project</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        .pub-hero {
+            padding: 8rem 3rem 4rem;
+            max-width: 1280px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .pub-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem 6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .pub-category-title {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            color: var(--ink);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .pub-item {
+            padding: 1.5rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pub-item:hover {
+            box-shadow: 0 10px 30px var(--shadow);
+            transform: translateY(-2px);
+            border-color: var(--teal-lt);
+        }
+
+        .pub-year {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--teal);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .pub-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .pub-authors {
+            color: var(--ink-lite);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pub-venue {
+            font-style: italic;
+            color: var(--ink-lite);
+            font-size: 0.95rem;
+        }
+
+        .pub-link {
+            display: inline-block;
+            margin-top: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--teal);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .pub-link:hover {
+            color: var(--deep);
+        }
+
+        .pub-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: var(--bg-surface);
+            color: var(--deep);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        
+        .badge-peer { background: rgba(81, 153, 150, 0.15); color: var(--teal); }
+        .badge-kindle { background: rgba(139, 122, 204, 0.15); color: #8B7ACC; }
+    </style>
+</head>
+<body>
+    <nav id="main-nav">
+        <a href="index.html" class="nav-logo">
+            <span class="nav-logo-pip"></span>
+            c4model.org
+        </a>
+        <div class="nav-right">
+            <div class="lang-toggle">
+                <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+                <button class="lang-btn" data-lang="ja" onclick="setLang('ja')">日本語</button>
+            </div>
+            <a href="index.html" class="nav-cta">
+                <span data-en>← Back</span>
+                <span data-ja>← トップへ</span>
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="pub-hero">
+            <div class="section-label reveal" style="justify-content: center;">
+                <span data-en>Research & Academic Activities</span>
+                <span data-ja>研究・学術活動</span>
+            </div>
+            <h1 class="hero-h1 reveal reveal-d1" style="font-size: clamp(2.5rem, 5vw, 4.5rem);">
+                <span data-en>Publications</span>
+                <span data-ja>著作<br>論文一覧</span>
+            </h1>
+            <p class="section-body reveal reveal-d2" style="margin: 0 auto; text-align: center;">
+                <span data-en>A comprehensive list of works utilizing the C4 Model, exploring literature, software architecture, and academic writing.</span>
+                <span data-ja>C4モデルを活用し、ソフトウェアアーキテクチャから文学、学術論文執筆手法までを探求する著作・査読論文の包括的リスト。</span>
+            </p>
+        </section>
+
+        <section class="pub-container reveal reveal-d3">
+
+            <!-- Category 1: Peer-Reviewed & Conference -->
+            <div>
+                <h2 class="pub-category-title">
+                    <span data-en>Peer-Reviewed Papers & Academic Publications</span>
+                    <span data-ja>査読付き論文・国際学会・寄稿</span>
+                </h2>
+
+                <div class="pub-item">
+                    <div class="pub-year">Forthcoming (審査・掲載前)</div>
+                    <div class="pub-title">シューベルト 華麗なるロンドについての論文 <span class="pub-badge badge-peer">査読合格</span></div>
+                    <div class="pub-authors">奥村 治</div>
+                    <div class="pub-venue">公益財団法人 音楽文化創造</div>
+                    <a href="http://www.onbunso.or.jp" class="pub-link" target="_blank">View Foundation Website →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">2026-01-04</div>
+                    <div class="pub-title">Schubert's "Ave Maria (Ellen's Song No. 3)": Poetic Structure Analysis Using the C4 Model <span class="pub-badge badge-peer">Peer Reviewed</span></div>
+                    <div class="pub-authors">Osamu Okumura</div>
+                    <div class="pub-venue">American Academic Journal (査読済み・掲載)</div>
+                    <a href="https://doi.org/10.11648/j.hss.20251306.23" class="pub-link" target="_blank">DOI: 10.11648/j.hss.20251306.23 →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">2026-01-04</div>
+                    <div class="pub-title">Visualizing Film Narrative: Applying the C4 Model to "Oi, Ohoi", a Systems Approach to Narrative Structure Analysis <span class="pub-badge badge-peer">Peer Reviewed</span></div>
+                    <div class="pub-authors">Osamu Okumura</div>
+                    <div class="pub-venue">American Academic Journal</div>
+                    <a href="https://doi.org/10.11648/j.llc.20250101.15" class="pub-link" target="_blank">DOI: 10.11648/j.llc.20250101.15 →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">2025-12-22</div>
+                    <div class="pub-title">Digital Legacy Inheritance System Architecture: A Systematic Analysis Using PlantUML C4 Model <span class="pub-badge badge-peer">Peer Reviewed</span></div>
+                    <div class="pub-authors">Osamu Okumura</div>
+                    <div class="pub-venue">American Academic Journal</div>
+                    <a href="https://doi.org/10.11648/j.ae.20250902.13" class="pub-link" target="_blank">DOI: 10.11648/j.ae.20250902.13 →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">2025</div>
+                    <div class="pub-title">映画『国宝』鑑賞入門 <span class="pub-badge badge-peer">Peer Reviewed</span> <span class="pub-badge badge-kindle">Kindle Published</span></div>
+                    <div class="pub-authors">奥村 治</div>
+                    <div class="pub-venue">国際学会査読合格・日本語論文発表およびAmazon Kindleにて展開中</div>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">最近の研究</div>
+                    <div class="pub-title">「パンダロス」に関する感性工学分野における分析</div>
+                    <div class="pub-authors">奥村 治</div>
+                    <div class="pub-venue">ニュース性の高いテーマを用いた感性工学的構造分析アプローチ</div>
+                </div>
+            </div>
+
+            <!-- Category 2: Kindle Publications -->
+            <div>
+                <h2 class="pub-category-title">
+                    <span data-en>Amazon Kindle Books (C4 Model & AI)</span>
+                    <span data-ja>技術・ビジネス書（Amazon Kindle出版）</span>
+                </h2>
+
+                <div class="pub-item">
+                    <div class="pub-year">2025 -</div>
+                    <div class="pub-title">C4 Model 俳句・文学分析シリーズ <span class="pub-badge badge-kindle">Kindle Books</span></div>
+                    <div class="pub-authors">C4モデル研究会 / 奥村 治</div>
+                    <div class="pub-venue">
+                        <ul>
+                            <li>松尾芭蕉「古池や蛙飛び込む水の音」のひみつ</li>
+                            <li>「奥の細道」全50句 C4モデル完全解析</li>
+                            <li>与謝蕪村俳句ー菜の花や月は東に日は西に (C4図解化 #2)</li>
+                            <li>浮世絵探偵団長の妄想旅行: 海上の不二</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">Recent Release</div>
+                    <div class="pub-title">AI × C4 モデル 問題解決実践ガイド: チャート図解で学ぶ構造化思考入門</div>
+                    <div class="pub-authors">C4モデル研究会 / 奥村 治</div>
+                    <a href="https://www.amazon.co.jp/dp/B0GHJCD6KP" class="pub-link" target="_blank">Amazon Kindle →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">Recent Release</div>
+                    <div class="pub-title">総合的 UX/UI システム設計のガイド</div>
+                    <div class="pub-authors">奥村 治</div>
+                    <a href="https://www.amazon.co.jp/dp/B0GL3RZHSB" class="pub-link" target="_blank">Amazon Kindle →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">Recent Release</div>
+                    <div class="pub-title">Google Opal を用いた 次世代 AI ワークフロー 構築手法の提案</div>
+                    <div class="pub-authors">C4モデル研究会 / 奥村 治</div>
+                    <a href="https://www.amazon.co.jp/dp/B0GKY1K9QQ" class="pub-link" target="_blank">Amazon Kindle →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">Recent Release</div>
+                    <div class="pub-title">PlantUML C4 モデル活用入門ガイド: ソフトウェア設計から文学分析まで</div>
+                    <div class="pub-authors">C4モデル研究会 / 奥村 治</div>
+                    <a href="https://www.amazon.co.jp/dp/B0GG817BWF" class="pub-link" target="_blank">Amazon Kindle →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">Recent Release</div>
+                    <div class="pub-title">投資判断プロポーザル自動生成システム : PlantUML C4 モデルに基づく詳細設計マニュアル</div>
+                    <div class="pub-authors">C4モデル研究会 / 奥村 治</div>
+                    <a href="https://www.amazon.co.jp/dp/B0GKQNSY55" class="pub-link" target="_blank">Amazon Kindle →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">Recent Release</div>
+                    <div class="pub-title">AI × C4 モデル活用実践ワークブック: 金融機関向け 課題構造化と AI 導入設計</div>
+                    <div class="pub-authors">C4モデル研究会 / 奥村 治</div>
+                    <a href="https://www.amazon.co.jp/dp/B0GGZGLBS3" class="pub-link" target="_blank">Amazon Kindle →</a>
+                </div>
+            </div>
+
+            <!-- Category 3: Projects & Preprints -->
+            <div>
+                <h2 class="pub-category-title">
+                    <span data-en>Research Projects & Preprints</span>
+                    <span data-ja>開発プロジェクト・プレプリント</span>
+                </h2>
+
+                <div class="pub-item">
+                    <div class="pub-year">2026年度末 一般公開予定</div>
+                    <div class="pub-title">アプリケーションソフト 「論文道場」 (Academic Paper Dojo)</div>
+                    <div class="pub-authors">C4モデル研究会 / 奥村 治</div>
+                    <div class="pub-venue">C4モデルによる「思考の設計図」構築とウェルビーイング・ライティングの提唱。<br>東京都立産業技術大学院大学 PBLワークショップ実装テスト。産総研・科学技術文化財団等へ学術助成申請中。</div>
+                    <a href="https://www.youtube.com/watch?v=CYPYNjxFKOg" class="pub-link" target="_blank">Watch Video Overview →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">March 2026</div>
+                    <div class="pub-title">俯瞰して描く組織論 Phase 1 静的構造編 / PlantUML C4 L1 AI 革命が露わにした「組織の盲点」</div>
+                    <div class="pub-authors">Osamu Okumura</div>
+                    <div class="pub-venue">ResearchGate (DOI: 10.13140/RG.2.2.15259.12326)</div>
+                    <a href="https://www.researchgate.net" class="pub-link" target="_blank">ResearchGate Publisher Page →</a>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">2023 年 7-8 月</div>
+                    <div class="pub-title">「スタートアップの起業家における行動科学研究」 / 「顧客の生涯価値モデリング」</div>
+                    <div class="pub-authors">奥村 治</div>
+                    <div class="pub-venue">Amazon 単著</div>
+                </div>
+            </div>
+
+            <!-- Category 4: Past Base Work -->
+            <div>
+                <h2 class="pub-category-title">
+                    <span data-en>Foundational Research & Earlier Works</span>
+                    <span data-ja>基礎研究・過去の主要業績</span>
+                </h2>
+
+                <div class="pub-item">
+                    <div class="pub-year">2014</div>
+                    <div class="pub-title">A proposal of command-based real-time navigation system for foreigner.</div>
+                    <div class="pub-authors">Co-author</div>
+                    <div class="pub-venue">The Joint International Conference of ITCA 2014, Central South University</div>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">2013-09</div>
+                    <div class="pub-title">「指示と確認による外国人向け実時間誘導システムの提案」</div>
+                    <div class="pub-authors">共著</div>
+                    <div class="pub-venue">日本機械学会</div>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">1991-12</div>
+                    <div class="pub-title">「データベース・マーケティング時代の顧客管理」</div>
+                    <div class="pub-authors">奥村 治</div>
+                    <div class="pub-venue">Telemarketing Journal, 日本能率協会 連載 (1991-1992)</div>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-year">1991-02</div>
+                    <div class="pub-title">「エンサイクロペディア・オブ・テレマーケティング」</div>
+                    <div class="pub-authors">共訳著</div>
+                    <div class="pub-venue">ベルシステム 24 出版</div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-logo">c4model.org</div>
+        <ul class="footer-links">
+            <li><a href="index.html#concept"><span data-en>Concept</span><span data-ja>概念</span></a></li>
+            <li><a href="index.html#dojo"><span data-en>Thesis Dojo</span><span data-ja>論文道場</span></a></li>
+            <li><a href="publications.html"><span data-en>Publications</span><span data-ja>業績・論文集</span></a></li>
+        </ul>
+        <div class="footer-copy">© 2026 C4 Model Study Project · c4model.org</div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

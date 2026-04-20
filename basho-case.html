@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage 2: Technical Deep Dive | C4 Model Study</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder@1.4.0/dist/plantuml-encoder.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        .case-hero {
+            padding: 8rem 3rem 4rem;
+            max-width: 1280px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .diagram-view { padding: 3rem; background: var(--white); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 40px var(--shadow); }
+    </style>
+</head>
+<body>
+    <nav id="main-nav">
+        <a href="index.html" class="nav-logo">
+            <span class="nav-logo-pip"></span>
+            c4model.org
+        </a>
+        <div class="nav-right">
+            <div class="lang-toggle">
+                <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+                <button class="lang-btn" data-lang="ja" onclick="setLang('ja')">日本語</button>
+            </div>
+            <a href="index.html" class="nav-cta">
+                <span data-en>← Back</span>
+                <span data-ja>← 戻る</span>
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="case-hero">
+            <div class="section-label reveal" style="justify-content: center;">
+                <span data-en>Stage 2 — Advanced Deep Dive</span>
+                <span data-ja>Stage 2 — 上級者向け解析</span>
+            </div>
+            <h1 class="hero-h1 reveal reveal-d1" style="font-size: clamp(2.5rem, 5vw, 4.5rem);">
+                <span data-en>C4 PlantUML<br><em>Execution</em></span>
+                <span data-ja>C4 PlantUML<br><em>完全描画</em></span>
+            </h1>
+            <p class="section-body reveal reveal-d2" style="margin: 0 auto; text-align: center;">
+                <span data-en>Rigorous timeline sequence rendering from the ResearchGate publication. Dynamic SVG generation via PlantUML.</span>
+                <span data-ja>ResearchGate掲載論文より、厳密な感情のタイムライン解析。PlantUMLを通じた動的SVGレンダリング。</span>
+            </p>
+        </section>
+
+        <section class="section-wrap" style="padding-top: 0;">
+            <div class="diagram-en diagram-view reveal reveal-d3">
+                <h3 style="font-family: var(--font-display); font-size: 1.5rem; text-align: center; margin-bottom: 2rem; color: var(--ink);">
+                    <span data-en>Narrative Sequence Analysis</span>
+                    <span data-ja>ナラティブ・シーケンス（文脈解析）</span>
+                </h3>
+
+                <!-- EN Diagram -->
+                <div data-en>
+<pre class="puml-code" style="display:none;">
+@startuml
+skinparam monochrome true
+skinparam ParticipantPadding 20
+actor Reader
+participant Poem
+Reader -> Poem: C1 Concept: Setup (Old Pond)
+Poem --> Reader: Static Scene / Baseline emotion
+Reader -> Poem: C2 Context/C3 Contribution: Action (Frog Jumps)
+Poem --> Reader: Dynamic Movement (Kireji application)
+Reader -> Poem: C4 Conclusion: Resolution (Sound of water)
+Poem --> Reader: Emotional Resonance (Complete structural narrative)
+@enduml
+</pre>
+                    <div class="puml-render"></div>
+                </div>
+
+                <!-- JA Diagram -->
+                <div data-ja>
+<pre class="puml-code" style="display:none;">
+@startuml
+skinparam monochrome true
+skinparam ParticipantPadding 20
+actor 読者 as Reader
+participant 俳句 as Poem
+Reader -> Poem: C1 概念: 静的な世界観（古池や）
+Poem --> Reader: 普遍的な情景の提示と土台構築
+Reader -> Poem: C2 文脈 / C3 貢献: 衝撃・アクション（蛙飛び込む）
+Poem --> Reader: 時間・空間の劇的な変化 (二物衝撃)
+Reader -> Poem: C4 結論: 聴覚への帰結（水の音）
+Poem --> Reader: ナラティブの解決と感情の深い共鳴
+@enduml
+</pre>
+                    <div class="puml-render"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-logo">c4model.org</div>
+        <div class="footer-copy">© 2026 C4 Model Study Project · c4model.org</div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

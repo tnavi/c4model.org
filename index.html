@@ -3,92 +3,493 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C4 Model Organization | Structuring Academic Excellence</title>
-    <meta name="description" content="Global standard for analyzing and presenting academic structures.">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>C4 Model Study Project — c4model.org</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder@1.4.0/dist/plantuml-encoder.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar glass">
-        <div class="logo">
-            <span class="gradient-text">C4 Model.org</span>
-        </div>
-        <div class="lang-switch">
-            <button id="btn-jp" class="active">JP</button>
-            <button id="btn-en">EN</button>
-        </div>
-    </nav>
+<!-- ══════════════════════════════════════════════════════
+     NAV
+══════════════════════════════════════════════════════ -->
+<nav id="main-nav">
+  <a href="#" class="nav-logo">
+    <span class="nav-logo-pip"></span>
+    c4model.org
+  </a>
+  <ul class="nav-center">
+    <li><a href="#concept"><span data-en>Concept</span><span data-ja>概念</span></a></li>
+    <li><a href="#dojo"><span data-en>Thesis Dojo</span><span data-ja>論文道場</span></a></li>
+    <li><a href="publications.html"><span data-en>Publications</span><span data-ja>業績・論文</span></a></li>
+    <li><a href="#org"><span data-en>Organization</span><span data-ja>組織</span></a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" data-lang="ja" onclick="setLang('ja')">日本語</button>
+    </div>
+    <a href="#org" class="nav-cta">
+      <span data-en>Contact</span>
+      <span data-ja>お問い合わせ</span>
+    </a>
+  </div>
+</nav>
 
-    <!-- Hero Section -->
-    <header class="hero">
-        <div class="hero-bg-glow"></div>
-        <div class="hero-content">
-            <h1 class="lang-jp">学術的論理の<br><span class="gradient-text">アーキテクチャ</span></h1>
-            <h1 class="lang-en hidden">Architecting<br><span class="gradient-text">Academic Logic</span></h1>
-            
-            <p class="lang-jp subtitle">ソフトウェア工学と文学解析を構造的統合によって結びつける、新しい世界標準。</p>
-            <p class="lang-en hidden subtitle">Bridging the gap between software engineering and literary analysis through structural synthesis.</p>
-            
-            <a href="#case-study" class="cta-button lang-jp">道場を見る</a>
-            <a href="#case-study" class="cta-button lang-en hidden">Explore the Dojo</a>
-        </div>
-    </header>
+<!-- ══════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-badge">C4 Model Study Project</div>
 
-    <!-- Case Study Section (Tornado UI) -->
-    <section id="case-study" class="case-study">
-        <div class="section-header">
-            <h2 class="lang-jp">トルネードUI / <span class="gradient-text">松尾芭蕉ケーススタディ</span></h2>
-            <h2 class="lang-en hidden">The Tornado UI / <span class="gradient-text">Matsuo Basho Case Study</span></h2>
-            <p class="lang-jp">17音の宇宙をC4フレームワークの4階層で可視化する。</p>
-            <p class="lang-en hidden">Visualizing the 17-syllable universe using the four levels of the C4 framework.</p>
-        </div>
+    <h1 class="hero-h1">
+      <span data-en>Structure<br><em>everything.</em><br><span class="accent-teal">Think deeper.</span></span>
+      <span data-ja>すべてを<br><em>構造化する。</em><br><span class="accent-teal">より深く思考する。</span></span>
+    </h1>
 
-        <div class="tornado-container">
-            <!-- Level 1 -->
-            <div class="tornado-item glass-card">
-                <div class="level-badge">Level 1: System Context</div>
-                <h3 class="lang-jp">古池や (Furu ike ya)</h3>
-                <h3 class="lang-en hidden">The Old Pond</h3>
-                <p class="lang-jp">全体を包み込む環境的コンテキスト。静寂と不動の世界。</p>
-                <p class="lang-en hidden">The overarching environmental context. Silence and stillness.</p>
+    <p class="hero-sub">
+      <span data-en>The C4 Model is not just for software. It is a universal language for structural thinking — from microservices to haiku, from code to academic papers.</span>
+      <span data-ja>C4モデルはソフトウェアだけのものではありません。マイクロサービスから俳句へ、コードから学術論文へ——構造的思考の普遍的言語です。</span>
+    </p>
+
+    <div class="hero-actions">
+      <a href="#dojo" class="btn-primary">
+        <span data-en>Explore Thesis Dojo</span>
+        <span data-ja>論文道場を見る</span>
+      </a>
+      <a href="#concept" class="btn-ghost">
+        <span data-en>See the Framework</span>
+        <span data-ja>フレームワークを見る</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Live Haiku Card -->
+  <div class="hero-right">
+    <div class="haiku-card">
+      <div class="haiku-card-header">
+        <span class="haiku-card-dot"></span>
+        <span>C4 Model Applied — Live Structural Analysis</span>
+      </div>
+      <div class="haiku-poem">
+        <p>Furu ike ya —<br>kawazu tobikomu,<br>mizu no oto.</p>
+        <cite>— Matsuo Bashō, c. 1686 &nbsp;·&nbsp; 17 syllables</cite>
+      </div>
+      <div class="spiral-stack">
+        <div class="spiral-item" data-layer="1">
+          <span class="spiral-tag">L1 · CONTEXT</span>
+          <span class="spiral-body">Edo Japan · Zen tradition · Bashō's spiritual exile in Fukagawa</span>
+        </div>
+        <div class="spiral-item" data-layer="2">
+          <span class="spiral-tag">L2 · CONTAINER</span>
+          <span class="spiral-body">5·7·5 — Setting / Action / Echo: three logical vessels</span>
+        </div>
+        <div class="spiral-item" data-layer="3">
+          <span class="spiral-tag">L3 · COMPONENT</span>
+          <span class="spiral-body">Kigo (frog=spring) · Kireji "ya" · Silence vs. sudden sound</span>
+        </div>
+        <div class="spiral-item" data-layer="4">
+          <span class="spiral-tag">L4 · CODE</span>
+          <span class="spiral-body">FU-RU-I-KE · abrupt MU · resonant long-O — phonemic architecture</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     §1 CONCEPT
+══════════════════════════════════════════════════════ -->
+<section id="concept">
+  <div class="section-wrap">
+    <div class="concept-grid">
+      <div>
+        <div class="section-label reveal">
+          <span data-en>Universal Architecture</span>
+          <span data-ja>普遍的アーキテクチャ</span>
+        </div>
+        <h2 class="section-h2 reveal reveal-d1">
+          <span data-en>One framework.<br><em>Infinite</em> domains.</span>
+          <span data-ja>ひとつのフレームワーク。<br><em>無限</em>のドメイン。</span>
+        </h2>
+        <p class="section-body reveal reveal-d2">
+          <span data-en>Simon Brown's C4 Model was born in software engineering. We extended it to every domain where structure creates clarity — academic papers, literary analysis, and grant proposals.</span>
+          <span data-ja>Simon BrownのC4モデルはソフトウェア工学から生まれました。私たちはこれを、構造が明確さを生み出すすべてのドメインへと拡張しました——学術論文、文学分析、グラント提案書まで。</span>
+        </p>
+        <div class="domain-grid reveal reveal-d3">
+          <div class="domain-card sw">
+            <div class="domain-icon">⚙️</div>
+            <div class="domain-title"><span data-en>Software Systems</span><span data-ja>ソフトウェア</span></div>
+            <div class="domain-desc"><span data-en>Microservices, APIs, cloud — the original domain.</span><span data-ja>マイクロサービス・API・クラウド——原点のドメイン。</span></div>
+          </div>
+          <div class="domain-card ac">
+            <div class="domain-icon">📄</div>
+            <div class="domain-title"><span data-en>Academic Papers</span><span data-ja>学術論文</span></div>
+            <div class="domain-desc"><span data-en>RQ → Chapters → Arguments → Sentences.</span><span data-ja>RQ → 章立て → 論点 → 文章。</span></div>
+          </div>
+          <div class="domain-card ha">
+            <div class="domain-icon">🌸</div>
+            <div class="domain-title"><span data-en>Literary Works</span><span data-ja>文学作品</span></div>
+            <div class="domain-desc"><span data-en>17 syllables. 4 layers. A universe visible.</span><span data-ja>17音。4層。宇宙が見える。</span></div>
+          </div>
+          <div class="domain-card gr">
+            <div class="domain-icon">🏛️</div>
+            <div class="domain-title"><span data-en>Grant Proposals</span><span data-ja>グラント提案</span></div>
+            <div class="domain-desc"><span data-en>JST A-STEP · JSPS · NSF — structured to win.</span><span data-ja>JST A-STEP · JSPS · NSF——採択のために構造化。</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Haiku full breakdown with large spiral -->
+      <div class="reveal reveal-d2">
+        <p class="haiku-big">"Furu ike ya —<br>kawazu tobikomu,<br>mizu no oto."</p>
+        <p class="haiku-credit">Matsuo Bashō · Japan's greatest haiku poet · c. 1686</p>
+
+        <div class="spiral-stack spiral-stack-lg">
+          <div class="spiral-item" data-layer="1">
+            <div>
+              <div class="spiral-title"><span data-en>L1 · Context — World & Era</span><span data-ja>L1 · Context — 世界・時代</span></div>
+              <div class="spiral-desc"><span data-en>Edo-period Japan. Zen tradition of finding eternity in a single moment. Bashō's self-imposed exile in Fukagawa creates the contemplative silence.</span><span data-ja>江戸時代の日本。一瞬に永遠を見出す禅の伝統。深川での隠棲が、静寂の中の詩情を生み出す。</span></div>
             </div>
-
-            <!-- Level 2 -->
-            <div class="tornado-item glass-card reverse">
-                <div class="level-badge">Level 2: Container</div>
-                <h3 class="lang-jp">蛙飛び込む (Kawazu tobikomu)</h3>
-                <h3 class="lang-en hidden">A Frog Jumps In</h3>
-                <p class="lang-jp">システムに侵入し、状態をダイナミックに変化させるアクティブな要素。</p>
-                <p class="lang-en hidden">The active agent entering the system, disrupting the state dynamically.</p>
+          </div>
+          <div class="spiral-item" data-layer="2">
+            <div>
+              <div class="spiral-title"><span data-en>L2 · Container — 5·7·5 Structure</span><span data-ja>L2 · Container — 5·7·5の構造</span></div>
+              <div class="spiral-desc"><span data-en>Three logical containers: <strong>5 syllables</strong> (setting: ancient pond), <strong>7 syllables</strong> (action: frog leaps), <strong>5 syllables</strong> (resonance: sound of water).</span><span data-ja>3つの論理的器：<strong>5音</strong>（情景：古池）、<strong>7音</strong>（動作：蛙が飛び込む）、<strong>5音</strong>（余韻：水の音）。</span></div>
             </div>
-
-            <!-- Level 3 -->
-            <div class="tornado-item glass-card">
-                <div class="level-badge">Level 3: Component</div>
-                <h3 class="lang-jp">水の音 (Mizu no oto)</h3>
-                <h3 class="lang-en hidden">Sound of Water</h3>
-                <p class="lang-jp">コンテナ間の相互作用によって生成された直接的な出力イベント。</p>
-                <p class="lang-en hidden">The direct output event generated by the container interaction.</p>
+          </div>
+          <div class="spiral-item" data-layer="3">
+            <div>
+              <div class="spiral-title"><span data-en>L3 · Component — Poetic Devices</span><span data-ja>L3 · Component — 表現技法</span></div>
+              <div class="spiral-desc"><span data-en><em>Kigo</em> (frog = spring). <em>Kireji</em> "ya" creates emotional pause. Contrast: absolute silence vs. sudden splash. Deliberate omission invites imagination.</span><span data-ja>季語（蛙＝春）。切れ字「や」が感情の間を作る。静寂 vs 音の対比。意図的な余白が読者の想像力を招く。</span></div>
             </div>
-
-            <!-- Level 4 -->
-            <div class="tornado-item glass-card reverse">
-                <div class="level-badge">Level 4: Code</div>
-                <h3 class="lang-jp">波紋 (Hamon)</h3>
-                <h3 class="lang-en hidden">The Ripple Effect</h3>
-                <p class="lang-jp">エネルギーを再びコンテキストへと伝播させ、余韻を残す根本的なメカニズム。</p>
-                <p class="lang-en hidden">The fundamental mechanics propagating energy back into the context, leaving resonance.</p>
+          </div>
+          <div class="spiral-item" data-layer="4">
+            <div>
+              <div class="spiral-title"><span data-en>L4 · Code — Phonemic Architecture</span><span data-ja>L4 · Code — 音素アーキテクチャ</span></div>
+              <div class="spiral-desc"><span data-en>FU-RU-I-KE: clear consonants = transparency. Abrupt <strong>MU</strong> = single instant of impact. Long vowel <strong>O</strong> in "oto" = resonance. As precisely engineered as beautiful.</span><span data-ja>FU-RU-I-KE：清音＝透明感。促音<strong>ム</strong>＝一瞬の閉塞。長母音<strong>オ</strong>＝余韻。美しさと同じくらい精密に設計されている。</span></div>
             </div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- Footer -->
-    <footer class="glass">
-        <p>© 2026 C4 Model Organization. All rights reserved.</p>
-        <p class="small-text">SaaS Platform "Thesis Dojo" & "Academic Paper Dojo" coming soon.</p>
-    </footer>
+<div class="divider"></div>
 
-    <script src="app.js"></script>
+<!-- ══════════════════════════════════════════════════════
+     §2 THESIS DOJO
+══════════════════════════════════════════════════════ -->
+<section id="dojo">
+  <div class="section-wrap">
+    <div class="dojo-header">
+      <div>
+        <div class="section-label reveal">
+          <span data-en>Core Product</span><span data-ja>主要プロダクト</span>
+        </div>
+        <div class="badge-row reveal reveal-d1">
+          <span class="badge saas">SaaS</span>
+          <span class="badge ai">Claude API</span>
+          <span class="badge open">Open Research</span>
+        </div>
+        <h2 class="section-h2 reveal reveal-d1">
+          <span data-en>Thesis Dojo —<br><em>Academic Paper</em><br>Writing System</span>
+          <span data-ja>論文道場 —<br><em>学術論文</em><br>執筆支援システム</span>
+        </h2>
+        <p class="section-body reveal reveal-d2">
+          <span data-en>A 7-stage AI writing system built on the C4 Model. Transforms scattered ideas into publication-ready academic papers while protecting writer wellbeing through the PERMA framework.</span>
+          <span data-ja>C4モデルを基盤とした7段階AI執筆支援システム。散在するアイデアを出版可能な学術論文へと変換しながら、PERMAフレームワークで執筆者のウェルビーイングを守ります。</span>
+        </p>
+      </div>
+      <div class="score-box reveal reveal-d3">
+        <div style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem;">C4 Quality Score</div>
+        <div class="score-n">32<span class="score-den">/35</span></div>
+        <div class="score-lbl">Pass: 28pts · Preprint Published</div>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-lt);display:grid;grid-template-columns:1fr 1fr;gap:.5rem;text-align:left;">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;color:var(--ink-lite);">WHO-5</div>
+            <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--teal);">↑ Sig.</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;color:var(--ink-lite);">Cog. Load</div>
+            <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--sage);">−40%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="pipeline reveal">
+      <div class="pipe-block inp">
+        <div class="pipe-label">📥 <span data-en>Input</span><span data-ja>入力</span></div>
+        <span class="pipe-icon">💭</span>
+        <div class="pipe-title"><span data-en>Raw Ideas</span><span data-ja>散在するアイデア</span></div>
+        <ul class="pipe-items">
+          <li><span data-en>Research question</span><span data-ja>研究課題（RQ）</span></li>
+          <li><span data-en>Scattered notes</span><span data-ja>断片的なメモ</span></li>
+          <li><span data-en>Prior literature</span><span data-ja>先行研究</span></li>
+          <li><span data-en>Grant requirements</span><span data-ja>グラント要件</span></li>
+        </ul>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-block proc">
+        <div class="pipe-label">⚙️ <span data-en>C4 Structuring Engine</span><span data-ja>C4構造化エンジン</span></div>
+        <span class="pipe-icon">🏗️</span>
+        <div class="pipe-title"><span data-en>7-Stage AI Process</span><span data-ja>7段階AIプロセス</span></div>
+        <ul class="pipe-items">
+          <li>Stage 0 — <span data-en>Paper Input & C4 Score</span><span data-ja>論文入力・C4スコア</span></li>
+          <li>Stage I — <span data-en>CREATE Prompt Ideation</span><span data-ja>CREATEプロンプト発想</span></li>
+          <li>Stage II — <span data-en>C4 Blueprint Design</span><span data-ja>C4設計図</span></li>
+          <li>Stage III — <span data-en>7R Writing Support</span><span data-ja>7R執筆支援</span></li>
+          <li>Stage IV — <span data-en>Quality Evaluation</span><span data-ja>品質評価</span></li>
+          <li>Stage V–VII — <span data-en>Presentation & Submission</span><span data-ja>発表・投稿</span></li>
+        </ul>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-block out">
+        <div class="pipe-label">📤 <span data-en>Output</span><span data-ja>出力</span></div>
+        <span class="pipe-icon">🌍</span>
+        <div class="pipe-title"><span data-en>World-Ready Paper</span><span data-ja>世界公開の論文</span></div>
+        <ul class="pipe-items">
+          <li><span data-en>DOI-citable preprint</span><span data-ja>DOI取得・引用可能</span></li>
+          <li><span data-en>PlantUML C4 diagrams</span><span data-ja>C4モデル図4枚</span></li>
+          <li><span data-en>Conference presentation</span><span data-ja>学会発表資料</span></li>
+          <li><span data-en>Grant proposal draft</span><span data-ja>グラント提案書</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Stages -->
+    <div class="stages reveal">
+      <div class="stage-cell" data-n="0">
+        <div class="stage-tag">Input</div>
+        <div class="stage-name"><span data-en>Paper Info & C4 Score</span><span data-ja>論文情報・C4スコア</span></div>
+        <div class="stage-desc"><span data-en>Author, RQ, structure, refs. Real-time 35-pt score preview.</span><span data-ja>著者・RQ・構成・文献。35点リアルタイムプレビュー。</span></div>
+      </div>
+      <div class="stage-cell" data-n="I">
+        <div class="stage-tag">Ideation</div>
+        <div class="stage-name">CREATE Prompt</div>
+        <div class="stage-desc"><span data-en>Context→Role→Explore→Assert→Test→Evaluate. Structured ideation.</span><span data-ja>文脈→役割→探索→主張→検証→評価。体系的発想法。</span></div>
+      </div>
+      <div class="stage-cell" data-n="II">
+        <div class="stage-tag">Design</div>
+        <div class="stage-name"><span data-en>C4 Blueprint</span><span data-ja>C4設計図</span></div>
+        <div class="stage-desc"><span data-en>L1 Context · L2 Chapters · L3 Arguments · L4 Sentences.</span><span data-ja>L1 Context · L2 章立て · L3 論点 · L4 文章。</span></div>
+      </div>
+      <div class="stage-cell" data-n="III">
+        <div class="stage-tag">Writing</div>
+        <div class="stage-name">7R Prompt</div>
+        <div class="stage-desc"><span data-en>Reframe · Relate · Reason · Reveal · Refine · Respond · Recap.</span><span data-ja>再定義・接続・論拠・発見・精緻・応答・要約。</span></div>
+      </div>
+      <div class="stage-cell" data-n="IV">
+        <div class="stage-tag">Evaluation</div>
+        <div class="stage-name"><span data-en>C4 Tiered Score</span><span data-ja>C4段階評価</span></div>
+        <div class="stage-desc"><span data-en>6-axis quality assessment, 35-pt max. Actionable feedback.</span><span data-ja>6軸品質評価、35点満点。具体的フィードバック。</span></div>
+      </div>
+      <div class="stage-cell" data-n="V">
+        <div class="stage-tag">Presentation</div>
+        <div class="stage-name"><span data-en>Conference Prep</span><span data-ja>学会発表</span></div>
+        <div class="stage-desc"><span data-en>Auto-generate 10-slide deck, script skeleton.</span><span data-ja>10枚スライド・スクリプト自動生成。</span></div>
+      </div>
+      <div class="stage-cell" data-n="VI">
+        <div class="stage-tag">Training</div>
+        <div class="stage-name">AI Peer Review</div>
+        <div class="stage-desc"><span data-en>Simulated reviewer questions on methodology & novelty.</span><span data-ja>AI査読者シミュレーション。方法論・新規性を問う。</span></div>
+      </div>
+      <div class="stage-cell" data-n="VII">
+        <div class="stage-tag">Submission</div>
+        <div class="stage-name"><span data-en>Publication</span><span data-ja>投稿・公開</span></div>
+        <div class="stage-desc"><span data-en>Cover letter, checklist, reviewer response. ResearchGate-ready.</span><span data-ja>カバーレター・チェックリスト・査読対応。ResearchGate対応。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     STAGE 2 BANNER
+══════════════════════════════════════════════════════ -->
+<div class="stage2-banner">
+  <div class="stage2-banner-text">
+    <div class="stage2-banner-label">
+      <span data-en>Stage 2 — Technical Deep Dive</span>
+      <span data-ja>Stage 2 — 技術詳細</span>
+    </div>
+    <div class="stage2-banner-title">
+      <span data-en>PlantUML Diagrams & Full Architecture</span>
+      <span data-ja>PlantUML図集・完全アーキテクチャ</span>
+    </div>
+    <div class="stage2-banner-sub">
+      <span data-en>C4 Context / Container / Component / Code — all 4 layers with auto-rendered SVG diagrams. For researchers and engineers.</span>
+      <span data-ja>C4の全4層を自動SVGレンダリング。研究者・エンジニア向けの技術詳細ページ。</span>
+    </div>
+  </div>
+  <a href="basho-case.html" class="stage2-cta">
+    <span data-en>View Technical Docs →</span>
+    <span data-ja>技術資料を見る →</span>
+  </a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     METRICS
+══════════════════════════════════════════════════════ -->
+<div id="metrics">
+  <div class="metrics-row">
+    <div class="metric-cell reveal">
+      <div class="metric-val">32<sup>/35</sup></div>
+      <div class="metric-key">C4 Quality Score</div>
+      <div class="metric-sub"><span data-en>Publication-ready threshold</span><span data-ja>発表・投稿レベル</span></div>
+    </div>
+    <div class="metric-cell reveal reveal-d1">
+      <div class="metric-val" style="color:var(--teal-lt)">−40<sup>%</sup></div>
+      <div class="metric-key"><span data-en>Cognitive Load</span><span data-ja>認知的負荷</span></div>
+      <div class="metric-sub"><span data-en>Extraneous load reduction</span><span data-ja>外発的負荷の削減</span></div>
+    </div>
+    <div class="metric-cell reveal reveal-d2">
+      <div class="metric-val" style="color:var(--sage)">+17<sup>%</sup></div>
+      <div class="metric-key">C4 Score Growth</div>
+      <div class="metric-sub">28.3 → 33.1 pts (N=8 pilot)</div>
+    </div>
+    <div class="metric-cell reveal reveal-d3">
+      <div class="metric-val" style="color:#8B7ACC">7</div>
+      <div class="metric-key"><span data-en>Pipeline Stages</span><span data-ja>パイプライン段階</span></div>
+      <div class="metric-sub">Stage 0 → VII</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     §4 ORGANIZATION
+══════════════════════════════════════════════════════ -->
+<section id="org">
+  <div class="section-wrap">
+    <div class="org-grid">
+      <div>
+        <div class="section-label reveal">
+          <span data-en>Organization</span><span data-ja>組織</span>
+        </div>
+        <h2 class="section-h2 reveal reveal-d1">
+          <span data-en>C4 Model<br><em>Study Project</em></span>
+          <span data-ja>C4モデル<br><em>研究会®</em></span>
+        </h2>
+        <p class="section-body reveal reveal-d2">
+          <span data-en>An independent research consortium advancing the application of structural architecture methodology beyond software — into education, scholarship, and the humanities.</span>
+          <span data-ja>ソフトウェアを超えて、教育・学術・人文科学への構造的アーキテクチャ手法の応用を推進する独立型研究コンソーシアム。</span>
+        </p>
+
+        <div class="pillars reveal reveal-d3">
+          <div class="pillar">
+            <span class="pillar-icon">🔬</span>
+            <div>
+              <div class="pillar-title"><span data-en>Research</span><span data-ja>研究活動</span></div>
+              <div class="pillar-desc"><span data-en>Empirical study targeting JST A-STEP, JSPS Grants-in-Aid, and international research partnerships. N=30 trial scheduled June–August 2026.</span><span data-ja>JST A-STEP・JSPS科研費・国際共同研究を対象とした実証研究。2026年6〜8月にN=30の実証実験を予定。</span></div>
+            </div>
+          </div>
+          <div class="pillar">
+            <span class="pillar-icon">🤝</span>
+            <div>
+              <div class="pillar-title"><span data-en>Industry Partnership</span><span data-ja>産業連携</span></div>
+              <div class="pillar-desc"><span data-en>Seeking SaaS integration — IcePanel, Structurizr, enterprise knowledge management platforms. API and white-label licensing available.</span><span data-ja>IcePanel・Structurizr・ナレッジマネジメントプラットフォームとのSaaS連携を検討。API・OEM提供可能。</span></div>
+            </div>
+          </div>
+          <div class="pillar">
+            <span class="pillar-icon">🌐</span>
+            <div>
+              <div class="pillar-title"><span data-en>Global Expansion</span><span data-ja>グローバル展開</span></div>
+              <div class="pillar-desc"><span data-en>Academic Paper Dojo public release March 2027. Kindle: <em>Writing Without Giving Up</em>. Multilingual support roadmap.</span><span data-ja>論文道場を2027年3月に一般公開。Kindle「挫折しない論文術」同時刊行。多言語ロードマップ。</span></div>
+            </div>
+          </div>
+          <div class="pillar">
+            <span class="pillar-icon">📊</span>
+            <div>
+              <div class="pillar-title"><span data-en>Evidence Base</span><span data-ja>実証基盤</span></div>
+              <div class="pillar-desc"><span data-en>Preprint published on ResearchGate.net. Pilot study N=8 completed. C4 Score +17%, Cognitive Load −40%, WHO-5 significant improvement.</span><span data-ja>ResearchGate.netにプレプリント公開済み。N=8パイロット完了。C4スコア+17%・認知負荷−40%・WHO-5有意改善。</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Card -->
+      <div class="reveal reveal-d2">
+        <div class="contact-card">
+          <div class="contact-card-top">
+            <div class="contact-card-top-label">
+              <span data-en>Research & Partnership</span><span data-ja>研究・連携のお問い合わせ</span>
+            </div>
+            <div class="contact-card-top-title">
+              <span data-en>Get in touch</span><span data-ja>お問い合わせ</span>
+            </div>
+          </div>
+          <div class="contact-body">
+            <div class="contact-row">
+              <div class="contact-item">
+                <span class="ci-icon">👤</span>
+                <div>
+                  <div class="ci-label"><span data-en>Principal Investigator</span><span data-ja>主宰</span></div>
+                  <div class="ci-val">Osamu Okumura（奥村 治）</div>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="ci-icon">🏛️</span>
+                <div>
+                  <div class="ci-label"><span data-en>Affiliation</span><span data-ja>所属</span></div>
+                  <div class="ci-val">C4 Model Study Project（C4モデル研究会®）<br>Tokyo Metropolitan Univ. of Technology M.S.</div>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="ci-icon">📧</span>
+                <div>
+                  <div class="ci-label">Email</div>
+                  <div class="ci-val"><a href="mailto:c4model.study@gmail.com">c4model.study@gmail.com</a></div>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="ci-icon">🔗</span>
+                <div>
+                  <div class="ci-label">Preprint</div>
+                  <div class="ci-val"><a href="https://www.researchgate.net" target="_blank" rel="noopener">ResearchGate.net → Academic Paper Dojo</a></div>
+                </div>
+              </div>
+            </div>
+            <a href="mailto:c4model.study@gmail.com" class="contact-cta">
+              <span data-en>Send Research Inquiry →</span>
+              <span data-ja>研究・連携について問い合わせる →</span>
+            </a>
+            <div class="funding-tags">
+              <span class="ftag jst">JST A-STEP</span>
+              <span class="ftag jsps">JSPS 科研費</span>
+              <span class="ftag ind">Industry Partners</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">c4model.org</div>
+  <ul class="footer-links">
+    <li><a href="#concept"><span data-en>Concept</span><span data-ja>概念</span></a></li>
+    <li><a href="#dojo"><span data-en>Thesis Dojo</span><span data-ja>論文道場</span></a></li>
+    <li><a href="publications.html"><span data-en>Publications</span><span data-ja>業績・論文</span></a></li>
+    <li><a href="#org"><span data-en>Organization</span><span data-ja>組織</span></a></li>
+    <li><a href="mailto:c4model.study@gmail.com"><span data-en>Contact</span><span data-ja>連絡先</span></a></li>
+  </ul>
+  <div class="footer-copy">© 2026 C4 Model Study Project · c4model.org</div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════ -->
+    <script src="script.js"></script>
 </body>
 </html>

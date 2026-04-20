@@ -1,12 +1,12 @@
 :root {
-    --bg: #0b0f19;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --primary: #3b82f6;
-    --secondary: #8b5cf6;
-    --accent: #06b6d4;
-    --glass-bg: rgba(30, 41, 59, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --bg: #ffffff; /* 白背景 */
+    --text-main: #0f172a; /* 黒文字 */
+    --text-muted: #475569; /* グレー文字 */
+    --primary: #2563eb; /* 知的なブルー */
+    --secondary: #4f46e5; /* インディゴ */
+    --accent: #0284c7; /* ライトブルー */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(15, 23, 42, 0.1);
 }
 
 * {
@@ -29,7 +29,7 @@ body {
 
 /* Typography */
 .gradient-text {
-    background: linear-gradient(135deg, var(--accent), var(--secondary), var(--primary));
+    background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-size: 200% 200%;
@@ -51,11 +51,11 @@ body {
 }
 
 .glass-card {
-    background: linear-gradient(145deg, rgba(30,41,59,0.9), rgba(15,23,42,0.8));
+    background: linear-gradient(145deg, rgba(255,255,255,1), rgba(248,250,252,0.9));
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 3rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
 }
 
 /* Navigation */
@@ -107,7 +107,7 @@ body {
     position: absolute;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, rgba(11,15,25,0) 70%);
+    background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, rgba(255,255,255,0) 70%);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -131,7 +131,7 @@ body {
 .cta-button {
     display: inline-block;
     padding: 1rem 2.5rem;
-    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
     text-decoration: none;
     font-weight: 600;
@@ -141,7 +141,7 @@ body {
 
 .cta-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
 }
 
 /* Case Study / Tornado UI */
@@ -179,7 +179,7 @@ body {
     width: 2px;
     background: linear-gradient(to bottom, var(--primary), var(--secondary));
     transform: translateX(-50%);
-    opacity: 0.3;
+    opacity: 0.2;
     z-index: -1;
 }
 

@@ -1,0 +1,255 @@
+:root {
+    --bg: #0b0f19;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary: #3b82f6;
+    --secondary: #8b5cf6;
+    --accent: #06b6d4;
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text-main);
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Typography */
+.gradient-text {
+    background: linear-gradient(135deg, var(--accent), var(--secondary), var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% 200%;
+    animation: gradientFlow 5s ease infinite;
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Glassmorphism */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.glass-card {
+    background: linear-gradient(145deg, rgba(30,41,59,0.9), rgba(15,23,42,0.8));
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Navigation */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.lang-switch button {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    transition: 0.3s;
+}
+
+.lang-switch button.active {
+    color: var(--text-main);
+    border-bottom: 2px solid var(--primary);
+}
+
+/* Hero Section */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    padding: 0 5%;
+}
+
+.hero-bg-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, rgba(11,15,25,0) 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+}
+
+.hero h1 {
+    font-size: clamp(2.5rem, 6vw, 6rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+}
+
+.subtitle {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto 3rem;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Case Study / Tornado UI */
+.case-study {
+    padding: 8rem 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 6rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.tornado-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+}
+
+/* The vertical connecting line */
+.tornado-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary), var(--secondary));
+    transform: translateX(-50%);
+    opacity: 0.3;
+    z-index: -1;
+}
+
+.tornado-item {
+    width: 60%;
+    position: relative;
+    opacity: 0;
+    transform: perspective(1200px) rotateY(30deg) translateZ(100px) translateX(-50px) scale(0.9);
+    transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tornado-item.reverse {
+    transform: perspective(1200px) rotateY(-30deg) translateZ(100px) translateX(50px) scale(0.9);
+}
+
+.tornado-item.visible {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) translateZ(0) translateX(0) scale(1);
+}
+
+.level-badge {
+    position: absolute;
+    top: -15px;
+    left: 30px;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 0.2rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.tornado-item h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.tornado-item p {
+    color: var(--text-muted);
+}
+
+footer {
+    text-align: center;
+    padding: 3rem 5%;
+    margin-top: 5rem;
+}
+
+footer .small-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+    .tornado-item {
+        width: 100%;
+        margin-left: 20px;
+    }
+    .tornado-container::before {
+        left: 0;
+        transform: translateX(0);
+    }
+    .tornado-item, .tornado-item.reverse {
+        transform: perspective(1200px) rotateY(15deg) translateZ(50px) translateX(-20px) scale(0.95);
+    }
+    .tornado-item.visible, .tornado-item.reverse.visible {
+        transform: perspective(1200px) rotateY(0deg) translateZ(0) translateX(0) scale(1);
+    }
+}

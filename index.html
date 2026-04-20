@@ -506,6 +506,50 @@
     }
     .footer-links a:hover { color: var(--teal-lt); }
 
+    /* ─────────────── DOJO CTA ─────────────── */
+    .dojo-cta {
+      text-align: center;
+      margin: 2.5rem 0 0.5rem;
+    }
+    .dojo-cta-btn {
+      display: inline-block;
+      font-size: 1rem;
+      padding: 1rem 2.5rem;
+    }
+    .dojo-cta-note {
+      font-family: var(--font-mono);
+      font-size: 0.75rem; letter-spacing: 0.08em;
+      color: var(--ink-lite);
+      margin-top: 0.75rem;
+    }
+
+    /* ─────────────── CLICKABLE PIPE & CARD ─────────────── */
+    .pipe-step--link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .pipe-step--link:hover {
+      background: var(--bg-alt);
+      box-shadow: inset 0 -3px 0 var(--teal);
+    }
+    .pipe-step--link:hover .pipe-title { color: var(--teal); }
+    .feature-card--link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-top-color 0.2s;
+    }
+    .feature-card--link:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px var(--shadow);
+      border-top-color: var(--teal);
+    }
+    .feature-card--link:hover .feature-title { color: var(--teal); }
+
     /* ─────────────── REVEAL ANIMATION ─────────────── */
     .reveal {
       opacity: 0; transform: translateY(20px);
@@ -665,65 +709,75 @@
       </div>
 
       <div class="pipeline reveal">
-        <div class="pipe-step">
+        <a class="pipe-step pipe-step--link" href="dojo.html#stage0">
           <div class="pipe-num">01</div>
           <div class="pipe-title" data-en>Research Question</div>
           <div class="pipe-title" data-ja style="display:none">研究問いの入力</div>
           <div class="pipe-body" data-en>Input your topic and keywords at Stage 0</div>
           <div class="pipe-body" data-ja style="display:none">Stage 0でテーマ・キーワードを入力</div>
-        </div>
-        <div class="pipe-step">
+        </a>
+        <a class="pipe-step pipe-step--link" href="dojo.html#structure">
           <div class="pipe-num">02</div>
           <div class="pipe-title" data-en>C4 Structuring</div>
           <div class="pipe-title" data-ja style="display:none">C4構造化</div>
           <div class="pipe-body" data-en>AI generates L1–L4 PlantUML diagrams automatically</div>
           <div class="pipe-body" data-ja style="display:none">AIがL1〜L4 PlantUML図を自動生成</div>
-        </div>
-        <div class="pipe-step">
+        </a>
+        <a class="pipe-step pipe-step--link" href="dojo.html#write">
           <div class="pipe-num">03</div>
           <div class="pipe-title" data-en>7R Prompting</div>
           <div class="pipe-title" data-ja style="display:none">7Rプロンプト</div>
           <div class="pipe-body" data-en>Iterative refinement through 7 structured prompts</div>
           <div class="pipe-body" data-ja style="display:none">7つの構造化プロンプトで反復改良</div>
-        </div>
-        <div class="pipe-step">
+        </a>
+        <a class="pipe-step pipe-step--link" href="dojo.html#submit">
           <div class="pipe-num">04</div>
           <div class="pipe-title" data-en>Manuscript Output</div>
           <div class="pipe-title" data-ja style="display:none">原稿出力</div>
           <div class="pipe-body" data-en>Word / PDF ready for journal submission</div>
           <div class="pipe-body" data-ja style="display:none">学術誌投稿用Word / PDFで出力</div>
-        </div>
+        </a>
+      </div>
+
+      <!-- CTA to dojo -->
+      <div class="dojo-cta reveal">
+        <a href="dojo.html" class="btn-primary dojo-cta-btn">
+          <span data-en>→ Open Thesis Dojo — Start Stage 0</span>
+          <span data-ja style="display:none">→ 論文道場を開く — Stage 0 入力スタート</span>
+        </a>
+        <p class="dojo-cta-note" data-en>Free to use · No account required · Runs in your browser</p>
+        <p class="dojo-cta-note" data-ja style="display:none">無料 · アカウント不要 · ブラウザで完結</p>
       </div>
 
       <div class="dojo-features reveal">
-        <div class="feature-card">
+        <a class="feature-card feature-card--link" href="dojo.html#stage0">
           <div class="feature-icon">⬡</div>
           <div class="feature-title" data-en>Wellbeing Writing</div>
           <div class="feature-title" data-ja style="display:none">ウェルビーイング執筆</div>
           <div class="feature-body" data-en>Minimal input burden — designed for sustainable academic practice</div>
           <div class="feature-body" data-ja style="display:none">入力負荷を最小化した、持続可能な論文執筆設計</div>
-        </div>
-        <div class="feature-card">
+        </a>
+        <a class="feature-card feature-card--link" href="dojo.html#c4uml">
           <div class="feature-icon">◈</div>
           <div class="feature-title" data-en>PlantUML Diagrams</div>
           <div class="feature-title" data-ja style="display:none">PlantUML自動図解</div>
           <div class="feature-body" data-en>Auto-generated C4 architecture diagrams embedded in your manuscript</div>
           <div class="feature-body" data-ja style="display:none">C4図を自動生成し論文に直接埋め込み</div>
-        </div>
-        <div class="feature-card">
+        </a>
+        <a class="feature-card feature-card--link" href="dojo.html#formats">
           <div class="feature-icon">✦</div>
           <div class="feature-title" data-en>Multi-format Export</div>
           <div class="feature-title" data-ja style="display:none">マルチ形式エクスポート</div>
           <div class="feature-body" data-en>IEEE / ACM / 感性工学会 templates ready for direct submission</div>
           <div class="feature-body" data-ja style="display:none">IEEE / ACM / 感性工学会 形式に対応した直接投稿テンプレート</div>
-        </div>
-        <div class="feature-card">
+        </a>
+        <a class="feature-card feature-card--link" href="dojo.html#write">
           <div class="feature-icon">⬟</div>
           <div class="feature-title" data-en>Claude API Powered</div>
           <div class="feature-title" data-ja style="display:none">Claude API連携</div>
           <div class="feature-body" data-en>Cloudflare Workers backend with D1 usage logging</div>
           <div class="feature-body" data-ja style="display:none">Cloudflare WorkersバックエンドとD1使用ログ</div>
-        </div>
+        </a>
       </div>
     </div>
   </section>

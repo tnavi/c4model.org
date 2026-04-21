@@ -584,7 +584,13 @@
 
   <!-- ═══════════ NAV ═══════════ -->
   <nav>
-    <a href="/" class="nav-logo">c4model.org</a>
+    <div class="nav-left" style="display:flex; align-items:center; gap:1.25rem;">
+      <div class="lang-toggle">
+        <button class="lang-btn active" data-lang="ja" onclick="setLang('ja')">日本語</button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+      </div>
+      <a href="/" class="nav-logo">c4model.org</a>
+    </div>
     <ul class="nav-links">
       <li><a href="#concept">Concept</a></li>
       <li><a href="#dojo">Thesis Dojo</a></li>
@@ -592,10 +598,6 @@
       <li><a href="#org">Contact</a></li>
     </ul>
     <div class="nav-right">
-      <div class="lang-toggle">
-        <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" data-lang="ja" onclick="setLang('ja')">日本語</button>
-      </div>
       <a href="#org" class="nav-cta">Contact</a>
     </div>
   </nav>
@@ -929,10 +931,22 @@
 
         <!-- Right: Contact box -->
         <div>
+          <div class="contact-box" style="margin-bottom:1.5rem; border-top: 2px solid var(--gold);">
+            <h3 data-en style="display:none">📣 Monitors Wanted!</h3>
+            <h3 data-ja>📣 モニター・協力者 募集中！</h3>
+            <p class="contact-info-note" data-en style="display:none">
+              <strong>Ronbun Dojo</strong> is currently recruiting test monitors and system collaborators. Help us improve Japan's academic information distribution through Zotero / SIST 02 testing and PlantUML feedback!
+            </p>
+            <p class="contact-info-note" data-ja>
+              <strong>Ronbun Dojo（論文道場）</strong>は現在、<strong>モニターおよびシステム協力者</strong>を広く募集しています。<br><br>
+              Zotero連携（SIST 02形式）やPlantUMLの改善を通じ、学術情報流通のDXにご協力いただける大学院生・教員・研究者の方はぜひご連絡ください。
+            </p>
+          </div>
+
           <div class="contact-box">
-            <h3 data-en>Get in Touch</h3>
-            <h3 data-ja style="display:none">お問い合わせ</h3>
-            <p class="contact-info-note" data-en>
+            <h3 data-en style="display:none">Get in Touch</h3>
+            <h3 data-ja>お問い合わせ</h3>
+            <p class="contact-info-note" data-en style="display:none">
               For research collaboration, grant inquiries (ものづくり補助金 / JST A-STEP), academic partnerships, or Thesis Dojo access requests, please contact us via email.
             </p>
             <p class="contact-info-note" data-ja style="display:none">
@@ -989,7 +1003,7 @@
       document.documentElement.lang = lang === 'ja' ? 'ja' : 'en';
       localStorage.setItem('c4-lang', lang);
     }
-    setLang(localStorage.getItem('c4-lang') || 'en');
+    setLang(localStorage.getItem('c4-lang') || 'ja');
 
     /* ── Scroll reveal ── */
     const observer = new IntersectionObserver(

@@ -4,8 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>論文道場 — Academic Paper Dojo | c4model.org</title>
-  <meta name="description" content="C4モデル×Claude AIによる学術論文執筆支援システム。Stage 0から投稿まで一貫サポート。">
+  <meta name="description" content="C4モデル×Claude AIによる学術論文執筆支援システム。Stage 0から投稿まで一貫サポート。本ページはZoteroとの技術的連携により、正確な書誌情報の抽出に対応しています。">
   <link rel="canonical" href="https://c4model.org/dojo.html">
+
+  <!-- Citation / Zotero metadata -->
+  <meta name="citation_title" content="論文道場：AI駆動型学術執筆インフラの構築">
+  <meta name="citation_author" content="Okumura, Osamu">
+  <meta name="citation_author" content="Nakanishi, Kamon">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_journal_title" content="c4model.org - 論文道場">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -396,7 +403,7 @@
           <div class="form-row">
             <div class="form-group">
               <label for="f-journal">投稿先ジャーナル・学会</label>
-              <input type="text" id="f-journal" placeholder="例：感性工学会 / IEEE Access">
+              <input type="text" id="f-journal" placeholder="例：ResearchGate.net / IEEE Access">
             </div>
             <div class="form-group">
               <label for="f-language">執筆言語 <span class="req">*</span></label>
@@ -411,7 +418,6 @@
           <div class="form-group full">
             <label>投稿フォーマット <span class="req">*</span></label>
             <div class="format-grid" id="format-grid">
-              <label class="format-option"><input type="radio" name="format" value="感性工学会" onchange="recalc()"><span>感性工学会</span></label>
               <label class="format-option"><input type="radio" name="format" value="情報処理学会" onchange="recalc()"><span>情報処理学会</span></label>
               <label class="format-option"><input type="radio" name="format" value="IEEE" onchange="recalc()"><span>IEEE</span></label>
               <label class="format-option"><input type="radio" name="format" value="ACM" onchange="recalc()"><span>ACM</span></label>
@@ -421,7 +427,7 @@
           </div>
           <div class="form-group full">
             <label for="f-keywords">キーワード（カンマ区切り）<span class="req">*</span></label>
-            <input type="text" id="f-keywords" placeholder="例：C4モデル, 俳句, 感性工学, PlantUML" oninput="recalc()">
+            <input type="text" id="f-keywords" placeholder="例：C4モデル, 俳句, PlantUML, 構造分析" oninput="recalc()">
           </div>
         </div>
       </div>
@@ -669,19 +675,124 @@ Rel(d, p, "図コード送信")
       <div class="page-header">
         <div class="page-stage-tag">TOOLS · 学会フォーマット集</div>
         <h1 class="page-h1">国際フォーマット規程</h1>
-        <p class="page-desc">主要な学会・ジャーナルの投稿規程まとめです。</p>
+        <p class="page-desc">主要な学会・ジャーナルの投稿規程まとめです。実際の投稿前は必ず各学会の公式サイトで最新版を確認してください。</p>
       </div>
+
+      <!-- 概要テーブル -->
       <table class="formats-table">
         <tr>
           <th>学会・誌名</th><th>言語</th><th>字数/頁数</th><th>書式</th><th>締切パターン</th>
         </tr>
-        <tr><td>感性工学会</td><td>日本語/英語</td><td>4〜8頁</td><td>2段組・A4</td><td>年2〜3回</td></tr>
+        <tr><td><strong>日本図書館情報学会（JSLIS）</strong></td><td>日本語・英語</td><td>刷り上がり10頁以内</td><td>2段組・A4</td><td>年2回</td></tr>
         <tr><td>情報処理学会</td><td>日本語</td><td>4〜8頁</td><td>2段組・A4</td><td>随時</td></tr>
         <tr><td>IEEE Access</td><td>English</td><td>無制限</td><td>IEEE style</td><td>Rolling</td></tr>
         <tr><td>ACM Digital Library</td><td>English</td><td>8〜12頁</td><td>ACM style</td><td>Conference</td></tr>
         <tr><td>卒業論文</td><td>日本語</td><td>20,000字〜</td><td>大学指定</td><td>1月〜2月</td></tr>
         <tr><td>修士論文</td><td>日本語/英語</td><td>40,000字〜</td><td>大学指定</td><td>1月〜2月</td></tr>
       </table>
+
+      <!-- JSLIS 詳細規約 -->
+      <div class="stage-card" style="margin-top:2rem; border-left-color:var(--teal);">
+        <h3 style="margin-bottom:0.75rem;">📚 日本図書館情報学会（JSLIS）論文作成規約</h3>
+        <p style="font-size:0.82rem;color:var(--ink-lite);margin-bottom:1.25rem;">
+          機関誌『図書館情報学』等への投稿規約の重要ポイント。<br>
+          ※ 実際の投稿時は必ず <strong>JSLIS公式サイト</strong> の最新版を確認してください。
+        </p>
+
+        <!-- 1. 構成要素 -->
+        <div style="margin-bottom:1.5rem;">
+          <div style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;color:var(--teal);margin-bottom:0.6rem;">1 · 構成要素と順序</div>
+          <table class="formats-table">
+            <tr><th>要素</th><th>内容・規定</th></tr>
+            <tr><td>表題（タイトル）</td><td>和文および英文</td></tr>
+            <tr><td>著者名</td><td>和文および英文、所属機関を併記</td></tr>
+            <tr><td>抄録（Abstract）</td><td>和文：400〜600字程度 ／ 英文：200〜300語程度</td></tr>
+            <tr><td>キーワード</td><td>和文および英文、通常5語以内</td></tr>
+            <tr><td>本文</td><td>序論 → 方法 → 結果 → 考察 → 結論</td></tr>
+            <tr><td>注（Notes）</td><td>本文中の補足説明</td></tr>
+            <tr><td>引用文献（References）</td><td>本文中で引用した資料のリスト</td></tr>
+            <tr><td>付録（Appendix）</td><td>必要に応じて</td></tr>
+          </table>
+        </div>
+
+        <!-- 2. 基本ルール -->
+        <div style="margin-bottom:1.5rem;">
+          <div style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;color:var(--teal);margin-bottom:0.6rem;">2 · 執筆上の基本ルール</div>
+          <table class="formats-table">
+            <tr><th>項目</th><th>規定</th></tr>
+            <tr><td>使用言語</td><td>日本語または英語</td></tr>
+            <tr><td>分量</td><td>刷り上がりで原則 <strong>10ページ以内</strong>（図表含む）</td></tr>
+            <tr><td>表記</td><td>常用漢字・現代仮名遣い、数字は算用数字（アラビア数字）</td></tr>
+            <tr><td>図（Figure）</td><td>通し番号を振り本文中で言及、タイトルは図の<strong>下</strong></td></tr>
+            <tr><td>表（Table）</td><td>通し番号を振り本文中で言及、タイトルは表の<strong>上</strong></td></tr>
+          </table>
+        </div>
+
+        <!-- 3. 引用・参考文献 -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;color:var(--teal);margin-bottom:0.6rem;">3 · 引用・参考文献の書き方（SIST 02準拠）</div>
+          <table class="formats-table" style="margin-bottom:0.75rem;">
+            <tr><th>項目</th><th>規定・例</th></tr>
+            <tr><td>本文中の引用形式</td><td>著者名・年号形式<br>例：田中（2023）が指摘している　／　（田中, 2023, p. 45）</td></tr>
+            <tr><td>参考文献リストの配列</td><td>著者名の五十音順（またはアルファベット順）</td></tr>
+            <tr><td>準拠規格</td><td>科学技術情報流通基準（SIST 02）</td></tr>
+          </table>
+        </div>
+
+        <!-- 4. SIST 02 詳細 -->
+        <div style="margin-top:1.25rem;">
+          <div style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;color:var(--teal);margin-bottom:0.6rem;">4 · SIST 02 基本構成と記述ルール</div>
+
+          <!-- 基本形 -->
+          <div class="prompt-box" style="font-size:0.78rem;margin-bottom:1rem;">【基本形】
+著者名. 論文名. 誌名. 出版年, 巻, 号, p. 始ページ-終ページ.</div>
+
+          <!-- 記述のポイント -->
+          <table class="formats-table" style="margin-bottom:1rem;">
+            <tr><th>要素</th><th>記述ルール</th></tr>
+            <tr><td>著者名</td><td>3名までは全員記述。4名以上は「ほか」または「et al.」で省略可</td></tr>
+            <tr><td>出版年</td><td>西暦を使用</td></tr>
+            <tr><td>ページ数（雑誌）</td><td>p. 123-130 のように記述</td></tr>
+            <tr><td>ページ数（図書の一部）</td><td>pp. 45-60 のように記述</td></tr>
+          </table>
+
+          <!-- ケース別記述例 -->
+          <div style="font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.08em;color:var(--ink-mid);margin-bottom:0.5rem;">【ケース別 記述例】</div>
+          <div class="prompt-box" style="font-size:0.76rem;margin-bottom:1rem;">① 雑誌論文（ジャーナル）
+  佐藤次郎. 公共図書館における電子書籍の利用動向. 図書館情報学. 2024, 70(1), p. 10-25.
+
+② 単行本（図書）
+  田中一郎. デジタルアーカイブの構築. 第2版, 学会出版, 2022, 250p.
+
+③ 図書の一部分（編著書の1章）
+  鈴木花子. "第3章 情報検索の歴史". 現代の情報学. 山田太郎編. 知識社, 2023, p. 55-80.
+
+④ ウェブサイト（参照日を必ず記載）
+  日本図書館情報学会. "研究大会の案内".
+  http://www.jslis.jp/events/ , (参照 2026-04-21).</div>
+
+          <!-- 区切り記号ルール -->
+          <table class="formats-table" style="margin-bottom:1rem;">
+            <tr><th>記号</th><th>用途</th><th>例</th></tr>
+            <tr><td>ピリオド（.）</td><td>著者名・論文名・誌名など<strong>大きな項目の区切り</strong></td><td>佐藤次郎. 論文名. 誌名.</td></tr>
+            <tr><td>カンマ（,）</td><td>出版年・巻・号・ページなど<strong>出版事項内の詳細の区切り</strong></td><td>2024, 70(1), p. 10-25.</td></tr>
+          </table>
+
+          <!-- 執筆ヒント -->
+          <div style="background:var(--bg-alt);border:1px solid var(--border-lt);border-left:3px solid var(--gold);padding:0.9rem 1.1rem;font-size:0.84rem;">
+            <strong>💡 執筆ヒント：本文引用との連動</strong><br>
+            <span style="color:var(--ink-mid);">
+            本文中で <code style="font-family:var(--font-mono);font-size:0.78rem;background:rgba(0,0,0,0.05);padding:0.1rem 0.3rem;">(佐藤, 2024)</code> と書いた場合、巻末の参考文献リストも「サ」行（五十音順）で配列する必要があります。SIST 02の形式を保ちつつ、リスト冒頭に著者名と年を置く構成が一般的です。
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- Zotero 連携ボックス -->
+      <div style="border:1px solid var(--border);padding:1.25rem 1.5rem;margin-top:2rem;font-size:0.88rem;background:var(--white);border-left:3px solid var(--teal);">
+        <p style="font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.1em;color:var(--teal);margin-bottom:0.6rem;">ZOTERO INTEGRATION</p>
+        <p style="margin-bottom:0.5rem;"><strong>【研究者・執筆者の皆様へ】</strong></p>
+        <p style="color:var(--ink-mid);line-height:1.75;">当サイト「c4model.org」および「論文道場」では、学術情報の流通を最適化するため、文献管理ソフト<strong>Zotero</strong>等との技術的連携を図っています。ブラウザのコネクタを利用することで、SIST 02形式に準拠した正確な書誌データを直接取り込むことが可能です。</p>
+      </div>
     </div>
 
     <!-- ══════ SETTINGS ══════ -->
@@ -701,11 +812,13 @@ Rel(d, p, "図コード送信")
       </div>
       <div class="stage-card" style="margin-top:1.25rem;">
         <h3>ℹ️ このアプリについて</h3>
-        <p><strong>論文道場 Academic Paper Dojo</strong><br>
+        <p><strong>Ronbun Dojo（論文道場）</strong><br>
         開発：奥村 治 / C4モデル研究会®<br>
         バックエンド：Cloudflare Workers + D1<br>
         AI：Claude API (Anthropic)<br>
         図解：PlantUML Server</p>
+        <!-- COinS: Webサービスとしての書誌メタデータ（Zotero等で取り込み可） -->
+        <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info:ofi/fmt:kev:mtx:dc&amp;rft.title=%E8%AB%96%E6%96%87%E9%81%93%E5%A0%B4%EF%BC%9AAI%E9%A7%86%E5%8B%95%E5%9E%8B%E5%AD%A6%E8%A1%93%E5%9F%B7%E7%AD%86%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9&amp;rft.creator=Okumura%2C%20Osamu&amp;rft.publisher=C4%20Model%20Study%20Group&amp;rft.date=2026&amp;rft.type=service&amp;rft.identifier=http%3A%2F%2Fc4model.org%2Fdojo.html"></span>
       </div>
     </div>
 

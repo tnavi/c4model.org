@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>論文道場 電子カルテ — PBL共同研究システム | c4model.org</title>
+  <meta name="description" content="PBL型共同研究の電子カルテシステム。チーム全員の研究データを一元管理。">
+  <link rel="canonical" href="https://c4model.org/pbl-karte.html">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+  /* ═══════════════════════════════════════
+     DESIGN TOKENS — 電子カルテ×学術病院
+  ═══════════════════════════════════════ */
+  :root {
+    --white:     #FFFFFF;
+    --bg:        #F8F7F4;
+    --bg-alt:    #F0EDE6;
+    --ink:       #1A1A2E;
+    --ink-mid:   #3D3D5C;
+    --ink-lite:  #7A7A9A;
+    --gold:      #B8860B;
+    --gold-lt:   #D4A01A;
+    --teal:      #1A7A8A;
+    --teal-lt:   #2A9BAD;
+    --sage:      #3A6A4A;
+    --sage-lt:   #5A9A6A;
+    --red:       #B83030;
+    --red-lt:    #D45050;
+    --purple:    #6A3A9A;
+    --orange:    #B8600B;
+    --border:    #D4D0C8;
+    --border-lt: #E8E4DC;
+    --shadow:    rgba(26,26,46,0.10);
+    --font-display:'Fraunces',Georgia,serif;
+    --font-mono:   'DM Mono','Courier New',monospace;
+    --font-body:   'Source Serif 4',Georgia,serif;
+
+    /* 科（Department）カラー */
+    --dept-s0:   #B8860B;   /* Stage 0  — 入院受付（ゴールド）*/
+    --dept-s1:   #1A7A8A;   /* Stage I  — 内科（ティール）*/
+    --dept-s2:   #3A6A4A;   /* Stage II — 外科（セージ）*/
+    --dept-s3:   #6A3A9A;   /* Stage III— 神経科（パープル）*/
+    --dept-s4:   #B8600B;   /* Stage IV — 検査科（オレンジ）*/
+    --dept-s5:   #1A5A8A;   /* Stage V  — リハビリ（ブルー）*/
+    --dept-s6:   #8A1A4A;   /* Stage VI — 精神科（ローズ）*/
+    --dept-s7:   #1A1A2E;   /* Stage VII— 退院判定（インク）*/
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--font-body);font-size:1rem;font-weight:600;color:var(--ink);background:var(--bg);line-height:1.75;}
+  a{color:inherit;text-decoration:none;}
+
+  /* ═══ TOP BAR ═══ */
+  .top-bar{
+    position:sticky;top:0;z-index:300;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 1.25rem;height:54px;
+    background:rgba(26,26,46,0.97);backdrop-filter:blur(8px);
+    border-bottom:2px solid var(--gold);
+    flex-wrap:wrap;gap:0.5rem;
+  }
+  .top-brand{display:flex;align-items:center;gap:1rem;}
+  .brand-logo{
+    font-family:var(--font-mono);font-size:0.82rem;font-weight:700;
+    letter-spacing:0.08em;color:rgba(255,255,255,0.6);
+  }
+  .brand-title{
+    font-family:var(--font-display);font-size:1rem;font-weight:900;
+    color:var(--gold);letter-spacing:0.02em;
+  }
+  .brand-sub{
+    font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.1em;
+    color:rgba(255,255,255,0.4);
+  }
+  .top-actions{display:flex;align-items:center;gap:0.6rem;}
+  .btn-top{
+    font-family:var(--font-mono);font-size:0.72rem;font-weight:700;
+    letter-spacing:0.06em;padding:0.3rem 0.85rem;
+    border:1px solid rgba(255,255,255,0.2);background:transparent;
+    color:rgba(255,255,255,0.6);cursor:pointer;transition:all 0.2s;
+  }
+  .btn-top:hover{border-color:var(--gold);color:var(--gold);}
+  .btn-top.active{background:var(--gold);color:var(--ink);border-color:var(--gold);}
+
+  /* ═══ 3 PANEL LAYOUT ═══ */
+  .karte-layout{
+    display:grid;
+    grid-template-columns:200px 1fr 280px;
+    min-height:calc(100vh - 54px);
+  }
+
+  /* ═══ LEFT: 診療科ナビ ═══ */
+  .dept-nav{
+    background:var(--ink);
+    padding:1rem 0;
+    position:sticky;top:54px;
+    height:calc(100vh - 54px);
+    overflow-y:auto;
+  }
+  .dept-nav-title{
+    font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.16em;
+    color:rgba(255,255,255,0.25);padding:0 1rem 0.6rem;text-transform:uppercase;
+  }
+  .dept-btn{
+    display:flex;align-items:center;gap:0.5rem;
+    width:100%;padding:0.55rem 1rem;background:none;border:none;
+    font-family:var(--font-mono);font-size:0.73rem;font-weight:700;
+    letter-spacing:0.03em;color:rgba(255,255,255,0.45);
+    cursor:pointer;transition:all 0.15s;text-align:left;
+  }
+  .dept-btn:hover{color:var(--bg);background:rgba(255,255,255,0.06);}
+  .dept-btn.active{
+    color:var(--ink);background:var(--gold);
+    border-left:none;font-weight:800;
+  }
+  .dept-icon{font-size:0.9rem;flex-shrink:0;}
+  .dept-badge{
+    margin-left:auto;font-size:0.6rem;padding:0.1rem 0.4rem;
+    border-radius:1px;background:rgba(255,255,255,0.12);
+    color:rgba(255,255,255,0.4);font-weight:700;
+  }
+  .dept-btn.active .dept-badge{background:rgba(26,26,46,0.2);color:var(--ink-mid);}
+  .dept-divider{border:none;border-top:1px solid rgba(255,255,255,0.08);margin:0.5rem 1rem;}
+
+  /* ═══ CENTER: カルテ本体 ═══ */
+  .karte-main{padding:1.75rem 2rem 5rem;overflow-y:auto;}
+  .dept-panel{display:none;}
+  .dept-panel.active{display:block;}
+
+  /* カルテヘッダー */
+  .karte-head{
+    display:flex;align-items:flex-start;justify-content:space-between;
+    margin-bottom:1.5rem;padding-bottom:1rem;
+    border-bottom:2px solid var(--border);gap:1rem;flex-wrap:wrap;
+  }
+  .karte-dept-tag{
+    font-family:var(--font-mono);font-size:0.68rem;font-weight:800;
+    letter-spacing:0.14em;text-transform:uppercase;
+    padding:0.2rem 0.7rem;border-radius:1px;
+    display:inline-block;margin-bottom:0.4rem;
+  }
+  .karte-h1{
+    font-family:var(--font-display);
+    font-size:clamp(1.4rem,2.5vw,2rem);font-weight:900;line-height:1.1;
+  }
+  .karte-desc{color:var(--ink-mid);margin-top:0.35rem;font-size:0.95rem;font-weight:600;}
+
+  /* カルテフィールド */
+  .karte-field{
+    background:var(--white);border:1.5px solid var(--border);
+    margin-bottom:1rem;
+  }
+  .karte-field-head{
+    display:flex;align-items:center;gap:0.6rem;
+    padding:0.65rem 1rem;background:var(--bg-alt);
+    border-bottom:1px solid var(--border);
+  }
+  .field-num{
+    font-family:var(--font-mono);font-size:0.65rem;font-weight:800;
+    letter-spacing:0.1em;color:var(--ink-lite);
+    border:1px solid var(--border);padding:0.1rem 0.4rem;
+  }
+  .field-label{font-family:var(--font-mono);font-size:0.8rem;font-weight:800;letter-spacing:0.06em;}
+  .field-required{color:var(--red);margin-left:0.2rem;font-size:0.8rem;}
+  .field-body{padding:1rem;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;}
+  .field-group{display:flex;flex-direction:column;gap:0.3rem;}
+  .field-group.full{grid-column:1/-1;}
+  .fl{font-family:var(--font-mono);font-size:0.72rem;font-weight:800;letter-spacing:0.07em;color:var(--ink-mid);}
+  input[type="text"],input[type="email"],textarea,select{
+    font-family:var(--font-body);font-size:0.95rem;font-weight:600;
+    color:var(--ink);background:var(--bg);
+    border:1.5px solid var(--border);padding:0.55rem 0.8rem;
+    width:100%;transition:border-color 0.2s;
+    -webkit-appearance:none;appearance:none;
+  }
+  input:focus,textarea:focus,select:focus{
+    outline:none;border-color:var(--teal);background:var(--white);
+  }
+  textarea{resize:vertical;min-height:80px;line-height:1.65;}
+  .char-ct{font-family:var(--font-mono);font-size:0.65rem;font-weight:700;
+    color:var(--ink-lite);text-align:right;margin-top:0.15rem;}
+  .char-ct.ok{color:var(--sage);}
+  .char-ct.warn{color:var(--orange);}
+  .fmt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:0.45rem;}
+  .fmt-opt{display:flex;align-items:center;gap:0.4rem;cursor:pointer;}
+  .fmt-opt input[type="radio"]{accent-color:var(--teal);}
+  .fmt-opt span{font-family:var(--font-mono);font-size:0.78rem;font-weight:700;color:var(--ink-mid);}
+  .fmt-opt:has(input:checked) span{color:var(--teal);}
+
+  /* ═══ 合意形成ゾーン ═══ */
+  .consensus-zone{
+    background:linear-gradient(135deg,rgba(26,122,138,0.06) 0%,rgba(58,106,74,0.06) 100%);
+    border:1.5px solid var(--teal);padding:1.25rem;margin-bottom:1rem;
+  }
+  .cz-title{
+    font-family:var(--font-mono);font-size:0.72rem;font-weight:800;
+    letter-spacing:0.1em;color:var(--teal);margin-bottom:0.75rem;
+  }
+  .consensus-bar{
+    display:flex;align-items:center;gap:0.75rem;margin-bottom:0.6rem;
+  }
+  .cb-name{font-family:var(--font-mono);font-size:0.72rem;font-weight:700;
+    color:var(--ink-mid);width:100px;flex-shrink:0;}
+  .cb-track{flex:1;height:8px;background:var(--border);border-radius:1px;}
+  .cb-fill{height:100%;background:var(--teal);border-radius:1px;transition:width 0.5s ease;}
+  .cb-pct{font-family:var(--font-mono);font-size:0.68rem;font-weight:800;
+    color:var(--teal);width:36px;text-align:right;}
+
+  /* ═══ メンバーカード群 ═══ */
+  .member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-bottom:1rem;}
+  .member-card{
+    background:var(--white);border:1.5px solid var(--border);
+    padding:1rem;position:relative;
+  }
+  .member-card::before{
+    content:'';position:absolute;top:0;left:0;width:4px;height:100%;
+    background:var(--mc-color,var(--teal));
+  }
+  .mc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;}
+  .mc-name{font-family:var(--font-display);font-size:1rem;font-weight:800;}
+  .mc-role{font-family:var(--font-mono);font-size:0.65rem;font-weight:700;
+    letter-spacing:0.1em;padding:0.15rem 0.5rem;background:var(--bg-alt);color:var(--ink-lite);}
+  .mc-rq{font-size:0.85rem;font-weight:600;color:var(--ink-mid);
+    margin-top:0.35rem;line-height:1.5;}
+  .mc-score{display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;}
+  .mc-score-num{font-family:var(--font-display);font-size:1.4rem;font-weight:900;}
+  .mc-score-lbl{font-family:var(--font-mono);font-size:0.6rem;font-weight:700;color:var(--ink-lite);}
+  .mc-tags{display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.5rem;}
+  .mc-tag{font-family:var(--font-mono);font-size:0.6rem;font-weight:700;
+    padding:0.1rem 0.45rem;background:var(--bg-alt);color:var(--ink-lite);border:1px solid var(--border-lt);}
+  .mc-status{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .mc-status.done{background:var(--sage);}
+  .mc-status.wip{background:var(--gold);}
+  .mc-status.none{background:var(--border);}
+
+  /* ═══ スコアパネル ═══ */
+  .score-panel{
+    background:var(--ink);border:1.5px solid rgba(255,255,255,0.12);
+    padding:1rem 1.25rem;display:flex;align-items:center;gap:1.25rem;
+    flex-wrap:wrap;margin-top:1.25rem;
+    box-shadow:0 6px 24px rgba(26,26,46,0.2);
+  }
+  .sp-num{font-family:var(--font-display);font-size:2rem;font-weight:900;line-height:1;}
+  .sp-num.pass{color:var(--gold);}
+  .sp-num.fail{color:rgba(255,255,255,0.3);}
+  .sp-lbl{font-family:var(--font-mono);font-size:0.6rem;font-weight:700;
+    letter-spacing:0.1em;color:rgba(255,255,255,0.35);margin-top:0.1rem;}
+  .sp-bars{display:flex;gap:0.35rem;flex:1;flex-wrap:wrap;}
+  .spb{flex:1;min-width:60px;}
+  .spb-l{font-family:var(--font-mono);font-size:0.58rem;font-weight:700;
+    color:rgba(255,255,255,0.35);margin-bottom:0.18rem;}
+  .spb-t{height:5px;background:rgba(255,255,255,0.1);border-radius:1px;}
+  .spb-f{height:100%;background:var(--gold);border-radius:1px;transition:width 0.4s ease;}
+  .btn-admit{
+    font-family:var(--font-mono);font-size:0.82rem;font-weight:800;
+    letter-spacing:0.08em;padding:0.7rem 1.5rem;
+    background:var(--gold);color:var(--ink);border:none;cursor:pointer;
+    transition:all 0.2s;white-space:nowrap;
+  }
+  .btn-admit:hover{background:var(--gold-lt);}
+  .btn-admit:disabled{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);cursor:not-allowed;}
+  .sp-msg{font-family:var(--font-mono);font-size:0.68rem;font-weight:700;
+    color:rgba(255,255,255,0.45);flex-basis:100%;}
+
+  /* ═══ プロンプトボックス ═══ */
+  .prompt-card{
+    background:var(--white);border:1.5px solid var(--border);
+    border-left:4px solid var(--teal);margin-bottom:1rem;
+  }
+  .pc-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0.65rem 1rem;background:var(--bg-alt);border-bottom:1px solid var(--border);
+  }
+  .pc-label{font-family:var(--font-mono);font-size:0.75rem;font-weight:800;letter-spacing:0.08em;}
+  .pc-actions{display:flex;gap:0.4rem;}
+  .btn-sm{
+    font-family:var(--font-mono);font-size:0.68rem;font-weight:700;
+    letter-spacing:0.05em;padding:0.28rem 0.7rem;cursor:pointer;transition:all 0.18s;
+  }
+  .btn-sm.primary{background:var(--ink);color:var(--bg);border:none;}
+  .btn-sm.primary:hover{background:var(--teal);}
+  .btn-sm.outline{background:transparent;color:var(--ink-mid);border:1px solid var(--border);}
+  .btn-sm.outline:hover{border-color:var(--teal);color:var(--teal);}
+  .prompt-ta{
+    width:100%;font-family:var(--font-mono);font-size:0.8rem;font-weight:600;
+    line-height:1.7;color:var(--ink-mid);background:var(--bg);
+    border:none;border-top:1px solid var(--border-lt);
+    padding:1rem;resize:vertical;min-height:120px;
+  }
+  .prompt-ta:focus{outline:none;background:var(--white);}
+
+  /* ═══ チェックリスト ═══ */
+  .cl-item{
+    display:flex;gap:0.6rem;align-items:flex-start;
+    font-size:0.92rem;font-weight:700;cursor:pointer;
+    font-family:var(--font-body);line-height:1.5;padding:0.35rem 0;
+    border-bottom:1px solid var(--border-lt);
+  }
+  .cl-item:last-child{border-bottom:none;}
+  .cl-item input[type="checkbox"]{accent-color:var(--teal);width:17px;height:17px;flex-shrink:0;margin-top:2px;}
+
+  /* ═══ RIGHT: ダッシュボード ═══ */
+  .karte-dash{
+    background:var(--ink);
+    padding:1.25rem;
+    position:sticky;top:54px;
+    height:calc(100vh - 54px);
+    overflow-y:auto;border-left:1px solid rgba(255,255,255,0.08);
+  }
+  .dash-title{
+    font-family:var(--font-mono);font-size:0.65rem;font-weight:800;
+    letter-spacing:0.14em;color:var(--gold);text-transform:uppercase;
+    padding-bottom:0.75rem;border-bottom:1px solid rgba(255,255,255,0.1);
+    margin-bottom:1rem;
+  }
+
+  /* プロジェクト情報 */
+  .proj-info{margin-bottom:1.25rem;}
+  .proj-name{font-family:var(--font-display);font-size:1.1rem;font-weight:900;color:var(--bg);margin-bottom:0.2rem;}
+  .proj-id{font-family:var(--font-mono);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;color:rgba(255,255,255,0.3);}
+  .proj-meta{margin-top:0.5rem;display:grid;gap:0.3rem;}
+  .pm-row{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:0.68rem;font-weight:700;}
+  .pm-key{color:rgba(255,255,255,0.35);}
+  .pm-val{color:rgba(255,255,255,0.65);}
+
+  /* 進捗ビジュアル */
+  .stage-progress{margin-bottom:1.25rem;}
+  .sp-title{font-family:var(--font-mono);font-size:0.6rem;font-weight:800;
+    letter-spacing:0.12em;color:rgba(255,255,255,0.3);margin-bottom:0.6rem;text-transform:uppercase;}
+  .stage-row{
+    display:flex;align-items:center;gap:0.5rem;
+    padding:0.3rem 0;border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .sr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .sr-name{font-family:var(--font-mono);font-size:0.68rem;font-weight:700;
+    color:rgba(255,255,255,0.45);flex:1;}
+  .sr-pct{font-family:var(--font-mono);font-size:0.65rem;font-weight:800;
+    color:rgba(255,255,255,0.35);}
+
+  /* メンバーリスト */
+  .member-list{margin-bottom:1.25rem;}
+  .ml-item{
+    display:flex;align-items:center;gap:0.5rem;
+    padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .ml-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .ml-name{font-family:var(--font-mono);font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.6);flex:1;}
+  .ml-stage{font-family:var(--font-mono);font-size:0.6rem;font-weight:700;
+    color:rgba(255,255,255,0.3);padding:0.1rem 0.4rem;background:rgba(255,255,255,0.06);}
+
+  /* アクションパネル */
+  .dash-actions{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.25rem;}
+  .btn-dash{
+    font-family:var(--font-mono);font-size:0.72rem;font-weight:800;
+    letter-spacing:0.06em;padding:0.55rem 0.85rem;cursor:pointer;transition:all 0.2s;
+    text-align:left;border:none;
+  }
+  .btn-dash.primary{background:var(--gold);color:var(--ink);}
+  .btn-dash.primary:hover{background:var(--gold-lt);}
+  .btn-dash.outline{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);
+    border:1px solid rgba(255,255,255,0.15);}
+  .btn-dash.outline:hover{border-color:var(--gold);color:var(--gold);}
+  .btn-dash.danger{background:rgba(184,48,48,0.15);color:var(--red-lt);
+    border:1px solid rgba(184,48,48,0.3);}
+  .btn-dash.danger:hover{background:rgba(184,48,48,0.3);}
+
+  /* 合意率メーター */
+  .consensus-meter{
+    background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+    padding:0.85rem;margin-bottom:1.25rem;
+  }
+  .cm-title{font-family:var(--font-mono);font-size:0.6rem;font-weight:800;
+    letter-spacing:0.12em;color:var(--teal-lt);margin-bottom:0.6rem;text-transform:uppercase;}
+  .cm-big{font-family:var(--font-display);font-size:2.4rem;font-weight:900;
+    color:var(--gold);line-height:1;}
+  .cm-sub{font-family:var(--font-mono);font-size:0.6rem;font-weight:700;
+    color:rgba(255,255,255,0.3);margin-top:0.2rem;}
+  .cm-bar{height:6px;background:rgba(255,255,255,0.1);border-radius:1px;margin-top:0.6rem;}
+  .cm-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));
+    border-radius:1px;transition:width 0.8s ease;}
+
+  /* ═══ ACTION BAR ═══ */
+  .action-bar{display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1.25rem;}
+  .btn-act{
+    font-family:var(--font-mono);font-size:0.75rem;font-weight:800;
+    letter-spacing:0.06em;padding:0.5rem 1rem;cursor:pointer;transition:all 0.2s;
+  }
+  .btn-act.primary{background:var(--ink);color:var(--bg);border:1.5px solid var(--ink);}
+  .btn-act.primary:hover{background:var(--teal);border-color:var(--teal);}
+  .btn-act.outline{background:var(--white);color:var(--ink-mid);border:1.5px solid var(--border);}
+  .btn-act.outline:hover{border-color:var(--teal);color:var(--teal);}
+  .btn-act.gold{background:var(--gold);color:var(--white);border:1.5px solid var(--gold);}
+  .btn-act.gold:hover{background:var(--gold-lt);}
+  .btn-act.danger{background:transparent;color:var(--red);border:1.5px solid var(--red);}
+
+  /* ═══ SECTION LABELS ═══ */
+  .sect-label{
+    display:inline-block;font-family:var(--font-mono);font-size:0.68rem;font-weight:800;
+    letter-spacing:0.1em;padding:0.2rem 0.7rem;margin-bottom:0.6rem;
+    box-shadow:2px 2px 0 rgba(0,0,0,0.1);
+  }
+  .sl-gold{background:#FFF3CC;color:var(--gold);border:1px solid #E8C84A;}
+  .sl-teal{background:#D4F0F4;color:var(--teal);border:1px solid #7ECAD4;}
+  .sl-sage{background:#D8F0DC;color:var(--sage);border:1px solid #7EC48A;}
+  .sl-purple{background:#EDD8F8;color:var(--purple);border:1px solid #B87AE0;}
+  .sl-red{background:#FAE0DC;color:var(--red);border:1px solid #E89080;}
+  .sl-orange{background:#FAEACC;color:var(--orange);border:1px solid #E0A050;}
+  .sl-ink{background:#E0E0EC;color:var(--ink);border:1px solid #9090B0;}
+  .sl-blue{background:#D0E8F8;color:#1A5A8A;border:1px solid #80B8E0;}
+
+  /* ═══ TABLE ═══ */
+  .karte-table{width:100%;border-collapse:collapse;font-size:0.88rem;margin-bottom:1rem;}
+  .karte-table th{
+    font-family:var(--font-mono);font-size:0.68rem;font-weight:800;
+    letter-spacing:0.08em;text-align:left;padding:0.55rem 0.75rem;
+    background:var(--bg-alt);border:1px solid var(--border);color:var(--ink-mid);
+  }
+  .karte-table td{padding:0.5rem 0.75rem;border:1px solid var(--border-lt);font-size:0.85rem;font-weight:600;}
+  .karte-table tr:nth-child(even) td{background:var(--bg);}
+
+  /* ═══ 出力プレビュー ═══ */
+  .preview-box{
+    background:var(--white);border:2px solid var(--teal);
+    padding:1.5rem;font-family:var(--font-mono);font-size:0.82rem;
+    font-weight:600;line-height:1.8;white-space:pre-wrap;
+    min-height:200px;max-height:500px;overflow-y:auto;
+  }
+
+  /* ═══ PRINT A4 ═══ */
+  @media print {
+    .dept-nav,.karte-dash,.top-bar{display:none!important;}
+    .karte-layout{grid-template-columns:1fr;}
+    .karte-main{padding:1cm;font-size:11pt;}
+    .dept-panel{display:block!important;page-break-after:always;}
+    .score-panel,.action-bar{display:none;}
+  }
+
+  /* ═══ RESPONSIVE ═══ */
+  @media(max-width:900px){
+    .karte-layout{grid-template-columns:1fr;}
+    .dept-nav{position:static;height:auto;display:flex;flex-wrap:wrap;padding:0.5rem;gap:0.2rem;}
+    .dept-btn{width:auto;padding:0.35rem 0.65rem;font-size:0.65rem;}
+    .dept-divider{display:none;}
+    .karte-dash{position:static;height:auto;}
+    .karte-main{padding:1.25rem 1rem;}
+    .field-row{grid-template-columns:1fr;}
+    .member-grid{grid-template-columns:1fr;}
+  }
+  </style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<header class="top-bar">
+  <div class="top-brand">
+    <div>
+      <div class="brand-logo">c4model.org</div>
+      <div class="brand-title">論文道場 電子カルテ</div>
+    </div>
+    <div class="brand-sub">PBL TEAM SCIENCE SYSTEM</div>
+  </div>
+  <div class="top-actions">
+    <button class="btn-top" onclick="window.print()">🖨 A4印刷</button>
+    <button class="btn-top" onclick="exportKarteJSON()">📥 カルテ保存</button>
+    <button class="btn-top" onclick="importKarteJSON()">📤 カルテ読込</button>
+    <button class="btn-top" onclick="exportKarteCSV()">📊 CSV集計</button>
+    <a href="dojo.html" class="btn-top">← 論文道場</a>
+    <a href="/" class="btn-top">← ホーム</a>
+  </div>
+</header>
+
+<div class="karte-layout">
+
+<!-- ═══ LEFT NAV: 診療科 ═══ -->
+<nav class="dept-nav">
+  <div class="dept-nav-title">診療科 / Departments</div>
+
+  <button class="dept-btn active" onclick="showDept('reception',this)">
+    <span class="dept-icon">🏥</span>入院受付
+    <span class="dept-badge">S0</span>
+  </button>
+  <button class="dept-btn" onclick="showDept('naika',this)">
+    <span class="dept-icon">🔬</span>内科（発想）
+    <span class="dept-badge">S1</span>
+  </button>
+  <button class="dept-btn" onclick="showDept('geka',this)">
+    <span class="dept-icon">⚙️</span>外科（構造化）
+    <span class="dept-badge">S2</span>
+  </button>
+  <button class="dept-btn" onclick="showDept('shinkei',this)">
+    <span class="dept-icon">🧠</span>神経科（執筆）
+    <span class="dept-badge">S3</span>
+  </button>
+  <button class="dept-btn" onclick="showDept('kensa',this)">
+    <span class="dept-icon">📊</span>検査科（評価）
+    <span class="dept-badge">S4</span>
+  </button>
+  <button class="dept-btn" onclick="showDept('rehab',this)">
+    <span class="dept-icon">🎤</span>リハビリ（発表）
+    <span class="dept-badge">S5</span>
+  </button>
+  <button class="dept-btn" onclick="showDept('seishin',this)">
+    <span class="dept-icon">💬</span>精神科（質疑）
+    <span class="dept-badge">S6</span>
+  </button>
+  <button class="dept-btn" onclick="showDept('taiin',this)">
+    <span class="dept-icon">🎓</span>退院判定（投稿）
+    <span class="dept-badge">S7</span>
+  </button>
+
+  <hr class="dept-divider">
+  <div class="dept-nav-title">チーム管理</div>
+  <button class="dept-btn" onclick="showDept('team',this)">
+    <span class="dept-icon">👥</span>チームカルテ
+  </button>
+  <button class="dept-btn" onclick="showDept('consensus',this)">
+    <span class="dept-icon">🤝</span>合意形成
+  </button>
+  <button class="dept-btn" onclick="showDept('output',this)">
+    <span class="dept-icon">📄</span>カルテ出力
+  </button>
+  <button class="dept-btn" onclick="showDept('settings',this)">
+    <span class="dept-icon">⚙️</span>設定・データ管理
+  </button>
+</nav>
+
+<!-- ═══ CENTER: カルテ本体 ═══ -->
+<main class="karte-main">
+
+<!-- ▼ 入院受付（Stage 0） ▼ -->
+<div class="dept-panel active" id="dept-reception">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#FFF3CC;color:var(--gold);border:1px solid #E8C84A;">🏥 入院受付 — Stage 0</div>
+      <h1 class="karte-h1">患者（研究者）基本情報カルテ</h1>
+      <p class="karte-desc">研究プロジェクトの基本情報を入力してください。これが全Stageで共有される「電子カルテ」の表紙になります。</p>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn-act primary" onclick="saveKarte()">💾 カルテ保存</button>
+    <button class="btn-act outline" onclick="loadKarte()">📂 カルテ読込</button>
+    <button class="btn-act outline" onclick="clearReception()">🗑 クリア</button>
+  </div>
+
+  <!-- プロジェクト基本情報 -->
+  <div class="karte-field">
+    <div class="karte-field-head">
+      <span class="field-num">01</span>
+      <span class="sect-label sl-gold">プロジェクト / Project</span>
+    </div>
+    <div class="field-body">
+      <div class="field-row">
+        <div class="field-group">
+          <label class="fl">プロジェクト名 <span class="field-required">*</span></label>
+          <input type="text" id="k-proj-name" placeholder="例：C4モデルによる俳句認知構造分析" oninput="recalc();updateDash()">
+        </div>
+        <div class="field-group">
+          <label class="fl">プロジェクトID</label>
+          <input type="text" id="k-proj-id" placeholder="例：PBL-2026-001（自動生成可）">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="fl">指導教員・PI（Principal Investigator）</label>
+          <input type="text" id="k-pi" placeholder="例：奥村 治（C4モデル研究会®）">
+        </div>
+        <div class="field-group">
+          <label class="fl">所属機関</label>
+          <input type="text" id="k-institution" placeholder="例：東京都立産業技術大学院大学">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="fl">開始日</label>
+          <input type="text" id="k-start-date" placeholder="2026-04-01">
+        </div>
+        <div class="field-group">
+          <label class="fl">投稿目標日</label>
+          <input type="text" id="k-target-date" placeholder="2026-12-31">
+        </div>
+      </div>
+      <div class="field-group full" style="margin-top:0.5rem;">
+        <label class="fl">投稿先・フォーマット <span class="field-required">*</span></label>
+        <div class="fmt-grid">
+          <label class="fmt-opt"><input type="radio" name="k-fmt" value="情報処理学会" onchange="recalc()"><span>情報処理学会</span></label>
+          <label class="fmt-opt"><input type="radio" name="k-fmt" value="日本図書館情報学会" onchange="recalc()"><span>日本図書館情報学会</span></label>
+          <label class="fmt-opt"><input type="radio" name="k-fmt" value="IEEE" onchange="recalc()"><span>IEEE</span></label>
+          <label class="fmt-opt"><input type="radio" name="k-fmt" value="ACM" onchange="recalc()"><span>ACM</span></label>
+          <label class="fmt-opt"><input type="radio" name="k-fmt" value="ResearchGate.net" onchange="recalc()"><span>ResearchGate.net</span></label>
+          <label class="fmt-opt"><input type="radio" name="k-fmt" value="卒論・修論" onchange="recalc()"><span>卒論・修論</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- チームメンバー登録 -->
+  <div class="karte-field">
+    <div class="karte-field-head">
+      <span class="field-num">02</span>
+      <span class="sect-label sl-teal">チームメンバー登録（最大8名）</span>
+    </div>
+    <div class="field-body">
+      <div id="member-input-zone">
+        <!-- JS生成 -->
+      </div>
+      <button class="btn-act outline" onclick="addMemberInput()" style="margin-top:0.5rem;">＋ メンバーを追加</button>
+    </div>
+  </div>
+
+  <!-- グループ共通RQ -->
+  <div class="karte-field">
+    <div class="karte-field-head">
+      <span class="field-num">03</span>
+      <span class="sect-label sl-purple">グループ共通 研究課題（Group RQ）<span class="field-required">*</span></span>
+    </div>
+    <div class="field-body">
+      <div class="field-group">
+        <label class="fl">グループ全体の研究課題（合意済みRQ）</label>
+        <textarea id="k-group-rq" rows="3" placeholder="例：C4モデルは複数の文学ジャンルにわたる認知構造の差異を体系的に可視化できるか？" oninput="recalc();updateCount('k-group-rq','cnt-grq',40)"></textarea>
+        <div class="char-ct" id="cnt-grq">0 字</div>
+      </div>
+      <div class="field-group">
+        <label class="fl">グループ共通仮説</label>
+        <textarea id="k-group-hypo" rows="2" placeholder="例：C4モデルのL1〜L4の4層分析により、各文学作品の感動メカニズムを構造的に比較できる。" oninput="recalc()"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="fl">キーワード（グループ共通）</label>
+        <input type="text" id="k-group-kw" placeholder="C4モデル, 俳句, 認知科学, PlantUML, デジタル人文学" oninput="recalc()">
+      </div>
+    </div>
+  </div>
+
+  <!-- 参考文献（共通） -->
+  <div class="karte-field">
+    <div class="karte-field-head">
+      <span class="field-num">04</span>
+      <span class="sect-label sl-orange">参考文献（グループ共有リスト）<span class="field-required">*</span></span>
+    </div>
+    <div class="field-body">
+      <div class="field-group">
+        <label class="fl">先行研究の要点</label>
+        <textarea id="k-prior" rows="4" placeholder="1. 従来の俳句分析の限界（季語・切れ字分析に依存）&#10;2. C4モデルの有効性（Simon Brown, 2018）&#10;3. デジタル人文学の動向（Distant Reading等）"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="fl">参考文献（SIST 02形式、1行1件）<span class="field-required">*</span></label>
+        <textarea id="k-refs" rows="6" placeholder="Brown, S. (2018). Software Architecture for Developers. Leanpub.&#10;復本一郎 (2019). 小林一茶. 岩波新書.&#10;Okumura, O. (2025). Schubert's Ave Maria. Humanities and Social Sciences, 13(6)." oninput="recalc();countRefs()"></textarea>
+        <div class="char-ct" id="cnt-refs">0 件（6件以上推奨）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- スコアパネル -->
+  <div class="score-panel">
+    <div>
+      <div class="sp-num fail" id="k-score-num">0</div>
+      <div class="sp-lbl">/ 30 点</div>
+    </div>
+    <div class="sp-bars">
+      <div class="spb"><div class="spb-l">RQ</div><div class="spb-t"><div class="spb-f" id="spb-rq" style="width:0%"></div></div></div>
+      <div class="spb"><div class="spb-l">メンバー</div><div class="spb-t"><div class="spb-f" id="spb-mem" style="width:0%"></div></div></div>
+      <div class="spb"><div class="spb-l">参考文献</div><div class="spb-t"><div class="spb-f" id="spb-ref" style="width:0%"></div></div></div>
+      <div class="spb"><div class="spb-l">フォーマット</div><div class="spb-t"><div class="spb-f" id="spb-fmt" style="width:0%"></div></div></div>
+      <div class="spb"><div class="spb-l">プロジェクト</div><div class="spb-t"><div class="spb-f" id="spb-proj" style="width:0%"></div></div></div>
+    </div>
+    <button class="btn-admit" id="btn-admit" disabled onclick="showDept('naika',document.querySelector('[onclick*=naika]'))">→ 入院許可（Stage I へ）</button>
+    <div class="sp-msg" id="k-score-msg">必須項目を入力してスコアを上げてください</div>
+  </div>
+</div>
+
+<!-- ▼ 内科（Stage I：発想） ▼ -->
+<div class="dept-panel" id="dept-naika">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#D4F0F4;color:var(--teal);border:1px solid #7ECAD4;">🔬 内科 — Stage I</div>
+      <h1 class="karte-h1">研究アイデア診断（発想科）</h1>
+      <p class="karte-desc">CREATEプロンプトで研究テーマを深掘り。各メンバーの個別RQを整理し、グループ共通RQとの整合性を確認します。</p>
+    </div>
+  </div>
+  <div class="prompt-card">
+    <div class="pc-head">
+      <span class="pc-label sect-label sl-teal">CREATEプロンプト（編集・コピー可）</span>
+      <div class="pc-actions">
+        <button class="btn-sm primary" onclick="copyTA('prompt-create')">📋 コピー</button>
+        <button class="btn-sm outline" onclick="regenCreate()">🔄 再生成</button>
+      </div>
+    </div>
+    <textarea class="prompt-ta" id="prompt-create" rows="12">「入院受付」を完了するとプロンプトが自動生成されます。</textarea>
+  </div>
+  <div class="prompt-card" style="border-left-color:var(--sage)">
+    <div class="pc-head">
+      <span class="pc-label sect-label sl-sage">Claude回答メモ（保存・編集可）</span>
+      <div class="pc-actions"><button class="btn-sm outline" onclick="saveKarte()">💾 保存</button></div>
+    </div>
+    <textarea class="prompt-ta" id="resp-naika" rows="8" placeholder="Claudeの回答をここに貼り付けてください…"></textarea>
+  </div>
+</div>
+
+<!-- ▼ 外科（Stage II：構造化） ▼ -->
+<div class="dept-panel" id="dept-geka">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#D8F0DC;color:var(--sage);border:1px solid #7EC48A;">⚙️ 外科 — Stage II</div>
+      <h1 class="karte-h1">C4モデル構造化（外科手術）</h1>
+      <p class="karte-desc">4層（L1〜L4）で論文の骨格を設計します。PlantUML図を生成・描画できます。</p>
+    </div>
+  </div>
+  <div id="c4-panels">
+    <!-- L1〜L4は動的生成 -->
+  </div>
+</div>
+
+<!-- ▼ 神経科（Stage III：執筆） ▼ -->
+<div class="dept-panel" id="dept-shinkei">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#EDD8F8;color:var(--purple);border:1px solid #B87AE0;">🧠 神経科 — Stage III</div>
+      <h1 class="karte-h1">7Rプロンプト執筆支援（神経外科）</h1>
+      <p class="karte-desc">7つのプロンプトで草稿から完成稿へ。各Rは編集・保存・コピー可能です。</p>
+    </div>
+  </div>
+  <div id="r-panels"><!-- JS生成 --></div>
+</div>
+
+<!-- ▼ 検査科（Stage IV：評価） ▼ -->
+<div class="dept-panel" id="dept-kensa">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#FAEACC;color:var(--orange);border:1px solid #E0A050;">📊 検査科 — Stage IV</div>
+      <h1 class="karte-h1">C4段階評価・査読模擬（検査科）</h1>
+    </div>
+  </div>
+  <div class="prompt-card" style="border-left-color:var(--orange)">
+    <div class="pc-head">
+      <span class="pc-label sect-label sl-orange">査読想定コメント生成プロンプト</span>
+      <div class="pc-actions">
+        <button class="btn-sm primary" onclick="copyTA('prompt-eval')">📋 コピー</button>
+        <button class="btn-sm outline" onclick="regenEval()">🔄 再生成</button>
+      </div>
+    </div>
+    <textarea class="prompt-ta" id="prompt-eval" rows="10">入院受付完了後に自動生成されます。</textarea>
+  </div>
+  <div style="margin-top:1rem;">
+    <div class="sect-label sl-orange">評価チェックシート</div>
+    <div class="karte-field" style="margin-top:0.5rem;">
+      <div class="field-body" style="padding:0.75rem 1rem;">
+        <label class="cl-item"><input type="checkbox"> L1 Context：社会的背景・研究の必要性が明確か</label>
+        <label class="cl-item"><input type="checkbox"> L2 Container：章立てに論理的な流れがあるか</label>
+        <label class="cl-item"><input type="checkbox"> L3 Component：各章の論点・根拠が具体的か</label>
+        <label class="cl-item"><input type="checkbox"> L4 Code：文体・接続詞・引用番号が統一されているか</label>
+        <label class="cl-item"><input type="checkbox"> RQに対して結論が明確に答えているか</label>
+        <label class="cl-item"><input type="checkbox"> 参考文献がSIST 02形式で統一されているか</label>
+        <label class="cl-item"><input type="checkbox"> 図・表に番号とキャプションが付いているか</label>
+      </div>
+    </div>
+  </div>
+  <div class="prompt-card" style="border-left-color:var(--sage)">
+    <div class="pc-head"><span class="pc-label sect-label sl-sage">査読コメント記録</span>
+      <div class="pc-actions"><button class="btn-sm outline" onclick="saveKarte()">💾 保存</button></div>
+    </div>
+    <textarea class="prompt-ta" id="resp-kensa" rows="8" placeholder="査読コメントをここに記録…"></textarea>
+  </div>
+</div>
+
+<!-- ▼ リハビリ（Stage V：発表） ▼ -->
+<div class="dept-panel" id="dept-rehab">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#D0E8F8;color:#1A5A8A;border:1px solid #80B8E0;">🎤 リハビリ科 — Stage V</div>
+      <h1 class="karte-h1">学会発表準備（リハビリ）</h1>
+    </div>
+  </div>
+  <div class="prompt-card" style="border-left-color:#1A5A8A">
+    <div class="pc-head">
+      <span class="pc-label sect-label sl-blue">スライド構成プロンプト</span>
+      <div class="pc-actions">
+        <button class="btn-sm primary" onclick="copyTA('prompt-pres')">📋 コピー</button>
+        <button class="btn-sm outline" onclick="regenPres()">🔄 再生成</button>
+      </div>
+    </div>
+    <textarea class="prompt-ta" id="prompt-pres" rows="10">入院受付完了後に自動生成されます。</textarea>
+  </div>
+  <div class="prompt-card" style="border-left-color:var(--sage)">
+    <div class="pc-head"><span class="pc-label sect-label sl-sage">発表準備メモ</span>
+      <div class="pc-actions"><button class="btn-sm outline" onclick="saveKarte()">💾 保存</button></div>
+    </div>
+    <textarea class="prompt-ta" id="resp-rehab" rows="8" placeholder="発表準備メモをここに記録…"></textarea>
+  </div>
+</div>
+
+<!-- ▼ 精神科（Stage VI：質疑） ▼ -->
+<div class="dept-panel" id="dept-seishin">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#FAE0DC;color:#8A1A4A;border:1px solid #E08080;">💬 精神科 — Stage VI</div>
+      <h1 class="karte-h1">想定質疑応答訓練（精神科）</h1>
+    </div>
+  </div>
+  <div class="prompt-card" style="border-left-color:#8A1A4A">
+    <div class="pc-head">
+      <span class="pc-label sect-label sl-red">想定質問生成プロンプト</span>
+      <div class="pc-actions">
+        <button class="btn-sm primary" onclick="copyTA('prompt-qa')">📋 コピー</button>
+        <button class="btn-sm outline" onclick="regenQA()">🔄 再生成</button>
+      </div>
+    </div>
+    <textarea class="prompt-ta" id="prompt-qa" rows="10">入院受付完了後に自動生成されます。</textarea>
+  </div>
+  <div class="prompt-card" style="border-left-color:var(--sage)">
+    <div class="pc-head"><span class="pc-label sect-label sl-sage">Q&amp;A記録</span>
+      <div class="pc-actions"><button class="btn-sm outline" onclick="saveKarte()">💾 保存</button></div>
+    </div>
+    <textarea class="prompt-ta" id="resp-seishin" rows="8" placeholder="想定Q&Aをここに記録…"></textarea>
+  </div>
+</div>
+
+<!-- ▼ 退院判定（Stage VII：投稿） ▼ -->
+<div class="dept-panel" id="dept-taiin">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#E0E0EC;color:var(--ink);border:1px solid #9090B0;">🎓 退院判定 — Stage VII</div>
+      <h1 class="karte-h1">投稿・退院判定</h1>
+    </div>
+  </div>
+  <div class="karte-field">
+    <div class="karte-field-head"><span class="sect-label sl-ink">最終投稿チェックリスト</span></div>
+    <div class="field-body" style="padding:0.75rem 1rem;">
+      <label class="cl-item"><input type="checkbox"> 著者情報・所属・連絡先が正確か</label>
+      <label class="cl-item"><input type="checkbox"> フォーマット規程（字数・書式）に準拠しているか</label>
+      <label class="cl-item"><input type="checkbox"> 参考文献がSIST 02形式で統一されているか</label>
+      <label class="cl-item"><input type="checkbox"> 要旨が和文400〜600字・英文200〜300語を満たすか</label>
+      <label class="cl-item"><input type="checkbox"> 図・表の番号・キャプションが付いているか</label>
+      <label class="cl-item"><input type="checkbox"> PlantUML図がSVG/PNG出力済みか</label>
+      <label class="cl-item"><input type="checkbox"> COinS（Zotero用メタデータ）が設定されているか</label>
+      <label class="cl-item"><input type="checkbox"> PBLメンバー全員の署名（または承認）が得られているか</label>
+    </div>
+  </div>
+  <div class="action-bar" style="margin-top:1rem;">
+    <button class="btn-act gold" onclick="showDept('output',document.querySelector('[onclick*=output]'))">📄 カルテ出力へ →</button>
+  </div>
+</div>
+
+<!-- ▼ チームカルテ ▼ -->
+<div class="dept-panel" id="dept-team">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#D4F0F4;color:var(--teal);border:1px solid #7ECAD4;">👥 チームカルテ</div>
+      <h1 class="karte-h1">メンバー別カルテ一覧</h1>
+      <p class="karte-desc">各メンバーの個別RQ・進捗・スコアを一覧表示します。JSONをインポートして集約できます。</p>
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn-act primary" onclick="importMemberJSON()">📤 メンバーJSON読込（追加）</button>
+    <button class="btn-act outline" onclick="exportKarteCSV()">📊 全員CSV出力（Excel集計）</button>
+  </div>
+  <div class="member-grid" id="member-cards-zone">
+    <div style="grid-column:1/-1;color:var(--ink-lite);font-family:var(--font-mono);font-size:0.8rem;padding:2rem;text-align:center;">
+      「入院受付」でメンバーを登録するか、<br>「メンバーJSON読込」で個別カルテを追加してください。
+    </div>
+  </div>
+
+  <!-- 全メンバー比較テーブル -->
+  <div style="margin-top:1.5rem;">
+    <div class="sect-label sl-teal">RQ比較テーブル（合意形成の基礎資料）</div>
+    <table class="karte-table" id="rq-compare-table" style="margin-top:0.5rem;">
+      <tr>
+        <th>氏名</th><th>役割</th><th>個別RQ</th><th>仮説</th><th>進捗</th>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ▼ 合意形成 ▼ -->
+<div class="dept-panel" id="dept-consensus">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#D8F0DC;color:var(--sage);border:1px solid #7EC48A;">🤝 合意形成</div>
+      <h1 class="karte-h1">論理的不一致（Logical Dislocations）の解消</h1>
+      <p class="karte-desc">メンバー間のRQ・仮説・方法論の差異を可視化し、グループ合意へ収束させます。</p>
+    </div>
+  </div>
+
+  <div class="consensus-zone">
+    <div class="cz-title">合意率メーター — CONSENSUS RATE</div>
+    <div id="consensus-bars">
+      <div style="font-family:var(--font-mono);font-size:0.78rem;color:var(--ink-lite);">メンバー登録後に自動計算されます。</div>
+    </div>
+  </div>
+
+  <div class="prompt-card" style="border-left-color:var(--sage)">
+    <div class="pc-head">
+      <span class="pc-label sect-label sl-sage">合意形成支援プロンプト（Claudeに送信）</span>
+      <div class="pc-actions">
+        <button class="btn-sm primary" onclick="copyTA('prompt-consensus')">📋 コピー</button>
+        <button class="btn-sm outline" onclick="regenConsensus()">🔄 再生成</button>
+      </div>
+    </div>
+    <textarea class="prompt-ta" id="prompt-consensus" rows="14">メンバーを登録すると、各メンバーのRQを比較し合意形成を促すプロンプトが自動生成されます。</textarea>
+  </div>
+
+  <div class="karte-field" style="margin-top:1rem;">
+    <div class="karte-field-head"><span class="sect-label sl-sage">合意形成プロセス記録</span></div>
+    <div class="field-body">
+      <div class="field-group">
+        <label class="fl">差異の整理（メンバー間の論点の違い）</label>
+        <textarea id="k-dislocation" rows="4" placeholder="例：AさんはC4モデルの定量分析を重視、BさんはDEMATEL法との統合を提案。共通点は俳句の構造分析にある。"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="fl">合意形成の結果（収束したRQ・方法論）</label>
+        <textarea id="k-agreement" rows="3" placeholder="例：合意済みRQ → C4モデルとDEMATEL法の統合による俳句認知構造の定量的比較分析"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▼ カルテ出力 ▼ -->
+<div class="dept-panel" id="dept-output">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#E0E0EC;color:var(--ink);border:1px solid #9090B0;">📄 カルテ出力</div>
+      <h1 class="karte-h1">統合カルテ出力 &amp; 清書プロンプト</h1>
+      <p class="karte-desc">全Stageのデータを統合して論文草稿プレビューを生成します。</p>
+    </div>
+  </div>
+  <div class="action-bar">
+    <button class="btn-act gold" onclick="genOutput()">🔄 統合カルテ生成</button>
+    <button class="btn-act outline" onclick="copyTA('output-preview')">📋 全文コピー</button>
+    <button class="btn-act outline" onclick="window.print()">🖨 A4印刷</button>
+    <button class="btn-act primary" onclick="exportKarteJSON()">📥 JSON保存</button>
+    <button class="btn-act outline" onclick="exportKarteCSV()">📊 CSV集計</button>
+  </div>
+  <!-- 修正ナビ -->
+  <div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-bottom:1rem;">
+    <button class="btn-act outline" onclick="showDept('reception',document.querySelector('[onclick*=reception]'))">① 基本情報修正</button>
+    <button class="btn-act outline" onclick="showDept('naika',document.querySelector('[onclick*=naika]'))">② 発想・RQ修正</button>
+    <button class="btn-act outline" onclick="showDept('geka',document.querySelector('[onclick*=geka]'))">③ C4構造修正</button>
+    <button class="btn-act outline" onclick="showDept('shinkei',document.querySelector('[onclick*=shinkei]'))">④ 執筆内容修正</button>
+    <button class="btn-act outline" onclick="showDept('consensus',document.querySelector('[onclick*=consensus]'))">⑤ 合意形成確認</button>
+  </div>
+  <textarea class="preview-box" id="output-preview" style="width:100%;" rows="20">「統合カルテ生成」ボタンを押すと全Stageのデータが統合されます。</textarea>
+
+  <div class="prompt-card" style="margin-top:1rem;border-left-color:var(--teal)">
+    <div class="pc-head">
+      <span class="pc-label sect-label sl-teal">清書・仕上げプロンプト（Claudeへ送信）</span>
+      <div class="pc-actions"><button class="btn-sm primary" onclick="copyTA('prompt-polish')">📋 コピー</button></div>
+    </div>
+    <textarea class="prompt-ta" id="prompt-polish" rows="8">「統合カルテ生成」後に自動更新されます。</textarea>
+  </div>
+</div>
+
+<!-- ▼ 設定・データ管理 ▼ -->
+<div class="dept-panel" id="dept-settings">
+  <div class="karte-head">
+    <div>
+      <div class="karte-dept-tag" style="background:#E0E0EC;color:var(--ink);border:1px solid #9090B0;">⚙️ 設定・データ管理</div>
+      <h1 class="karte-h1">データ管理システム</h1>
+    </div>
+  </div>
+  <div class="karte-field">
+    <div class="karte-field-head"><span class="sect-label sl-ink">💾 カルテ保存・復元</span></div>
+    <div class="field-body">
+      <div class="action-bar">
+        <button class="btn-act primary" onclick="saveKarte()">💾 カルテ保存（localStorage）</button>
+        <button class="btn-act outline" onclick="loadKarte()">📂 カルテ読込</button>
+        <button class="btn-act danger" onclick="clearAll()">🗑 全データ削除</button>
+      </div>
+    </div>
+  </div>
+  <div class="karte-field" style="margin-top:0.75rem;">
+    <div class="karte-field-head"><span class="sect-label sl-teal">📦 JSONエクスポート・インポート（PBL対応）</span></div>
+    <div class="field-body">
+      <p style="margin-bottom:0.75rem;color:var(--ink-mid);">JSONファイルで完全保存・完全復元。チームメンバーへ共有してグループ集約できます。</p>
+      <div class="action-bar">
+        <button class="btn-act primary" onclick="exportKarteJSON()">📥 JSONダウンロード（完全保存）</button>
+        <button class="btn-act outline" onclick="importKarteJSON()">📤 JSONを読み込む</button>
+      </div>
+    </div>
+  </div>
+  <div class="karte-field" style="margin-top:0.75rem;">
+    <div class="karte-field-head"><span class="sect-label sl-gold">📊 CSVエクスポート（PBL集計用）</span></div>
+    <div class="field-body">
+      <p style="margin-bottom:0.75rem;color:var(--ink-mid);">Excelで全メンバーのCSVを縦結合 → グループ比較・集計・分析できます。</p>
+      <div class="action-bar">
+        <button class="btn-act gold" onclick="exportKarteCSV()">📊 CSVダウンロード（Excel集計用）</button>
+      </div>
+      <div style="background:var(--bg-alt);padding:0.75rem 1rem;font-size:0.85rem;color:var(--ink-mid);margin-top:0.75rem;border-left:3px solid var(--gold);">
+        <strong>PBL集計手順：</strong><br>
+        ① 各メンバーが個別にCSVダウンロード<br>
+        ② Excelで全員のCSVを縦結合（行追加）<br>
+        ③ ピボットテーブルでRQ・仮説・キーワードを比較<br>
+        ④ 共通項と差異をグループ論文の構成へ反映
+      </div>
+    </div>
+  </div>
+  <div class="karte-field" style="margin-top:0.75rem;">
+    <div class="karte-field-head"><span class="sect-label sl-teal">ℹ️ このシステムについて</span></div>
+    <div class="field-body" style="line-height:1.9;">
+      <strong>論文道場 電子カルテ（PBL Team Science System）</strong><br>
+      開発：奥村 治 / C4モデル研究会®<br>
+      コンセプト：学術病院モデル × 電子カルテ型PBL共同研究インフラ<br>
+      バックエンド（予定）：Cloudflare D1 / Workers<br>
+      AI：Claude API (Anthropic) | 図解：PlantUML Server<br>
+      Zotero / SIST 02 / 日本図書館情報学会（JSLIS）連携
+    </div>
+  </div>
+</div>
+
+</main><!-- /karte-main -->
+
+<!-- ═══ RIGHT: ダッシュボード ═══ -->
+<aside class="karte-dash">
+  <div class="dash-title">カルテ ダッシュボード</div>
+
+  <!-- プロジェクト情報 -->
+  <div class="proj-info">
+    <div class="proj-name" id="dash-proj-name">—</div>
+    <div class="proj-id" id="dash-proj-id">PROJECT ID: —</div>
+    <div class="proj-meta">
+      <div class="pm-row"><span class="pm-key">PI</span><span class="pm-val" id="dash-pi">—</span></div>
+      <div class="pm-row"><span class="pm-key">所属</span><span class="pm-val" id="dash-inst">—</span></div>
+      <div class="pm-row"><span class="pm-key">形式</span><span class="pm-val" id="dash-fmt">—</span></div>
+      <div class="pm-row"><span class="pm-key">目標日</span><span class="pm-val" id="dash-date">—</span></div>
+    </div>
+  </div>
+
+  <!-- 合意率メーター -->
+  <div class="consensus-meter">
+    <div class="cm-title">合意率 Consensus</div>
+    <div class="cm-big" id="dash-consensus">—%</div>
+    <div class="cm-sub" id="dash-consensus-sub">メンバー登録後に計算</div>
+    <div class="cm-bar"><div class="cm-fill" id="dash-consensus-bar" style="width:0%"></div></div>
+  </div>
+
+  <!-- Stage進捗 -->
+  <div class="stage-progress">
+    <div class="sp-title">Stage 進捗</div>
+    <div id="stage-progress-rows">
+      <!-- JS生成 -->
+    </div>
+  </div>
+
+  <!-- メンバーリスト -->
+  <div class="member-list">
+    <div class="sp-title">チームメンバー</div>
+    <div id="dash-member-list">
+      <div style="font-family:var(--font-mono);font-size:0.68rem;color:rgba(255,255,255,0.25);">登録なし</div>
+    </div>
+  </div>
+
+  <!-- アクション -->
+  <div class="dash-actions">
+    <button class="btn-dash primary" onclick="saveKarte()">💾 カルテ保存</button>
+    <button class="btn-dash outline" onclick="exportKarteJSON()">📥 JSONダウンロード</button>
+    <button class="btn-dash outline" onclick="exportKarteCSV()">📊 CSVダウンロード</button>
+    <button class="btn-dash outline" onclick="genOutput();showDept('output',document.querySelector('[onclick*=output]'))">📄 カルテ出力</button>
+    <button class="btn-dash danger" onclick="clearAll()">🗑 全データ削除</button>
+  </div>
+
+  <!-- Zotero -->
+  <div style="padding:0.65rem;background:rgba(26,122,138,0.12);border:1px solid rgba(26,122,138,0.3);font-family:var(--font-mono);font-size:0.6rem;color:rgba(255,255,255,0.35);line-height:1.6;">
+    ZOTERO / SIST 02 連携対応<br>
+    info@c4model.org
+  </div>
+  <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info:ofi/fmt:kev:mtx:dc&amp;rft.title=%E8%AB%96%E6%96%87%E9%81%93%E5%A0%B4%E9%9B%BB%E5%AD%90%E3%82%AB%E3%83%AB%E3%83%86&amp;rft.creator=Okumura%2C%20Osamu&amp;rft.publisher=C4%20Model%20Study%20Group&amp;rft.date=2026&amp;rft.type=service&amp;rft.identifier=http%3A%2F%2Fc4model.org%2Fpbl-karte.html"></span>
+</aside>
+
+</div><!-- /karte-layout -->
+
+<script>
+/* ═══════════════════════════════════════
+   STATE — 電子カルテ共有DB構造
+═══════════════════════════════════════ */
+const DB = {
+  project: {},
+  members: [],          // [{id,name,role,rq,hypothesis,stage,score,color}]
+  stages: {             // 各Stageのprompt & response
+    naika:{prompt:'',response:''},
+    geka:{l1:'',l2:'',l3:'',l4:'',responses:{}},
+    shinkei:{r1:'',r1r:'',r2:'',r2r:'',r3:'',r3r:'',r4:'',r4r:'',r5:'',r5r:'',r6:'',r6r:'',r7:'',r7r:''},
+    kensa:{prompt:'',response:''},
+    rehab:{prompt:'',response:''},
+    seishin:{prompt:'',response:''},
+  },
+  consensus:{dislocation:'',agreement:'',prompt:''},
+  output:{preview:'',polishPrompt:''},
+  meta:{savedAt:'',version:'karte-v1'}
+};
+
+const MEMBER_COLORS = ['#B8860B','#1A7A8A','#3A6A4A','#6A3A9A','#B8600B','#1A5A8A','#8A1A4A','#1A1A2E'];
+
+/* ═══ NAVIGATION ═══ */
+function showDept(id, btn) {
+  document.querySelectorAll('.dept-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.dept-btn').forEach(b=>b.classList.remove('active'));
+  const p = document.getElementById('dept-'+id);
+  if (p) p.classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo(0,0);
+  if (history.replaceState) history.replaceState(null,'','#'+id);
+}
+
+/* ═══ MEMBER INPUT ═══ */
+let memberCount = 0;
+function addMemberInput() {
+  if (memberCount >= 8) { toast('⚠ メンバーは最大8名です'); return; }
+  const zone = document.getElementById('member-input-zone');
+  const idx = memberCount;
+  const color = MEMBER_COLORS[idx];
+  const div = document.createElement('div');
+  div.id = 'mi-'+idx;
+  div.style.cssText = `border-left:3px solid ${color};padding:0.75rem;background:var(--bg);margin-bottom:0.65rem;`;
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+      <span style="font-family:var(--font-mono);font-size:0.7rem;font-weight:800;color:${color};">MEMBER ${idx+1}</span>
+      <button onclick="removeMember(${idx})" style="font-family:var(--font-mono);font-size:0.65rem;background:none;border:none;color:var(--ink-lite);cursor:pointer;">✕ 削除</button>
+    </div>
+    <div class="field-row">
+      <div class="field-group"><label class="fl">氏名 *</label><input type="text" id="m${idx}-name" placeholder="例：奥村 治" oninput="recalc();updateMemberCards()"></div>
+      <div class="field-group"><label class="fl">役割</label>
+        <select id="m${idx}-role" onchange="updateMemberCards()">
+          <option value="研究者">研究者</option>
+          <option value="PBLリーダー">PBLリーダー</option>
+          <option value="執筆担当">執筆担当</option>
+          <option value="図解担当">図解担当</option>
+          <option value="文献管理">文献管理</option>
+          <option value="発表担当">発表担当</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-group" style="margin-top:0.4rem;"><label class="fl">個別RQ（このメンバーの研究課題）</label>
+      <textarea id="m${idx}-rq" rows="2" placeholder="例：C4モデルは松尾芭蕉の俳句の感動構造をどのように可視化できるか？" oninput="updateMemberCards();updateConsensus()"></textarea>
+    </div>
+    <div class="field-group" style="margin-top:0.4rem;"><label class="fl">個別仮説</label>
+      <input type="text" id="m${idx}-hypo" placeholder="例：L1〜L4の階層分析で芭蕉の俳句は定量化できる。" oninput="updateMemberCards()">
+    </div>`;
+  zone.appendChild(div);
+  memberCount++;
+  recalc();
+  updateMemberCards();
+}
+
+function removeMember(idx) {
+  const el = document.getElementById('mi-'+idx);
+  if (el) el.remove();
+  updateMemberCards();
+  recalc();
+}
+
+function collectMembers() {
+  const members = [];
+  for (let i=0;i<memberCount;i++) {
+    const n = document.getElementById('m'+i+'-name');
+    if (!n) continue;
+    members.push({
+      id: i,
+      name: n.value||'',
+      role: (document.getElementById('m'+i+'-role')||{}).value||'研究者',
+      rq:   (document.getElementById('m'+i+'-rq')||{}).value||'',
+      hypo: (document.getElementById('m'+i+'-hypo')||{}).value||'',
+      stage:'S0',
+      score:0,
+      color: MEMBER_COLORS[i]
+    });
+  }
+  return members.filter(m=>m.name);
+}
+
+/* ═══ MEMBER CARDS UPDATE ═══ */
+function updateMemberCards() {
+  const members = collectMembers();
+  const zone = document.getElementById('member-cards-zone');
+  if (!members.length) {
+    zone.innerHTML='<div style="grid-column:1/-1;color:var(--ink-lite);font-family:var(--font-mono);font-size:0.8rem;padding:2rem;text-align:center;">「入院受付」でメンバーを登録するか、「メンバーJSON読込」で個別カルテを追加してください。</div>';
+    updateRQTable([]);
+    updateDashMembers([]);
+    return;
+  }
+  zone.innerHTML = members.map(m=>`
+    <div class="member-card" style="--mc-color:${m.color}">
+      <div class="mc-header">
+        <div class="mc-name">${m.name||'—'}</div>
+        <div class="mc-role">${m.role}</div>
+      </div>
+      <div class="mc-rq">${m.rq||'RQ未入力'}</div>
+      <div class="mc-tags">
+        <span class="mc-tag">${m.stage}</span>
+        ${m.hypo ? `<span class="mc-tag">仮説あり</span>` : ''}
+      </div>
+    </div>`).join('');
+
+  updateRQTable(members);
+  updateDashMembers(members);
+  updateConsensus();
+}
+
+function updateRQTable(members) {
+  const table = document.getElementById('rq-compare-table');
+  const rows = members.map(m=>`
+    <tr>
+      <td><strong>${m.name||'—'}</strong></td>
+      <td>${m.role}</td>
+      <td>${m.rq||'—'}</td>
+      <td>${m.hypo||'—'}</td>
+      <td><span style="background:${m.color};color:#fff;padding:0.1rem 0.5rem;font-family:var(--font-mono);font-size:0.65rem;font-weight:700;">${m.stage}</span></td>
+    </tr>`).join('');
+  table.innerHTML = `<tr><th>氏名</th><th>役割</th><th>個別RQ</th><th>仮説</th><th>進捗</th></tr>${rows}`;
+}
+
+function updateDashMembers(members) {
+  const el = document.getElementById('dash-member-list');
+  if (!members.length) { el.innerHTML='<div style="font-family:var(--font-mono);font-size:0.68rem;color:rgba(255,255,255,0.25);">登録なし</div>'; return; }
+  el.innerHTML = members.map(m=>`
+    <div class="ml-item">
+      <div class="ml-dot" style="background:${m.color}"></div>
+      <div class="ml-name">${m.name}</div>
+      <div class="ml-stage">${m.role}</div>
+    </div>`).join('');
+}
+
+/* ═══ 合意率計算 ═══ */
+function updateConsensus() {
+  const members = collectMembers().filter(m=>m.rq);
+  if (members.length < 2) {
+    document.getElementById('dash-consensus').textContent='—%';
+    document.getElementById('dash-consensus-sub').textContent='2名以上のRQが必要';
+    document.getElementById('dash-consensus-bar').style.width='0%';
+    document.getElementById('consensus-bars').innerHTML='<div style="font-family:var(--font-mono);font-size:0.78rem;color:var(--ink-lite);">メンバーのRQ入力後に計算されます。</div>';
+    return;
+  }
+  // キーワード重複率で簡易合意率を計算
+  const groupRQ = (document.getElementById('k-group-rq')||{}).value||'';
+  const groupKW = new Set((groupRQ+' '+(document.getElementById('k-group-kw')||{}).value||'').split(/[,\s、　]+/).filter(Boolean).map(w=>w.toLowerCase()));
+
+  const rates = members.map(m=>{
+    if (!m.rq) return 0;
+    const mWords = new Set(m.rq.split(/[,\s、　。]+/).filter(Boolean).map(w=>w.toLowerCase()));
+    if (!groupKW.size) return 50;
+    let overlap = 0;
+    mWords.forEach(w=>{ if(groupKW.has(w)) overlap++; });
+    return Math.min(100, Math.round(overlap / Math.max(groupKW.size,1) * 100 + 30));
+  });
+  const avg = Math.round(rates.reduce((a,b)=>a+b,0)/rates.length);
+
+  document.getElementById('dash-consensus').textContent = avg+'%';
+  document.getElementById('dash-consensus-sub').textContent = `${members.length}名のRQを分析`;
+  document.getElementById('dash-consensus-bar').style.width = avg+'%';
+
+  const barsEl = document.getElementById('consensus-bars');
+  barsEl.innerHTML = members.map((m,i)=>`
+    <div class="consensus-bar">
+      <div class="cb-name">${m.name.slice(0,8)}</div>
+      <div class="cb-track"><div class="cb-fill" style="width:${rates[i]}%;background:${m.color}"></div></div>
+      <div class="cb-pct">${rates[i]}%</div>
+    </div>`).join('');
+
+  // 合意形成プロンプト更新
+  regenConsensus();
+}
+
+/* ═══ SCORE ═══ */
+function recalc() {
+  const rq     = (document.getElementById('k-group-rq')||{}).value||'';
+  const refs   = ((document.getElementById('k-refs')||{}).value||'').split('\n').filter(l=>l.trim()).length;
+  const fmt    = document.querySelector('input[name="k-fmt"]:checked');
+  const proj   = (document.getElementById('k-proj-name')||{}).value||'';
+  const pi     = (document.getElementById('k-pi')||{}).value||'';
+  const members= collectMembers();
+
+  let sRQ   = Math.min(10, rq.length>=20?5:rq.length>=10?3:0);
+  let sMem  = Math.min(5, members.length*2);
+  let sRef  = Math.min(5, refs);
+  let sFmt  = fmt ? 5 : 0;
+  let sProj = (proj?3:0)+(pi?2:0);
+  const total = sRQ+sMem+sRef+sFmt+sProj;
+
+  const numEl = document.getElementById('k-score-num');
+  if(numEl){ numEl.textContent=total; numEl.className='sp-num '+(total>=24?'pass':'fail'); }
+  setSpb('spb-rq',sRQ,10); setSpb('spb-mem',sMem,5);
+  setSpb('spb-ref',sRef,5); setSpb('spb-fmt',sFmt,5); setSpb('spb-proj',sProj,5);
+
+  const admitBtn = document.getElementById('btn-admit');
+  if(admitBtn) admitBtn.disabled = total<24;
+  const msgEl = document.getElementById('k-score-msg');
+  if(msgEl) msgEl.textContent = total>=24 ? '✅ 入院許可！Stage Iへ進んでください。' : `あと ${24-total} 点入力が必要です`;
+
+  // ダッシュボード更新
+  updateDash();
+  // 全プロンプト再生成
+  regenAllPrompts();
+}
+
+function setSpb(id,v,max){ const el=document.getElementById(id); if(el) el.style.width=(v/max*100)+'%'; }
+function v(id){ return ((document.getElementById(id)||{}).value||'').trim(); }
+
+/* ═══ ダッシュボード更新 ═══ */
+function updateDash() {
+  const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val||'—'; };
+  set('dash-proj-name', v('k-proj-name'));
+  set('dash-proj-id',   'PROJECT: '+(v('k-proj-id')||'未設定'));
+  set('dash-pi',        v('k-pi'));
+  set('dash-inst',      v('k-institution'));
+  set('dash-date',      v('k-target-date'));
+  const fmt = document.querySelector('input[name="k-fmt"]:checked');
+  set('dash-fmt', fmt ? fmt.value : '未選択');
+
+  // Stage進捗（簡易）
+  const stages = [
+    {name:'入院受付',id:'reception'},{name:'内科',id:'naika'},{name:'外科',id:'geka'},
+    {name:'神経科',id:'shinkei'},{name:'検査科',id:'kensa'},{name:'リハビリ',id:'rehab'},
+    {name:'精神科',id:'seishin'},{name:'退院判定',id:'taiin'}
+  ];
+  const colors = ['#B8860B','#1A7A8A','#3A6A4A','#6A3A9A','#B8600B','#1A5A8A','#8A1A4A','#1A1A2E'];
+  const rowsEl = document.getElementById('stage-progress-rows');
+  if (rowsEl) {
+    rowsEl.innerHTML = stages.map((s,i)=>`
+      <div class="stage-row">
+        <div class="sr-dot" style="background:${colors[i]}"></div>
+        <div class="sr-name">${s.name}</div>
+        <div class="sr-pct">—</div>
+      </div>`).join('');
+  }
+}
+
+/* ═══ PROMPT GENERATION ═══ */
+function getProjData() {
+  return {
+    proj:  v('k-proj-name') || '[プロジェクト名]',
+    pi:    v('k-pi')        || '[PI]',
+    rq:    v('k-group-rq')  || '[グループRQ]',
+    hypo:  v('k-group-hypo')|| '[仮説]',
+    kw:    v('k-group-kw')  || '[キーワード]',
+    refs:  v('k-refs')      || '[参考文献]',
+    prior: v('k-prior')     || '[先行研究]',
+    fmt:   (document.querySelector('input[name="k-fmt"]:checked')||{}).value || '[フォーマット]',
+    members: collectMembers()
+  };
+}
+
+function regenAllPrompts() {
+  const d = getProjData();
+  const memberLines = d.members.map(m=>`  - ${m.name}（${m.role}）: RQ → ${m.rq||'未入力'}`).join('\n');
+
+  // CREATE（内科）
+  const createEl = document.getElementById('prompt-create');
+  if(createEl) createEl.value =
+`あなたは学術論文執筆の専門家です。以下のPBLチームの研究情報をCREATEフレームワーク（Context/Research/Explore/Articulate/Test/Evaluate）で深掘りしてください。
+
+【プロジェクト名】${d.proj}
+【PI / 指導教員】${d.pi}
+【グループRQ】${d.rq}
+【グループ仮説】${d.hypo}
+【キーワード】${d.kw}
+【フォーマット】${d.fmt}
+【チームメンバーと個別RQ】
+${memberLines||'  （未登録）'}
+
+出力：
+1. このグループ研究のC4 L1コンテキスト（社会的背景・関連分野）を3点で説明
+2. グループRQをさらに細分化したSub-RQを${d.members.length||3}つ提案（メンバー別に対応させる）
+3. 各メンバーのRQとグループRQの整合性を評価し、調整提案を示す
+4. C4モデルでL1〜L4の構造を箇条書きで示す`;
+
+  // 査読（検査科）
+  const evalEl = document.getElementById('prompt-eval');
+  if(evalEl) evalEl.value =
+`以下のPBL論文について厳格な査読者として想定コメントを5点生成してください。
+
+プロジェクト：${d.proj}
+RQ：${d.rq}
+仮説：${d.hypo}
+著者：${d.members.map(m=>m.name).join('・')||'[チームメンバー]'}
+
+出力形式：
+1. [重要度：高] 指摘内容 → 改善提案
+...`;
+
+  // 発表（リハビリ）
+  const presEl = document.getElementById('prompt-pres');
+  if(presEl) presEl.value =
+`以下のPBL論文をもとに学会発表スライド（10枚）の骨子を作成してください。
+
+プロジェクト：${d.proj}
+RQ：${d.rq}
+発表者：${d.members.map(m=>m.name).join('・')||'[チームメンバー]'}
+
+各スライド：番号 | タイトル | 主要メッセージ | キービジュアル案
+発表時間：20分（質疑10分含む、PBL形式）`;
+
+  // 質疑（精神科）
+  const qaEl = document.getElementById('prompt-qa');
+  if(qaEl) qaEl.value =
+`以下のPBL論文に対する審査委員からの想定質問を難易度別に10問生成してください。
+
+プロジェクト：${d.proj}
+RQ：${d.rq}
+チーム：${d.members.length||0}名
+
+【高難度】Q1〜Q4：研究の根幹・共同研究の妥当性
+【中難度】Q5〜Q8：方法論・データ・C4モデル適用の妥当性
+【基本確認】Q9〜Q10：PBL分担・合意形成プロセス`;
+}
+
+function regenCreate()    { regenAllPrompts(); toast('🔄 プロンプト再生成'); }
+function regenEval()      { regenAllPrompts(); toast('🔄 査読プロンプト再生成'); }
+function regenPres()      { regenAllPrompts(); toast('🔄 発表プロンプト再生成'); }
+function regenQA()        { regenAllPrompts(); toast('🔄 Q&Aプロンプト再生成'); }
+
+function regenConsensus() {
+  const d = getProjData();
+  const memberLines = d.members.map(m=>`  - ${m.name}（${m.role}）: 「${m.rq||'未入力'}」`).join('\n');
+  const el = document.getElementById('prompt-consensus');
+  if(!el) return;
+  el.value =
+`あなたはPBL型共同研究のファシリテーターです。以下のチームメンバーの個別RQを比較分析し、グループ共通RQへの収束を支援してください。
+
+【グループ共通RQ（仮）】
+${d.rq}
+
+【各メンバーの個別RQ】
+${memberLines||'（未登録）'}
+
+出力：
+1. 各RQの「共通点」と「論理的不一致（Logical Dislocations）」を整理
+2. 共通点を核にした統合RQ（案）を3パターン提示
+3. 各メンバーが担当すべきサブRQを割り当て
+4. 合意形成に向けたディスカッション論点を3点提示`;
+}
+
+/* ═══ C4パネル（外科） ═══ */
+function buildC4Panels() {
+  const container = document.getElementById('c4-panels');
+  const layers = [
+    {id:'l1',lbl:'L1 · Context — 研究の世界観',color:'var(--gold)',sl:'sl-gold',
+     placeholder:`@startuml\n!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml\nskinparam backgroundColor #FAFAF8\ntitle L1 Context — [プロジェクト名]\nPerson(team, "研究チーム", "PBLグループ")\nSystem(paper, "グループ論文", "研究成果")\nSystem_Ext(prior, "先行研究", "参照文献群")\nSystem_Ext(journal, "投稿先", "[フォーマット]")\nRel(team, paper, "共同執筆")\nRel(paper, prior, "参照・差別化")\n@enduml`},
+    {id:'l2',lbl:'L2 · Container — 章立て構造',color:'var(--teal)',sl:'sl-teal',
+     placeholder:`@startuml\n!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\ntitle L2 Container — [プロジェクト名]\nSystem_Boundary(paper, "論文システム") {\n  Container(ch1, "第1章 序論", "章", "背景・目的")\n  Container(ch2, "第2章 先行研究", "章", "関連研究")\n  Container(ch3, "第3章 手法", "章", "C4モデル適用")\n  Container(ch4, "第4章 分析", "章", "結果")\n  Container(ch5, "第5章 考察", "章", "解釈")\n  Container(ch6, "第6章 結論", "章", "まとめ")\n}\n@enduml`},
+    {id:'l3',lbl:'L3 · Component — 論点・データ',color:'var(--sage)',sl:'sl-sage',placeholder:'L3 Component図のPlantUMLコードをここに入力してください。'},
+    {id:'l4',lbl:'L4 · Code — 文・接続詞',color:'var(--purple)',sl:'sl-purple',placeholder:'L4詳細設計（文体統一ルール・接続詞リスト）をここに記述してください。'},
+  ];
+  container.innerHTML = layers.map(l=>`
+    <div class="prompt-card" style="border-left-color:${l.color}">
+      <div class="pc-head">
+        <span class="pc-label sect-label ${l.sl}">${l.lbl}</span>
+        <div class="pc-actions">
+          <button class="btn-sm primary" onclick="copyTA('c4-${l.id}')">📋 コピー</button>
+          <button class="btn-sm outline" onclick="drawC4('c4-${l.id}','c4-r-${l.id}')">🎨 描画</button>
+        </div>
+      </div>
+      <textarea class="prompt-ta" id="c4-${l.id}" rows="10" placeholder="${l.placeholder}"></textarea>
+      <div id="c4-r-${l.id}" style="padding:0.75rem;text-align:center;display:none;"></div>
+    </div>`).join('');
+}
+
+/* ═══ 7Rパネル（神経科） ═══ */
+const RDATA=[
+  {r:'r1',lbl:'R1 · Research',color:'var(--gold)',sl:'sl-gold',desc:'文献調査 — 関連研究の網羅的収集と整理'},
+  {r:'r2',lbl:'R2 · Reason',color:'var(--teal)',sl:'sl-teal',desc:'論理構築 — 主張と根拠の一貫性確認'},
+  {r:'r3',lbl:'R3 · Reframe',color:'var(--sage)',sl:'sl-sage',desc:'再構成 — C4層ごとの論理の再整理'},
+  {r:'r4',lbl:'R4 · Refine',color:'var(--purple)',sl:'sl-purple',desc:'文章改善 — 語彙・文体・接続詞の統一'},
+  {r:'r5',lbl:'R5 · Review',color:'var(--orange)',sl:'sl-orange',desc:'査読模擬 — 想定査読コメントの生成'},
+  {r:'r6',lbl:'R6 · Respond',color:'var(--red)',sl:'sl-red',desc:'査読回答 — 修正対応レターの作成'},
+  {r:'r7',lbl:'R7 · Release',color:'var(--ink)',sl:'sl-ink',desc:'最終チェック — 投稿前の品質確認リスト'},
+];
+function buildRPanels() {
+  document.getElementById('r-panels').innerHTML = RDATA.map(d=>`
+    <div class="prompt-card" style="border-left-color:${d.color}">
+      <div class="pc-head">
+        <span class="pc-label sect-label ${d.sl}">${d.lbl}</span>
+        <div class="pc-actions">
+          <button class="btn-sm primary" onclick="copyTA('rp-${d.r}')">📋 コピー</button>
+          <button class="btn-sm outline" onclick="saveKarte()">💾 保存</button>
+        </div>
+      </div>
+      <textarea class="prompt-ta" id="rp-${d.r}" rows="5" placeholder="${d.desc}&#10;Claudeへのプロンプトをここに入力してください。"></textarea>
+      <div style="border-top:1px solid var(--border-lt);padding:0.75rem 1rem;background:var(--bg);">
+        <span style="font-family:var(--font-mono);font-size:0.65rem;font-weight:700;color:${d.color};">回答メモ</span>
+        <textarea class="prompt-ta" id="rp-${d.r}-res" rows="4" style="border:none;background:transparent;margin-top:0.3rem;" placeholder="Claudeの回答をここに記録…"></textarea>
+        <button class="btn-sm outline" onclick="saveKarte()" style="margin-top:0.3rem;">💾 保存</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ═══ 統合出力生成 ═══ */
+function genOutput() {
+  const d = getProjData();
+  const sep = '═'.repeat(52);
+  const lines = [
+    sep,
+    `  ${d.proj}`,
+    `  PBL電子カルテ統合出力`,
+    sep,
+    `PI / 指導教員：${d.pi}`,
+    `所属：${v('k-institution')}`,
+    `投稿先：${d.fmt}`,
+    `対象日：${v('k-target-date')}`,
+    `キーワード：${d.kw}`,
+    '',
+    '【グループ共通RQ】',
+    d.rq,
+    '',
+    '【グループ仮説】',
+    d.hypo||'—',
+    '',
+    '【チームメンバー】',
+    ...d.members.map(m=>`  ${m.name}（${m.role}）: ${m.rq||'RQ未入力'}`),
+    '',
+    '【先行研究の要点】',
+    d.prior||'—',
+    '',
+    '【参考文献（SIST 02形式）】',
+    d.refs,
+    '',
+    '【合意形成：差異の整理】',
+    v('k-dislocation')||'—',
+    '',
+    '【合意形成：収束した結論】',
+    v('k-agreement')||'—',
+    '',
+    '【Stage I（内科）メモ】',
+    v('resp-naika')||'—',
+    '',
+    '【Stage IV（検査科）査読コメント】',
+    v('resp-kensa')||'—',
+    '',
+    sep,
+    `生成日時：${new Date().toLocaleString('ja-JP')}`,
+    '論文道場 電子カルテ by C4モデル研究会® | c4model.org',
+    sep
+  ];
+  const preview = lines.join('\n');
+
+  const previewEl = document.getElementById('output-preview');
+  if(previewEl){ previewEl.value=preview; }
+
+  const polishEl = document.getElementById('prompt-polish');
+  if(polishEl) polishEl.value =
+`以下のPBL共同研究カルテを、${d.fmt}形式の完成稿論文に仕上げてください。
+
+執筆条件：
+・チーム全員が共著者として記載
+・要旨：和文400〜600字、英文200〜300語
+・参考文献：SIST 02形式で統一
+・図表：通し番号とキャプション付き（PlantUML図含む）
+・各メンバーのRQをサブ課題として本文に統合
+
+━━ PBL統合カルテ ━━
+${preview}`;
+
+  toast('📄 統合カルテを生成しました。清書プロンプトも更新されました。');
+}
+
+/* ═══ SAVE / LOAD ═══ */
+const ALL_IDS = [
+  'k-proj-name','k-proj-id','k-pi','k-institution','k-start-date','k-target-date',
+  'k-group-rq','k-group-hypo','k-group-kw','k-prior','k-refs',
+  'resp-naika','resp-kensa','resp-rehab','resp-seishin',
+  'c4-l1','c4-l2','c4-l3','c4-l4',
+  'rp-r1','rp-r1-res','rp-r2','rp-r2-res','rp-r3','rp-r3-res',
+  'rp-r4','rp-r4-res','rp-r5','rp-r5-res','rp-r6','rp-r6-res','rp-r7','rp-r7-res',
+  'k-dislocation','k-agreement','prompt-create','prompt-eval','prompt-pres','prompt-qa','prompt-consensus',
+];
+
+function collectAll() {
+  const data = { _meta:{savedAt:new Date().toLocaleString('ja-JP'),version:'karte-v1'} };
+  ALL_IDS.forEach(id=>{ const el=document.getElementById(id); if(el) data[id]=el.value; });
+  data['_fmt'] = (document.querySelector('input[name="k-fmt"]:checked')||{}).value||'';
+  // メンバー
+  data['_members'] = collectMembers();
+  data['_memberCount'] = memberCount;
+  return data;
+}
+
+function applyAll(d) {
+  ALL_IDS.forEach(id=>{ const el=document.getElementById(id); if(el&&d[id]!==undefined) el.value=d[id]; });
+  if(d['_fmt']){ const r=document.querySelector(`input[name="k-fmt"][value="${d['_fmt']}"]`); if(r) r.checked=true; }
+  updateCount('k-group-rq','cnt-grq',40);
+  countRefs();
+  recalc();
+  updateMemberCards();
+}
+
+function saveKarte() {
+  const data = collectAll();
+  try {
+    localStorage.setItem('karte-v1', JSON.stringify(data));
+    toast('💾 カルテを保存しました（'+data._meta.savedAt+'）');
+  } catch(e){ toast('⚠ 保存失敗（ストレージ容量不足）'); }
+}
+
+function loadKarte(silent) {
+  try {
+    const raw = localStorage.getItem('karte-v1');
+    if(!raw){ if(!silent) toast('⚠ 保存カルテが見つかりません'); return; }
+    const d = JSON.parse(raw);
+    applyAll(d);
+    if(!silent) toast('📂 カルテを読み込みました（'+(d._meta?.savedAt||'不明')+'）');
+  } catch(e){ if(!silent) toast('⚠ 読込失敗'); }
+}
+
+function clearReception() {
+  if(!confirm('入院受付の内容をクリアしますか？')) return;
+  ['k-proj-name','k-proj-id','k-pi','k-institution','k-start-date','k-target-date',
+   'k-group-rq','k-group-hypo','k-group-kw','k-prior','k-refs'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.querySelectorAll('input[name="k-fmt"]').forEach(r=>r.checked=false);
+  recalc();
+}
+
+function clearAll() {
+  if(!confirm('全データを削除しますか？\nこの操作は取り消せません。')) return;
+  localStorage.removeItem('karte-v1');
+  location.reload();
+}
+
+/* ═══ JSON/CSV I/O ═══ */
+function exportKarteJSON() {
+  const data = collectAll();
+  const proj = v('k-proj-name').replace(/[^a-zA-Z0-9\u3040-\u9FFF]/g,'_').slice(0,20)||'karte';
+  const ts = new Date().toISOString().slice(0,10);
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`karte_${proj}_${ts}.json`; a.click();
+  URL.revokeObjectURL(url);
+  toast('📥 カルテJSONをダウンロードしました（完全復元可）');
+}
+
+function importKarteJSON() {
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.json';
+  input.onchange = e => {
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload = ev=>{
+      try{
+        const d=JSON.parse(ev.target.result);
+        applyAll(d);
+        localStorage.setItem('karte-v1',JSON.stringify(d));
+        toast('📂 カルテを読み込みました（プロジェクト：'+(d['k-proj-name']||'不明')+'）');
+      } catch(err){ toast('⚠ 読込失敗：正しいカルテJSONを選択してください'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function importMemberJSON() {
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.json';
+  input.onchange = e => {
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload = ev=>{
+      try{
+        const d=JSON.parse(ev.target.result);
+        // 既存メンバーに追加
+        const newMember = {
+          name: d['f-author']||d['k-proj-name']||'不明',
+          role: '研究者',
+          rq:   d['f-rq']||d['k-group-rq']||'',
+          hypo: d['f-hypothesis']||d['k-group-hypo']||'',
+        };
+        const zone=document.getElementById('member-input-zone');
+        const idx=memberCount;
+        const color=MEMBER_COLORS[idx%8];
+        const div=document.createElement('div');
+        div.id='mi-'+idx;
+        div.style.cssText=`border-left:3px solid ${color};padding:0.75rem;background:var(--bg);margin-bottom:0.65rem;`;
+        div.innerHTML=`
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+            <span style="font-family:var(--font-mono);font-size:0.7rem;font-weight:800;color:${color};">MEMBER ${idx+1}（JSON読込）</span>
+          </div>
+          <div class="field-row">
+            <div class="field-group"><label class="fl">氏名</label><input type="text" id="m${idx}-name" value="${newMember.name}" oninput="recalc();updateMemberCards()"></div>
+            <div class="field-group"><label class="fl">役割</label><select id="m${idx}-role" onchange="updateMemberCards()"><option>研究者</option><option>PBLリーダー</option></select></div>
+          </div>
+          <div class="field-group" style="margin-top:0.4rem;"><label class="fl">個別RQ</label>
+            <textarea id="m${idx}-rq" rows="2" oninput="updateMemberCards();updateConsensus()">${newMember.rq}</textarea></div>
+          <div class="field-group" style="margin-top:0.4rem;"><label class="fl">個別仮説</label>
+            <input type="text" id="m${idx}-hypo" value="${newMember.hypo}" oninput="updateMemberCards()"></div>`;
+        zone.appendChild(div);
+        memberCount++;
+        updateMemberCards(); recalc();
+        toast('📤 メンバーを追加しました：'+newMember.name);
+      } catch(err){ toast('⚠ 読込失敗'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function exportKarteCSV() {
+  const d = collectAll();
+  const members = d['_members']||[];
+  const headers = ['プロジェクト名','PI','所属','フォーマット','グループRQ','グループ仮説','キーワード','メンバー数','参考文献数','保存日時'];
+  const refs = (d['k-refs']||'').split('\n').filter(l=>l.trim()).length;
+  const main = [
+    d['k-proj-name']||'', d['k-pi']||'', d['k-institution']||'', d['_fmt']||'',
+    d['k-group-rq']||'', d['k-group-hypo']||'', d['k-group-kw']||'',
+    members.length, refs, d._meta?.savedAt||''
+  ].map(c=>'"'+(String(c).replace(/"/g,'""').replace(/\n/g,'／'))+'"').join(',');
+
+  const memberHeaders = ['氏名','役割','個別RQ','個別仮説'];
+  const memberRows = members.map(m=>[m.name,m.role,m.rq,m.hypo].map(c=>'"'+(String(c||'').replace(/"/g,'""').replace(/\n/g,'／'))+'"').join(','));
+
+  const csv = '\uFEFF'
+    + ['【プロジェクト情報】'].join(',') + '\n'
+    + headers.map(h=>'"'+h+'"').join(',') + '\n'
+    + main + '\n\n'
+    + ['【メンバー一覧】'].join(',') + '\n'
+    + memberHeaders.map(h=>'"'+h+'"').join(',') + '\n'
+    + memberRows.join('\n');
+
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().slice(0,10);
+  const proj = (v('k-proj-name')||'karte').replace(/[^a-zA-Z0-9\u3040-\u9FFF]/g,'_').slice(0,20);
+  a.href=url; a.download=`karte_${proj}_${ts}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast('📊 CSVをダウンロードしました（Excel集計用）');
+}
+
+/* ═══ C4描画 ═══ */
+const C4C='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
+function enc64(d){let r='';for(let i=0;i<d.length;i+=3){const b=[d[i]||0,d[i+1]||0,d[i+2]||0];r+=C4C[(b[0]>>2)&63];r+=C4C[((b[0]&3)<<4)|((b[1]>>4)&15)];r+=C4C[((b[1]&15)<<2)|((b[2]>>6)&3)];r+=C4C[b[2]&63];}return r;}
+function deflRaw(s){const d=new TextEncoder().encode(s);const ch=[];const B=32768;for(let i=0;i<d.length;i+=B){const c=d.slice(i,i+B);const la=(i+B>=d.length)?1:0;const ln=c.length;const nl=(~ln)&0xFFFF;ch.push(la,ln&255,(ln>>8)&255,nl&255,(nl>>8)&255);c.forEach(b=>ch.push(b));}let s1=1,s2=0;d.forEach(b=>{s1=(s1+b)%65521;s2=(s2+s1)%65521;});const a=(s2<<16)|s1;return new Uint8Array([0x78,0x01,...ch,(a>>24)&255,(a>>16)&255,(a>>8)&255,a&255]);}
+function encPuml(p){return '~1'+enc64(deflRaw(p));}
+function drawC4(codeId,rendId){
+  const code=document.getElementById(codeId).value;
+  if(!code.trim()){toast('⚠ PlantUMLコードを入力してください');return;}
+  const enc=encPuml(code);
+  const div=document.getElementById(rendId);
+  div.style.display='block';
+  div.innerHTML='<p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--ink-lite)">描画中…</p>';
+  const img=new Image();
+  img.style.maxWidth='100%';
+  img.onload=()=>{div.innerHTML='';div.appendChild(img);};
+  img.onerror=()=>{img.src='https://kroki.io/plantuml/svg/'+btoa(unescape(encodeURIComponent(code)));};
+  img.src='https://www.plantuml.com/plantuml/svg/'+enc;
+}
+
+/* ═══ UTILITIES ═══ */
+function copyTA(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const text=el.tagName==='TEXTAREA'?el.value:el.textContent;
+  navigator.clipboard.writeText(text).then(()=>toast('📋 コピーしました')).catch(()=>{el.select();document.execCommand('copy');toast('📋 コピーしました');});
+}
+function updateCount(fId,cId,threshold){
+  const el=document.getElementById(cId); if(!el) return;
+  const n=(document.getElementById(fId)||{}).value?.length||0;
+  el.textContent=n+' 字';
+  el.className='char-ct '+(n>=threshold?'ok':n>=threshold*.5?'warn':'');
+}
+function countRefs(){
+  const r=((document.getElementById('k-refs')||{}).value||'').split('\n').filter(l=>l.trim()).length;
+  const el=document.getElementById('cnt-refs');
+  if(el){el.textContent=r+' 件（6件以上推奨）';el.className='char-ct '+(r>=6?'ok':r>=3?'warn':'');}
+  recalc();
+}
+function toast(msg){
+  let t=document.getElementById('_ktoast');
+  if(!t){t=document.createElement('div');t.id='_ktoast';
+    t.style.cssText='position:fixed;bottom:1.75rem;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-family:var(--font-mono);font-size:0.82rem;font-weight:700;padding:0.65rem 1.5rem;z-index:9999;border:1px solid rgba(255,255,255,0.15);border-left:3px solid var(--gold);transition:opacity 0.3s;pointer-events:none;';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>{t.style.opacity='0';},2800);
+}
+
+/* ═══ INIT ═══ */
+window.addEventListener('DOMContentLoaded',()=>{
+  // 1. 動的DOM生成
+  buildC4Panels();
+  buildRPanels();
+  addMemberInput(); // デフォルト1名
+  // 2. localStorage復元
+  loadKarte(true);
+  // 3. 初期計算
+  recalc();
+  updateMemberCards();
+  updateDash();
+  // 4. ハッシュ対応
+  const hash=location.hash.replace('#','');
+  const valid=['reception','naika','geka','shinkei','kensa','rehab','seishin','taiin','team','consensus','output','settings'];
+  if(hash && valid.includes(hash)) showDept(hash, document.querySelector(`[onclick*="${hash}"]`));
+  // 5. プロジェクトID自動生成
+  const pidEl=document.getElementById('k-proj-id');
+  if(pidEl && !pidEl.value) pidEl.value='PBL-'+new Date().getFullYear()+'-'+String(Date.now()).slice(-4);
+});
+</script>
+</body>
+</html>

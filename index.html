@@ -814,9 +814,9 @@
       <li><a href="#org">Contact</a></li>
     </ul>
     <div class="nav-right">
-      <div class="lang-toggle">
-        <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" data-lang="ja" onclick="setLang('ja')">日本語</button>
+      <div class="lang-toggle" role="group" aria-label="Language Selection">
+        <button class="lang-btn active" data-lang="en" aria-pressed="true" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" data-lang="ja" aria-pressed="false" onclick="setLang('ja')">日本語</button>
       </div>
       <a href="#org" class="nav-cta">Contact</a>
     </div>
@@ -858,8 +858,8 @@
 
       <div class="hero-stats">
         <div class="stat-item">
-          <div class="stat-num">3</div>
-          <div class="stat-label">peer-reviewed journals</div>
+          <div class="stat-num">14</div>
+          <div class="stat-label">peer-reviewed papers</div>
         </div>
         <div class="stat-item">
           <div class="stat-num">20+</div>
@@ -957,16 +957,25 @@
             </p>
           </div>
           
-          <!-- 英語動画 -->
-          <a href="https://www.youtube.com/watch?v=t2cnj1kUzcA" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
-            <img src="https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg';" alt="Thesis Dojo video by C4 model.org 2026 (English)" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
-            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
-          </a>
-          <!-- 日本語動画 -->
-          <a href="https://www.youtube.com/watch?v=ykbQoCvpVZs" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
-            <img src="https://via.placeholder.com/640x360/1A1A2E/EAE3CE?text=Coming+Soon" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/ykbQoCvpVZs/hqdefault.jpg';" alt="Thesis Dojo video by C4 model.org 2026 (Japanese)" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
-            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
-          </a>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+            <!-- 俳句 日本語動画 -->
+            <div>
+              <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); margin-bottom: 0.5rem; text-align: center;">▶ Haiku Engineering (Japanese)</div>
+              <a href="https://www.youtube.com/watch?v=ykbQoCvpVZs" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+                <img src="https://via.placeholder.com/640x360/1A1A2E/EAE3CE?text=Coming+Soon" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/ykbQoCvpVZs/hqdefault.jpg';" alt="教育工学的アプローチによる古典俳句の構造解析" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+                <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; padding-left: 3px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+              </a>
+            </div>
+            
+            <!-- 俳句 英語動画 -->
+            <div>
+              <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); margin-bottom: 0.5rem; text-align: center;">▶ Haiku Engineering (English)</div>
+              <a href="https://www.youtube.com/watch?v=t2cnj1kUzcA" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+                <img src="https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg';" alt="Haiku Engineering English" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+                <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; padding-left: 3px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+              </a>
+            </div>
+          </div>
         </div>
 
         <!-- RIGHT COLUMN -->
@@ -1002,14 +1011,11 @@
           </div>
           
           <div class="paper-action" style="position: relative; z-index: 20;">
-            <a href="https://www.researchgate.net/" target="_blank" class="btn-outline">
-              <span data-en>Read Full Paper on ResearchGate →</span>
-              <span data-ja style="display:none">ResearchGateで論文を読む →</span>
-            </a>
-            <a href="#video-lectures" class="btn-outline" style="border-color: rgba(255,255,255,0.2); color: rgba(250,250,248,0.7);">
-              <span data-en>View Analysis Video ↓</span>
-              <span data-ja style="display:none">動画解説を見る ↓</span>
-            </a>
+            <a href="https://www.researchgate.net/" target="_blank" class="btn-outline" data-en>Read Full Paper in English (ResearchGate) →</a>
+            <a href="https://www.researchgate.net/" target="_blank" class="btn-outline" data-ja style="display:none">日本語版論文を読む →</a>
+            
+            <a href="#video-lectures" class="btn-outline" data-en style="border-color: rgba(255,255,255,0.2); color: rgba(250,250,248,0.7);">View Analysis Video ↓</a>
+            <a href="#video-lectures" class="btn-outline" data-ja style="display:none; border-color: rgba(255,255,255,0.2); color: rgba(250,250,248,0.7);">動画解説を見る ↓</a>
           </div>
         </div>
 
@@ -1031,6 +1037,26 @@
         </h2>
         <p data-en>Thesis Dojo combines Claude AI with C4 model methodology to guide researchers from raw ideas to publication-ready manuscripts.</p>
         <p data-ja style="display:none">論文道場は、Claude AIとC4モデル手法を組み合わせ、研究者をアイデアから投稿準備まで導くAI学術論文執筆支援システムです。</p>
+      </div>
+
+      <!-- 論文道場 プロモーション動画 -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2.5rem; margin: 3rem 0;" class="reveal">
+        <!-- 日本語動画 -->
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--teal); margin-bottom: 0.5rem; text-align: center; font-weight: bold;">▶ Ronbun Dojo (Japanese)</div>
+          <a href="https://www.youtube.com/watch?v=W8KAt7YeeUs" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000; border-radius: 8px; overflow: hidden; box-shadow: 0 12px 24px rgba(26,26,46,0.15);">
+            <img src="https://img.youtube.com/vi/W8KAt7YeeUs/hqdefault.jpg" alt="論文道場 日本語" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--teal); color: var(--teal); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2;">▶</div>
+          </a>
+        </div>
+        <!-- 英語動画 -->
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--teal); margin-bottom: 0.5rem; text-align: center; font-weight: bold;">▶ Thesis Dojo (English)</div>
+          <a href="https://www.youtube.com/watch?v=t2cnj1kUzcA" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000; border-radius: 8px; overflow: hidden; box-shadow: 0 12px 24px rgba(26,26,46,0.15);">
+            <img src="https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg" alt="Thesis Dojo English" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--teal); color: var(--teal); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2;">▶</div>
+          </a>
+        </div>
       </div>
 
       <div class="pipeline reveal">
@@ -1142,15 +1168,10 @@
 
       <!-- VIDEO TABS -->
       <div class="video-tabs reveal">
-        <button class="video-tab active" onclick="switchTab('tab-all')">All Lectures</button>
-        <button class="video-tab" onclick="switchTab('tab-theory')" data-en>1. Theory</button>
-        <button class="video-tab" onclick="switchTab('tab-theory')" data-ja style="display:none">1. 理論・導入</button>
-        <button class="video-tab" onclick="switchTab('tab-haiku')" data-en>2. Haiku & Culture</button>
-        <button class="video-tab" onclick="switchTab('tab-haiku')" data-ja style="display:none">2. 実証研究（俳句）</button>
-        <button class="video-tab" onclick="switchTab('tab-tech')" data-en>3. Tech Analysis</button>
-        <button class="video-tab" onclick="switchTab('tab-tech')" data-ja style="display:none">3. 技術解析</button>
-        <button class="video-tab" onclick="switchTab('tab-global')" data-en>4. Global (EN)</button>
-        <button class="video-tab" onclick="switchTab('tab-global')" data-ja style="display:none">4. 英語発信</button>
+        <button class="video-tab active" onclick="switchTab('tab-all')">All Lectures (EN/JA)</button>
+        <button class="video-tab" onclick="switchTab('tab-theory')">1. Theory (EN/JA)</button>
+        <button class="video-tab" onclick="switchTab('tab-haiku')">2. Haiku & Culture (EN/JA)</button>
+        <button class="video-tab" onclick="switchTab('tab-tech')">3. Tech Analysis (EN/JA)</button>
       </div>
 
       <!-- TAB CONTENT: ALL -->
@@ -1565,8 +1586,11 @@
         el.style.display = lang === 'en' ? '' : 'none');
       document.querySelectorAll('[data-ja]').forEach(el =>
         el.style.display = lang === 'ja' ? '' : 'none');
-      document.querySelectorAll('.lang-btn').forEach(btn =>
-        btn.classList.toggle('active', btn.dataset.lang === lang));
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        const isActive = btn.dataset.lang === lang;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-pressed', isActive.toString());
+      });
       document.documentElement.lang = lang === 'ja' ? 'ja' : 'en';
       localStorage.setItem('c4-lang', lang);
     }

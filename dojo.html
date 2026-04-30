@@ -327,6 +327,7 @@
       <button class="sidebar-btn" onclick="goPage('presentation',this)"><span class="stage-dot"></span>Stage V — 発表準備</button>
       <button class="sidebar-btn" onclick="goPage('qa',this)"><span class="stage-dot"></span>Stage VI — 質疑応答</button>
       <button class="sidebar-btn" id="btn-submit" onclick="goPage('submit',this)"><span class="stage-dot"></span>Stage VII — 投稿</button>
+      <button class="sidebar-btn" onclick="goPage('feedback',this)"><span class="stage-dot"></span>📊 本アンケートの評価</button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Tools</div>
@@ -391,15 +392,16 @@
 
       <div class="action-bar">
         <a href="basho-case.html" target="_blank" class="btn-action" style="color:var(--teal); border-color:var(--teal);">📖 論文道場の活用事例を読む</a>
-        <button class="btn-action" onclick="saveDraft()" style="margin-left:auto;">💾 下書き保存</button>
+        <button class="btn-action primary" onclick="exportMarkdown()" style="margin-left:auto; background:var(--ink); color:var(--bg); border-color:var(--ink);">⬇️ Markdown出力</button>
+        <button class="btn-action" onclick="saveDraft()">💾 下書き保存</button>
         <button class="btn-action" onclick="loadDraft()">📂 下書き読込</button>
         <button class="btn-action" onclick="clearForm()">🗑 クリア</button>
       </div>
 
       <!-- 審査員向けのアピールブロック（Fukushima Tech Create / イノベーション人材育成） -->
-      <div style="background: rgba(26,122,138,0.08); border-left: 4px solid var(--teal); padding: 1.25rem 1.5rem; margin-bottom: 2rem;">
-        <h3 style="font-family: var(--font-display); font-size: 1.1rem; color: var(--teal); margin-bottom: 0.5rem;">地域からイノベーション人材を創出する「思考の型」</h3>
-        <p style="font-size: 0.9rem; color: var(--ink-mid); line-height: 1.6; margin-bottom: 0;">
+      <div style="background: linear-gradient(135deg, rgba(26,122,138,0.06) 0%, rgba(184,134,11,0.03) 100%); border: 1px solid rgba(26,122,138,0.15); border-left: 4px solid var(--teal); padding: 1.5rem; margin-bottom: 2rem; border-radius: 4px; box-shadow: 0 4px 12px rgba(26,26,46,0.03);">
+        <h3 style="font-family: var(--font-display); font-size: 1.15rem; color: var(--teal); margin-bottom: 0.6rem; display:flex; align-items:center; gap:0.5rem;"><span style="color:var(--gold);">✦</span> 地域からイノベーション人材を創出する「思考の型」</h3>
+        <p style="font-size: 0.92rem; color: var(--ink-mid); line-height: 1.65; margin-bottom: 0;">
           本プラットフォーム「論文道場」は、C4モデル（国際標準のアーキテクチャ設計手法）を用いて、誰もが自らのアイデアを論理的に構造化できる教育工学SaaSです。<br>
           「文章が書けない」という挫折を防ぐウェルビーイングな学習体験を提供し、福島県を起点とした<strong>次世代の起業家・高度デジタル人材の育成インフラ</strong>として機能します。
         </p>
@@ -672,14 +674,56 @@ C4モデルページで図を描画できます。</div>
         <h1 class="page-h1">7ステップで論文を書く</h1>
         <p class="page-desc">7Rフレームワークで草稿から完成稿まで反復的に改良します。</p>
       </div>
-      <div style="display:grid; gap:1rem;">
-        <div class="stage-card"><h3>R1 · Research</h3><p>文献調査プロンプト — 関連研究の網羅的収集と整理</p></div>
-        <div class="stage-card"><h3>R2 · Reason</h3><p>論理構築プロンプト — 主張と根拠の一貫性確認</p></div>
-        <div class="stage-card"><h3>R3 · Reframe</h3><p>再構成プロンプト — C4層ごとの論理の再整理</p></div>
-        <div class="stage-card"><h3>R4 · Refine</h3><p>文章改善プロンプト — 語彙・文体・接続詞の統一</p></div>
-        <div class="stage-card"><h3>R5 · Review</h3><p>査読模擬プロンプト — 想定査読コメントの生成</p></div>
-        <div class="stage-card"><h3>R6 · Respond</h3><p>査読回答プロンプト — 修正対応レターの作成</p></div>
-        <div class="stage-card"><h3>R7 · Release</h3><p>最終チェックプロンプト — 投稿前の品質確認リスト</p></div>
+      <div style="display:grid; gap:1.25rem;">
+        <div class="stage-card" style="border-left-color: var(--teal);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.1rem; color:var(--ink);">R1 · Research (文献調査)</h3>
+            <span style="font-family:var(--font-mono); font-size:0.7rem; background:var(--bg-alt); padding:0.2rem 0.6rem; color:var(--ink-mid); border:1px solid var(--border);">Step 1</span>
+          </div>
+          <p style="margin-top:0.5rem; font-size:0.9rem;">関連研究の網羅的収集と整理を行い、本研究の立ち位置を確定します。</p>
+        </div>
+        <div class="stage-card" style="border-left-color: var(--teal);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.1rem; color:var(--ink);">R2 · Reason (論理構築)</h3>
+            <span style="font-family:var(--font-mono); font-size:0.7rem; background:var(--bg-alt); padding:0.2rem 0.6rem; color:var(--ink-mid); border:1px solid var(--border);">Step 2</span>
+          </div>
+          <p style="margin-top:0.5rem; font-size:0.9rem;">主張と根拠の一貫性を確認し、論理の飛躍や矛盾を排除します。</p>
+        </div>
+        <div class="stage-card" style="border-left-color: var(--teal);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.1rem; color:var(--ink);">R3 · Reframe (再構成)</h3>
+            <span style="font-family:var(--font-mono); font-size:0.7rem; background:var(--bg-alt); padding:0.2rem 0.6rem; color:var(--ink-mid); border:1px solid var(--border);">Step 3</span>
+          </div>
+          <p style="margin-top:0.5rem; font-size:0.9rem;">C4層（Context, Container, Component, Code）ごとに論理を再整理します。</p>
+        </div>
+        <div class="stage-card" style="border-left-color: var(--teal);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.1rem; color:var(--ink);">R4 · Refine (文章改善)</h3>
+            <span style="font-family:var(--font-mono); font-size:0.7rem; background:var(--bg-alt); padding:0.2rem 0.6rem; color:var(--ink-mid); border:1px solid var(--border);">Step 4</span>
+          </div>
+          <p style="margin-top:0.5rem; font-size:0.9rem;">語彙・文体・接続詞を統一し、学術的で洗練された文章にブラッシュアップします。</p>
+        </div>
+        <div class="stage-card" style="border-left-color: var(--gold);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.1rem; color:var(--ink);">R5 · Review (査読模擬)</h3>
+            <span style="font-family:var(--font-mono); font-size:0.7rem; background:rgba(184,134,11,0.1); padding:0.2rem 0.6rem; color:var(--gold); border:1px solid var(--gold);">Step 5</span>
+          </div>
+          <p style="margin-top:0.5rem; font-size:0.9rem;">AIによる想定査読を実施し、厳しい視点からの批判的コメントを生成させます。</p>
+        </div>
+        <div class="stage-card" style="border-left-color: var(--gold);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.1rem; color:var(--ink);">R6 · Respond (査読回答)</h3>
+            <span style="font-family:var(--font-mono); font-size:0.7rem; background:rgba(184,134,11,0.1); padding:0.2rem 0.6rem; color:var(--gold); border:1px solid var(--gold);">Step 6</span>
+          </div>
+          <p style="margin-top:0.5rem; font-size:0.9rem;">査読コメントに対する論理的で丁寧な修正対応レター（Rebuttal letter）を作成します。</p>
+        </div>
+        <div class="stage-card" style="border-left-color: var(--ink);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.1rem; color:var(--ink);">R7 · Release (最終確認)</h3>
+            <span style="font-family:var(--font-mono); font-size:0.7rem; background:rgba(26,26,46,0.1); padding:0.2rem 0.6rem; color:var(--ink); border:1px solid var(--ink);">Step 7</span>
+          </div>
+          <p style="margin-top:0.5rem; font-size:0.9rem;">フォーマット、字数制限、引用漏れなどの投稿前の最終的な品質確認リストを通します。</p>
+        </div>
       </div>
     </div>
 
@@ -710,57 +754,91 @@ C4モデルページで図を描画できます。</div>
         </div>
       </div>
 
-      <!-- システム評価アンケート (Feedback) -->
-      <div class="stage-card reveal" style="margin-top: 2rem; border-left-color: var(--teal); background: rgba(26,122,138,0.03);">
-        <h3 style="color: var(--teal); margin-bottom: 0.5rem;">📊 論文道場 本アンケートの評価（Ver 1.0 実証用）</h3>
-        <p style="margin-bottom: 2rem; font-size: 0.9rem;">今後のバージョンアップおよび学会での研究発表に向け、本アンケートの評価にご協力をお願いいたします。</p>
+    </div>
 
-        <!-- 1. 全体満足度 -->
-        <div style="margin-bottom: 2rem;">
-          <label style="font-weight:bold; font-size:0.95rem; color:var(--ink);">1. 全体的な使い心地はいかがでしたか？</label>
-          <div style="display:flex; gap:1.25rem; margin-top:0.75rem; font-size:2rem; cursor:pointer;" id="feedback-stars">
-            <span onclick="showFeedbackFA(5)" title="非常によい" style="transition: all 0.2s;">😍</span>
-            <span onclick="showFeedbackFA(4)" title="よい" style="transition: all 0.2s;">🙂</span>
-            <span onclick="showFeedbackFA(3)" title="どちらともいえない" style="transition: all 0.2s;">😐</span>
-            <span onclick="showFeedbackFA(2)" title="わるい" style="transition: all 0.2s;">😕</span>
-            <span onclick="showFeedbackFA(1)" title="非常にわるい" style="transition: all 0.2s;">😡</span>
+    <!-- ══════ FEEDBACK (アンケート) ══════ -->
+    <div class="page" id="page-feedback">
+      <div class="page-header">
+        <div class="page-stage-tag">FEEDBACK · システム評価</div>
+        <h1 class="page-h1">論文道場 本アンケートの評価（Ver 1.0 実証用）</h1>
+        <p class="page-desc">今後のバージョンアップおよび学会での研究発表に向け、本アンケートの評価にご協力をお願いいたします。</p>
+      </div>
+
+      <div class="stage-card reveal" style="border-left-color: var(--teal); background: rgba(26,122,138,0.03);">
+        
+        <!-- アンケート自由回答フォーム -->
+        <div style="display: flex; flex-direction: column; gap: 2rem; margin-bottom: 2rem;">
+          
+          <!-- A -->
+          <div style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-lt);">
+            <label style="font-weight:bold; font-size:0.95rem; color:var(--ink); display:block; margin-bottom:0.75rem;">A. みやすさ</label>
+            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; margin-bottom:1rem; font-size:0.85rem; color:var(--ink);">
+              <label style="cursor:pointer;"><input type="radio" name="eval_a" value="1"> 1. 非常に良い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_a" value="2"> 2. やや良い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_a" value="3"> 3. どちらでもない</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_a" value="4"> 4. 悪い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_a" value="5"> 5. 非常に悪い</label>
+            </div>
+            <p style="font-size:0.8rem; color:var(--ink-mid); margin-bottom:0.4rem;">※「4. 悪い」「5. 非常に悪い」を選択された方は、改良点を自由にお書きください：</p>
+            <textarea rows="2" placeholder="（自由回答）" style="width:100%; padding:0.75rem; font-family:var(--font-body); border:1px solid var(--border); border-radius:4px;"></textarea>
           </div>
-        </div>
 
-        <!-- 2. ワークフロー評価（SD法） -->
-        <div style="margin-bottom: 2rem;">
-          <label style="font-weight:bold; font-size:0.95rem; color:var(--ink);">2. 各機能の評価（SD尺度）</label>
-          <p style="font-size:0.8rem; color:var(--ink-mid); margin-bottom:0.75rem;">それぞれの項目について、ご自身の印象に最も近いものを選択してください。</p>
-          <table style="width:100%; font-size:0.85rem; border-collapse:collapse; background:var(--white); border:1px solid var(--border);">
-            <tr style="background:var(--bg-alt); border-bottom:1px solid var(--border); font-family:var(--font-mono); font-size:0.7rem;">
-              <th style="padding:0.5rem; width:28%; text-align:right;">ネガティブ</th>
-              <th style="padding:0.5rem; text-align:center;">1</th><th style="padding:0.5rem; text-align:center;">2</th><th style="padding:0.5rem; text-align:center;">3</th><th style="padding:0.5rem; text-align:center;">4</th><th style="padding:0.5rem; text-align:center;">5</th>
-              <th style="padding:0.5rem; width:28%; text-align:left;">ポジティブ</th>
-            </tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.75rem 0.5rem; text-align:right; color:var(--ink-mid);">非常に見づらい</td><td style="text-align:center;"><input type="radio" name="sd1"></td><td style="text-align:center;"><input type="radio" name="sd1"></td><td style="text-align:center;"><input type="radio" name="sd1"></td><td style="text-align:center;"><input type="radio" name="sd1"></td><td style="text-align:center;"><input type="radio" name="sd1"></td><td style="padding:0.75rem 0.5rem; font-weight:600;">非常に見やすい（画面）</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.75rem 0.5rem; text-align:right; color:var(--ink-mid);">直感的でない</td><td style="text-align:center;"><input type="radio" name="sd2"></td><td style="text-align:center;"><input type="radio" name="sd2"></td><td style="text-align:center;"><input type="radio" name="sd2"></td><td style="text-align:center;"><input type="radio" name="sd2"></td><td style="text-align:center;"><input type="radio" name="sd2"></td><td style="padding:0.75rem 0.5rem; font-weight:600;">直感的である（操作性）</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.75rem 0.5rem; text-align:right; color:var(--ink-mid);">負担が大きい</td><td style="text-align:center;"><input type="radio" name="sd3"></td><td style="text-align:center;"><input type="radio" name="sd3"></td><td style="text-align:center;"><input type="radio" name="sd3"></td><td style="text-align:center;"><input type="radio" name="sd3"></td><td style="text-align:center;"><input type="radio" name="sd3"></td><td style="padding:0.75rem 0.5rem; font-weight:600;">負担が少ない（入力）</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.75rem 0.5rem; text-align:right; color:var(--ink-mid);">期待外れ</td><td style="text-align:center;"><input type="radio" name="sd4"></td><td style="text-align:center;"><input type="radio" name="sd4"></td><td style="text-align:center;"><input type="radio" name="sd4"></td><td style="text-align:center;"><input type="radio" name="sd4"></td><td style="text-align:center;"><input type="radio" name="sd4"></td><td style="padding:0.75rem 0.5rem; font-weight:600;">期待通り（出力精度）</td></tr>
-            <tr><td style="padding:0.75rem 0.5rem; text-align:right; color:var(--ink-mid);">不安がある</td><td style="text-align:center;"><input type="radio" name="sd5"></td><td style="text-align:center;"><input type="radio" name="sd5"></td><td style="text-align:center;"><input type="radio" name="sd5"></td><td style="text-align:center;"><input type="radio" name="sd5"></td><td style="text-align:center;"><input type="radio" name="sd5"></td><td style="padding:0.75rem 0.5rem; font-weight:600;">安心できる（データ保存）</td></tr>
-          </table>
-        </div>
-
-        <!-- 3. マルチ選択 -->
-        <div style="margin-bottom: 2rem;">
-          <label style="font-weight:bold; font-size:0.95rem; color:var(--ink);">3. 特に役立った機能（複数選択可）</label>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; margin-top:0.75rem;">
-            <label style="font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox"> 論文スコアパネル（進捗の可視化）</label>
-            <label style="font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox"> C4モデルによるL1〜L4の構造化ガイド</label>
-            <label style="font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox"> CREATEプロンプトの自動生成</label>
-            <label style="font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox"> PlantUML図の描画連携</label>
+          <!-- B -->
+          <div style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-lt);">
+            <label style="font-weight:bold; font-size:0.95rem; color:var(--ink); display:block; margin-bottom:0.75rem;">B. 解説のわかりやすさ</label>
+            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; margin-bottom:1rem; font-size:0.85rem; color:var(--ink);">
+              <label style="cursor:pointer;"><input type="radio" name="eval_b" value="1"> 1. 非常に良い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_b" value="2"> 2. やや良い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_b" value="3"> 3. どちらでもない</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_b" value="4"> 4. 悪い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_b" value="5"> 5. 非常に悪い</label>
+            </div>
+            <p style="font-size:0.8rem; color:var(--ink-mid); margin-bottom:0.4rem;">※「4. 悪い」「5. 非常に悪い」を選択された方は、改良点を自由にお書きください：</p>
+            <textarea rows="2" placeholder="（自由回答）" style="width:100%; padding:0.75rem; font-family:var(--font-body); border:1px solid var(--border); border-radius:4px;"></textarea>
           </div>
-        </div>
 
-        <!-- 4. FA (フリーアンサー) -->
-        <div id="feedback-fa" style="margin-bottom: 1.5rem;">
-          <label style="font-weight:bold; font-size:0.95rem; color:var(--ink);">4. 具体的な改善点やご意見（FA：自由記述）</label>
-          <p style="font-size:0.8rem; color:var(--ink-mid); margin-bottom:0.5rem;">「ここが使いにくかった」「こんな機能が欲しい」等、ご自由にお書きください。</p>
-          <textarea rows="4" placeholder="例：プレースホルダーが消えてしまうのでテンプレートとして残してほしい。" style="width:100%; padding:0.75rem; font-family:var(--font-body); border:1px solid var(--border); border-radius:4px;"></textarea>
+          <!-- C -->
+          <div style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-lt);">
+            <label style="font-weight:bold; font-size:0.95rem; color:var(--ink); display:block; margin-bottom:0.75rem;">C. 操作方法（入力の評価）</label>
+            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; margin-bottom:1rem; font-size:0.85rem; color:var(--ink);">
+              <label style="cursor:pointer;"><input type="radio" name="eval_c" value="1"> 1. 非常に良い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_c" value="2"> 2. やや良い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_c" value="3"> 3. どちらでもない</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_c" value="4"> 4. 悪い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_c" value="5"> 5. 非常に悪い</label>
+            </div>
+            <p style="font-size:0.8rem; color:var(--ink-mid); margin-bottom:0.4rem;">※「4. 悪い」「5. 非常に悪い」を選択された方は、改良点を自由にお書きください：</p>
+            <textarea rows="2" placeholder="（自由回答）" style="width:100%; padding:0.75rem; font-family:var(--font-body); border:1px solid var(--border); border-radius:4px;"></textarea>
+          </div>
+
+          <!-- D -->
+          <div style="padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-lt);">
+            <label style="font-weight:bold; font-size:0.95rem; color:var(--ink); display:block; margin-bottom:0.75rem;">D. 出力結果の評価</label>
+            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; margin-bottom:1rem; font-size:0.85rem; color:var(--ink);">
+              <label style="cursor:pointer;"><input type="radio" name="eval_d" value="1"> 1. 非常に良い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_d" value="2"> 2. やや良い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_d" value="3"> 3. どちらでもない</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_d" value="4"> 4. 悪い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_d" value="5"> 5. 非常に悪い</label>
+            </div>
+            <p style="font-size:0.8rem; color:var(--ink-mid); margin-bottom:0.4rem;">※「4. 悪い」「5. 非常に悪い」を選択された方は、改良点を自由にお書きください：</p>
+            <textarea rows="2" placeholder="（自由回答）" style="width:100%; padding:0.75rem; font-family:var(--font-body); border:1px solid var(--border); border-radius:4px;"></textarea>
+          </div>
+
+          <!-- E -->
+          <div>
+            <label style="font-weight:bold; font-size:0.95rem; color:var(--ink); display:block; margin-bottom:0.75rem;">E. 全体評価</label>
+            <div style="display:flex; flex-wrap:wrap; gap:1.25rem; margin-bottom:1rem; font-size:0.85rem; color:var(--ink);">
+              <label style="cursor:pointer;"><input type="radio" name="eval_e" value="1"> 1. 非常に良い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_e" value="2"> 2. やや良い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_e" value="3"> 3. どちらでもない</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_e" value="4"> 4. 悪い</label>
+              <label style="cursor:pointer;"><input type="radio" name="eval_e" value="5"> 5. 非常に悪い</label>
+            </div>
+            <p style="font-size:0.8rem; color:var(--ink-mid); margin-bottom:0.4rem;">※「4. 悪い」「5. 非常に悪い」を選択された方は、改良点を自由にお書きください：</p>
+            <textarea rows="2" placeholder="（自由回答）" style="width:100%; padding:0.75rem; font-family:var(--font-body); border:1px solid var(--border); border-radius:4px;"></textarea>
+          </div>
+
         </div>
         
         <button class="copy-btn" style="background:var(--teal); width:100%; font-size:1rem; padding:1rem; font-weight:bold;" onclick="submitFeedback()">📤 アンケートを送信する</button>
@@ -807,7 +885,6 @@ Rel(d, p, "図コード送信")
         <tr>
           <th>学会・誌名</th><th>言語</th><th>字数/頁数</th><th>書式</th><th>締切パターン</th>
         </tr>
-        <tr><td>感性工学会</td><td>日本語/英語</td><td>4〜8頁</td><td>2段組・A4</td><td>年2〜3回</td></tr>
         <tr><td>情報処理学会</td><td>日本語</td><td>4〜8頁</td><td>2段組・A4</td><td>随時</td></tr>
         <tr><td>IEEE Access</td><td>English</td><td>無制限</td><td>IEEE style</td><td>Rolling</td></tr>
         <tr><td>ACM Digital Library</td><td>English</td><td>8〜12頁</td><td>ACM style</td><td>Conference</td></tr>
@@ -1070,7 +1147,7 @@ Rel(d, p, "図コード送信")
     set('f-email', 'info@c4model.org');
     set('f-degree', 'Ph.D. / 主宰');
     set('f-title', '松尾芭蕉俳句の認知アーキテクチャの可視化：C4モデルによる詩的緊張構造の分析');
-    set('f-journal', '感性工学会');
+    set('f-journal', '');
     set('f-language', 'ja');
     set('f-keywords', 'C4モデル, 俳句, 松尾芭蕉, 認知アーキテクチャ, 構造分析');
     set('f-abstract', '本研究は、松尾芭蕉の俳句が持つ独自の詩的緊張構造（ポエティック・テンション）を、ソフトウェア設計手法であるC4モデルを用いて可視化する試みである。従来、定性的な文学分析に留まっていた俳句の鑑賞プロセスを「コンテキスト（L1）」「コンテナ（L2）」「コンポーネント（L3）」「コード（L4）」の4層構造に分解し、句の背景にある社会的事象から言葉の接続関係に至るまでを体系的にモデル化する。結果として、暗黙知とされていた芭蕉のナラティブ構造が明示的になり、文学表現の定量的な感性工学アプローチに新たな視座を提供するものである。');
@@ -1081,15 +1158,18 @@ Rel(d, p, "図コード送信")
     set('f-prior', 'これまでの俳句分析は主に国文学的アプローチ（定性評価）や、自然言語処理による単語頻出度分析（局所的マクロ評価）が中心であり、作品の「全体アーキテクチャ」を捉えるフレームワークが不足していた。');
     set('f-refs', '奥村治 (2025). 松尾芭蕉俳句 ナラティブ構造とC4モデルによる学術的分析.\nBrown, S. (2010). Software Architecture for Developers.\nC4モデル研究会 (2024). PlantUML C4モデル活用入門ガイド.\nSmith, J. (2023). Cognitive Structures in Japanese Poetry.\n田中角栄 (2015). 感性工学と文学分析の交差点.\n佐藤健 (2018). 知識の構造化手法としてのアーキテクチャ.');
 
-    const radio = document.querySelector('input[name="format"][value="感性工学会"]');
-    if (radio) radio.checked = true;
-
     updateCount('f-abstract', 'cnt-abstract', 200);
     updateCount('f-rq', 'cnt-rq', 50);
     updateCount('f-structure', 'cnt-structure', 0);
     countRefs();
     recalc();
     showToast('💡 サンプルデータを入力しました！');
+    
+    // 入力フォーム（Stage 0）へスクロールする
+    const stage0 = document.getElementById('stage0') || document.getElementById('f-author');
+    if (stage0) {
+      stage0.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   /* ── C4図描画 ── */
@@ -1163,7 +1243,24 @@ Rel(d, p, "図コード送信")
     clearTimeout(t._timer);
     t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
   }
-
+  /* ── Markdown Export ── */
+  function exportMarkdown() {
+    const title = document.getElementById('f-title').value || '無題';
+    const author = document.getElementById('f-author').value || '';
+    const abs = document.getElementById('f-abstract').value || '';
+    const rq = document.getElementById('f-rq').value || '';
+    const hypo = document.getElementById('f-hypothesis').value || '';
+    const struct = document.getElementById('f-structure').value || '';
+    const refs = document.getElementById('f-refs').value || '';
+    
+    let content = `# ${title}\n\n`;
+    if (author) content += `**著者:** ${author}\n\n`;
+    content += `## 要旨\n${abs}\n\n`;
+    content += `## Research Question\n${rq}\n\n`;
+    if (hypo) content += `## 仮説\n${hypo}\n\n`;
+    content += `## 構成案\n${struct}\n\n`;
+    if (refs) content += `## 参考文献\n${refs}\n\n`;
+    
     const blob = new Blob([content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

@@ -19,7 +19,7 @@
   <meta name="citation_author_institution" content="C4 Model Study Group">
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+JP:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 
   <style>
     /* ─────────────── DESIGN TOKENS ─────────────── */
@@ -38,15 +38,15 @@
       --border:     #D8D4CA;
       --border-lt:  #ECEAE4;
       --shadow:     rgba(26,26,46,0.12);
-      --font-display: 'Fraunces', Georgia, serif;
+      --font-display: 'Fraunces', 'Noto Serif JP', Georgia, serif;
       --font-mono:    'DM Mono', 'Courier New', monospace;
-      --font-body:    'Source Serif 4', Georgia, serif;
-      --fs-hero:    clamp(4rem, 8vw, 7rem);
-      --fs-h2:      clamp(2.5rem, 5vw, 4rem);
-      --fs-h3:      clamp(1.6rem, 3vw, 2.5rem);
-      --fs-body:    1.25rem;
-      --fs-mono:    0.9rem;
-      --fs-small:   0.95rem;
+      --font-body:    'Source Serif 4', 'Noto Serif JP', Georgia, serif;
+      --fs-hero:    clamp(4.5rem, 9vw, 8rem);
+      --fs-h2:      clamp(2.8rem, 6vw, 4.5rem);
+      --fs-h3:      clamp(1.8rem, 3.5vw, 3rem);
+      --fs-body:    1.35rem;
+      --fs-mono:    1rem;
+      --fs-small:   1.05rem;
     }
 
     /* ─────────────── RESET & BASE ─────────────── */
@@ -55,7 +55,7 @@
     body {
       font-family: var(--font-body);
       font-size: var(--fs-body);
-      font-weight: 500;
+      font-weight: 600;
       color: var(--ink);
       background: var(--bg);
       line-height: 1.7;
@@ -662,7 +662,7 @@
     }
     .video-wrapper {
       position: relative; padding-bottom: 56.25%; height: 0;
-      border-radius: 8px; overflow: hidden;
+      border-radius: 8px; overflow: hidden; display: block;
       box-shadow: 0 24px 48px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
       background: #000; transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
@@ -671,6 +671,11 @@
       border-color: rgba(42,155,173,0.3);
     }
     .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    .video-wrapper:hover img { opacity: 0.5 !important; }
+    .video-wrapper:hover .play-btn { 
+      transform: translate(-50%, -50%) scale(1.1) !important;
+      background: var(--teal) !important; border-color: var(--teal) !important; color: var(--white) !important;
+    }
 
     .paper-card {
       background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -699,6 +704,94 @@
       padding: 0.75rem 1.5rem; border: 1px solid var(--teal-lt); transition: all 0.2s;
     }
     .btn-outline:hover { background: var(--teal-lt); color: var(--ink); }
+
+    /* ─────────────── VIDEO GALLERY ─────────────── */
+    #video-lectures { background: var(--bg); }
+    .video-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2.5rem;
+      margin-bottom: 4rem;
+    }
+    .video-card {
+      background: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 6px 16px var(--shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex; flex-direction: column;
+    }
+    .video-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 32px rgba(26,26,46,0.15);
+    }
+    .video-card .video-wrapper {
+      margin: 0; border: none; box-shadow: none; border-radius: 0;
+    }
+    .video-info {
+      padding: 1.25rem;
+      flex-grow: 1;
+      display: flex; flex-direction: column;
+    }
+    .video-title {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.4;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+    .video-desc {
+      font-size: 0.85rem;
+      color: var(--ink-mid);
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+    .video-category-title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--teal);
+      margin-top: 4rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-lt);
+      padding-bottom: 0.5rem;
+    }
+    .video-category-desc {
+      font-size: 0.95rem;
+      color: var(--ink-mid);
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+
+    /* ─────────────── VIDEO TABS ─────────────── */
+    .video-tabs {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+      margin: 2rem 0 3rem;
+      border-bottom: 1px solid var(--border-lt);
+      padding-bottom: 1rem;
+    }
+    .video-tab {
+      font-family: var(--font-mono);
+      font-size: 0.8rem; letter-spacing: 0.08em;
+      padding: 0.5rem 1.25rem;
+      background: transparent; color: var(--ink-mid);
+      border: 1px solid var(--border);
+      border-radius: 40px; cursor: pointer; transition: all 0.2s;
+    }
+    .video-tab:hover { border-color: var(--teal); color: var(--teal); }
+    .video-tab.active {
+      background: var(--ink); color: var(--bg);
+      border-color: var(--ink); box-shadow: 0 4px 12px rgba(26,26,46,0.2);
+    }
+    .video-category-content { display: none; }
+    .video-category-content.active {
+      display: block; animation: fadeUp 0.4s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     @media (max-width: 992px) {
       .research-grid { grid-template-columns: 1fr; gap: 3rem; }
@@ -732,23 +825,24 @@
   <!-- ═══════════ HERO ═══════════ -->
   <section id="hero">
     <div class="hero-inner">
-      <a href="https://www.researchgate.net/publication/403672762_cuozheshinailunwenshuC4moderuniyorusikaonoshejitugouzhutouerubiinguraitingunotichang?fbclid=IwY2xjawRc5EdleHRuA2FlbQIxMQBzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEeO1T0qjvwrP9sGal_FIBDOEeVNjFOvAYImj567_jaXTzdRxlPvLtpmSUh9rI_aem_XmXwksZfSlVQlws-oVsMUg" target="_blank" class="hero-announcement reveal">
+      <a href="https://www.researchgate.net/" target="_blank" class="hero-announcement reveal">
         <span class="announcement-badge">NEW PUBLICATION</span>
-        <span class="announcement-text" data-en>Latest Paper: "Blueprint of Thought" via C4 Model & Wellbeing Writing</span>
-        <span class="announcement-text" data-ja style="display:none">最新論文：挫折しない論文術：C4モデルによる「思考の設計図」構築と...</span>
+        <span class="announcement-text" data-en>Latest: Structural Analysis of Classical Haiku via EdTech & C4 Model</span>
+        <span class="announcement-text" data-ja style="display:none">最新論文：教育工学的アプローチによる古典俳句の構造解析 — C4モデルを援用した松尾芭蕉の分析</span>
         <span class="announcement-arrow">→</span>
       </a>
 
-      <div class="hero-badge reveal">C4 Model Study Group®</div>
+      <div class="hero-badge reveal" data-en>Your Friendly AI Writing Partner</div>
+      <div class="hero-badge reveal" data-ja style="display:none;">文章が苦手でも大丈夫。AIがやさしく導く、あなたの執筆パートナー</div>
 
       <h1 class="hero-h1">
-        <span data-en>Structure<br><em>everything.</em></span>
-        <span data-ja style="display:none">すべてを<br><em>構造化する。</em></span>
+        <span data-en>From Daily Reports<br>to <em>Academic Papers.</em></span>
+        <span data-ja style="display:none">日常のレポートから<br><em>学会論文まで。</em></span>
       </h1>
 
       <p class="hero-sub">
-        <span data-en>C4 model — the universal lens for haiku, literature, music, and academic writing. From context to code, we visualize the invisible.</span>
-        <span data-ja style="display:none">C4モデルは、俳句・文学・音楽・学術論文を貫く普遍的な思考の設計図。コンテキストからコードまで、見えない構造を可視化する。</span>
+        <span data-en>Thesis Dojo is your AI-powered writing assistant. From initial ideas to the final paper, it naturally guides you through the process. Don't worry about where to start—by visualizing the structure of your paper, our AI provides solid support for everything from daily reports to peer-reviewed academic papers.</span>
+        <span data-ja style="display:none">「論文道場」は、最初のアイデア出しから論文の完成までを、AIが自然に導いてくれる執筆アシスタントです。<br>「何から書けばいいか分からない…」と悩まなくても大丈夫。<strong>論文の構造を可視化できる</strong>独自のアプローチで、AIがあなたをしっかりとサポート。日々のレポート課題から卒業論文、学会発表まで、知的なアウトプットをすべてカバーします。</span>
       </p>
 
       <div class="hero-actions">
@@ -794,12 +888,16 @@
         <div class="concept-text">
           <h2>
             <span data-en>The C4 model,<br>applied to <em>everything</em>.</span>
-            <span data-ja style="display:none">C4モデルを、<br>あらゆるものへ。</span>
+            <span data-ja style="display:none">全人類のための<br><em>思考の型（OS）</em></span>
           </h2>
-          <p data-en>Originally a software architecture framework, the C4 model — Context, Container, Component, Code — provides a universal language for structural thinking.</p>
-          <p data-ja style="display:none">ソフトウェアアーキテクチャの設計手法として生まれたC4モデルは、コンテキスト・コンテナ・コンポーネント・コードの4層構造で、思考のあらゆる場面に応用できる普遍的な言語です。</p>
-          <p data-en>At C4 Model Study Group®, we extend this lens to haiku poetry, literary analysis, music cognition, and AI-assisted academic writing.</p>
-          <p data-ja style="display:none">C4モデル研究会®では、この視点を俳句・文学分析・音楽認知・AI学術論文執筆に拡張し、新しい知的生産の方法論を探求しています。</p>
+          <div data-en>
+            <p>Originally a software architecture framework, the C4 model — Context, Container, Component, Code — provides a universal language for structural thinking.</p>
+            <p>At C4 Model Study Group®, we extend this lens to haiku poetry, literary analysis, music cognition, and AI-assisted academic writing.</p>
+          </div>
+          <div data-ja style="display:none">
+            <p>私は、英国発のアーキテクチャ設計手法「C4モデル」を、全人類のための「思考の型（OS）」として再定義しました。AIがもっともらしい嘘をつく時代、人間に必要なのは文章力ではなく、論理を構造的に設計する力です。これは、子供たちの探究心からシニアの知恵の整理まで、あらゆる教育の基盤を刷新する『令和の学問のすゝめ』です。</p>
+            <p style="margin-top:1.25rem; padding-top:1.25rem; border-top:1px solid var(--border);">本ソリューションは、DX推進の武器であるC4モデルを、汎用的な意思決定支援ツールへと転換したものです。都内中小企業の技術承継や、若手社員の論理性向上を「図解の力」で標準化し、東京から世界へ発信する知的生産性の新基準を目指します。</p>
+          </div>
         </div>
 
         <div class="spiral-stack">
@@ -851,22 +949,24 @@
           <div class="research-highlight">
             <h2 class="research-h2">
               <span data-en>"Transforming the Pain of Writing into the <span>Joy of Structure.</span>"</span>
-              <span data-ja style="display:none">「執筆の苦しみを、<span>構造化の喜び</span>に変える。」</span>
+              <span data-ja style="display:none">12年の歳月が生んだ<br><span>思考構造の進化。</span></span>
             </h2>
             <p class="research-sub">
               <span data-en>Academic evidence of how the C4 Model prevents writing fatigue and ensures high-quality output.</span>
-              <span data-ja style="display:none">C4モデルがいかに執筆の挫折を防ぎ、高品質なアウトプットを保証するかの学術的根拠。</span>
+              <span data-ja style="display:none">本プロジェクトは、2014年の産業技術大学院大学（AIIT）におけるSysMLを用いたサービスシステム設計の研究を起点としています。12年の歳月をかけ、設計対象を「交通システム」から「人間の思考構造そのもの」へと進化させてきました。この一貫した研究姿勢と、米国学会での査読論文、そして200冊におよぶ実証実績の融合こそが、本プロジェクトの核心です。</span>
             </p>
           </div>
           
           <!-- 英語動画 -->
-          <div class="video-wrapper" data-en>
-            <iframe src="https://www.youtube.com/embed/t2cnj1kUzcA" title="Thesis Dojo video by C4 model.org 2026 (English)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-          </div>
+          <a href="https://www.youtube.com/watch?v=t2cnj1kUzcA" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg';" alt="Thesis Dojo video by C4 model.org 2026 (English)" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
           <!-- 日本語動画 -->
-          <div class="video-wrapper" data-ja style="display:none">
-            <iframe src="https://www.youtube.com/embed/ykbQoCvpVZs" title="Thesis Dojo video by C4 model.org 2026 (Japanese)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-          </div>
+          <a href="https://www.youtube.com/watch?v=ykbQoCvpVZs" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://via.placeholder.com/640x360/1A1A2E/EAE3CE?text=Coming+Soon" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/ykbQoCvpVZs/hqdefault.jpg';" alt="Thesis Dojo video by C4 model.org 2026 (Japanese)" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
         </div>
 
         <!-- RIGHT COLUMN -->
@@ -902,12 +1002,13 @@
           </div>
           
           <div class="paper-action" style="position: relative; z-index: 20;">
-            <a href="https://www.researchgate.net/publication/403672762_cuozheshinailunwenshuC4moderuniyorusikaonoshejitugouzhutouerubiinguraitingunotichang?fbclid=IwY2xjawRc5EdleHRuA2FlbQIxMQBzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEeO1T0qjvwrP9sGal_FIBDOEeVNjFOvAYImj567_jaXTzdRxlPvLtpmSUh9rI_aem_XmXwksZfSlVQlws-oVsMUg" target="_blank" class="btn-outline">
+            <a href="https://www.researchgate.net/" target="_blank" class="btn-outline">
               <span data-en>Read Full Paper on ResearchGate →</span>
-              <span data-ja style="display:none">英語版論文を読む (ResearchGate) →</span>
+              <span data-ja style="display:none">ResearchGateで論文を読む →</span>
             </a>
-            <a href="https://www.researchgate.net/publication/403672762_cuozheshinailunwenshuC4moderuniyorusikaonoshejitugouzhutouerubiinguraitingunotichang?fbclid=IwY2xjawRc5EdleHRuA2FlbQIxMQBzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEeO1T0qjvwrP9sGal_FIBDOEeVNjFOvAYImj567_jaXTzdRxlPvLtpmSUh9rI_aem_XmXwksZfSlVQlws-oVsMUg" target="_blank" class="btn-outline" style="border-color: rgba(255,255,255,0.2); color: rgba(250,250,248,0.7);">
-              日本語版論文を読む →
+            <a href="#video-lectures" class="btn-outline" style="border-color: rgba(255,255,255,0.2); color: rgba(250,250,248,0.7);">
+              <span data-en>View Analysis Video ↓</span>
+              <span data-ja style="display:none">動画解説を見る ↓</span>
             </a>
           </div>
         </div>
@@ -1002,7 +1103,263 @@
           <div class="feature-body" data-en>Cloudflare Workers backend with D1 usage logging</div>
           <div class="feature-body" data-ja style="display:none">Cloudflare WorkersバックエンドとD1使用ログ</div>
         </a>
+        <a class="feature-card feature-card--link" href="dojo.html#submit">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title" data-en>User Feedback System</div>
+          <div class="feature-title" data-ja style="display:none">本アンケートの評価（SD法）</div>
+          <div class="feature-body" data-en>Built-in evaluation surveys to continuously improve UI/UX based on educational engineering.</div>
+          <div class="feature-body" data-ja style="display:none">教育工学に基づくアンケートを内蔵し、ユーザーの声でシステムをアジャイルに改善</div>
+        </a>
       </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ VIDEO LECTURES ═══════════ -->
+  <section id="video-lectures">
+    <div class="container">
+      <div class="section-label">
+        <span data-en>Video Portfolio</span>
+        <span data-ja style="display:none">動画ポートフォリオ</span>
+      </div>
+      <h2 class="pub-h2 reveal">
+        <span data-en>Lectures & Case Studies</span>
+        <span data-ja style="display:none">解説・事例研究動画</span>
+      </h2>
+      
+      <!-- 申請書向けの戦略的メッセージ -->
+      <div class="reveal" style="background: rgba(26,122,138,0.05); border-left: 3px solid var(--teal); padding: 1.5rem; margin-bottom: 2rem;">
+        <p style="font-weight: 700; color: var(--teal); margin-bottom: 0.5rem;" data-en>Fukushima Tech Create / Regional Innovation EdTech</p>
+        <p style="font-weight: 700; color: var(--teal); margin-bottom: 0.5rem;" data-ja style="display:none;">福島イノベーション創出：教育工学的アプローチ</p>
+        <ul style="font-size: 0.9rem; color: var(--ink-mid); padding-left: 1.5rem; line-height: 1.6;">
+          <li data-en><strong>Regional Implementation:</strong> Thesis Dojo aims to raise the level of digital and logical thinking in regional communities, starting with Fukushima.</li>
+          <li data-ja style="display:none;"><strong>地域社会への実装:</strong> 論文道場は、福島を起点に地域のデジタル・論理思考力を底上げするEdTechインフラを目指しています。</li>
+          <li data-en><strong>Educational Engineering:</strong> Our latest paper "Structural Analysis of Classical Haiku via EdTech" proves that logical framing can be applied to cultural heritage.</li>
+          <li data-ja style="display:none;"><strong>教育工学の実証:</strong> 最新論文「教育工学的アプローチによる古典俳句の構造解析」は、日本の文化遺産に論理構造を与え、教育へ応用できることを証明しました。</li>
+          <li data-en><strong>Global Accessibility:</strong> Visualizing complex logic on YouTube to embody Open Science for all.</li>
+          <li data-ja style="display:none;"><strong>オープンサイエンス:</strong> 複雑な論理をYouTubeで可視化し、誰にでも分かりやすく公開する姿勢を貫いています。</li>
+        </ul>
+      </div>
+
+      <!-- VIDEO TABS -->
+      <div class="video-tabs reveal">
+        <button class="video-tab active" onclick="switchTab('tab-all')">All Lectures</button>
+        <button class="video-tab" onclick="switchTab('tab-theory')" data-en>1. Theory</button>
+        <button class="video-tab" onclick="switchTab('tab-theory')" data-ja style="display:none">1. 理論・導入</button>
+        <button class="video-tab" onclick="switchTab('tab-haiku')" data-en>2. Haiku & Culture</button>
+        <button class="video-tab" onclick="switchTab('tab-haiku')" data-ja style="display:none">2. 実証研究（俳句）</button>
+        <button class="video-tab" onclick="switchTab('tab-tech')" data-en>3. Tech Analysis</button>
+        <button class="video-tab" onclick="switchTab('tab-tech')" data-ja style="display:none">3. 技術解析</button>
+        <button class="video-tab" onclick="switchTab('tab-global')" data-en>4. Global (EN)</button>
+        <button class="video-tab" onclick="switchTab('tab-global')" data-ja style="display:none">4. 英語発信</button>
+      </div>
+
+      <!-- TAB CONTENT: ALL -->
+      <div id="tab-all" class="video-category-content active">
+        <p class="video-category-desc" data-en>All video lectures exploring the intersection of C4 model, education, and literature.</p>
+        <p class="video-category-desc" data-ja style="display:none">C4モデル、教育、文学の交差を探求する全講義動画一覧です。</p>
+        
+        <div class="video-gallery">
+          <!-- Latest Paper Highlight -->
+          <div class="video-card" style="border: 2px solid var(--gold);">
+            <a href="https://www.youtube.com/watch?v=ykbQoCvpVZs" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://via.placeholder.com/640x360/1A1A2E/EAE3CE?text=Coming+Soon" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/ykbQoCvpVZs/hqdefault.jpg';" alt="松尾芭蕉「風流のはじめや奥の田植え歌」の構造分析" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+            <div class="video-info">
+              <div class="video-title">教育工学的アプローチによる古典俳句の構造解析</div>
+              <div class="video-desc">最新論文：C4モデルを援用した松尾芭蕉「風流のはじめや奥の田植え歌」の分析。</div>
+            </div>
+          </div>
+          <!-- Other videos dynamically imported here via UI feel (we list top ones) -->
+          <div class="video-card">
+            <a href="https://www.youtube.com/watch?v=W8KAt7YeeUs" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/W8KAt7YeeUs/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/W8KAt7YeeUs/hqdefault.jpg';" alt="論文道場 誰もが論理的に書ける" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+            <div class="video-info">
+              <div class="video-title">論文道場：誰もが論理的に書ける Ronbun Dojo</div>
+              <div class="video-desc">本プロジェクトの社会実装の核となる、知的生産インフラの紹介。</div>
+            </div>
+          </div>
+          <div class="video-card">
+            <a href="https://www.youtube.com/watch?v=DhdfHpeMU9M" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://via.placeholder.com/640x360/2A9BAD/FAFAF8?text=Introduction+to+C4+Model" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/DhdfHpeMU9M/hqdefault.jpg';" alt="問題解決志向ガイド" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+            <div class="video-info">
+              <div class="video-title">チャート図解の学習・構造化思考入門</div>
+              <div class="video-desc">全10スライドで、L1（Context）からL4（Code）までの一貫した表現手法を解説。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: THEORY -->
+      <div id="tab-theory" class="video-category-content">
+      <h3 class="video-category-title" data-en="1. Theory & Introduction" data-ja="1. 理論・導入：構造化思考の基礎" style="margin-top:0;">1. 理論・導入：構造化思考の基礎</h3>
+      <p class="video-category-desc" data-en="Learn the essence of the C4 model and its application to problem-solving." data-ja="C4モデルの本質を学び、あらゆる問題解決に応用するための導入部です。">C4モデルの本質を学び、あらゆる問題解決に応用するための導入部です。</p>
+      
+      <div class="video-gallery">
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=DhdfHpeMU9M" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://via.placeholder.com/640x360/2A9BAD/FAFAF8?text=Introduction+to+C4+Model" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/DhdfHpeMU9M/hqdefault.jpg';" alt="問題解決志向ガイド" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">PlantUML C4モデルで実現する チャート図解の学習・構造化思考入門</div>
+            <div class="video-desc">全10スライドで、L1（Context）からL4（Code）までの一貫した表現手法を解説。</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=W8KAt7YeeUs" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/W8KAt7YeeUs/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/W8KAt7YeeUs/hqdefault.jpg';" alt="論文道場 誰もが論理的に書ける" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">論文道場：誰もが論理的に書ける Ronbun Dojo</div>
+            <div class="video-desc">本プロジェクトの社会実装の核となる、知的生産インフラの紹介。</div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- TAB CONTENT: HAIKU -->
+      <div id="tab-haiku" class="video-category-content">
+      <h3 class="video-category-title" data-en="2. Empirical Research: Haiku Engineering" data-ja="2. 実証研究（日本文化）：俳句工学のすすめ" style="margin-top:0;">2. 実証研究（日本文化）：俳句工学のすすめ</h3>
+      <p class="video-category-desc" data-en="A series deconstructing Japanese aesthetics through engineering, visualizing the 17-syllable universe." data-ja="日本の美意識を工学的に解剖し、17音の宇宙を可視化したシリーズです。">日本の美意識を工学的に解剖し、17音の宇宙を可視化したシリーズです。</p>
+
+      <div class="video-gallery">
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=t2cnj1kUzcA" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg';" alt="松尾芭蕉「古池や蛙飛び込む水の音」の構造分析" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">松尾芭蕉「古池や蛙飛び込む水の音」の構造分析</div>
+            <div class="video-desc">俳句工学の代表的事例。</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=ykbQoCvpVZs" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://via.placeholder.com/640x360/1A1A2E/EAE3CE?text=Coming+Soon" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/ykbQoCvpVZs/hqdefault.jpg';" alt="俳句鑑賞入門ｘＣ４モデル事例研究" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">俳句鑑賞入門ｘＣ４モデル事例研究</div>
+            <div class="video-desc">工学的構造解析で俳句を読み解く。「古池や蛙飛び込む水の音」ー松尾芭蕉の構造分析。</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=ib_ZKyWsVMs" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/ib_ZKyWsVMs/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/ib_ZKyWsVMs/hqdefault.jpg';" alt="C4モデルで俳句を理解しよう" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">C4モデルで俳句を理解しよう！”俳句工学”のすすめ。</div>
+            <div class="video-desc">松尾芭蕉「古池や蛙飛び込む水の音」のひみつ</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=CNRBkzON518" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/CNRBkzON518/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/CNRBkzON518/hqdefault.jpg';" alt="松尾芭蕉　閑かさや岩にしみ入る蝉の声" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">松尾芭蕉「閑かさや岩にしみ入る蝉の声」</div>
+            <div class="video-desc">図でみる俳句 第2弾。C4モデルで読み解く。</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=Gsdx5PIP1Xs" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/Gsdx5PIP1Xs/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/Gsdx5PIP1Xs/hqdefault.jpg';" alt="松尾芭蕉　荒海や佐渡に横たふ天の川" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">松尾芭蕉「荒海や佐渡に横たふ天の川」</div>
+            <div class="video-desc">図でみる俳句 第3弾。”俳句工学”のすすめ。</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=XZEJsl1quAg" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/XZEJsl1quAg/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/XZEJsl1quAg/hqdefault.jpg';" alt="松尾芭蕉　夏草や兵どもが夢の跡" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">松尾芭蕉「夏草や兵どもが夢の跡」</div>
+            <div class="video-desc">C4モデルで読み解く、俳句工学のすすめ。</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=JTQIR1Eak1w" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/JTQIR1Eak1w/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/JTQIR1Eak1w/hqdefault.jpg';" alt="松尾芭蕉　旅に病んで夢は枯野をかけ廻る" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">松尾芭蕉「旅に病んで夢は枯野をかけ廻る」</div>
+            <div class="video-desc">図でみる俳句 第5弾。</div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- TAB CONTENT: TECH -->
+      <div id="tab-tech" class="video-category-content">
+      <h3 class="video-category-title" data-en="3. Technical Analysis" data-ja="3. 技術解析：最先端AIの構造化" style="margin-top:0;">3. 技術解析：最先端AIの構造化</h3>
+      <p class="video-category-desc" data-en="Case studies applying the C4 model perspective to modern technology analysis." data-ja="C4モデルの視点を現代のテクノロジー解析に適用した事例です。">C4モデルの視点を現代のテクノロジー解析に適用した事例です。</p>
+
+      <div class="video-gallery">
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=YnJM8QmKo5k" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/YnJM8QmKo5k/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/YnJM8QmKo5k/hqdefault.jpg';" alt="Google AI「Opal」の内部構造" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">Google AI「Opal」の内部構造解析</div>
+            <div class="video-desc">推論エンジン、ワークフロー制御、ツール統合、データ管理の4層アーキテクチャを解明。</div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- TAB CONTENT: GLOBAL -->
+      <div id="tab-global" class="video-category-content">
+      <h3 class="video-category-title" data-en="4. Global Outreach: English" data-ja="4. Global Outreach：英語による発信" style="margin-top:0;">4. Global Outreach：英語による発信</h3>
+      <p class="video-category-desc" data-en="English series demonstrating our project's global footprint." data-ja="世界を舞台にした研究プロジェクトであることを証明する英語シリーズです。">世界を舞台にした研究プロジェクトであることを証明する英語シリーズです。</p>
+
+      <div class="video-gallery">
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=A4cH9-3Ab1k" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/A4cH9-3Ab1k/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/A4cH9-3Ab1k/hqdefault.jpg';" alt="A 17 Syllable Universe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">A 17 Syllable Universe: Haiku by Matsuo Basho</div>
+            <div class="video-desc">using C4 model, study Osamu Okumura.</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=iSD1uPT4aQY" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/iSD1uPT4aQY/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/iSD1uPT4aQY/hqdefault.jpg';" alt="Haiku c4 EN v4" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">Haiku c4 EN v4: Using C4 model study</div>
+            <div class="video-desc">by Osamu Okumura 2026.</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=4GuTYcl3t-g" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/4GuTYcl3t-g/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/4GuTYcl3t-g/hqdefault.jpg';" alt="Deconstructing a Poem" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">Deconstructing a Poem: Matsuo Basho</div>
+            <div class="video-desc">Using C4 model study, Osamu Okumura 2026.</div>
+          </div>
+        </div>
+      </div>
+      </div>
+
     </div>
   </section>
 
@@ -1223,6 +1580,18 @@
       { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
     );
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    /* ── Video Tabs ── */
+    function switchTab(tabId) {
+      document.querySelectorAll('.video-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.video-category-content').forEach(c => c.classList.remove('active'));
+      
+      const tabBtn = document.querySelector(`[onclick="switchTab('${tabId}')"]`);
+      if(tabBtn) tabBtn.classList.add('active');
+      
+      const content = document.getElementById(tabId);
+      if(content) content.classList.add('active');
+    }
 
     /* ── Smooth active nav highlight ── */
     const sections = document.querySelectorAll('section[id]');

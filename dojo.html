@@ -3,853 +3,783 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ronbun Dojo 論文道場 | c4model.org</title>
-  <meta name="description" content="C4モデル×Claude AIによる学術論文執筆支援システム。Stage 0から投稿まで一貫サポート。本ページはZoteroとの技術的連携により、正確な書誌情報の抽出に対応しています。">
-  <link rel="canonical" href="https://c4model.org/dojo.html">
-  <meta name="citation_title" content="論文道場：AI駆動型学術執筆インフラの構築">
+  <title>論文道場 — Academic Paper Dojo | c4model.org</title>
+  <meta name="description" content="C4モデル×Claude AIによる学術論文執筆支援システム。Stage 0から投稿まで一貫サポート。">
+
+  <!-- Citation Metadata (Google Scholar) -->
+  <meta name="citation_title" content="論文道場：AI駆動型学術執筆インフラ">
   <meta name="citation_author" content="Okumura, Osamu">
-  <meta name="citation_author" content="Nakanishi, Kamon">
   <meta name="citation_publication_date" content="2026">
-  <meta name="citation_journal_title" content="c4model.org - 論文道場">
+  <link rel="canonical" href="https://c4model.org/dojo.html">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
   <style>
-    /* ═══ TOKENS ═══ */
     :root {
-      --white:#FFFFFF; --bg:#FAFAF8; --bg-alt:#F4F1EC;
-      --ink:#1A1A2E; --ink-mid:#3D3D5C; --ink-lite:#7A7A9A;
-      --gold:#B8860B; --gold-lt:#D4A01A;
-      --teal:#1A7A8A; --teal-lt:#2A9BAD;
-      --sage:#4A7A5A; --red:#C0392B;
-      --purple:#7B3FA0; --orange:#C05A10;
-      --border:#D8D4CA; --border-lt:#ECEAE4;
-      --shadow:rgba(26,26,46,0.10);
-      --font-display:'Fraunces',Georgia,serif;
-      --font-mono:'DM Mono','Courier New',monospace;
-      --font-body:'Source Serif 4',Georgia,serif;
-      /* A4縦 印刷想定: 794px幅, 文字大・太字 */
-      --fs-base: 1.05rem;
-      --fs-label: 0.88rem;
-      --fs-mono: 0.85rem;
+      --white:     #FFFFFF;
+      --bg:        #FAFAF8;
+      --bg-alt:    #F4F1EC;
+      --ink:       #1A1A2E;
+      --ink-mid:   #3D3D5C;
+      --ink-lite:  #7A7A9A;
+      --gold:      #B8860B;
+      --gold-lt:   #D4A01A;
+      --teal:      #1A7A8A;
+      --teal-lt:   #2A9BAD;
+      --sage:      #4A7A5A;
+      --red:       #C0392B;
+      --border:    #D8D4CA;
+      --border-lt: #ECEAE4;
+      --shadow:    rgba(26,26,46,0.08);
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-mono:    'DM Mono', 'Courier New', monospace;
+      --font-body:    'Source Serif 4', Georgia, serif;
     }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    html{scroll-behavior:smooth;}
-    body{font-family:var(--font-body);font-size:var(--fs-base);font-weight:600;color:var(--ink);background:var(--bg);line-height:1.75;}
-    a{color:inherit;text-decoration:none;}
-    strong{font-weight:800;}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); font-size: 1rem; color: var(--ink); background: var(--bg); line-height: 1.7; }
+    a { color: inherit; text-decoration: none; }
 
-    /* ═══ STICKY TOP BAR ═══ */
-    .top-bar {
-      position:sticky;top:0;z-index:200;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 1.25rem;height:52px;
-      background:rgba(250,250,248,0.97);backdrop-filter:blur(8px);
-      border-bottom:1px solid var(--border);
-      flex-wrap:wrap;gap:0.5rem;
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem; height: 54px;
+      background: rgba(250,250,248,0.96); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
     }
-    .top-left{display:flex;align-items:center;gap:0.75rem;}
-    /* 言語切り替えを左上 */
-    .lang-toggle{display:flex;border:1px solid var(--border);}
-    .lang-btn{
-      font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.08em;
-      padding:0.3rem 0.8rem;background:var(--bg);color:var(--ink-lite);
-      border:none;border-right:1px solid var(--border);cursor:pointer;transition:all 0.15s;
-    }
-    .lang-btn:last-child{border-right:none;}
-    .lang-btn.active{background:var(--ink);color:var(--bg);}
-    .top-logo{font-family:var(--font-mono);font-size:0.9rem;letter-spacing:0.04em;font-weight:700;}
-    .top-logo span{color:var(--gold);}
-    .top-right{display:flex;align-items:center;gap:0.75rem;}
-    .nav-back{
-      font-family:var(--font-mono);font-size:var(--fs-mono);letter-spacing:0.06em;
-      color:var(--ink-lite);border:1px solid var(--border);padding:0.3rem 0.9rem;
-      transition:all 0.2s;
-    }
-    .nav-back:hover{color:var(--teal);border-color:var(--teal);}
+    .nav-logo { font-family: var(--font-mono); font-size: 0.88rem; letter-spacing: 0.04em; color: var(--ink); }
+    .nav-logo span { color: var(--gold); margin-left: 0.4rem; }
+    .nav-back { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; color: var(--ink-lite); border: 1px solid var(--border); padding: 0.3rem 0.9rem; transition: all 0.2s; }
+    .nav-back:hover { color: var(--teal); border-color: var(--teal); }
 
-    /* ═══ LAYOUT ═══ */
-    .app-wrap{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 52px);}
-
-    /* ═══ SIDEBAR ═══ */
-    .sidebar{
-      background:var(--ink);padding:1rem 0;
-      position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;
+    /* ── SIDEBAR + MAIN LAYOUT ── */
+    .app-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: calc(100vh - 54px);
     }
-    .sb-section{padding:0.25rem 0 0.5rem;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:0.25rem;}
-    .sb-lbl{
-      font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.14em;
-      color:rgba(255,255,255,0.3);padding:0 1.1rem 0.35rem;text-transform:uppercase;
+    .sidebar {
+      background: var(--ink);
+      padding: 1.5rem 0;
+      position: sticky; top: 54px;
+      height: calc(100vh - 54px);
+      overflow-y: auto;
     }
-    .sb-btn{
-      display:flex;align-items:center;gap:0.55rem;width:100%;
-      padding:0.5rem 1.1rem;background:none;border:none;
-      font-family:var(--font-mono);font-size:0.76rem;letter-spacing:0.04em;
-      color:rgba(255,255,255,0.55);cursor:pointer;transition:all 0.15s;text-align:left;
+    .sidebar-section {
+      padding: 0.5rem 0 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 0.25rem;
     }
-    .sb-btn:hover{color:var(--bg);background:rgba(255,255,255,0.06);}
-    .sb-btn.active{color:var(--gold);background:rgba(184,134,11,0.14);border-left:2px solid var(--gold);}
-    .sb-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
-
-    /* ═══ MAIN ═══ */
-    .main{padding:2rem 2.5rem 5rem;max-width:860px;}
-    .page{display:none;}
-    .page.active{display:block;}
-
-    /* ═══ PAGE HEADER ═══ */
-    .pg-head{margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:2px solid var(--border-lt);}
-    .pg-tag{
-      font-family:var(--font-mono);font-size:var(--fs-mono);letter-spacing:0.12em;
-      font-weight:700;margin-bottom:0.35rem;
+    .sidebar-label {
+      font-family: var(--font-mono); font-size: 0.62rem;
+      letter-spacing: 0.14em; color: rgba(255,255,255,0.3);
+      padding: 0 1.25rem 0.4rem; text-transform: uppercase;
     }
-    .pg-h1{
-      font-family:var(--font-display);
-      font-size:clamp(1.6rem,3vw,2.2rem);font-weight:900;line-height:1.12;
+    .sidebar-btn {
+      display: flex; align-items: center; gap: 0.6rem;
+      width: 100%; padding: 0.55rem 1.25rem;
+      background: none; border: none;
+      font-family: var(--font-mono); font-size: 0.78rem;
+      letter-spacing: 0.04em; color: rgba(255,255,255,0.55);
+      cursor: pointer; transition: all 0.15s; text-align: left;
     }
-    .pg-desc{color:var(--ink-mid);margin-top:0.4rem;font-size:var(--fs-base);font-weight:600;}
-
-    /* ═══ STICKY LABELS (付箋) ═══ */
-    .label-tag{
-      display:inline-block;
-      font-family:var(--font-mono);font-size:0.75rem;font-weight:700;
-      letter-spacing:0.1em;padding:0.25rem 0.85rem;
-      border-radius:2px;margin-bottom:0.6rem;
-      box-shadow:2px 2px 0 rgba(0,0,0,0.12);
-      transform:rotate(-0.5deg);
-    }
-    .label-gold{background:#FFF3CC;color:var(--gold);border:1px solid #E8C84A;}
-    .label-teal{background:#D4F0F4;color:var(--teal);border:1px solid #7ECAD4;}
-    .label-sage{background:#D8F0DC;color:var(--sage);border:1px solid #7EC48A;}
-    .label-purple{background:#EDD8F8;color:var(--purple);border:1px solid #B87AE0;}
-    .label-red{background:#FAE0DC;color:var(--red);border:1px solid #E89080;}
-    .label-orange{background:#FAEACC;color:var(--orange);border:1px solid #E0A050;}
-    .label-ink{background:#E0E0EC;color:var(--ink);border:1px solid #9090B0;}
-
-    /* ═══ FORM ═══ */
-    .form-sec{background:var(--white);border:1px solid var(--border);margin-bottom:1.25rem;}
-    .form-sec-head{
-      display:flex;align-items:center;gap:0.65rem;padding:0.8rem 1.1rem;
-      background:var(--bg-alt);border-bottom:1px solid var(--border);
-    }
-    .form-sec-num{
-      font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.1em;
-      color:var(--ink-lite);border:1px solid var(--border);padding:0.12rem 0.45rem;font-weight:700;
-    }
-    .form-sec-title{font-family:var(--font-mono);font-size:var(--fs-mono);font-weight:700;letter-spacing:0.06em;}
-    .form-body{padding:1.1rem;display:grid;gap:0.9rem;}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;}
-    .form-group{display:flex;flex-direction:column;gap:0.3rem;}
-    .form-group.full{grid-column:1/-1;}
-    label{font-family:var(--font-mono);font-size:var(--fs-label);font-weight:700;letter-spacing:0.07em;color:var(--ink-mid);}
-    label .req{color:var(--red);margin-left:0.2rem;}
-    input[type="text"],input[type="email"],textarea,select{
-      font-family:var(--font-body);font-size:var(--fs-base);font-weight:600;
-      color:var(--ink);background:var(--bg);border:1.5px solid var(--border);
-      padding:0.6rem 0.85rem;width:100%;transition:border-color 0.2s;
-      -webkit-appearance:none;appearance:none;
-    }
-    input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);background:var(--white);}
-    textarea{resize:vertical;min-height:88px;}
-    .char-ct{font-family:var(--font-mono);font-size:0.68rem;font-weight:700;color:var(--ink-lite);text-align:right;margin-top:0.15rem;}
-    .char-ct.warn{color:var(--orange);}
-    .char-ct.ok{color:var(--sage);}
-    .fmt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.5rem;}
-    .fmt-opt{display:flex;align-items:center;gap:0.45rem;cursor:pointer;}
-    .fmt-opt input[type="radio"]{accent-color:var(--teal);}
-    .fmt-opt span{font-family:var(--font-mono);font-size:0.8rem;font-weight:700;color:var(--ink-mid);}
-    .fmt-opt:has(input:checked) span{color:var(--teal);}
-
-    /* ═══ SCORE PANEL ═══ */
-    .score-panel{
-      background:var(--ink);border:1px solid rgba(255,255,255,0.15);
-      padding:1.1rem 1.4rem;display:flex;align-items:center;gap:1.25rem;
-      flex-wrap:wrap;margin-top:1.25rem;
-      box-shadow:0 6px 24px rgba(26,26,46,0.22);
-    }
-    .score-num{font-family:var(--font-display);font-size:2.2rem;font-weight:900;line-height:1;}
-    .score-num.pass{color:var(--gold);}
-    .score-num.fail{color:rgba(255,255,255,0.35);}
-    .score-lbl{font-family:var(--font-mono);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-top:0.15rem;}
-    .score-bars{display:flex;gap:0.35rem;flex:1;flex-wrap:wrap;}
-    .sbar{flex:1;min-width:65px;}
-    .sbar-lbl{font-family:var(--font-mono);font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.4);margin-bottom:0.2rem;}
-    .sbar-track{height:5px;background:rgba(255,255,255,0.1);border-radius:2px;}
-    .sbar-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.4s ease;}
-    .btn-start{
-      font-family:var(--font-mono);font-size:0.85rem;font-weight:700;letter-spacing:0.08em;
-      padding:0.8rem 1.75rem;background:var(--gold);color:var(--ink);
-      border:none;cursor:pointer;transition:all 0.2s;white-space:nowrap;
-    }
-    .btn-start:hover{background:var(--gold-lt);}
-    .btn-start:disabled{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);cursor:not-allowed;}
-    .score-msg{font-family:var(--font-mono);font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.5);flex-basis:100%;}
-
-    /* ═══ ACTION BAR ═══ */
-    .action-bar{display:flex;gap:0.65rem;flex-wrap:wrap;margin-bottom:1.25rem;}
-    .btn-act{
-      font-family:var(--font-mono);font-size:0.78rem;font-weight:700;letter-spacing:0.06em;
-      padding:0.5rem 1.1rem;border:1.5px solid var(--border);background:var(--white);
-      color:var(--ink-mid);cursor:pointer;transition:all 0.2s;
-    }
-    .btn-act:hover{border-color:var(--teal);color:var(--teal);}
-    .btn-act.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);}
-    .btn-act.primary:hover{background:var(--teal);border-color:var(--teal);}
-    .btn-act.danger{border-color:var(--red);color:var(--red);}
-
-    /* ═══ STAGE CARDS ═══ */
-    .stage-card{
-      background:var(--white);border:1px solid var(--border);
-      border-left:4px solid var(--gold);padding:1.4rem;margin-bottom:1.1rem;
-    }
-    .stage-card h3{font-family:var(--font-display);font-size:1.2rem;font-weight:800;margin-bottom:0.5rem;}
-    .stage-card p{color:var(--ink-mid);font-size:var(--fs-base);font-weight:600;}
-
-    /* EDITABLE PROMPT BOX */
-    .prompt-wrap{position:relative;margin-top:0.9rem;}
-    .prompt-edit{
-      width:100%;min-height:160px;padding:1rem 1.1rem;
-      font-family:var(--font-mono);font-size:0.82rem;font-weight:600;line-height:1.7;
-      color:var(--ink-mid);background:var(--bg-alt);
-      border:1.5px solid var(--teal);resize:vertical;
-    }
-    .prompt-edit:focus{outline:none;background:var(--white);}
-    .prompt-actions{display:flex;gap:0.6rem;margin-top:0.6rem;flex-wrap:wrap;}
-    .btn-copy{
-      font-family:var(--font-mono);font-size:0.75rem;font-weight:700;
-      letter-spacing:0.06em;padding:0.45rem 1.1rem;
-      background:var(--ink);color:var(--bg);border:none;cursor:pointer;transition:background 0.2s;
-    }
-    .btn-copy:hover{background:var(--teal);}
-    .btn-copy.outline{background:var(--bg-alt);color:var(--ink-mid);border:1.5px solid var(--border);}
-    .btn-copy.outline:hover{border-color:var(--teal);color:var(--teal);background:var(--white);}
-
-    /* ═══ OUTPUT PREVIEW ═══ */
-    .output-box{
-      background:var(--white);border:2px solid var(--teal);
-      padding:1.5rem;margin-top:1.25rem;font-size:var(--fs-base);font-weight:600;
-      line-height:1.8;white-space:pre-wrap;min-height:120px;
-    }
-    .output-actions{display:flex;gap:0.65rem;flex-wrap:wrap;margin-top:0.75rem;}
-
-    /* ═══ CHECK LIST ═══ */
-    .checklist{display:grid;gap:0.5rem;}
-    .check-item{
-      display:flex;gap:0.65rem;align-items:flex-start;
-      font-size:var(--fs-base);font-weight:700;cursor:pointer;
-      font-family:var(--font-body);line-height:1.5;
-    }
-    .check-item input[type="checkbox"]{
-      accent-color:var(--teal);width:18px;height:18px;flex-shrink:0;margin-top:2px;
+    .sidebar-btn:hover { color: var(--bg); background: rgba(255,255,255,0.06); }
+    .sidebar-btn.active { color: var(--gold); background: rgba(184,134,11,0.12); border-left: 2px solid var(--gold); }
+    .sidebar-btn .stage-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor; flex-shrink: 0;
     }
 
-    /* ═══ TABLE ═══ */
-    .fmt-table{width:100%;border-collapse:collapse;font-size:0.88rem;font-weight:700;}
-    .fmt-table th{
-      font-family:var(--font-mono);font-size:0.72rem;font-weight:800;
-      letter-spacing:0.08em;text-align:left;padding:0.6rem 0.75rem;
-      background:var(--bg-alt);border:1px solid var(--border);color:var(--ink-mid);
-    }
-    .fmt-table td{padding:0.55rem 0.75rem;border:1px solid var(--border-lt);font-size:0.85rem;}
-    .fmt-table tr:nth-child(even) td{background:var(--bg);}
+    /* ── MAIN CONTENT ── */
+    .main-content { padding: 2.5rem 2.5rem 4rem; max-width: 860px; }
+    .page { display: none; }
+    .page.active { display: block; }
 
-    /* ═══ A4 PRINT ═══ */
-    @media print {
-      .top-bar,.sidebar{display:none!important;}
-      .app-wrap{grid-template-columns:1fr;}
-      .main{padding:1cm;max-width:100%;font-size:11pt;}
-      .page{display:block!important;page-break-after:always;}
-      .score-panel{display:none;}
-      .action-bar{display:none;}
+    /* ── PAGE HEADER ── */
+    .page-header { margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-lt); }
+    .page-stage-tag {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.12em; color: var(--gold);
+      margin-bottom: 0.4rem;
     }
+    .page-h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 900; color: var(--ink); line-height: 1.15;
+    }
+    .page-desc { color: var(--ink-mid); margin-top: 0.5rem; font-size: 0.95rem; }
 
-    /* ═══ RESPONSIVE ═══ */
-    @media(max-width:768px){
-      .app-wrap{grid-template-columns:1fr;}
-      .sidebar{position:static;height:auto;display:flex;flex-wrap:wrap;padding:0.5rem;gap:0.25rem;}
-      .sb-section{padding:0;border:none;display:flex;flex-wrap:wrap;gap:0.2rem;}
-      .sb-lbl{display:none;}
-      .sb-btn{width:auto;padding:0.35rem 0.7rem;font-size:0.68rem;}
-      .main{padding:1.25rem 1rem 3rem;}
-      .form-row{grid-template-columns:1fr;}
-      .score-panel{position:static;}
-      .top-bar{height:auto;padding:0.5rem 1rem;}
+    /* ── FORM ── */
+    .form-section {
+      background: var(--white);
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .form-section-head {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.9rem 1.25rem;
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--border);
+    }
+    .form-section-num {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.1em; color: var(--ink-lite);
+      border: 1px solid var(--border); padding: 0.15rem 0.5rem;
+    }
+    .form-section-title {
+      font-family: var(--font-mono); font-size: 0.82rem;
+      letter-spacing: 0.06em; font-weight: 500; color: var(--ink);
+    }
+    .form-section-body { padding: 1.25rem; display: grid; gap: 1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    label {
+      font-family: var(--font-mono); font-size: 0.72rem;
+      letter-spacing: 0.08em; color: var(--ink-mid);
+    }
+    label .req { color: var(--red); margin-left: 0.2rem; }
+    input[type="text"], input[type="email"], textarea, select {
+      font-family: var(--font-body); font-size: 0.92rem;
+      color: var(--ink); background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.85rem;
+      width: 100%;
+      transition: border-color 0.2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    input[type="text"]:focus, input[type="email"]:focus,
+    textarea:focus, select:focus {
+      outline: none; border-color: var(--teal);
+      background: var(--white);
+    }
+    input.invalid, textarea.invalid { border-color: var(--red); }
+    textarea { resize: vertical; min-height: 90px; }
+    .char-count {
+      font-family: var(--font-mono); font-size: 0.68rem;
+      color: var(--ink-lite); text-align: right; margin-top: 0.2rem;
+    }
+    .char-count.warn { color: var(--gold); }
+    .char-count.ok { color: var(--sage); }
+
+    /* format radio */
+    .format-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.6rem;
+    }
+    .format-option { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+    .format-option input[type="radio"] { accent-color: var(--teal); }
+    .format-option span {
+      font-family: var(--font-mono); font-size: 0.78rem;
+      letter-spacing: 0.04em; color: var(--ink-mid);
+    }
+    .format-option:has(input:checked) span { color: var(--teal); font-weight: 500; }
+
+    /* ── SCORE PANEL ── */
+    .score-panel {
+      position: sticky; bottom: 1.5rem;
+      background: var(--ink);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+      box-shadow: 0 8px 32px rgba(26,26,46,0.25);
+    }
+    .score-total {
+      font-family: var(--font-display);
+      font-size: 2rem; font-weight: 900;
+      line-height: 1;
+    }
+    .score-total.pass { color: var(--gold); }
+    .score-total.fail { color: rgba(255,255,255,0.4); }
+    .score-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-top: 0.2rem; }
+    .score-bars { display: flex; gap: 0.4rem; flex: 1; flex-wrap: wrap; }
+    .score-bar-item { flex: 1; min-width: 70px; }
+    .score-bar-label { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.06em; color: rgba(255,255,255,0.4); margin-bottom: 0.25rem; }
+    .score-bar-track { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .score-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.4s ease; }
+    .btn-start {
+      font-family: var(--font-mono); font-size: 0.82rem;
+      letter-spacing: 0.08em; padding: 0.75rem 1.75rem;
+      background: var(--gold); color: var(--ink);
+      border: none; cursor: pointer; transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-start:hover { background: var(--gold-lt); }
+    .btn-start:disabled {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.3); cursor: not-allowed;
+    }
+    .score-msg { font-family: var(--font-mono); font-size: 0.72rem; color: rgba(255,255,255,0.5); flex-basis: 100%; }
+
+    /* ── STAGE PAGES ── */
+    .stage-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .stage-card h3 {
+      font-family: var(--font-display); font-size: 1.15rem; font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .stage-card p { color: var(--ink-mid); font-size: 0.92rem; }
+    .prompt-box {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--teal);
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem; line-height: 1.7;
+      color: var(--ink-mid);
+      white-space: pre-wrap;
+    }
+    .copy-btn {
+      font-family: var(--font-mono); font-size: 0.72rem;
+      letter-spacing: 0.08em; padding: 0.4rem 1rem;
+      background: var(--ink); color: var(--bg);
+      border: none; cursor: pointer; margin-top: 0.75rem;
+      transition: background 0.2s;
+    }
+    .copy-btn:hover { background: var(--teal); }
+
+    /* formats table */
+    .formats-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .formats-table th {
+      font-family: var(--font-mono); font-size: 0.68rem;
+      letter-spacing: 0.08em; text-align: left;
+      padding: 0.6rem 0.75rem;
+      background: var(--bg-alt); border: 1px solid var(--border);
+      color: var(--ink-mid);
+    }
+    .formats-table td {
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--border-lt);
+      vertical-align: top; font-size: 0.82rem;
+    }
+    .formats-table tr:nth-child(even) td { background: var(--bg); }
+
+    /* ── SAVE/LOAD BAR ── */
+    .action-bar {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .btn-action {
+      font-family: var(--font-mono); font-size: 0.75rem;
+      letter-spacing: 0.06em; padding: 0.5rem 1.1rem;
+      border: 1px solid var(--border); background: var(--white);
+      color: var(--ink-mid); cursor: pointer; transition: all 0.2s;
+    }
+    .btn-action:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-action.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .btn-action.primary:hover { background: var(--teal); border-color: var(--teal); }
+
+    /* ── COMING SOON ── */
+    .coming-soon {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--ink-lite);
+    }
+    .coming-soon .cs-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .coming-soon h3 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--ink); }
+    .coming-soon p { font-size: 0.9rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .app-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; display: flex; flex-wrap: wrap; padding: 0.75rem; gap: 0.25rem; }
+      .sidebar-section { padding: 0; border: none; display: flex; flex-wrap: wrap; gap: 0.25rem; }
+      .sidebar-label { display: none; }
+      .sidebar-btn { width: auto; padding: 0.4rem 0.8rem; font-size: 0.7rem; }
+      .main-content { padding: 1.5rem 1rem 3rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .score-panel { position: static; }
     }
   </style>
 </head>
 <body>
 
-<!-- ═══ TOP BAR ═══ -->
-<header class="top-bar">
-  <div class="top-left">
-    <!-- 言語切り替え：左上 -->
-    <div class="lang-toggle">
-      <button class="lang-btn active" data-lang="ja" onclick="setLang('ja')">日本語</button>
-      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-logo">c4model.org <span>— 論文道場</span></div>
+  <a href="/" class="nav-back">← ホームへ戻る</a>
+</nav>
+
+<div class="app-layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Start Here</div>
+      <button class="sidebar-btn active" id="btn-stage0" onclick="goPage('stage0',this)">
+        <span class="stage-dot"></span>Stage 0 — 入力
+      </button>
     </div>
-    <div class="top-logo">c4model.org <span>— 論文道場</span></div>
-  </div>
-  <div class="top-right">
-    <button class="btn-act" onclick="window.print()" title="印刷（A4縦）">🖨 印刷</button>
-    <a href="/" class="nav-back">← ホームへ</a>
-  </div>
-</header>
-
-<div class="app-wrap">
-<!-- ═══ SIDEBAR ═══ -->
-<aside class="sidebar">
-  <div class="sb-section">
-    <div class="sb-lbl">Start</div>
-    <button class="sb-btn active" id="sb-stage0" onclick="go('stage0',this)"><span class="sb-dot"></span>Stage 0 — 入力</button>
-  </div>
-  <div class="sb-section">
-    <div class="sb-lbl">Stages</div>
-    <button class="sb-btn" id="sb-ideation"    onclick="go('ideation',this)"><span class="sb-dot"></span>Stage I — 発想</button>
-    <button class="sb-btn" id="sb-structure"   onclick="go('structure',this)"><span class="sb-dot"></span>Stage II — 構造化</button>
-    <button class="sb-btn" id="sb-write"       onclick="go('write',this)"><span class="sb-dot"></span>Stage III — 執筆</button>
-    <button class="sb-btn" id="sb-evaluate"    onclick="go('evaluate',this)"><span class="sb-dot"></span>Stage IV — 評価</button>
-    <button class="sb-btn" id="sb-presentation" onclick="go('presentation',this)"><span class="sb-dot"></span>Stage V — 発表準備</button>
-    <button class="sb-btn" id="sb-qa"          onclick="go('qa',this)"><span class="sb-dot"></span>Stage VI — 質疑応答</button>
-    <button class="sb-btn" id="sb-submit"      onclick="go('submit',this)"><span class="sb-dot"></span>Stage VII — 投稿</button>
-  </div>
-  <div class="sb-section">
-    <div class="sb-lbl">Tools</div>
-    <button class="sb-btn" id="sb-output"   onclick="go('output',this)"><span class="sb-dot"></span>📄 出力プレビュー</button>
-    <button class="sb-btn" id="sb-c4uml"    onclick="go('c4uml',this)"><span class="sb-dot"></span>C4モデル図集</button>
-    <button class="sb-btn" id="sb-formats"  onclick="go('formats',this)"><span class="sb-dot"></span>学会フォーマット</button>
-    <button class="sb-btn" id="sb-contact"  onclick="go('contact',this)"><span class="sb-dot"></span>お問い合わせ</button>
-    <button class="sb-btn" id="sb-settings" onclick="go('settings',this)"><span class="sb-dot"></span>設定</button>
-  </div>
-</aside>
-
-<!-- ═══ MAIN ═══ -->
-<main class="main">
-
-<!-- ══ STAGE 0: 入力 ══ -->
-<div class="page active" id="page-stage0">
-  <div class="pg-head">
-    <div class="pg-tag" style="color:var(--gold)">
-      <span class="label-tag label-gold">STAGE 0</span>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Writing Stages</div>
+      <button class="sidebar-btn" onclick="goPage('ideation',this)"><span class="stage-dot"></span>Stage I — 発想</button>
+      <button class="sidebar-btn" id="btn-structure" onclick="goPage('structure',this)"><span class="stage-dot"></span>Stage II — 構造化</button>
+      <button class="sidebar-btn" id="btn-write" onclick="goPage('write',this)"><span class="stage-dot"></span>Stage III — 執筆</button>
+      <button class="sidebar-btn" onclick="goPage('evaluate',this)"><span class="stage-dot"></span>Stage IV — 評価</button>
+      <button class="sidebar-btn" onclick="goPage('presentation',this)"><span class="stage-dot"></span>Stage V — 発表準備</button>
+      <button class="sidebar-btn" onclick="goPage('qa',this)"><span class="stage-dot"></span>Stage VI — 質疑応答</button>
+      <button class="sidebar-btn" id="btn-submit" onclick="goPage('submit',this)"><span class="stage-dot"></span>Stage VII — 投稿</button>
     </div>
-    <h1 class="pg-h1" data-ja>研究の設計図を描く</h1>
-    <h1 class="pg-h1" data-en style="display:none">Design Your Research Blueprint</h1>
-    <p class="pg-desc" data-ja>必須項目（<span style="color:var(--red)">*</span>）を入力。スコア28点以上で「分析開始」が有効になります。</p>
-    <p class="pg-desc" data-en style="display:none">Fill in required fields (*). Score 28+ to unlock "Start Analysis".</p>
-  </div>
-
-  <!-- Monitor Data Instruction -->
-  <div style="background:#E8F4F8; border:1px solid #B0D4E3; padding:1rem 1.25rem; margin-bottom:1.5rem; border-left:4px solid var(--teal);">
-    <strong style="color:var(--teal); font-family:var(--font-mono); font-size:0.9rem;">【モニター参加者へのご案内】データの保存・再生について</strong>
-    <p style="font-size:0.85rem; margin-top:0.4rem; font-weight:600; line-height:1.6; color:var(--ink-mid);">
-      本システムは<strong>外部のデータベースに個人情報や研究データを送信せず、お使いの端末（ブラウザ）内にのみ安全にデータを保存</strong>します。そのため、アカウント登録不要で全国どこからでも即座にテスト利用が可能です。<br>
-      作業を中断・再開する際は、必ず下の<strong>「💾 下書き保存」</strong>を押し、次回アクセス時に<strong>「📂 下書き読込」</strong>を押すことで、すべてのプロンプトと入力状態を完全復元（再生）できます。
-    </p>
-  </div>
-
-  <div class="action-bar">
-    <button class="btn-act primary" onclick="saveDraft()">💾 <span data-ja>下書き保存</span><span data-en style="display:none">Save Draft</span></button>
-    <button class="btn-act" onclick="loadDraft()">📂 <span data-ja>下書き読込</span><span data-en style="display:none">Load Draft</span></button>
-    <button class="btn-act danger" onclick="clearForm()">🗑 <span data-ja>クリア</span><span data-en style="display:none">Clear</span></button>
-  </div>
-
-  <!-- S1: 著者 -->
-  <div class="form-sec">
-    <div class="form-sec-head">
-      <span class="form-sec-num">01</span>
-      <span class="label-tag label-teal" style="margin:0">著者情報</span>
-      <span class="form-sec-title" data-ja>Author Information</span>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tools</div>
+      <button class="sidebar-btn" id="btn-c4uml" onclick="goPage('c4uml',this)"><span class="stage-dot"></span>C4モデル図集</button>
+      <button class="sidebar-btn" id="btn-formats" onclick="goPage('formats',this)"><span class="stage-dot"></span>学会フォーマット</button>
+      <button class="sidebar-btn" onclick="goPage('settings',this)"><span class="stage-dot"></span>設定</button>
     </div>
-    <div class="form-body">
-      <div class="form-row">
-        <div class="form-group"><label for="f-author">著者氏名 <span class="req">*</span></label><input type="text" id="f-author" placeholder="例：奥村 治" oninput="recalc()"></div>
-        <div class="form-group"><label for="f-affiliation">所属機関 <span class="req">*</span></label><input type="text" id="f-affiliation" placeholder="例：C4モデル研究会®" oninput="recalc()"></div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main-content">
+
+    <!-- ══════ STAGE 0 ══════ -->
+    <div class="page active" id="page-stage0">
+      <div class="page-header">
+        <div class="page-stage-tag">STAGE 0 · 論文情報入力</div>
+        <h1 class="page-h1">200の実証例をワンクリックで再現する<br>『思考の自動化ツール』</h1>
+        <p class="page-desc">必須項目（<span style="color:var(--red)">*</span>）を入力してください。スコアが28点以上になると「分析開始」ボタンが有効になります。</p>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label for="f-email">メール <span class="req">*</span></label><input type="email" id="f-email" placeholder="info@c4model.org" oninput="recalc()"></div>
-        <div class="form-group"><label for="f-degree">学位・職位</label><input type="text" id="f-degree" placeholder="Ph.D. / 主宰"></div>
-      </div>
-      <div class="form-group full"><label for="f-coauthors">共著者（任意）</label><input type="text" id="f-coauthors" placeholder="山田太郎（東京大学）"></div>
-    </div>
-  </div>
 
-  <!-- S2: 論文情報 -->
-  <div class="form-sec">
-    <div class="form-sec-head">
-      <span class="form-sec-num">02</span>
-      <span class="label-tag label-gold" style="margin:0">論文情報</span>
-      <span class="form-sec-title">Paper Information</span>
-    </div>
-    <div class="form-body">
-      <div class="form-group full"><label for="f-title">論文題名 <span class="req">*</span></label><input type="text" id="f-title" placeholder="例：C4モデルによる俳句の認知構造分析" oninput="recalc()"></div>
-      <div class="form-row">
-        <div class="form-group"><label for="f-journal">投稿先</label><input type="text" id="f-journal" placeholder="例：ResearchGate.net / IEEE Access"></div>
-        <div class="form-group"><label for="f-language">執筆言語 <span class="req">*</span></label>
-          <select id="f-language" onchange="recalc()">
-            <option value="">選択してください</option>
-            <option value="ja">日本語</option>
-            <option value="en">English</option>
-            <option value="zh">中国語（中文）</option>
-            <option value="vi">ベトナム語（Tiếng Việt）</option>
-            <option value="it">イタリア語（Italiano）</option>
-            <option value="ja-en">日英バイリンガル</option>
-          </select>
+      <!-- 🔰 オンボーディング（使い方ガイド） -->
+      <div class="onboarding-guide reveal" style="margin-bottom: 2rem; background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--gold); padding: 1.75rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 8px 24px rgba(26,26,46,0.04);">
+        <h3 style="font-family: var(--font-display); font-size: 1.25rem; color: var(--ink); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>🔰</span> 3分でわかる！論文道場の使い方
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
+          <!-- Step 1 -->
+          <div style="background: var(--bg-alt); padding: 1.25rem; border: 1px solid var(--border-lt); border-radius: 6px;">
+            <div style="font-weight: bold; color: var(--teal); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+              <span style="background: var(--teal); color: var(--white); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">1</span>
+              何ができるの？
+            </div>
+            <p style="font-size: 0.85rem; color: var(--ink-mid); line-height: 1.6; margin: 0;">頭の中のモヤモヤを整理し、論理的な「レポート・企画書・論文」を挫折せずに書き上げるための思考自動化ツールです。</p>
+          </div>
+          
+          <!-- Step 2 -->
+          <div style="background: var(--bg-alt); padding: 1.25rem; border: 1px solid var(--border-lt); border-radius: 6px;">
+            <div style="font-weight: bold; color: var(--teal); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+              <span style="background: var(--teal); color: var(--white); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">2</span>
+              どう入力するの？
+            </div>
+            <p style="font-size: 0.85rem; color: var(--ink-mid); line-height: 1.6; margin: 0;">左のメニューに沿って、分かる項目から穴埋めしていくだけ。まずは下の<strong>【💡 サンプルを入力】</strong>ボタンを押して体験してみてください。</p>
+          </div>
+          
+          <!-- Step 3 -->
+          <div style="background: var(--bg-alt); padding: 1.25rem; border: 1px solid var(--border-lt); border-radius: 6px;">
+            <div style="font-weight: bold; color: var(--teal); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+              <span style="background: var(--teal); color: var(--white); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">3</span>
+              何が出てくるの？
+            </div>
+            <p style="font-size: 0.85rem; color: var(--ink-mid); line-height: 1.6; margin: 0;">審査をパスするレベルの「緻密な論文構成（Markdown）」と、最大の売りである<strong>「論文の構造を可視化できる図解（PlantUML）」</strong>が完成します。</p>
+          </div>
+        </div>
+        
+        <div style="margin-top: 1rem; text-align: center;">
+          <button class="btn-action primary" onclick="loadSample()" style="background:var(--teal); border-color:var(--teal); font-size: 0.95rem; padding: 0.85rem 2rem; box-shadow: 0 4px 12px rgba(42,155,173,0.3); transition: transform 0.2s; font-weight: bold; width: 100%; max-width: 600px;">
+            <span style="margin-right:0.4rem">💡</span> 迷ったらここをクリック！（サンプルデータを入力して体験する）
+          </button>
         </div>
       </div>
-      <div class="form-group full">
-        <label>投稿フォーマット <span class="req">*</span></label>
-        <div class="fmt-grid">
-          <label class="fmt-opt"><input type="radio" name="format" value="情報処理学会" onchange="recalc()"><span>情報処理学会</span></label>
-          <label class="fmt-opt"><input type="radio" name="format" value="日本図書館情報学会" onchange="recalc()"><span>日本図書館情報学会</span></label>
-          <label class="fmt-opt"><input type="radio" name="format" value="IEEE" onchange="recalc()"><span>IEEE</span></label>
-          <label class="fmt-opt"><input type="radio" name="format" value="ACM" onchange="recalc()"><span>ACM</span></label>
-          <label class="fmt-opt"><input type="radio" name="format" value="卒論・修論" onchange="recalc()"><span>卒論・修論</span></label>
-          <label class="fmt-opt"><input type="radio" name="format" value="自由形式" onchange="recalc()"><span>自由形式</span></label>
+
+      <div class="action-bar">
+        <a href="basho-case.html" target="_blank" class="btn-action" style="color:var(--teal); border-color:var(--teal);">📖 論文道場の活用事例を読む</a>
+        <button class="btn-action" onclick="saveDraft()" style="margin-left:auto;">💾 下書き保存</button>
+        <button class="btn-action" onclick="loadDraft()">📂 下書き読込</button>
+        <button class="btn-action" onclick="clearForm()">🗑 クリア</button>
+      </div>
+
+      <!-- 審査員向けのアピールブロック（Fukushima Tech Create / イノベーション人材育成） -->
+      <div style="background: rgba(26,122,138,0.08); border-left: 4px solid var(--teal); padding: 1.25rem 1.5rem; margin-bottom: 2rem;">
+        <h3 style="font-family: var(--font-display); font-size: 1.1rem; color: var(--teal); margin-bottom: 0.5rem;">地域からイノベーション人材を創出する「思考の型」</h3>
+        <p style="font-size: 0.9rem; color: var(--ink-mid); line-height: 1.6; margin-bottom: 0;">
+          本プラットフォーム「論文道場」は、C4モデル（国際標準のアーキテクチャ設計手法）を用いて、誰もが自らのアイデアを論理的に構造化できる教育工学SaaSです。<br>
+          「文章が書けない」という挫折を防ぐウェルビーイングな学習体験を提供し、福島県を起点とした<strong>次世代の起業家・高度デジタル人材の育成インフラ</strong>として機能します。
+        </p>
+      </div>
+
+      <!-- Section 1: 著者情報 -->
+      <div class="form-section">
+        <div class="form-section-head">
+          <span class="form-section-num">01</span>
+          <span class="form-section-title">著者情報 Author Information</span>
+        </div>
+        <div class="form-section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-author">著者氏名 <span class="req">*</span></label>
+              <input type="text" id="f-author" placeholder="例：奥村 治" oninput="recalc()">
+            </div>
+            <div class="form-group">
+              <label for="f-affiliation">所属機関 <span class="req">*</span></label>
+              <input type="text" id="f-affiliation" placeholder="例：C4モデル研究会®" oninput="recalc()">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-email">連絡先メール <span class="req">*</span></label>
+              <input type="email" id="f-email" placeholder="例：info@c4model.org" oninput="recalc()">
+            </div>
+            <div class="form-group">
+              <label for="f-degree">学位・職位</label>
+              <input type="text" id="f-degree" placeholder="例：Ph.D. / 主宰">
+            </div>
+          </div>
+          <div class="form-group full">
+            <label for="f-coauthors">共著者（任意）</label>
+            <input type="text" id="f-coauthors" placeholder="例：山田太郎（東京大学）">
+          </div>
         </div>
       </div>
-      <div class="form-group full"><label for="f-keywords">キーワード（カンマ区切り）<span class="req">*</span></label><input type="text" id="f-keywords" placeholder="C4モデル, 俳句, PlantUML, 構造分析" oninput="recalc()"></div>
-    </div>
-  </div>
 
-  <!-- S3: 要旨・RQ -->
-  <div class="form-sec">
-    <div class="form-sec-head">
-      <span class="form-sec-num">03</span>
-      <span class="label-tag label-purple" style="margin:0">要旨・RQ</span>
-      <span class="form-sec-title">Abstract &amp; Research Question</span>
-    </div>
-    <div class="form-body">
-      <div class="form-group full">
-        <label for="f-abstract">要旨（200字以上推奨）<span class="req">*</span></label>
-        <textarea id="f-abstract" rows="5" placeholder="研究の背景・目的・方法・結果・結論を簡潔に記述してください。" oninput="recalc();updateCount('f-abstract','cnt-abs',200)"></textarea>
-        <div class="char-ct" id="cnt-abs">0 字</div>
+      <!-- Section 2: 論文情報 -->
+      <div class="form-section">
+        <div class="form-section-head">
+          <span class="form-section-num">02</span>
+          <span class="form-section-title">論文情報 Paper Information</span>
+        </div>
+        <div class="form-section-body">
+          <div class="form-group full">
+            <label for="f-title">論文題名 <span class="req">*</span></label>
+            <input type="text" id="f-title" placeholder="例：C4モデルによる俳句の認知構造分析" oninput="recalc()">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-journal">投稿先ジャーナル・学会</label>
+              <input type="text" id="f-journal" placeholder="例：感性工学会 / IEEE Access">
+            </div>
+            <div class="form-group">
+              <label for="f-language">執筆言語 <span class="req">*</span></label>
+              <select id="f-language" onchange="recalc()">
+                <option value="">選択してください</option>
+                <option value="ja">日本語</option>
+                <option value="en">English</option>
+                <option value="ja-en">日英バイリンガル</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>投稿フォーマット <span class="req">*</span></label>
+            <div class="format-grid" id="format-grid">
+              <label class="format-option"><input type="radio" name="format" value="感性工学会" onchange="recalc()"><span>感性工学会</span></label>
+              <label class="format-option"><input type="radio" name="format" value="情報処理学会" onchange="recalc()"><span>情報処理学会</span></label>
+              <label class="format-option"><input type="radio" name="format" value="IEEE" onchange="recalc()"><span>IEEE</span></label>
+              <label class="format-option"><input type="radio" name="format" value="ACM" onchange="recalc()"><span>ACM</span></label>
+              <label class="format-option"><input type="radio" name="format" value="卒論・修論" onchange="recalc()"><span>卒論・修論</span></label>
+              <label class="format-option"><input type="radio" name="format" value="自由形式" onchange="recalc()"><span>自由形式</span></label>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label for="f-keywords">キーワード（カンマ区切り）<span class="req">*</span></label>
+            <input type="text" id="f-keywords" placeholder="例：C4モデル, 俳句, 感性工学, PlantUML" oninput="recalc()">
+          </div>
+        </div>
       </div>
-      <div class="form-group full">
-        <label for="f-rq">研究課題（RQ）<span class="req">*</span></label>
-        <textarea id="f-rq" rows="3" placeholder="例：C4モデルは俳句の認知構造をどのように可視化できるか？" oninput="recalc();updateCount('f-rq','cnt-rq',40)"></textarea>
-        <div class="char-ct" id="cnt-rq">0 字</div>
-      </div>
-      <div class="form-group full">
-        <label for="f-hypothesis">仮説</label>
-        <textarea id="f-hypothesis" rows="2" placeholder="例：俳句は「感情・言語・構造・象徴」の4つの階層（Container）がマトリョーシカ状に重なるシステムであり、各層の相互作用を可視化することで、読者の感動メカニズムを論理的に説明できる。" oninput="recalc()"></textarea>
-      </div>
-    </div>
-  </div>
 
-  <!-- S4: 構成 -->
-  <div class="form-sec">
-    <div class="form-sec-head">
-      <span class="form-sec-num">04</span>
-      <span class="label-tag label-sage" style="margin:0">論文構成</span>
-      <span class="form-sec-title">Paper Structure</span>
-    </div>
-    <div class="form-body">
-      <div class="form-group full">
-        <label for="f-structure">目次・章立て（1行1章）<span class="req">*</span></label>
-        <textarea id="f-structure" rows="7" placeholder="1. はじめに&#10;2. 先行研究&#10;3. 研究手法&#10;4. 分析結果&#10;5. 考察&#10;6. 結論" oninput="recalc();chapterCount()"></textarea>
-        <div class="char-ct" id="cnt-str">0 章</div>
+      <!-- Section 3: 要旨・RQ -->
+      <div class="form-section">
+        <div class="form-section-head">
+          <span class="form-section-num">03</span>
+          <span class="form-section-title">要旨・研究課題 Abstract &amp; Research Question</span>
+        </div>
+        <div class="form-section-body">
+          <div class="form-group full">
+            <label for="f-abstract">要旨（200字以上推奨）<span class="req">*</span></label>
+            <textarea id="f-abstract" rows="5" placeholder="研究の背景・目的・方法・結果・結論を簡潔に記述してください。" oninput="recalc(); updateCount('f-abstract','cnt-abstract',200)"></textarea>
+            <div class="char-count" id="cnt-abstract">0 字</div>
+          </div>
+          <div class="form-group full">
+            <label for="f-rq">研究課題 RQ（Research Question）<span class="req">*</span></label>
+            <textarea id="f-rq" rows="3" placeholder="例：C4モデルは俳句の認知構造をどのように可視化できるか？" oninput="recalc(); updateCount('f-rq','cnt-rq',50)"></textarea>
+            <div class="char-count" id="cnt-rq">0 字</div>
+          </div>
+          <div class="form-group full">
+            <label for="f-hypothesis">仮説（Hypothesis）</label>
+            <textarea id="f-hypothesis" rows="2" placeholder="例：L1〜L4の4層分析により、俳句の詩的緊張構造が定量化できる。" oninput="recalc()"></textarea>
+          </div>
+        </div>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label for="f-wordcount">想定字数</label>
-          <select id="f-wordcount">
-            <option value="">未定</option>
-            <option value="3000">〜3,000字（短報）</option>
-            <option value="6000">〜6,000字（一般）</option>
-            <option value="10000">〜10,000字（長報）</option>
-            <option value="20000">〜20,000字（卒論）</option>
-          </select>
+
+      <!-- Section 4: 構成 -->
+      <div class="form-section">
+        <div class="form-section-head">
+          <span class="form-section-num">04</span>
+          <span class="form-section-title">論文構成 Paper Structure</span>
+        </div>
+        <div class="form-section-body">
+          <div class="form-group full">
+            <label for="f-structure">目次・章立て（1行1章）<span class="req">*</span></label>
+            <textarea id="f-structure" rows="17" oninput="recalc(); updateCount('f-structure','cnt-structure',0)">1. 題名
+2. 要旨
+3. キーワード
+4. はじめに
+5. XXの活用意義
+6. 背景
+7. 目的
+8. 手法
+9. 結果の考察
+10. 今後の展望
+11. 参考文献
+12. 脚注
+13. 著作権表示
+14. 利益相反
+15. 著者プロフィール
+16. 付録
+17. 連絡先</textarea>
+            <div class="char-count" id="cnt-structure">17 章</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-wordcount">想定字数（目安）</label>
+              <select id="f-wordcount">
+                <option value="">未定</option>
+                <option value="3000">〜3,000字（短報）</option>
+                <option value="6000">〜6,000字（一般）</option>
+                <option value="10000">〜10,000字（長報）</option>
+                <option value="20000">〜20,000字（卒論）</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: 参考文献 -->
+      <div class="form-section">
+        <div class="form-section-head">
+          <span class="form-section-num">05</span>
+          <span class="form-section-title">先行研究・参考文献 References</span>
+        </div>
+        <div class="form-section-body">
+          <div class="form-group full">
+            <label for="f-prior">先行研究の要点</label>
+            <textarea id="f-prior" rows="3" placeholder="関連する既存研究の要点を記述してください。" oninput="recalc()"></textarea>
+          </div>
+          <div class="form-group full">
+            <label for="f-refs" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>参考文献リスト（1行1件）<span class="req">*</span></span>
+            </label>
+            <textarea id="f-refs" rows="5" oninput="recalc(); countRefs()">[例] Okumura, O. (2025). Schubert's Ave Maria...
+[例] 奥村治 (2025). 松尾芭蕉俳句...</textarea>
+            <div class="char-count" id="cnt-refs">2 件（6件以上で満点）</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCORE PANEL -->
+      <div class="score-panel" id="score-panel">
+        <div>
+          <div class="score-total fail" id="score-num">0</div>
+          <div class="score-label">/ 30 点</div>
+        </div>
+        <div class="score-bars" id="score-bars">
+          <div class="score-bar-item"><div class="score-bar-label">RQ明確性</div><div class="score-bar-track"><div class="score-bar-fill" id="bar-rq" style="width:0%"></div></div></div>
+          <div class="score-bar-item"><div class="score-bar-label">論文構成</div><div class="score-bar-track"><div class="score-bar-fill" id="bar-str" style="width:0%"></div></div></div>
+          <div class="score-bar-item"><div class="score-bar-label">参考文献</div><div class="score-bar-track"><div class="score-bar-fill" id="bar-ref" style="width:0%"></div></div></div>
+          <div class="score-bar-item"><div class="score-bar-label">フォーマット</div><div class="score-bar-track"><div class="score-bar-fill" id="bar-fmt" style="width:0%"></div></div></div>
+          <div class="score-bar-item"><div class="score-bar-label">要旨</div><div class="score-bar-track"><div class="score-bar-fill" id="bar-abs" style="width:0%"></div></div></div>
+          <div class="score-bar-item"><div class="score-bar-label">著者情報</div><div class="score-bar-track"><div class="score-bar-fill" id="bar-aut" style="width:0%"></div></div></div>
+        </div>
+        <button class="btn-start" id="btn-start" disabled onclick="goPage('ideation', document.querySelector('.sidebar-btn:nth-child(2)'))">
+          → 分析開始
+        </button>
+        <div class="score-msg" id="score-msg">必須項目を入力してスコアを28点以上にしてください</div>
+      </div>
+    </div>
+
+    <!-- ══════ STAGE I: IDEATION ══════ -->
+    <div class="page" id="page-ideation">
+      <div class="page-header">
+        <div class="page-stage-tag">STAGE I · 発想</div>
+        <h1 class="page-h1">研究アイデアを育てる</h1>
+        <p class="page-desc">CREATEプロンプトを使い、研究課題を多角的に探索します。</p>
+      </div>
+      <div class="stage-card">
+        <h3>🧠 CREATEプロンプト</h3>
+        <p>以下のプロンプトをClaude AIにコピー＆ペーストして、研究テーマの発展的な問いを生成させてください。</p>
+        <div class="prompt-box" id="create-prompt">Stage 0のデータを入力してから「分析開始」を押してください。
+プロンプトが自動生成されます。</div>
+        <button class="copy-btn" onclick="copyPrompt('create-prompt')">📋 プロンプトをコピー</button>
+      </div>
+      <div class="stage-card">
+        <h3>📝 RQチェックリスト</h3>
+        <p style="margin-bottom:0.75rem;">良いResearch Questionの条件を確認してください：</p>
+        <div style="display:grid; gap:0.5rem;">
+          <label style="display:flex;gap:0.6rem;align-items:center;font-size:0.9rem;cursor:pointer;font-family:var(--font-body)"><input type="checkbox"> 具体的で測定可能な問いになっている</label>
+          <label style="display:flex;gap:0.6rem;align-items:center;font-size:0.9rem;cursor:pointer;font-family:var(--font-body)"><input type="checkbox"> 先行研究との差別化が明確である</label>
+          <label style="display:flex;gap:0.6rem;align-items:center;font-size:0.9rem;cursor:pointer;font-family:var(--font-body)"><input type="checkbox"> 仮説が検証可能な形で設定されている</label>
+          <label style="display:flex;gap:0.6rem;align-items:center;font-size:0.9rem;cursor:pointer;font-family:var(--font-body)"><input type="checkbox"> C4モデルの層構造（L1〜L4）との対応が明確である</label>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- S5: 先行研究・参考文献 -->
-  <div class="form-sec">
-    <div class="form-sec-head">
-      <span class="form-sec-num">05</span>
-      <span class="label-tag label-orange" style="margin:0">先行研究・参考文献</span>
-      <span class="form-sec-title">References</span>
-    </div>
-    <div class="form-body">
-      <div class="form-group full">
-        <label for="f-prior">先行研究の要点</label>
-        <textarea id="f-prior" rows="4" placeholder="1. 従来の俳句分析の限界: 従来の分析は「季語・切れ字の分析」や「作者の生涯との関連付け」に依存しており、作品内部の構造的関係性を体系的に可視化することには限界があった。&#10;2. C4モデルの有効性: Simon Brownが提唱したソフトウェア・アーキテクチャ記述手法（C4モデル）は、階層的な記述により、複雑なシステムの構造を整理するのに適している。&#10;3. デジタル人文学（DH）の動向: 文学研究に情報システム分野の分析手法を応用する試みが注目されており、構造分析の重要性が高まっている。" oninput="recalc()"></textarea>
+    <!-- ══════ STAGE II: STRUCTURE ══════ -->
+    <div class="page" id="page-structure">
+      <div class="page-header">
+        <div class="page-stage-tag">STAGE II · C4モデル構造化</div>
+        <h1 class="page-h1">論文の設計図を描く</h1>
+        <p class="page-desc">C4モデルの4層（Context→Container→Component→Code）で論文構造を可視化します。</p>
       </div>
-      <div class="form-group full">
-        <label for="f-refs">参考文献リスト（1行1件）<span class="req">*</span></label>
-        <textarea id="f-refs" rows="5" placeholder="Brown, S. (2018). Software Architecture for Developers. Leanpub.&#10;復本一郎 (2019). 小林一茶. 岩波新書.&#10;Moretti, F. (2013). Distant Reading. Verso Books." oninput="recalc();countRefs()"></textarea>
-        <div class="char-ct" id="cnt-refs">0 件（6件以上で満点）</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SCORE PANEL -->
-  <div class="score-panel">
-    <div>
-      <div class="score-num fail" id="score-num">0</div>
-      <div class="score-lbl">/ 30 点</div>
-    </div>
-    <div class="score-bars">
-      <div class="sbar"><div class="sbar-lbl">RQ</div><div class="sbar-track"><div class="sbar-fill" id="bar-rq" style="width:0%"></div></div></div>
-      <div class="sbar"><div class="sbar-lbl">構成</div><div class="sbar-track"><div class="sbar-fill" id="bar-str" style="width:0%"></div></div></div>
-      <div class="sbar"><div class="sbar-lbl">文献</div><div class="sbar-track"><div class="sbar-fill" id="bar-ref" style="width:0%"></div></div></div>
-      <div class="sbar"><div class="sbar-lbl">形式</div><div class="sbar-track"><div class="sbar-fill" id="bar-fmt" style="width:0%"></div></div></div>
-      <div class="sbar"><div class="sbar-lbl">要旨</div><div class="sbar-track"><div class="sbar-fill" id="bar-abs" style="width:0%"></div></div></div>
-      <div class="sbar"><div class="sbar-lbl">著者</div><div class="sbar-track"><div class="sbar-fill" id="bar-aut" style="width:0%"></div></div></div>
-    </div>
-    <button class="btn-start" id="btn-start" disabled onclick="go('ideation',document.getElementById('sb-ideation'))">→ 分析開始</button>
-    <div class="score-msg" id="score-msg">必須項目を入力してください</div>
-  </div>
-</div>
-
-<!-- ══ STAGE I: 発想 ══ -->
-<div class="page" id="page-ideation">
-  <div class="pg-head">
-    <span class="label-tag label-gold">STAGE I</span>
-    <h1 class="pg-h1" data-ja>研究アイデアを育てる</h1>
-    <h1 class="pg-h1" data-en style="display:none">Develop Research Ideas</h1>
-    <p class="pg-desc" data-ja>CREATEプロンプトを編集してClaudeに送信し、研究テーマを深掘りしてください。</p>
-    <p class="pg-desc" data-en style="display:none">Edit the CREATE prompt and send to Claude to deepen your research theme.</p>
-  </div>
-
-  <div class="stage-card" style="border-left-color:var(--gold)">
-    <span class="label-tag label-gold">CREATEプロンプト（編集可・コピー可）</span>
-    <p data-ja>下のテキストエリアを直接編集できます。編集後「コピー」してClaudeへ貼り付けてください。</p>
-    <p data-en style="display:none">Edit the textarea below directly. Copy and paste to Claude when ready.</p>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="create-prompt" rows="12">Stage 0のデータを入力して「分析開始」を押すと、プロンプトが自動生成されます。</textarea>
-      <div class="prompt-actions">
-        <button class="btn-copy" onclick="copyEl('create-prompt')">📋 プロンプトをコピー</button>
-        <button class="btn-copy outline" onclick="regenPrompt()">🔄 プロンプト再生成</button>
-        <button class="btn-copy outline" onclick="clearEl('create-prompt')">✕ クリア</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="stage-card" style="border-left-color:var(--teal)">
-    <span class="label-tag label-teal">RQチェックリスト</span>
-    <div class="checklist" style="margin-top:0.75rem;">
-      <label class="check-item"><input type="checkbox"> 具体的で測定可能な問いになっている</label>
-      <label class="check-item"><input type="checkbox"> 先行研究との差別化が明確である</label>
-      <label class="check-item"><input type="checkbox"> 仮説が検証可能な形で設定されている</label>
-      <label class="check-item"><input type="checkbox"> C4モデルのL1〜L4との対応が明確である</label>
-    </div>
-  </div>
-
-  <div class="stage-card" style="border-left-color:var(--sage)">
-    <span class="label-tag label-sage">Claudeからの回答を記録</span>
-    <p data-ja style="margin-bottom:0.75rem;">Claudeの回答をここに貼り付けて保存できます。</p>
-    <textarea class="prompt-edit" id="ideation-response" rows="8" placeholder="Claudeの回答をここに貼り付けてください…"></textarea>
-    <div class="prompt-actions">
-      <button class="btn-copy" onclick="saveField('ideation-response')">💾 保存</button>
-      <button class="btn-copy outline" onclick="copyEl('ideation-response')">📋 コピー</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ STAGE II: 構造化 ══ -->
-<div class="page" id="page-structure">
-  <div class="pg-head">
-    <span class="label-tag label-teal">STAGE II</span>
-    <h1 class="pg-h1">C4モデル構造化</h1>
-    <p class="pg-desc">4層（L1〜L4）で論文の骨格を設計します。</p>
-  </div>
-  <div class="stage-card" style="border-left-color:var(--gold)">
-    <span class="label-tag label-gold">L1 · Context — 研究の世界観</span>
-    <p>「なぜ今この研究が必要か？」社会的背景・外部アクターを記述します。</p>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="l1-prompt" rows="8">L1 Context図生成プロンプト（Stage 0入力後に自動生成されます）</textarea>
-      <div class="prompt-actions">
-        <button class="btn-copy" onclick="copyEl('l1-prompt')">📋 コピー</button>
-        <button class="btn-copy outline" onclick="goPage('c4uml')">🎨 C4図集で描画</button>
-      </div>
-    </div>
-  </div>
-  <div class="stage-card" style="border-left-color:var(--teal)">
-    <span class="label-tag label-teal">L2 · Container — 章立て構造</span>
-    <p>論文の各章を「コンテナ」として配置し、論理の流れを可視化します。</p>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="l2-prompt" rows="6">L2 Container図生成プロンプト（自動生成）</textarea>
-      <div class="prompt-actions"><button class="btn-copy" onclick="copyEl('l2-prompt')">📋 コピー</button></div>
-    </div>
-  </div>
-  <div class="stage-card" style="border-left-color:var(--sage)">
-    <span class="label-tag label-sage">L3 · Component — 論点・データ</span>
-    <p>各章の主要な論点・実験・引用を「コンポーネント」として整理します。</p>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="l3-prompt" rows="6">L3 Component図生成プロンプト（自動生成）</textarea>
-      <div class="prompt-actions"><button class="btn-copy" onclick="copyEl('l3-prompt')">📋 コピー</button></div>
-    </div>
-  </div>
-  <div class="stage-card" style="border-left-color:var(--purple)">
-    <span class="label-tag label-purple">L4 · Code — 文・接続詞</span>
-    <p>接続詞・文末表現・引用番号の統一ルールを設定します。</p>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="l4-prompt" rows="5">L4 Code詳細プロンプト（自動生成）</textarea>
-      <div class="prompt-actions"><button class="btn-copy" onclick="copyEl('l4-prompt')">📋 コピー</button></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ STAGE III: 執筆 ══ -->
-<div class="page" id="page-write">
-  <div class="pg-head">
-    <span class="label-tag label-purple">STAGE III</span>
-    <h1 class="pg-h1">7Rプロンプト執筆支援</h1>
-    <p class="pg-desc">7ステップで草稿から完成稿まで反復的に改良します。各プロンプトは編集可能です。</p>
-  </div>
-  <div id="r-cards"></div>
-</div>
-
-<!-- ══ STAGE IV: 評価 ══ -->
-<div class="page" id="page-evaluate">
-  <div class="pg-head">
-    <span class="label-tag label-orange">STAGE IV</span>
-    <h1 class="pg-h1">C4段階評価・止揚</h1>
-    <p class="pg-desc">C4スコアルーブリックで論文品質を自己評価します。</p>
-  </div>
-  <div class="stage-card">
-    <span class="label-tag label-orange">評価チェックシート</span>
-    <div class="checklist" style="margin-top:0.75rem;">
-      <label class="check-item"><input type="checkbox"> L1 Context：社会的背景・研究の必要性が明確か</label>
-      <label class="check-item"><input type="checkbox"> L2 Container：章立てに論理的な流れがあるか</label>
-      <label class="check-item"><input type="checkbox"> L3 Component：各章の論点・根拠が具体的か</label>
-      <label class="check-item"><input type="checkbox"> L4 Code：文体・接続詞・引用番号が統一されているか</label>
-      <label class="check-item"><input type="checkbox"> RQに対して結論が明確に答えているか</label>
-      <label class="check-item"><input type="checkbox"> 先行研究との差別化が本文中で説明されているか</label>
-      <label class="check-item"><input type="checkbox"> 図・表に番号とキャプションが付いているか</label>
-      <label class="check-item"><input type="checkbox"> 参考文献がSIST 02形式で統一されているか</label>
-    </div>
-  </div>
-  <div class="stage-card" style="border-left-color:var(--teal);margin-top:1rem;">
-    <span class="label-tag label-teal">査読想定コメント生成プロンプト</span>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="eval-prompt" rows="8">以下の論文草稿について、厳格な査読者の立場から想定コメントを5点生成してください。各コメントには「重要度（高/中/低）」と「改善提案」を含めてください。
+      <div class="stage-card" style="border-left-color:var(--gold)">
+        <h3>L1 · Context — 研究の世界観</h3>
+        <p>「この研究はなぜ今必要か？」社会的背景・先行研究・外部要因を記述します。</p>
+        <div class="prompt-box">以下をClaudeに送信してL1 Context図（PlantUML）を生成：
+---
+あなたはC4モデルの専門家です。以下の研究情報からL1 Context図をPlantUML形式で生成してください。
 
 論文題名：[Stage 0で入力した題名]
 研究課題：[Stage 0で入力したRQ]
-仮説：[Stage 0で入力した仮説]
+投稿先：[Stage 0で入力した学会]
 
 出力形式：
-1. [重要度：高] 指摘内容 → 改善提案
-2. ...</textarea>
-      <div class="prompt-actions">
-        <button class="btn-copy" onclick="copyEl('eval-prompt')">📋 コピー</button>
-        <button class="btn-copy outline" onclick="regenEvalPrompt()">🔄 入力データで再生成</button>
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+title L1 Context — [論文題名]
+Person(researcher, "研究者", "著者")
+System(paper, "本研究", "研究目的")
+System_Ext(prior, "先行研究", "関連分野")
+Rel(researcher, paper, "執筆")
+Rel(paper, prior, "参照")
+@enduml
+---
+C4モデルページで図を描画できます。</div>
+        <button class="copy-btn" onclick="goPage('c4uml', document.getElementById('btn-c4uml'))">🎨 C4図集ページで描画</button>
       </div>
-    </div>
-  </div>
-  <div class="stage-card" style="border-left-color:var(--sage);margin-top:1rem;">
-    <span class="label-tag label-sage">Claudeの査読コメントを記録</span>
-    <textarea class="prompt-edit" id="eval-response" rows="8" placeholder="Claudeの査読コメントをここに貼り付けてください…"></textarea>
-    <div class="prompt-actions">
-      <button class="btn-copy" onclick="saveField('eval-response')">💾 保存</button>
-      <button class="btn-copy outline" onclick="copyEl('eval-response')">📋 コピー</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ STAGE V: 発表準備 ══ -->
-<div class="page" id="page-presentation">
-  <div class="pg-head">
-    <span class="label-tag label-sage">STAGE V</span>
-    <h1 class="pg-h1">学会発表準備</h1>
-    <p class="pg-desc">発表スライド構成・ナレーション原稿を作成します。</p>
-  </div>
-  <div class="stage-card">
-    <span class="label-tag label-sage">スライド構成プロンプト</span>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="pres-prompt" rows="10">以下の論文をもとに、学会発表用スライド（10枚構成）の骨子を作成してください。
-
-論文題名：[Stage 0の題名]
-研究課題：[Stage 0のRQ]
-章立て：[Stage 0の構成]
-
-各スライドについて以下を出力：
-スライド番号 | タイトル | 主要メッセージ（1文）| キービジュアル案
-
-発表時間：15分を想定（質疑5分含む）</textarea>
-      <div class="prompt-actions">
-        <button class="btn-copy" onclick="copyEl('pres-prompt')">📋 コピー</button>
-        <button class="btn-copy outline" onclick="regenPresPrompt()">🔄 入力データで再生成</button>
+      <div class="stage-card" style="border-left-color:var(--teal)">
+        <h3>L2 · Container — 章立て構造</h3>
+        <p>論文の各章を「コンテナ」として配置し、論理の流れを可視化します。</p>
       </div>
-    </div>
-  </div>
-  <div class="stage-card" style="border-left-color:var(--teal);margin-top:1rem;">
-    <span class="label-tag label-teal">ナレーション原稿プロンプト</span>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="narr-prompt" rows="6">上記のスライド構成をもとに、各スライドの読み上げナレーション原稿（1スライド約90秒）を作成してください。自然な日本語口語体で記述してください。</textarea>
-      <div class="prompt-actions"><button class="btn-copy" onclick="copyEl('narr-prompt')">📋 コピー</button></div>
-    </div>
-  </div>
-  <div class="stage-card" style="border-left-color:var(--gold);margin-top:1rem;">
-    <span class="label-tag label-gold">発表メモ</span>
-    <textarea class="prompt-edit" id="pres-notes" rows="6" placeholder="Claudeの回答・発表準備メモをここに記録してください…"></textarea>
-    <div class="prompt-actions">
-      <button class="btn-copy" onclick="saveField('pres-notes')">💾 保存</button>
-      <button class="btn-copy outline" onclick="copyEl('pres-notes')">📋 コピー</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ STAGE VI: 質疑応答 ══ -->
-<div class="page" id="page-qa">
-  <div class="pg-head">
-    <span class="label-tag label-teal">STAGE VI</span>
-    <h1 class="pg-h1">想定質疑応答訓練</h1>
-    <p class="pg-desc">想定質問を生成して回答を練習します。</p>
-  </div>
-  <div class="stage-card">
-    <span class="label-tag label-teal">想定質問生成プロンプト</span>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="qa-prompt" rows="10">以下の論文に対して、審査委員・聴衆から想定される質問を難易度別に10問生成してください。
-
-論文題名：[Stage 0の題名]
-研究課題：[Stage 0のRQ]
-仮説：[Stage 0の仮説]
-
-出力形式：
-【高難度（研究の根幹を問う）】
-Q1：...
-Q2：...
-【中難度（方法論・データを問う）】
-Q3：...
-【基本確認】
-Q8：...</textarea>
-      <div class="prompt-actions">
-        <button class="btn-copy" onclick="copyEl('qa-prompt')">📋 コピー</button>
-        <button class="btn-copy outline" onclick="regenQAPrompt()">🔄 入力データで再生成</button>
+      <div class="stage-card" style="border-left-color:var(--sage)">
+        <h3>L3 · Component — 論点・データ</h3>
+        <p>各章内の主要な論点・実験・引用を「コンポーネント」として整理します。</p>
       </div>
-    </div>
-  </div>
-  <div class="stage-card" style="border-left-color:var(--gold);margin-top:1rem;">
-    <span class="label-tag label-gold">想定Q&amp;A 記録</span>
-    <textarea class="prompt-edit" id="qa-notes" rows="10" placeholder="想定質問と回答案をここに記録してください…"></textarea>
-    <div class="prompt-actions">
-      <button class="btn-copy" onclick="saveField('qa-notes')">💾 保存</button>
-      <button class="btn-copy outline" onclick="copyEl('qa-notes')">📋 コピー</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ STAGE VII: 投稿 ══ -->
-<div class="page" id="page-submit">
-  <div class="pg-head">
-    <span class="label-tag label-red">STAGE VII</span>
-    <h1 class="pg-h1">投稿・査読対応</h1>
-    <p class="pg-desc">最終チェックと投稿準備です。</p>
-  </div>
-  <div class="stage-card">
-    <span class="label-tag label-red">最終投稿チェックリスト</span>
-    <div class="checklist" style="margin-top:0.75rem;">
-      <label class="check-item"><input type="checkbox"> 著者情報・所属・メールが正確に記載されている</label>
-      <label class="check-item"><input type="checkbox"> フォーマット規程（字数・書式・頁数）に準拠している</label>
-      <label class="check-item"><input type="checkbox"> 参考文献がSIST 02形式で統一されている</label>
-      <label class="check-item"><input type="checkbox"> 図・表に通し番号とキャプションが付いている</label>
-      <label class="check-item"><input type="checkbox"> 要旨が和文・英文ともに規定字数を満たしている</label>
-      <label class="check-item"><input type="checkbox"> キーワードが5語以内で記載されている</label>
-      <label class="check-item"><input type="checkbox"> PlantUML図がSVG/PNG形式で出力済み</label>
-      <label class="check-item"><input type="checkbox"> COinS（Zotero用メタデータ）が設定されている</label>
-      <label class="check-item"><input type="checkbox"> 査読回答レターが準備されている（改訂投稿の場合）</label>
-    </div>
-  </div>
-  <div class="stage-card" style="border-left-color:var(--teal);margin-top:1rem;">
-    <span class="label-tag label-teal">査読回答レタープロンプト</span>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="response-letter" rows="8">以下の査読コメントに対する丁寧な回答レターを作成してください。
-
-査読コメント：
-[Stage IVで記録した査読コメントを貼り付ける]
-
-各コメントに対して：
-1. 御指摘の理解（1文）
-2. 対応内容（具体的な修正箇所と内容）
-3. 修正後の文章（該当部分）</textarea>
-      <div class="prompt-actions"><button class="btn-copy" onclick="copyEl('response-letter')">📋 コピー</button></div>
-    </div>
-  </div>
-  <div class="action-bar" style="margin-top:1.5rem;">
-    <button class="btn-act primary" onclick="go('output',document.getElementById('sb-output'))">📄 出力プレビューへ →</button>
-  </div>
-</div>
-
-<!-- ══ 出力プレビュー ══ -->
-<div class="page" id="page-output">
-  <div class="pg-head">
-    <span class="label-tag label-ink">📄 出力プレビュー</span>
-    <h1 class="pg-h1">論文草稿プレビュー &amp; 確認</h1>
-    <p class="pg-desc">入力データをもとに論文草稿のプレビューを生成します。修正が必要な場合は各Stageに戻って編集してください。</p>
-  </div>
-
-  <div class="action-bar">
-    <button class="btn-act primary" onclick="genPreview()">🔄 プレビュー生成</button>
-    <button class="btn-act" onclick="copyEl('preview-box')">📋 全文コピー</button>
-    <button class="btn-act" onclick="window.print()">🖨 PDF印刷（A4）</button>
-  </div>
-
-  <!-- 判断基準パネル -->
-  <div class="stage-card" style="border-left-color:var(--orange); margin-bottom:1.5rem;">
-    <span class="label-tag label-orange">🔍 品質点検と次のステップ</span>
-    <p style="font-weight:700; margin-bottom:1rem; font-size:1.05rem;">
-      出力されたプレビューの内容を確認し、以下のいずれかのステップを選択してください。
-    </p>
-    
-    <div style="background:var(--bg-alt); padding:1rem; border:1px solid var(--border); margin-bottom:1rem;">
-      <strong style="color:var(--red);">【A】まだ修正が必要な場合（各Stageで再検討）</strong>
-      <p style="font-size:0.85rem; color:var(--ink-mid); margin-bottom:0.75rem;">
-        入力の抜け漏れや、論理の飛躍がある場合は、ここから直接各Stageに戻って入力データを修正してください。修正後、再度「🔄 プレビュー生成」を押すことでデータが再反映されます。
-      </p>
-      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-        <button class="btn-act" onclick="go('stage0',document.getElementById('sb-stage0'))">① 著者・題名を修正</button>
-        <button class="btn-act" onclick="go('ideation',document.getElementById('sb-ideation'))">② RQ・仮説を修正</button>
-        <button class="btn-act" onclick="go('structure',document.getElementById('sb-structure'))">③ C4構造を修正</button>
-        <button class="btn-act" onclick="go('write',document.getElementById('sb-write'))">④ 本文を修正</button>
-        <button class="btn-act" onclick="go('evaluate',document.getElementById('sb-evaluate'))">⑤ 評価・査読対応へ</button>
+      <div class="stage-card" style="border-left-color:#8B4A8B">
+        <h3>L4 · Code — 文・接続詞</h3>
+        <p>接続詞・文末表現・引用番号の統一ルールを設定します。</p>
       </div>
     </div>
 
-    <div style="background:var(--bg-alt); padding:1rem; border:1px solid var(--border);">
-      <strong style="color:var(--teal);">【B】このまま進める場合（Claudeで清書・仕上げ）</strong>
-      <p style="font-size:0.85rem; color:var(--ink-mid); margin-bottom:0.75rem;">
-        内容が十分に整っていると判断した場合は、「全文をコピー」し、すぐ下にある【清書・仕上げプロンプト】と一緒にClaudeへ送信して完成稿を作成させます。
-      </p>
-      <button class="btn-act primary" onclick="copyEl('preview-box')">📋 プレビューをコピーして次へ進む</button>
+    <!-- ══════ STAGE III: WRITE ══════ -->
+    <div class="page" id="page-write">
+      <div class="page-header">
+        <div class="page-stage-tag">STAGE III · 7Rプロンプト執筆支援</div>
+        <h1 class="page-h1">7ステップで論文を書く</h1>
+        <p class="page-desc">7Rフレームワークで草稿から完成稿まで反復的に改良します。</p>
+      </div>
+      <div style="display:grid; gap:1rem;">
+        <div class="stage-card"><h3>R1 · Research</h3><p>文献調査プロンプト — 関連研究の網羅的収集と整理</p></div>
+        <div class="stage-card"><h3>R2 · Reason</h3><p>論理構築プロンプト — 主張と根拠の一貫性確認</p></div>
+        <div class="stage-card"><h3>R3 · Reframe</h3><p>再構成プロンプト — C4層ごとの論理の再整理</p></div>
+        <div class="stage-card"><h3>R4 · Refine</h3><p>文章改善プロンプト — 語彙・文体・接続詞の統一</p></div>
+        <div class="stage-card"><h3>R5 · Review</h3><p>査読模擬プロンプト — 想定査読コメントの生成</p></div>
+        <div class="stage-card"><h3>R6 · Respond</h3><p>査読回答プロンプト — 修正対応レターの作成</p></div>
+        <div class="stage-card"><h3>R7 · Release</h3><p>最終チェックプロンプト — 投稿前の品質確認リスト</p></div>
+      </div>
     </div>
-  </div>
 
-  <div class="output-box" id="preview-box">「プレビュー生成」ボタンを押すと、入力データをもとに論文草稿プレビューが表示されます。</div>
-
-  <div class="stage-card" style="margin-top:1.5rem;border-left-color:var(--teal)">
-    <span class="label-tag label-teal">清書・仕上げプロンプト</span>
-    <p style="margin-bottom:0.75rem;">上のプレビューをコピーして以下のプロンプトと一緒にClaudeへ送信してください。</p>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="polish-prompt" rows="7">以下の論文草稿を、指定の学術フォーマットに準拠した完成稿に仕上げてください。
-
-フォーマット：[Stage 0で選択したフォーマット]
-執筆言語：[Stage 0で選択した言語]
-
-要件：
-- 要旨は和文400〜600字、英文200〜300語
-- 参考文献はSIST 02形式で統一
-- 図・表には通し番号とキャプションを付加
-- 接続詞・文末表現を統一
-
-論文草稿：
-[上のプレビューをここに貼り付ける]</textarea>
-      <div class="prompt-actions"><button class="btn-copy" onclick="copyEl('polish-prompt')">📋 コピー</button></div>
+    <!-- ══════ STAGE IV–VII: COMING SOON ══════ -->
+    <div class="page" id="page-evaluate">
+      <div class="page-header"><div class="page-stage-tag">STAGE IV</div><h1 class="page-h1">C4段階評価・止揚</h1></div>
+      <div class="coming-soon"><div class="cs-icon">🔬</div><h3>準備中</h3><p>C4スコアルーブリックによる自動評価機能を実装予定です。</p></div>
     </div>
-  </div>
-</div>
+    <div class="page" id="page-presentation">
+      <div class="page-header"><div class="page-stage-tag">STAGE V</div><h1 class="page-h1">学会発表準備</h1></div>
+      <div class="coming-soon"><div class="cs-icon">🎤</div><h3>準備中</h3><p>発表スライド自動生成・ナレーション原稿作成機能を実装予定です。</p></div>
+    </div>
+    <div class="page" id="page-qa">
+      <div class="page-header"><div class="page-stage-tag">STAGE VI</div><h1 class="page-h1">想定質疑応答訓練</h1></div>
+      <div class="coming-soon"><div class="cs-icon">💬</div><h3>準備中</h3><p>Claude APIを使った想定質問生成・回答練習機能を実装予定です。</p></div>
+    </div>
+    <div class="page" id="page-submit">
+      <div class="page-header"><div class="page-stage-tag">STAGE VII · 投稿</div><h1 class="page-h1">投稿・査読対応</h1></div>
+      <div class="stage-card">
+        <h3>📤 投稿チェックリスト</h3>
+        <div style="display:grid; gap:0.5rem; margin-top:0.75rem;">
+          <label style="display:flex;gap:0.6rem;align-items:center;font-size:0.9rem;cursor:pointer;font-family:var(--font-body)"><input type="checkbox"> 著者情報・所属が正確に記載されている</label>
+          <label style="display:flex;gap:0.6rem;align-items:center;font-size:0.9rem;cursor:pointer;font-family:var(--font-body)"><input type="checkbox"> フォーマット規程（字数・書式）に準拠している</label>
+          <label style="display:flex;gap:0.6rem;align-items:center;font-size:0.9rem;cursor:pointer;font-family:var(--font-body)"><input type="checkbox"> 参考文献形式が統一されている</label>
+          <label style="display:flex;gap:0.6rem;align-items:center;font-size:0.9rem;cursor:pointer;font-family:var(--font-body)"><input type="checkbox"> 図・表に番号とキャプションが付いている</label>
+          <label style="display:flex;gap:0.6rem;align-items:center;font-size:0.9rem;cursor:pointer;font-family:var(--font-body)"><input type="checkbox"> PlantUML図がSVG/PNG形式で出力済み</label>
+          <label style="display:flex;gap:0.6rem;align-items:center;font-size:0.9rem;cursor:pointer;font-family:var(--font-body)"><input type="checkbox"> 倫理申請（必要な場合）が完了している</label>
+        </div>
+      </div>
 
-<!-- ══ C4図集 ══ -->
-<div class="page" id="page-c4uml">
-  <div class="pg-head">
-    <span class="label-tag label-teal">TOOLS</span>
-    <h1 class="pg-h1">C4モデル図集</h1>
-    <p class="pg-desc">PlantUMLコードを編集して「描画」ボタンでSVG図を生成します。</p>
-  </div>
-  <div class="stage-card">
-    <span class="label-tag label-gold">L1 · Context図</span>
-    <textarea id="c4-ctx" class="prompt-edit" rows="14">@startuml
+      <!-- システム評価アンケート (Feedback) -->
+      <div class="stage-card reveal" style="margin-top: 2rem; border-left-color: var(--teal); background: rgba(26,122,138,0.03);">
+        <h3 style="color: var(--teal); margin-bottom: 0.5rem;">📊 論文道場 本アンケートの評価（Ver 1.0 実証用）</h3>
+        <p style="margin-bottom: 2rem; font-size: 0.9rem;">今後のバージョンアップおよび学会での研究発表に向け、本アンケートの評価にご協力をお願いいたします。</p>
+
+        <!-- 1. 全体満足度 -->
+        <div style="margin-bottom: 2rem;">
+          <label style="font-weight:bold; font-size:0.95rem; color:var(--ink);">1. 全体的な使い心地はいかがでしたか？</label>
+          <div style="display:flex; gap:1.25rem; margin-top:0.75rem; font-size:2rem; cursor:pointer;" id="feedback-stars">
+            <span onclick="showFeedbackFA(5)" title="非常によい" style="transition: all 0.2s;">😍</span>
+            <span onclick="showFeedbackFA(4)" title="よい" style="transition: all 0.2s;">🙂</span>
+            <span onclick="showFeedbackFA(3)" title="どちらともいえない" style="transition: all 0.2s;">😐</span>
+            <span onclick="showFeedbackFA(2)" title="わるい" style="transition: all 0.2s;">😕</span>
+            <span onclick="showFeedbackFA(1)" title="非常にわるい" style="transition: all 0.2s;">😡</span>
+          </div>
+        </div>
+
+        <!-- 2. ワークフロー評価（SD法） -->
+        <div style="margin-bottom: 2rem;">
+          <label style="font-weight:bold; font-size:0.95rem; color:var(--ink);">2. 各機能の評価（SD尺度）</label>
+          <p style="font-size:0.8rem; color:var(--ink-mid); margin-bottom:0.75rem;">それぞれの項目について、ご自身の印象に最も近いものを選択してください。</p>
+          <table style="width:100%; font-size:0.85rem; border-collapse:collapse; background:var(--white); border:1px solid var(--border);">
+            <tr style="background:var(--bg-alt); border-bottom:1px solid var(--border); font-family:var(--font-mono); font-size:0.7rem;">
+              <th style="padding:0.5rem; width:28%; text-align:right;">ネガティブ</th>
+              <th style="padding:0.5rem; text-align:center;">1</th><th style="padding:0.5rem; text-align:center;">2</th><th style="padding:0.5rem; text-align:center;">3</th><th style="padding:0.5rem; text-align:center;">4</th><th style="padding:0.5rem; text-align:center;">5</th>
+              <th style="padding:0.5rem; width:28%; text-align:left;">ポジティブ</th>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.75rem 0.5rem; text-align:right; color:var(--ink-mid);">非常に見づらい</td><td style="text-align:center;"><input type="radio" name="sd1"></td><td style="text-align:center;"><input type="radio" name="sd1"></td><td style="text-align:center;"><input type="radio" name="sd1"></td><td style="text-align:center;"><input type="radio" name="sd1"></td><td style="text-align:center;"><input type="radio" name="sd1"></td><td style="padding:0.75rem 0.5rem; font-weight:600;">非常に見やすい（画面）</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.75rem 0.5rem; text-align:right; color:var(--ink-mid);">直感的でない</td><td style="text-align:center;"><input type="radio" name="sd2"></td><td style="text-align:center;"><input type="radio" name="sd2"></td><td style="text-align:center;"><input type="radio" name="sd2"></td><td style="text-align:center;"><input type="radio" name="sd2"></td><td style="text-align:center;"><input type="radio" name="sd2"></td><td style="padding:0.75rem 0.5rem; font-weight:600;">直感的である（操作性）</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.75rem 0.5rem; text-align:right; color:var(--ink-mid);">負担が大きい</td><td style="text-align:center;"><input type="radio" name="sd3"></td><td style="text-align:center;"><input type="radio" name="sd3"></td><td style="text-align:center;"><input type="radio" name="sd3"></td><td style="text-align:center;"><input type="radio" name="sd3"></td><td style="text-align:center;"><input type="radio" name="sd3"></td><td style="padding:0.75rem 0.5rem; font-weight:600;">負担が少ない（入力）</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.75rem 0.5rem; text-align:right; color:var(--ink-mid);">期待外れ</td><td style="text-align:center;"><input type="radio" name="sd4"></td><td style="text-align:center;"><input type="radio" name="sd4"></td><td style="text-align:center;"><input type="radio" name="sd4"></td><td style="text-align:center;"><input type="radio" name="sd4"></td><td style="text-align:center;"><input type="radio" name="sd4"></td><td style="padding:0.75rem 0.5rem; font-weight:600;">期待通り（出力精度）</td></tr>
+            <tr><td style="padding:0.75rem 0.5rem; text-align:right; color:var(--ink-mid);">不安がある</td><td style="text-align:center;"><input type="radio" name="sd5"></td><td style="text-align:center;"><input type="radio" name="sd5"></td><td style="text-align:center;"><input type="radio" name="sd5"></td><td style="text-align:center;"><input type="radio" name="sd5"></td><td style="text-align:center;"><input type="radio" name="sd5"></td><td style="padding:0.75rem 0.5rem; font-weight:600;">安心できる（データ保存）</td></tr>
+          </table>
+        </div>
+
+        <!-- 3. マルチ選択 -->
+        <div style="margin-bottom: 2rem;">
+          <label style="font-weight:bold; font-size:0.95rem; color:var(--ink);">3. 特に役立った機能（複数選択可）</label>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; margin-top:0.75rem;">
+            <label style="font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox"> 論文スコアパネル（進捗の可視化）</label>
+            <label style="font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox"> C4モデルによるL1〜L4の構造化ガイド</label>
+            <label style="font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox"> CREATEプロンプトの自動生成</label>
+            <label style="font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:0.5rem;"><input type="checkbox"> PlantUML図の描画連携</label>
+          </div>
+        </div>
+
+        <!-- 4. FA (フリーアンサー) -->
+        <div id="feedback-fa" style="margin-bottom: 1.5rem;">
+          <label style="font-weight:bold; font-size:0.95rem; color:var(--ink);">4. 具体的な改善点やご意見（FA：自由記述）</label>
+          <p style="font-size:0.8rem; color:var(--ink-mid); margin-bottom:0.5rem;">「ここが使いにくかった」「こんな機能が欲しい」等、ご自由にお書きください。</p>
+          <textarea rows="4" placeholder="例：プレースホルダーが消えてしまうのでテンプレートとして残してほしい。" style="width:100%; padding:0.75rem; font-family:var(--font-body); border:1px solid var(--border); border-radius:4px;"></textarea>
+        </div>
+        
+        <button class="copy-btn" style="background:var(--teal); width:100%; font-size:1rem; padding:1rem; font-weight:bold;" onclick="submitFeedback()">📤 アンケートを送信する</button>
+      </div>
+    </div>
+
+    <!-- ══════ C4 DIAGRAM TOOL ══════ -->
+    <div class="page" id="page-c4uml">
+      <div class="page-header">
+        <div class="page-stage-tag">TOOLS · C4モデル図集</div>
+        <h1 class="page-h1">PlantUML C4図を描く</h1>
+        <p class="page-desc">コードを編集して「描画」ボタンを押すとSVG図が生成されます。</p>
+      </div>
+      <div class="stage-card">
+        <h3>L1 Context図</h3>
+        <textarea id="c4-ctx-code" rows="12" style="font-family:var(--font-mono);font-size:0.78rem;width:100%;background:var(--bg-alt);border:1px solid var(--border);padding:0.75rem;resize:vertical;">@startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 skinparam backgroundColor #FAFAF8
-title L1 Context — 論文道場
+title L1 Context — Academic Paper Dojo
 Person(w, "研究者", "論文執筆者")
 System(d, "論文道場", "C4モデル×AI論文支援")
 System_Ext(c, "Claude API", "AI文章生成")
@@ -858,537 +788,412 @@ Rel(w, d, "論文情報を入力")
 Rel(d, c, "プロンプト送信")
 Rel(d, p, "図コード送信")
 @enduml</textarea>
-    <div class="prompt-actions">
-      <button class="btn-copy" onclick="drawC4('c4-ctx','c4-r-ctx')">🎨 描画</button>
-      <button class="btn-copy outline" onclick="copyEl('c4-ctx')">📋 コピー</button>
+        <div style="display:flex;gap:0.75rem;margin-top:0.75rem;">
+          <button class="copy-btn" onclick="drawC4('c4-ctx-code','c4-render-ctx')">🎨 描画</button>
+          <button class="copy-btn" style="background:var(--bg-alt);color:var(--ink-mid);border:1px solid var(--border);" onclick="copyText('c4-ctx-code')">📋 コピー</button>
+        </div>
+        <div id="c4-render-ctx" style="margin-top:1rem;text-align:center;display:none;"></div>
+      </div>
     </div>
-    <div id="c4-r-ctx" style="margin-top:1rem;text-align:center;display:none;"></div>
-  </div>
+
+    <!-- ══════ FORMATS ══════ -->
+    <div class="page" id="page-formats">
+      <div class="page-header">
+        <div class="page-stage-tag">TOOLS · 学会フォーマット集</div>
+        <h1 class="page-h1">国際フォーマット規程</h1>
+        <p class="page-desc">主要な学会・ジャーナルの投稿規程まとめです。</p>
+      </div>
+      <table class="formats-table">
+        <tr>
+          <th>学会・誌名</th><th>言語</th><th>字数/頁数</th><th>書式</th><th>締切パターン</th>
+        </tr>
+        <tr><td>感性工学会</td><td>日本語/英語</td><td>4〜8頁</td><td>2段組・A4</td><td>年2〜3回</td></tr>
+        <tr><td>情報処理学会</td><td>日本語</td><td>4〜8頁</td><td>2段組・A4</td><td>随時</td></tr>
+        <tr><td>IEEE Access</td><td>English</td><td>無制限</td><td>IEEE style</td><td>Rolling</td></tr>
+        <tr><td>ACM Digital Library</td><td>English</td><td>8〜12頁</td><td>ACM style</td><td>Conference</td></tr>
+        <tr><td>卒業論文</td><td>日本語</td><td>20,000字〜</td><td>大学指定</td><td>1月〜2月</td></tr>
+        <tr><td>修士論文</td><td>日本語/英語</td><td>40,000字〜</td><td>大学指定</td><td>1月〜2月</td></tr>
+      </table>
+    </div>
+
+    <!-- ══════ SETTINGS ══════ -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div class="page-stage-tag">SETTINGS</div>
+        <h1 class="page-h1">設定</h1>
+      </div>
+      <div class="stage-card">
+        <h3>💾 データ管理</h3>
+        <p style="margin-bottom:1rem;">入力データはブラウザのlocalStorageに保存されます。</p>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button class="copy-btn" onclick="saveDraft()">下書き保存</button>
+          <button class="copy-btn" onclick="loadDraft()">下書き読込</button>
+          <button class="copy-btn" style="background:var(--red);" onclick="clearAll()">全データ削除</button>
+        </div>
+      </div>
+      <div class="stage-card" style="margin-top:1.25rem;">
+        <h3>ℹ️ このアプリについて</h3>
+        <p><strong>論文道場 Academic Paper Dojo</strong><br>
+        開発：奥村 治 / C4モデル研究会®<br>
+        バックエンド：Cloudflare Workers + D1<br>
+        AI：Claude API (Anthropic)<br>
+        図解：PlantUML Server</p>
+        <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info:ofi/fmt:kev:mtx:dc&amp;rft.title=%E8%AB%96%E6%96%87%E9%81%93%E5%A0%B4%EF%BC%9AAI%E9%A7%86%E5%8B%95%E5%9E%8B%E5%AD%A6%E8%A1%93%E5%9F%B7%E7%AD%86%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9&amp;rft.creator=Okumura%2C%20Osamu&amp;rft.publisher=C4%20Model%20Study%20Group&amp;rft.date=2026&amp;rft.type=service&amp;rft.identifier=http%3A%2F%2Fc4model.org%2Fronbundojo"></span>
+      </div>
+    </div>
+
+  </main>
 </div>
-
-<!-- ══ フォーマット集 ══ -->
-<div class="page" id="page-formats">
-  <div class="pg-head">
-    <span class="label-tag label-ink">TOOLS</span>
-    <h1 class="pg-h1">国際フォーマット規程</h1>
-    <p class="pg-desc">実際の投稿前は各学会の公式サイトで最新版を確認してください。</p>
-  </div>
-  <table class="fmt-table">
-    <tr><th>学会・誌名</th><th>言語</th><th>字数/頁数</th><th>書式</th><th>締切パターン</th></tr>
-    <tr><td><strong>日本図書館情報学会（JSLIS）</strong></td><td>日本語・英語</td><td>10頁以内</td><td>2段組・A4</td><td>年2回</td></tr>
-    <tr><td>情報処理学会</td><td>日本語</td><td>4〜8頁</td><td>2段組・A4</td><td>随時</td></tr>
-    <tr><td>IEEE Access</td><td>English</td><td>無制限</td><td>IEEE style</td><td>Rolling</td></tr>
-    <tr><td>ACM Digital Library</td><td>English</td><td>8〜12頁</td><td>ACM style</td><td>Conference</td></tr>
-    <tr><td>卒業論文</td><td>日本語</td><td>20,000字〜</td><td>大学指定</td><td>1月〜2月</td></tr>
-    <tr><td>修士論文</td><td>日本語/英語</td><td>40,000字〜</td><td>大学指定</td><td>1月〜2月</td></tr>
-  </table>
-
-  <div class="stage-card" style="margin-top:1.5rem;border-left-color:var(--teal)">
-    <span class="label-tag label-teal">📚 JSLIS論文作成規約（SIST 02準拠）</span>
-    <p style="margin-bottom:1rem;font-size:var(--fs-base);">基本形：<strong>著者名. 論文名. 誌名. 出版年, 巻, 号, p. 始ページ-終ページ.</strong></p>
-    <table class="fmt-table">
-      <tr><th>資料種別</th><th>記述例</th></tr>
-      <tr><td>雑誌論文</td><td>佐藤次郎. 公共図書館における電子書籍の利用動向. 図書館情報学. 2024, 70(1), p. 10-25.</td></tr>
-      <tr><td>単行本</td><td>田中一郎. デジタルアーカイブの構築. 第2版, 学会出版, 2022, 250p.</td></tr>
-      <tr><td>編著書の1章</td><td>鈴木花子. "第3章 情報検索の歴史". 現代の情報学. 山田太郎編. 知識社, 2023, p. 55-80.</td></tr>
-      <tr><td>ウェブサイト</td><td>日本図書館情報学会. "研究大会の案内". http://www.jslis.jp/events/ , (参照 2026-04-21).</td></tr>
-    </table>
-    <div style="margin-top:1rem;background:var(--bg-alt);border-left:3px solid var(--gold);padding:0.9rem 1.1rem;font-size:var(--fs-base);">
-      <strong>💡 本文引用との連動：</strong>本文中で <code style="font-family:var(--font-mono);background:rgba(0,0,0,0.05);padding:0.1rem 0.3rem;">(佐藤, 2024)</code> と書いた場合、巻末リストも「サ」行（五十音順）で配列してください。
-    </div>
-    <div style="margin-top:1rem;border:1px solid var(--border);padding:1rem 1.25rem;background:var(--white);border-left:3px solid var(--teal);">
-      <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--teal);margin-bottom:0.5rem;font-weight:700;">ZOTERO INTEGRATION</p>
-      <p><strong>【研究者・執筆者の皆様へ】</strong> 当サイト「c4model.org」および「論文道場」では、文献管理ソフト<strong>Zotero</strong>等との技術的連携（COinS / SIST 02準拠）を行っています。ブラウザのコネクタで正確な書誌データを直接取り込むことが可能です。</p>
-    </div>
-  </div>
-  <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info:ofi/fmt:kev:mtx:dc&amp;rft.title=%E8%AB%96%E6%96%87%E9%81%93%E5%A0%B4%EF%BC%9AAI%E9%A7%86%E5%8B%95%E5%9E%8B%E5%AD%A6%E8%A1%93%E5%9F%B7%E7%AD%86%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9&amp;rft.creator=Okumura%2C%20Osamu&amp;rft.publisher=C4%20Model%20Study%20Group&amp;rft.date=2026&amp;rft.type=service&amp;rft.identifier=http%3A%2F%2Fc4model.org%2Fdojo.html"></span>
-</div>
-
-<!-- ══ お問い合わせ ══ -->
-<div class="page" id="page-contact">
-  <div class="pg-head">
-    <span class="label-tag label-gold">CONTACT</span>
-    <h1 class="pg-h1" data-ja>お問い合わせ &amp; モニター募集</h1>
-    <h1 class="pg-h1" data-en style="display:none">Contact &amp; Monitor Recruitment</h1>
-  </div>
-
-  <div class="stage-card" style="border-left-color:var(--gold)">
-    <span class="label-tag label-gold">📣 モニター・協力者 募集中！</span>
-    <p style="font-size:1.05rem;font-weight:700;margin-bottom:0.75rem;">
-      <strong>Ronbun Dojo（論文道場）</strong>は現在、<strong>モニターおよびシステム協力者</strong>を広く募集しています。
-    </p>
-    <p style="color:var(--ink-mid);margin-bottom:1rem;">
-      本アプリはZoteroおよび日本図書館情報学会が推奨する<strong>SIST 02形式</strong>の精度向上を目指し、
-      Zoteroユーザーと研究者の相互連携を推進するプロジェクトです。
-      あなたの研究・執筆活動を通じて、日本の学術情報流通の改善にご協力ください。
-    </p>
-    <div style="background:var(--bg-alt);border:1px solid var(--border-lt);padding:1rem 1.25rem;margin-bottom:1rem;">
-      <strong>募集対象：</strong><br>
-      ・大学院生・研究者・教員（論文執筆経験者）<br>
-      ・ZoteroまたはSIST 02形式を利用している方<br>
-      ・C4モデル・PlantUMLに関心のある方<br>
-      ・デジタル人文学・学術情報流通に関心のある方
-    </div>
-    <div style="background:var(--bg-alt);border:1px solid var(--border-lt);padding:1rem 1.25rem;margin-bottom:1rem;">
-      <strong>協力内容：</strong><br>
-      ・論文道場の試用とフィードバック提供<br>
-      ・SIST 02形式のZotero連携テスト<br>
-      ・PlantUML C4図の検証と改善提案
-    </div>
-    <p style="font-family:var(--font-mono);font-size:0.9rem;font-weight:700;color:var(--teal);">
-      ご連絡先：<a href="mailto:info@c4model.org" style="color:var(--teal);">info@c4model.org</a>
-    </p>
-  </div>
-
-  <div class="stage-card" style="border-left-color:var(--teal);margin-top:1rem;">
-    <span class="label-tag label-teal">一般お問い合わせ</span>
-    <div style="display:grid;gap:0.65rem;margin-top:0.5rem;">
-      <div><strong>Email：</strong><a href="mailto:info@c4model.org" style="color:var(--teal);">info@c4model.org</a></div>
-      <div><strong>Web：</strong><a href="https://c4model.org" style="color:var(--teal);">https://c4model.org</a></div>
-      <div><strong>YouTube Demo：</strong><a href="https://www.youtube.com/watch?v=CYPYNjxFKOg" target="_blank" style="color:var(--teal);">youtube.com/watch?v=CYPYNjxFKOg</a></div>
-      <div style="margin-top:0.5rem;font-size:0.9rem;color:var(--ink-lite);">通常2営業日以内にご返答します（日本時間）。</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ 設定 ══ -->
-<div class="page" id="page-settings">
-  <div class="pg-head">
-    <span class="label-tag label-ink">SETTINGS</span>
-    <h1 class="pg-h1">設定</h1>
-  </div>
-  <div class="stage-card">
-    <span class="label-tag label-ink">💾 データ管理</span>
-    <p style="margin-bottom:1rem;">入力データはブラウザのlocalStorageに保存されます。</p>
-    <div class="action-bar">
-      <button class="btn-act primary" onclick="saveDraft()">下書き保存</button>
-      <button class="btn-act" onclick="loadDraft()">下書き読込</button>
-      <button class="btn-act danger" onclick="clearAll()">全データ削除</button>
-    </div>
-  </div>
-  <div class="stage-card" style="margin-top:1rem;">
-    <span class="label-tag label-teal">ℹ️ このアプリについて</span>
-    <p style="line-height:1.9;">
-      <strong>Ronbun Dojo（論文道場）</strong><br>
-      開発：奥村 治 / C4モデル研究会®<br>
-      バックエンド：Cloudflare Workers + D1<br>
-      AI：Claude API (Anthropic)<br>
-      図解：PlantUML Server<br>
-      連携：Zotero / SIST 02 / 日本図書館情報学会（JSLIS）
-    </p>
-    <span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info:ofi/fmt:kev:mtx:dc&amp;rft.title=%E8%AB%96%E6%96%87%E9%81%93%E5%A0%B4%EF%BC%9AAI%E9%A7%86%E5%8B%95%E5%9E%8B%E5%AD%A6%E8%A1%93%E5%9F%B7%E7%AD%86%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9&amp;rft.creator=Okumura%2C%20Osamu&amp;rft.publisher=C4%20Model%20Study%20Group&amp;rft.date=2026&amp;rft.type=service&amp;rft.identifier=http%3A%2F%2Fc4model.org%2Fdojo.html"></span>
-  </div>
-</div>
-
-</main>
-</div><!-- /app-wrap -->
 
 <script>
-/* ══ NAVIGATION ══ */
-function go(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
-  const pg = document.getElementById('page-' + id);
-  if (pg) pg.classList.add('active');
-  if (btn) btn.classList.add('active');
-  window.scrollTo(0, 0);
-  if (history.replaceState) history.replaceState(null, '', '#' + id);
-}
-function goPage(id) { go(id, document.getElementById('sb-' + id)); }
+  /* ── ページ切り替え ── */
+  function goPage(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    const page = document.getElementById('page-' + id);
+    if (page) page.classList.add('active');
+    if (btn) btn.classList.add('active');
+    window.scrollTo(0, 0);
+    // URLハッシュ対応
+    if (history.replaceState) history.replaceState(null, '', '#' + id);
+  }
 
-/* ══ LANG TOGGLE ══ */
-function setLang(lang) {
-  document.querySelectorAll('[data-en]').forEach(el => el.style.display = lang==='en' ? '' : 'none');
-  document.querySelectorAll('[data-ja]').forEach(el => el.style.display = lang==='ja' ? '' : 'none');
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang===lang));
-  document.documentElement.lang = lang==='ja' ? 'ja' : 'en';
-  localStorage.setItem('c4-lang', lang);
-}
+  /* ── ハッシュで直接遷移 ── */
+  window.addEventListener('DOMContentLoaded', () => {
+    const hash = location.hash.replace('#', '');
+    const validPages = ['stage0','ideation','structure','write','evaluate','presentation','qa','submit','c4uml','formats','settings'];
+    if (hash && validPages.includes(hash)) {
+      const btn = document.getElementById('btn-' + hash);
+      goPage(hash, btn);
+    }
+    loadDraft(true); // サイレント読込
+    recalc();
+  });
 
-/* ══ SCORE CALC ══ */
-function recalc() {
-  const rqLen = (val('f-rq')).length;
-  const hypo  = val('f-hypothesis').trim();
-  const strLines = val('f-structure').split('\n').filter(l=>l.trim()).length;
-  const refs  = val('f-refs').split('\n').filter(l=>l.trim()).length;
-  const fmt   = document.querySelector('input[name="format"]:checked');
-  const absLen= val('f-abstract').length;
-  const author= val('f-author').trim();
-  const aff   = val('f-affiliation').trim();
-  const email = val('f-email').trim();
+  /* ── スコア計算 ── */
+  function recalc() {
+    const rqLen  = (document.getElementById('f-rq').value || '').length;
+    const hypo   = (document.getElementById('f-hypothesis').value || '').trim();
+    const strLines = (document.getElementById('f-structure').value || '').split('\n').filter(l => l.trim()).length;
+    const refs   = (document.getElementById('f-refs').value || '').split('\n').filter(l => l.trim()).length;
+    const fmt    = document.querySelector('input[name="format"]:checked');
+    const absLen = (document.getElementById('f-abstract').value || '').length;
+    const author = (document.getElementById('f-author').value || '').trim();
+    const aff    = (document.getElementById('f-affiliation').value || '').trim();
+    const email  = (document.getElementById('f-email').value || '').trim();
 
-  let sRq = Math.min(5, (rqLen>=20?2:0)+(rqLen>=40?1:0)+(hypo.length>=20?2:0));
-  let sStr= Math.min(5, strLines);
-  let sRef= Math.min(5, refs);
-  let sFmt= fmt ? 5 : 0;
-  let sAbs= absLen>=200?5:absLen>=100?3:absLen>=50?1:0;
-  let sAut= (author?2:0)+(aff?2:0)+(email.includes('@')?1:0);
-  const total = sRq+sStr+sRef+sFmt+sAbs+sAut;
+    // RQ明確性（5点）
+    let sRq = 0;
+    if (rqLen >= 20) sRq += 2;
+    if (rqLen >= 40) sRq += 1;
+    if (hypo.length >= 20) sRq += 2;
+    sRq = Math.min(5, sRq);
 
-  document.getElementById('score-num').textContent = total;
-  document.getElementById('score-num').className = 'score-num '+(total>=28?'pass':'fail');
-  setBar('bar-rq',sRq,5); setBar('bar-str',sStr,5); setBar('bar-ref',sRef,5);
-  setBar('bar-fmt',sFmt,5); setBar('bar-abs',sAbs,5); setBar('bar-aut',sAut,5);
-  document.getElementById('btn-start').disabled = total < 28;
-  document.getElementById('score-msg').textContent = total>=28
-    ? '✅ スコア合格！「分析開始」ボタンを押してStage Iへ進んでください。'
-    : `あと ${28-total} 点必要です`;
-  regenAllPrompts();
-}
-function setBar(id, v, max) {
-  document.getElementById(id).style.width = (v/max*100)+'%';
-}
-function val(id) { return (document.getElementById(id)||{}).value || ''; }
+    // 論文構成（5点）
+    let sStr = Math.min(5, strLines);
 
-/* ══ CHAR COUNT ══ */
-function updateCount(fId, cId, threshold) {
-  const v = val(fId);
-  const el = document.getElementById(cId);
-  const n = v.length;
-  el.textContent = n + ' 字';
-  el.className = 'char-ct '+(n>=threshold?'ok':n>=threshold*0.5?'warn':'');
-}
-function chapterCount() {
-  const lines = val('f-structure').split('\n').filter(l=>l.trim()).length;
-  const el = document.getElementById('cnt-str');
-  el.textContent = lines + ' 章';
-  el.className = 'char-ct '+(lines>=5?'ok':lines>=3?'warn':'');
-}
-function countRefs() {
-  const r = val('f-refs').split('\n').filter(l=>l.trim()).length;
-  const el = document.getElementById('cnt-refs');
-  el.textContent = r + ' 件（6件以上で満点）';
-  el.className = 'char-ct '+(r>=6?'ok':r>=3?'warn':'');
-  recalc();
-}
+    // 参考文献（5点）
+    let sRef = Math.min(5, refs);
 
-/* ══ PROMPT GENERATION ══ */
-function regenAllPrompts() {
-  const title = val('f-title') || '[論文題名]';
-  const rq    = val('f-rq')    || '[RQ]';
-  const hypo  = val('f-hypothesis') || '[仮説]';
-  const abs   = val('f-abstract').slice(0,200) || '[要旨]';
-  const fmt   = (document.querySelector('input[name="format"]:checked')||{}).value || '[フォーマット]';
-  const str   = val('f-structure') || '[章立て]';
-  const prior = val('f-prior') || '[先行研究]';
-  const refs  = val('f-refs')  || '[参考文献]';
+    // フォーマット（5点）
+    let sFmt = fmt ? 5 : 0;
 
-  // CREATE prompt
-  document.getElementById('create-prompt').value =
-`あなたは学術論文執筆の専門家です。以下の研究情報をCREATEフレームワーク（Context/Research/Explore/Articulate/Test/Evaluate）で深掘りしてください。
+    // 要旨（5点）
+    let sAbs = absLen >= 200 ? 5 : absLen >= 100 ? 3 : absLen >= 50 ? 1 : 0;
+
+    // 著者情報（5点）
+    let sAut = 0;
+    if (author) sAut += 2;
+    if (aff) sAut += 2;
+    if (email && email.includes('@')) sAut += 1;
+
+    const total = sRq + sStr + sRef + sFmt + sAbs + sAut;
+
+    document.getElementById('score-num').textContent = total;
+    document.getElementById('score-num').className = 'score-total ' + (total >= 28 ? 'pass' : 'fail');
+
+    document.getElementById('bar-rq').style.width  = (sRq  / 5 * 100) + '%';
+    document.getElementById('bar-str').style.width = (sStr / 5 * 100) + '%';
+    document.getElementById('bar-ref').style.width = (sRef / 5 * 100) + '%';
+    document.getElementById('bar-fmt').style.width = (sFmt / 5 * 100) + '%';
+    document.getElementById('bar-abs').style.width = (sAbs / 5 * 100) + '%';
+    document.getElementById('bar-aut').style.width = (sAut / 5 * 100) + '%';
+
+    const startBtn = document.getElementById('btn-start');
+    startBtn.disabled = total < 28;
+
+    const msg = total >= 28
+      ? '✅ スコア合格！「分析開始」ボタンを押してStage Iへ進んでください。'
+      : `あと ${28 - total} 点入力してください（不足：${[
+          sRq<5 && 'RQ・仮説',
+          sStr<5 && '章立て',
+          sRef<5 && '参考文献',
+          sFmt<5 && 'フォーマット',
+          sAbs<5 && '要旨',
+          sAut<5 && '著者情報'
+        ].filter(Boolean).join('・')}）`;
+    document.getElementById('score-msg').textContent = msg;
+
+    // CREATEプロンプト自動生成
+    updateCreatePrompt();
+  }
+
+  function updateCount(fId, cId, threshold) {
+    const val = document.getElementById(fId).value || '';
+    const el  = document.getElementById(cId);
+    if (fId === 'f-structure') {
+      const lines = val.split('\n').filter(l => l.trim()).length;
+      el.textContent = lines + ' 章';
+    } else {
+      const n = val.length;
+      el.textContent = n + ' 字';
+      el.className = 'char-count ' + (n >= threshold ? 'ok' : n >= threshold * 0.5 ? 'warn' : '');
+    }
+  }
+
+  function countRefs() {
+    const refs = (document.getElementById('f-refs').value || '').split('\n').filter(l => l.trim()).length;
+    const el   = document.getElementById('cnt-refs');
+    el.textContent = refs + ' 件（6件以上で満点）';
+    el.className = 'char-count ' + (refs >= 6 ? 'ok' : refs >= 3 ? 'warn' : '');
+    recalc();
+  }
+
+  /* ── CREATEプロンプト生成 ── */
+  function updateCreatePrompt() {
+    const title = document.getElementById('f-title').value || '[論文題名未入力]';
+    const rq    = document.getElementById('f-rq').value || '[RQ未入力]';
+    const abs   = document.getElementById('f-abstract').value || '';
+    const fmt   = document.querySelector('input[name="format"]:checked');
+    const fmtV  = fmt ? fmt.value : '[フォーマット未選択]';
+    const prompt = `あなたは学術論文執筆の専門家です。以下の研究情報を基に、研究テーマをCREATEフレームワーク（Context/Research/Explore/Articulate/Test/Evaluate）で深掘りしてください。
 
 【論文題名】${title}
 【研究課題（RQ）】${rq}
-【仮説】${hypo}
-【要旨（冒頭）】${abs}
-【投稿フォーマット】${fmt}
+【要旨】${abs.slice(0, 200)}...
+【投稿フォーマット】${fmtV}
 
 出力：
 1. この研究のC4 L1コンテキスト（社会的背景・関連分野）を3点で説明
-2. RQをさらに細分化したSub-RQを3つ提案
+2. RQをさらに細分化した Sub-RQ を3つ提案
 3. 本研究の独自性・新規性を先行研究との差別化で説明
-4. C4モデルでL1〜L4構造を箇条書きで示す
-5. 推奨する研究手法と分析方法を提案`;
-
-  // L1 prompt
-  document.getElementById('l1-prompt').value =
-`@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
-skinparam backgroundColor #FAFAF8
-title L1 Context — ${title}
-Person(researcher, "研究者", "著者")
-System(paper, "本研究", "${rq}")
-System_Ext(prior, "先行研究", "${prior.slice(0,50)}")
-System_Ext(journal, "投稿先", "${fmt}")
-Rel(researcher, paper, "執筆")
-Rel(paper, prior, "参照・差別化")
-Rel(researcher, journal, "投稿")
-@enduml`;
-
-  // L2 prompt
-  const chapters = str.split('\n').filter(l=>l.trim()).map(l=>`  Container(ch${Math.random().toString(36).slice(2,5)}, "${l.trim()}", "章", "本文")`).join('\n');
-  document.getElementById('l2-prompt').value =
-`@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
-title L2 Container — ${title}
-System_Boundary(paper, "論文システム") {
-${chapters}
-}
-@enduml`;
-
-  // L3 / L4
-  document.getElementById('l3-prompt').value =
-`以下の論文のL3 Component図（コンポーネント図）をPlantUML C4形式で生成してください。
-論文題名：${title}
-RQ：${rq}
-仮説：${hypo}
-各章の主要論点・実験・引用をコンポーネントとして記述してください。`;
-
-  document.getElementById('l4-prompt').value =
-`以下の論文のL4詳細設計として、文体統一ルールを提案してください。
-論文題名：${title}
-フォーマット：${fmt}
-言語：${val('f-language')}
-
-出力：
-1. 推奨接続詞リスト（順接/逆接/理由/結果）
-2. 文末表現統一ルール（〜である/〜した/〜と考えられる等）
-3. 引用番号スタイル
-4. 数字・単位の表記ルール`;
-
-  // Eval prompt
-  const evalEl = document.getElementById('eval-prompt');
-  if (evalEl) evalEl.value =
-`以下の論文について、厳格な査読者の立場から想定コメントを5点生成してください。
-
-論文題名：${title}
-研究課題：${rq}
-仮説：${hypo}
-章立て：${str}
-
-出力形式（各コメントに重要度と改善提案を含む）：
-1. [重要度：高] 指摘内容 → 改善提案
-...`;
-
-  // QA prompt
-  const qaEl = document.getElementById('qa-prompt');
-  if (qaEl) qaEl.value =
-`以下の論文に対して審査委員・聴衆から想定される質問を難易度別に10問生成してください。
-
-論文題名：${title}
-RQ：${rq}
-仮説：${hypo}
-
-【高難度】Q1〜Q4（研究の根幹）
-【中難度】Q5〜Q8（方法論・データ）
-【基本確認】Q9〜Q10`;
-
-  // Pres prompt
-  const presEl = document.getElementById('pres-prompt');
-  if (presEl) presEl.value =
-`以下の論文をもとに、学会発表用スライド（10枚構成）の骨子を作成してください。
-
-論文題名：${title}
-RQ：${rq}
-章立て：${str}
-
-各スライド：番号 | タイトル | 主要メッセージ（1文）| キービジュアル案
-発表時間：15分（質疑5分含む）`;
-
-  // Polish prompt
-  const polishEl = document.getElementById('polish-prompt');
-  if (polishEl) polishEl.value =
-`以下の論文草稿を、${fmt}形式の完成稿に仕上げてください。
-執筆言語：${val('f-language')}
-・要旨：和文400〜600字、英文200〜300語
-・参考文献：SIST 02形式
-・図表：通し番号とキャプション付き
-・接続詞・文末表現を統一
-
-論文草稿：
-[上のプレビューをここに貼り付ける]`;
-}
-
-function regenPrompt() { regenAllPrompts(); toast('🔄 プロンプトを再生成しました'); }
-function regenEvalPrompt() { regenAllPrompts(); toast('🔄 評価プロンプトを再生成しました'); }
-function regenPresPrompt() { regenAllPrompts(); toast('🔄 発表プロンプトを再生成しました'); }
-function regenQAPrompt() { regenAllPrompts(); toast('🔄 質疑応答プロンプトを再生成しました'); }
-
-/* ══ 7R CARDS ══ */
-const R_DATA = [
-  {r:'R1',label:'Research',color:'gold',desc:'文献調査 — 関連研究の網羅的収集と整理'},
-  {r:'R2',label:'Reason',color:'teal',desc:'論理構築 — 主張と根拠の一貫性確認'},
-  {r:'R3',label:'Reframe',color:'sage',desc:'再構成 — C4層ごとの論理の再整理'},
-  {r:'R4',label:'Refine',color:'purple',desc:'文章改善 — 語彙・文体・接続詞の統一'},
-  {r:'R5',label:'Review',color:'orange',desc:'査読模擬 — 想定査読コメントの生成'},
-  {r:'R6',label:'Respond',color:'red',desc:'査読回答 — 修正対応レターの作成'},
-  {r:'R7',label:'Release',color:'ink',desc:'最終チェック — 投稿前の品質確認リスト'},
-];
-function buildRCards() {
-  const c = document.getElementById('r-cards');
-  c.innerHTML = R_DATA.map(d => `
-  <div class="stage-card" style="border-left-color:var(--${d.color})">
-    <span class="label-tag label-${d.color}">${d.r} · ${d.label}</span>
-    <p style="margin-bottom:0.75rem;">${d.desc}</p>
-    <div class="prompt-wrap">
-      <textarea class="prompt-edit" id="r-${d.r.toLowerCase()}" rows="6">Claudeへのプロンプトは「分析開始」後に自動生成されます。編集してご利用ください。</textarea>
-      <div class="prompt-actions">
-        <button class="btn-copy" onclick="copyEl('r-${d.r.toLowerCase()}')">📋 コピー</button>
-        <button class="btn-copy outline" onclick="saveField('r-${d.r.toLowerCase()}')">💾 保存</button>
-      </div>
-    </div>
-    <div class="stage-card" style="border:1.5px dashed var(--border);background:var(--bg);margin-top:0.75rem;padding:1rem;">
-      <span style="font-family:var(--font-mono);font-size:0.72rem;font-weight:700;color:var(--${d.color});">回答メモ</span>
-      <textarea class="prompt-edit" id="r-${d.r.toLowerCase()}-res" rows="4" style="margin-top:0.5rem;" placeholder="Claudeの回答をここに貼り付け…"></textarea>
-      <div class="prompt-actions">
-        <button class="btn-copy outline" onclick="saveField('r-${d.r.toLowerCase()}-res')">💾 保存</button>
-      </div>
-    </div>
-  </div>`).join('');
-}
-
-/* ══ OUTPUT PREVIEW ══ */
-function genPreview() {
-  const t = val('f-title')||'[題名未入力]';
-  const auth = val('f-author')||'[著者未入力]';
-  const aff  = val('f-affiliation')||'[所属未入力]';
-  const abs  = val('f-abstract')||'[要旨未入力]';
-  const rq   = val('f-rq')||'[RQ未入力]';
-  const hypo = val('f-hypothesis')||'[仮説未入力]';
-  const kw   = val('f-keywords')||'[キーワード未入力]';
-  const str  = val('f-structure')||'[章立て未入力]';
-  const prior= val('f-prior')||'[先行研究未入力]';
-  const refs = val('f-refs')||'[参考文献未入力]';
-  const fmt  = (document.querySelector('input[name="format"]:checked')||{}).value||'[フォーマット未選択]';
-  const ideaRes = val('ideation-response');
-
-  const preview = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${t}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-著者：${auth}（${aff}）
-フォーマット：${fmt}
-キーワード：${kw}
-
-【要旨】
-${abs}
-
-【研究課題（RQ）】
-${rq}
-
-【仮説】
-${hypo}
-
-【目次・章立て】
-${str}
-
-【先行研究の要点】
-${prior}
-
-【参考文献】
-${refs}
-${ideaRes ? '\n【Stage I メモ（CREATEプロンプト回答）】\n'+ideaRes : ''}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-生成日時：${new Date().toLocaleString('ja-JP')}
-Ronbun Dojo by C4モデル研究会® | c4model.org
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
-  document.getElementById('preview-box').textContent = preview;
-  toast('📄 プレビューを生成しました');
-}
-
-/* ══ SAVE / LOAD ══ */
-const FIELDS = ['f-author','f-affiliation','f-email','f-degree','f-coauthors',
- 'f-title','f-journal','f-language','f-keywords','f-abstract','f-rq',
- 'f-hypothesis','f-structure','f-wordcount','f-prior','f-refs',
- 'ideation-response','eval-response','pres-notes','qa-notes'];
-const TEXTAREAS = ['create-prompt','l1-prompt','l2-prompt','l3-prompt','l4-prompt',
- 'r-r1','r-r1-res','r-r2','r-r2-res','r-r3','r-r3-res','r-r4','r-r4-res',
- 'r-r5','r-r5-res','r-r6','r-r6-res','r-r7','r-r7-res'];
-
-function saveDraft() {
-  const data = {};
-  [...FIELDS,...TEXTAREAS].forEach(id => { const el=document.getElementById(id); if(el) data[id]=el.value; });
-  const fmt = (document.querySelector('input[name="format"]:checked')||{}).value||'';
-  data['_format'] = fmt;
-  data['_savedAt'] = new Date().toLocaleString('ja-JP');
-  try {
-    localStorage.setItem('rdojo-v2', JSON.stringify(data));
-    toast('💾 保存しました（'+data['_savedAt']+'）');
-  } catch(e) { toast('⚠ 保存失敗（容量不足の可能性）'); }
-}
-
-function loadDraft(silent) {
-  try {
-    const raw = localStorage.getItem('rdojo-v2');
-    if (!raw) { if(!silent) toast('下書きが見つかりません'); return; }
-    const d = JSON.parse(raw);
-    [...FIELDS,...TEXTAREAS].forEach(id => { const el=document.getElementById(id); if(el && d[id]!==undefined) el.value=d[id]; });
-    if (d['_format']) {
-      const r = document.querySelector(`input[name="format"][value="${d['_format']}"]`);
-      if (r) r.checked = true;
-    }
-    updateCount('f-abstract','cnt-abs',200);
-    updateCount('f-rq','cnt-rq',40);
-    chapterCount(); countRefs(); recalc();
-    if(!silent) toast('📂 下書きを読み込みました（'+( d['_savedAt']||'')+'）');
-  } catch(e) { if(!silent) toast('⚠ 読込失敗'); }
-}
-
-function saveField(id) {
-  saveDraft();
-  toast('💾 保存しました');
-}
-
-function clearForm() {
-  if(!confirm('入力内容をクリアしますか？')) return;
-  FIELDS.forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  document.querySelectorAll('input[name="format"]').forEach(r=>r.checked=false);
-  updateCount('f-abstract','cnt-abs',200);
-  updateCount('f-rq','cnt-rq',40);
-  chapterCount(); countRefs(); recalc();
-}
-
-function clearAll() {
-  if(!confirm('全データを削除しますか？')) return;
-  localStorage.removeItem('rdojo-v2');
-  clearForm();
-  toast('🗑 全データ削除完了');
-}
-
-/* ══ C4 RENDER ══ */
-const C4C='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
-function enc64(d){let r='';for(let i=0;i<d.length;i+=3){const b=[d[i]||0,d[i+1]||0,d[i+2]||0];r+=C4C[(b[0]>>2)&63];r+=C4C[((b[0]&3)<<4)|((b[1]>>4)&15)];r+=C4C[((b[1]&15)<<2)|((b[2]>>6)&3)];r+=C4C[b[2]&63];}return r;}
-function deflRaw(s){const d=new TextEncoder().encode(s);const ch=[];const B=32768;for(let i=0;i<d.length;i+=B){const c=d.slice(i,i+B);const la=(i+B>=d.length)?1:0;const ln=c.length;const nl=(~ln)&0xFFFF;ch.push(la,ln&255,(ln>>8)&255,nl&255,(nl>>8)&255);c.forEach(b=>ch.push(b));}let s1=1,s2=0;d.forEach(b=>{s1=(s1+b)%65521;s2=(s2+s1)%65521;});const a=(s2<<16)|s1;return new Uint8Array([0x78,0x01,...ch,(a>>24)&255,(a>>16)&255,(a>>8)&255,a&255]);}
-function encPuml(p){return '~1'+enc64(deflRaw(p));}
-function drawC4(codeId, renderId) {
-  const code = document.getElementById(codeId).value;
-  const enc  = encPuml(code);
-  const div  = document.getElementById(renderId);
-  div.style.display='block';
-  div.innerHTML='<p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--ink-lite)">描画中…</p>';
-  const img = new Image();
-  img.style.maxWidth='100%';
-  img.onload = ()=>{div.innerHTML='';div.appendChild(img);};
-  img.onerror = ()=>{ img.src='https://kroki.io/plantuml/svg/'+btoa(unescape(encodeURIComponent(code))); };
-  img.src = 'https://www.plantuml.com/plantuml/svg/'+enc;
-}
-
-/* ══ COPY / CLEAR HELPERS ══ */
-function copyEl(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const text = el.tagName==='TEXTAREA'||el.tagName==='INPUT' ? el.value : el.textContent;
-  navigator.clipboard.writeText(text).then(()=>toast('📋 コピーしました')).catch(()=>{
-    el.select(); document.execCommand('copy'); toast('📋 コピーしました');
-  });
-}
-function clearEl(id) {
-  const el = document.getElementById(id);
-  if (el) el.value = '';
-}
-
-/* ══ TOAST ══ */
-function toast(msg) {
-  let t = document.getElementById('_toast');
-  if (!t) {
-    t = document.createElement('div'); t.id='_toast';
-    t.style.cssText='position:fixed;bottom:1.75rem;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-family:var(--font-mono);font-size:0.82rem;font-weight:700;padding:0.65rem 1.5rem;z-index:9999;border:1px solid rgba(255,255,255,0.15);transition:opacity 0.3s;pointer-events:none;';
-    document.body.appendChild(t);
+4. C4モデルで本研究のL1〜L4構造を箇条書きで示す`;
+    document.getElementById('create-prompt').textContent = prompt;
   }
-  t.textContent=msg; t.style.opacity='1';
-  clearTimeout(t._t); t._t=setTimeout(()=>{t.style.opacity='0';},2500);
-}
 
-/* ══ INIT ══ */
-window.addEventListener('DOMContentLoaded', ()=>{
-  buildRCards();
-  setLang(localStorage.getItem('c4-lang')||'ja');
-  loadDraft(true);
-  recalc();
-  const hash = location.hash.replace('#','');
-  const valid=['stage0','ideation','structure','write','evaluate','presentation','qa',
-    'submit','output','c4uml','formats','contact','settings'];
-  if (hash && valid.includes(hash)) go(hash, document.getElementById('sb-'+hash));
-});
+  /* ── 保存・読込 ── */
+  function saveDraft() {
+    const data = {
+      author:    document.getElementById('f-author').value,
+      affiliation: document.getElementById('f-affiliation').value,
+      email:     document.getElementById('f-email').value,
+      degree:    document.getElementById('f-degree').value,
+      coauthors: document.getElementById('f-coauthors').value,
+      title:     document.getElementById('f-title').value,
+      journal:   document.getElementById('f-journal').value,
+      language:  document.getElementById('f-language').value,
+      keywords:  document.getElementById('f-keywords').value,
+      abstract:  document.getElementById('f-abstract').value,
+      rq:        document.getElementById('f-rq').value,
+      hypothesis:document.getElementById('f-hypothesis').value,
+      structure: document.getElementById('f-structure').value,
+      wordcount: document.getElementById('f-wordcount').value,
+      prior:     document.getElementById('f-prior').value,
+      refs:      document.getElementById('f-refs').value,
+      format:    (document.querySelector('input[name="format"]:checked') || {}).value || '',
+      savedAt:   new Date().toLocaleString('ja-JP')
+    };
+    try {
+      localStorage.setItem('dojo-draft', JSON.stringify(data));
+      showToast('💾 下書きを保存しました（' + data.savedAt + '）');
+    } catch(e) { showToast('⚠ 保存に失敗しました'); }
+  }
+
+  function loadDraft(silent) {
+    try {
+      const raw = localStorage.getItem('dojo-draft');
+      if (!raw) { if (!silent) showToast('下書きが見つかりません'); return; }
+      const d = JSON.parse(raw);
+      const set = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+      set('f-author', d.author); set('f-affiliation', d.affiliation);
+      set('f-email', d.email); set('f-degree', d.degree);
+      set('f-coauthors', d.coauthors); set('f-title', d.title);
+      set('f-journal', d.journal); set('f-language', d.language);
+      set('f-keywords', d.keywords); set('f-abstract', d.abstract);
+      set('f-rq', d.rq); set('f-hypothesis', d.hypothesis);
+      set('f-structure', d.structure); set('f-wordcount', d.wordcount);
+      set('f-prior', d.prior); set('f-refs', d.refs);
+      if (d.format) {
+        const radio = document.querySelector('input[name="format"][value="' + d.format + '"]');
+        if (radio) radio.checked = true;
+      }
+      // count updates
+      updateCount('f-abstract','cnt-abstract',200);
+      updateCount('f-rq','cnt-rq',50);
+      updateCount('f-structure','cnt-structure',0);
+      countRefs();
+      recalc();
+      if (!silent) showToast('📂 下書きを読み込みました（' + (d.savedAt || '') + '）');
+    } catch(e) { if (!silent) showToast('⚠ 読込に失敗しました'); }
+  }
+
+  function clearForm() {
+    if (!confirm('入力内容をクリアしますか？')) return;
+    ['f-author','f-affiliation','f-email','f-degree','f-coauthors',
+     'f-title','f-journal','f-keywords','f-abstract','f-rq',
+     'f-hypothesis','f-structure','f-prior','f-refs'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.querySelectorAll('input[name="format"]').forEach(r => r.checked = false);
+    document.getElementById('f-language').value = '';
+    document.getElementById('f-wordcount').value = '';
+    updateCount('f-abstract','cnt-abstract',200);
+    updateCount('f-rq','cnt-rq',50);
+    updateCount('f-structure','cnt-structure',0);
+    countRefs();
+    recalc();
+  }
+
+  function clearAll() {
+    if (!confirm('全データを削除しますか？')) return;
+    localStorage.removeItem('dojo-draft');
+    clearForm();
+    showToast('🗑 全データを削除しました');
+  }
+
+  function loadSample() {
+    if (!confirm('入力欄に「松尾芭蕉の俳句分析」のサンプルデータを入力しますか？\n（現在の入力は上書きされます）')) return;
+    const set = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+    
+    set('f-author', '奥村 治');
+    set('f-affiliation', 'C4モデル研究会®');
+    set('f-email', 'info@c4model.org');
+    set('f-degree', 'Ph.D. / 主宰');
+    set('f-title', '松尾芭蕉俳句の認知アーキテクチャの可視化：C4モデルによる詩的緊張構造の分析');
+    set('f-journal', '感性工学会');
+    set('f-language', 'ja');
+    set('f-keywords', 'C4モデル, 俳句, 松尾芭蕉, 認知アーキテクチャ, 構造分析');
+    set('f-abstract', '本研究は、松尾芭蕉の俳句が持つ独自の詩的緊張構造（ポエティック・テンション）を、ソフトウェア設計手法であるC4モデルを用いて可視化する試みである。従来、定性的な文学分析に留まっていた俳句の鑑賞プロセスを「コンテキスト（L1）」「コンテナ（L2）」「コンポーネント（L3）」「コード（L4）」の4層構造に分解し、句の背景にある社会的事象から言葉の接続関係に至るまでを体系的にモデル化する。結果として、暗黙知とされていた芭蕉のナラティブ構造が明示的になり、文学表現の定量的な感性工学アプローチに新たな視座を提供するものである。');
+    set('f-rq', 'C4モデルの4層構造を用いることで、松尾芭蕉の俳句における暗黙の詩的緊張構造をどのように明示的かつ体系的に可視化・分析できるか？');
+    set('f-hypothesis', 'L1（世界観）からL4（単語の接続）までの階層分析により、芭蕉の「不易流行」の概念が構造的に裏付けられ、感性工学的な定量的評価・議論が可能になる。');
+    set('f-structure', '1. はじめに（研究の背景と目的）\n2. 先行研究（文学分析と情報アーキテクチャ）\n3. 研究手法（C4モデルの俳句への適用定義）\n4. 事例分析（「古池や」「奥の細道」抽出句のL1-L4モデリング）\n5. 考察（可視化がもたらす新しい鑑賞体験と限界）\n6. 結論と今後の展望');
+    set('f-wordcount', '6000');
+    set('f-prior', 'これまでの俳句分析は主に国文学的アプローチ（定性評価）や、自然言語処理による単語頻出度分析（局所的マクロ評価）が中心であり、作品の「全体アーキテクチャ」を捉えるフレームワークが不足していた。');
+    set('f-refs', '奥村治 (2025). 松尾芭蕉俳句 ナラティブ構造とC4モデルによる学術的分析.\nBrown, S. (2010). Software Architecture for Developers.\nC4モデル研究会 (2024). PlantUML C4モデル活用入門ガイド.\nSmith, J. (2023). Cognitive Structures in Japanese Poetry.\n田中角栄 (2015). 感性工学と文学分析の交差点.\n佐藤健 (2018). 知識の構造化手法としてのアーキテクチャ.');
+
+    const radio = document.querySelector('input[name="format"][value="感性工学会"]');
+    if (radio) radio.checked = true;
+
+    updateCount('f-abstract', 'cnt-abstract', 200);
+    updateCount('f-rq', 'cnt-rq', 50);
+    updateCount('f-structure', 'cnt-structure', 0);
+    countRefs();
+    recalc();
+    showToast('💡 サンプルデータを入力しました！');
+  }
+
+  /* ── C4図描画 ── */
+  const PUML_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
+  function encode64(data) {
+    let r = '';
+    for (let i = 0; i < data.length; i += 3) {
+      const b = [data[i]||0, data[i+1]||0, data[i+2]||0];
+      r += PUML_CHARS[(b[0]>>2)&0x3F];
+      r += PUML_CHARS[((b[0]&3)<<4)|((b[1]>>4)&0xF)];
+      r += PUML_CHARS[((b[1]&0xF)<<2)|((b[2]>>6)&3)];
+      r += PUML_CHARS[b[2]&0x3F];
+    }
+    return r;
+  }
+  function deflateRaw(str) {
+    const data = new TextEncoder().encode(str);
+    const chunks = [];
+    const BSIZE = 32768;
+    for (let i = 0; i < data.length; i += BSIZE) {
+      const chunk = data.slice(i, i+BSIZE);
+      const last = (i+BSIZE >= data.length) ? 1 : 0;
+      const len = chunk.length;
+      const nlen = (~len) & 0xFFFF;
+      chunks.push(last, len&0xFF, (len>>8)&0xFF, nlen&0xFF, (nlen>>8)&0xFF);
+      chunk.forEach(b => chunks.push(b));
+    }
+    let s1=1, s2=0;
+    data.forEach(b => { s1=(s1+b)%65521; s2=(s2+s1)%65521; });
+    const adler = (s2<<16)|s1;
+    return new Uint8Array([0x78,0x01,...chunks,(adler>>24)&0xFF,(adler>>16)&0xFF,(adler>>8)&0xFF,adler&0xFF]);
+  }
+  function encodePuml(puml) { return '~1'+encode64(deflateRaw(puml)); }
+
+  function drawC4(codeId, renderId) {
+    const code = document.getElementById(codeId).value;
+    const enc  = encodePuml(code);
+    const div  = document.getElementById(renderId);
+    div.style.display = 'block';
+    div.innerHTML = '<p style="font-family:var(--font-mono);font-size:0.75rem;color:var(--ink-lite)">描画中…</p>';
+    const img = new Image();
+    img.style.maxWidth = '100%';
+    img.onload = () => { div.innerHTML = ''; div.appendChild(img); };
+    img.onerror = () => {
+      img.src = 'https://kroki.io/plantuml/svg/' + btoa(unescape(encodeURIComponent(code)));
+    };
+    img.src = 'https://www.plantuml.com/plantuml/svg/' + enc;
+  }
+
+  /* ── コピー ── */
+  function copyPrompt(id) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => showToast('📋 コピーしました'));
+  }
+  function copyText(id) {
+    const text = document.getElementById(id).value;
+    navigator.clipboard.writeText(text).then(() => showToast('📋 コピーしました'));
+  }
+
+  /* ── Toast ── */
+  function showToast(msg) {
+    let t = document.getElementById('toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'toast';
+      t.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-family:var(--font-mono);font-size:0.8rem;padding:0.65rem 1.5rem;z-index:9999;border:1px solid rgba(255,255,255,0.15);transition:opacity 0.3s;';
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+  }
+
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'ronbun_dojo_draft.md';
+    a.click(); URL.revokeObjectURL(url);
+    showToast('💾 Markdownを出力しました');
+  }
+
+  /* ── フィードバック・アンケート ── */
+  function showFeedbackFA(score) {
+    document.querySelectorAll('#feedback-stars span').forEach((el, idx) => {
+      const currentScore = 5 - idx;
+      el.style.opacity = currentScore <= score ? '1' : '0.3';
+      el.style.transform = currentScore === score ? 'scale(1.2)' : 'scale(1)';
+    });
+    // ★3以下（どちらともいえない以下）の場合にFA入力欄を表示
+    if (score <= 3) {
+      document.getElementById('feedback-fa').style.display = 'block';
+    } else {
+      document.getElementById('feedback-fa').style.display = 'none';
+      setTimeout(() => alert('高評価ありがとうございます！引き続き論文道場をご活用ください。'), 300);
+    }
+  }
+  function submitFeedback() {
+    alert('フィードバックを送信しました。貴重なご意見ありがとうございます！\n（※現在はデモ用のため実際のデータ送信は行われません）');
+    document.getElementById('feedback-fa').style.display = 'none';
+    document.querySelectorAll('#feedback-stars span').forEach(el => { 
+      el.style.opacity = '1'; el.style.transform = 'scale(1)'; 
+    });
+  }
 </script>
 </body>
 </html>

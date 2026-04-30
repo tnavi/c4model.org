@@ -1122,17 +1122,17 @@
           <div class="feature-body" data-en>Customizable export templates supporting various academic standards</div>
           <div class="feature-body" data-ja style="display:none">各種学術基準に対応した柔軟なエクスポートテンプレート</div>
         </a>
-        <a class="feature-card feature-card--link" href="dojo.html#write">
+        <div class="feature-card">
           <div class="feature-icon">⬟</div>
           <div class="feature-title" data-en>Claude API Powered</div>
           <div class="feature-title" data-ja style="display:none">Claude API連携</div>
           <div class="feature-body" data-en>Cloudflare Workers backend with D1 usage logging</div>
           <div class="feature-body" data-ja style="display:none">Cloudflare WorkersバックエンドとD1使用ログ</div>
-        </a>
-        <a class="feature-card feature-card--link" href="dojo.html#submit">
+        </div>
+        <a class="feature-card feature-card--link" href="dojo.html#feedback">
           <div class="feature-icon">📊</div>
           <div class="feature-title" data-en>User Feedback System</div>
-          <div class="feature-title" data-ja style="display:none">本アンケートの評価（SD法）</div>
+          <div class="feature-title" data-ja style="display:none">本アプリの評価アンケート（SD法）</div>
           <div class="feature-body" data-en>Built-in evaluation surveys to continuously improve UI/UX based on educational engineering.</div>
           <div class="feature-body" data-ja style="display:none">教育工学に基づくアンケートを内蔵し、ユーザーの声でシステムをアジャイルに改善</div>
         </a>
@@ -1160,7 +1160,7 @@
           <li data-en><strong>Regional Implementation:</strong> Thesis Dojo aims to raise the level of digital and logical thinking in regional communities, starting with Fukushima.</li>
           <li data-ja style="display:none;"><strong>地域社会への実装:</strong> 論文道場は、福島を起点に地域のデジタル・論理思考力を底上げするEdTechインフラを目指しています。</li>
           <li data-en><strong>Educational Engineering:</strong> Our latest paper "Structural Analysis of Classical Haiku via EdTech" proves that logical framing can be applied to cultural heritage.</li>
-          <li data-ja style="display:none;"><strong>教育工学の実証:</strong> 最新論文「教育工学的アプローチによる古典俳句の構造解析」は、日本の文化遺産に論理構造を与え、教育へ応用できることを証明しました。</li>
+          <li data-ja style="display:none;"><strong>教育工学の実証:</strong> 最新論文<a href="https://www.researchgate.net/publication/404293639_jiaoyugongxuedeapurochiniyorugudianpaijunogouzaojiexi_-_C4moderuwoyuanyongshitasongweibajiaofengliunohajimeyaaonotianzhiegenofenxi_-_An_Educational-Engineering_Approach_to_Structural_Analysis_of_Class" target="_blank" style="text-decoration: underline; color: var(--teal);">「教育工学的アプローチによる古典俳句の構造解析」</a>は、日本の文化遺産に論理構造を与え、教育へ応用できることを証明しました。</li>
           <li data-en><strong>Global Accessibility:</strong> Visualizing complex logic on YouTube to embody Open Science for all.</li>
           <li data-ja style="display:none;"><strong>オープンサイエンス:</strong> 複雑な論理をYouTubeで可視化し、誰にでも分かりやすく公開する姿勢を貫いています。</li>
         </ul>
@@ -1237,8 +1237,18 @@
             <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
           </a>
           <div class="video-info">
-            <div class="video-title">論文道場：誰もが論理的に書ける Ronbun Dojo</div>
+            <div class="video-title">論文道場：誰もが論理的に書ける Ronbun Dojo (Japanese)</div>
             <div class="video-desc">本プロジェクトの社会実装の核となる、知的生産インフラの紹介。</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <a href="https://www.youtube.com/watch?v=t2cnj1kUzcA" target="_blank" class="video-wrapper" style="display: block; text-decoration: none; position: relative; background: #000;">
+            <img src="https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg';" alt="Thesis Dojo English" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.2s;">
+            <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26,26,46,0.8); border: 2px solid var(--gold); color: var(--gold); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; padding-left: 4px; transition: all 0.2s; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">▶</div>
+          </a>
+          <div class="video-info">
+            <div class="video-title">Thesis Dojo: Write smarter. Structure deeper. (English)</div>
+            <div class="video-desc">Introduction to Thesis Dojo for global academic writing.</div>
           </div>
         </div>
       </div>
@@ -1402,8 +1412,7 @@
         
         <!-- Kindle Book 1 -->
         <a href="https://www.amazon.co.jp/dp/B0GTCPL24M" target="_blank" class="kindle-card">
-          <!-- TODO: Update src with the actual cover image path from Obsidian -->
-          <img src="https://via.placeholder.com/400x560/EAE3CE/1A1A2E?text=Cover+Image" alt="俳句鑑賞における認知アーキテクチャの可視化" class="kindle-cover">
+          <img src="https://images-na.ssl-images-amazon.com/images/P/B0GTCPL24M.09.LZZZZZZZ.jpg" alt="俳句鑑賞における認知アーキテクチャの可視化" class="kindle-cover">
           <div class="kindle-info">
             <div class="kindle-title">俳句鑑賞における認知アーキテクチャの可視化</div>
             <div class="kindle-action">View on Amazon →</div>
@@ -1412,7 +1421,7 @@
 
         <!-- Kindle Book 2 -->
         <a href="https://www.amazon.co.jp/dp/B0GSZ8ZXDN" target="_blank" class="kindle-card">
-          <img src="https://via.placeholder.com/400x560/EAE3CE/1A1A2E?text=Cover+Image" alt="Business Process Reengineering (BPR)" class="kindle-cover">
+          <img src="https://images-na.ssl-images-amazon.com/images/P/B0GSZ8ZXDN.09.LZZZZZZZ.jpg" alt="Business Process Reengineering (BPR)" class="kindle-cover">
           <div class="kindle-info">
             <div class="kindle-title">Business Process Reengineering (BPR)</div>
             <div class="kindle-action">View on Amazon →</div>
@@ -1421,7 +1430,7 @@
 
         <!-- Kindle Book 3 -->
         <a href="https://www.amazon.co.jp/dp/B0GSR79MW2" target="_blank" class="kindle-card">
-          <img src="https://via.placeholder.com/400x560/EAE3CE/1A1A2E?text=Cover+Image" alt="富裕層向け投資用不動産情報サービスのサービタイゼーション" class="kindle-cover">
+          <img src="https://images-na.ssl-images-amazon.com/images/P/B0GSR79MW2.09.LZZZZZZZ.jpg" alt="富裕層向け投資用不動産情報サービスのサービタイゼーション" class="kindle-cover">
           <div class="kindle-info">
             <div class="kindle-title">富裕層向け投資用不動産情報サービスのサービタイゼーション</div>
             <div class="kindle-action">View on Amazon →</div>
@@ -1429,8 +1438,8 @@
         </a>
 
         <!-- Kindle Book 4 -->
-        <a href="https://www.amazon.co.jp/dp/B0GRGG4JPL" target="_blank" class="kindle-card">
-          <img src="https://via.placeholder.com/400x560/EAE3CE/1A1A2E?text=Cover+Image" alt="インターバルウォーキング測定アプリの開発" class="kindle-cover">
+        <a href="https://www.amazon.co.jp/dp/B0GX5HL6NC" target="_blank" class="kindle-card">
+          <img src="https://images-na.ssl-images-amazon.com/images/P/B0GX5HL6NC.09.LZZZZZZZ.jpg" alt="インターバルウォーキング測定アプリの開発" class="kindle-cover">
           <div class="kindle-info">
             <div class="kindle-title">インターバルウォーキング測定アプリの開発</div>
             <div class="kindle-action">View on Amazon →</div>
@@ -1439,7 +1448,7 @@
 
         <!-- Kindle Book 5 -->
         <a href="https://www.amazon.co.jp/dp/B0G6X7BSPX" target="_blank" class="kindle-card">
-          <img src="https://via.placeholder.com/400x560/EAE3CE/1A1A2E?text=Cover+Image" alt="映画『国宝』のPlantUML C4モデルによる構造分析" class="kindle-cover">
+          <img src="https://images-na.ssl-images-amazon.com/images/P/B0G6X7BSPX.09.LZZZZZZZ.jpg" alt="映画『国宝』のPlantUML C4モデルによる構造分析" class="kindle-cover">
           <div class="kindle-info">
             <div class="kindle-title">映画『国宝』のPlantUML C4モデルによる構造分析</div>
             <div class="kindle-action">View on Amazon →</div>
@@ -1448,7 +1457,7 @@
 
         <!-- Kindle Book 6 -->
         <a href="https://www.amazon.co.jp/dp/B0G6L3YP42" target="_blank" class="kindle-card">
-          <img src="https://via.placeholder.com/400x560/EAE3CE/1A1A2E?text=Cover+Image" alt="スタジオジブリ『おもひでぽろぽろ』における二重時間構造の可視化分析" class="kindle-cover">
+          <img src="https://images-na.ssl-images-amazon.com/images/P/B0G6L3YP42.09.LZZZZZZZ.jpg" alt="スタジオジブリ『おもひでぽろぽろ』における二重時間構造の可視化分析" class="kindle-cover">
           <div class="kindle-info">
             <div class="kindle-title">スタジオジブリ『おもひでぽろぽろ』における二重時間構造の可視化分析</div>
             <div class="kindle-action">View on Amazon →</div>
@@ -1457,7 +1466,7 @@
 
         <!-- Kindle Book 7 -->
         <a href="https://www.amazon.co.jp/dp/B0G61XY615" target="_blank" class="kindle-card">
-          <img src="https://via.placeholder.com/400x560/EAE3CE/1A1A2E?text=Cover+Image" alt="芭蕉俳句のウェルビーイング概念と構造分析" class="kindle-cover">
+          <img src="https://images-na.ssl-images-amazon.com/images/P/B0G61XY615.09.LZZZZZZZ.jpg" alt="芭蕉俳句のウェルビーイング概念と構造分析" class="kindle-cover">
           <div class="kindle-info">
             <div class="kindle-title">芭蕉俳句のウェルビーイング概念と構造分析</div>
             <div class="kindle-action">View on Amazon →</div>
@@ -1466,7 +1475,7 @@
 
         <!-- Kindle Book 8 -->
         <a href="https://www.amazon.co.jp/dp/B0FSXNMSY2" target="_blank" class="kindle-card">
-          <img src="https://via.placeholder.com/400x560/EAE3CE/1A1A2E?text=Cover+Image" alt="図でみる“俳句”：松尾芭蕉「古池や蛙飛び込む水の音」のひみつ" class="kindle-cover">
+          <img src="https://images-na.ssl-images-amazon.com/images/P/B0FSXNMSY2.09.LZZZZZZZ.jpg" alt="図でみる“俳句”：松尾芭蕉「古池や蛙飛び込む水の音」のひみつ" class="kindle-cover">
           <div class="kindle-info">
             <div class="kindle-title">図でみる“俳句”：松尾芭蕉「古池や蛙飛び込む水の音」のひみつ</div>
             <div class="kindle-action">View on Amazon →</div>

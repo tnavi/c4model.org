@@ -938,7 +938,7 @@ Rel(d, p, "図コード送信")
   /* ── ハッシュで直接遷移 ── */
   window.addEventListener('DOMContentLoaded', () => {
     const hash = location.hash.replace('#', '');
-    const validPages = ['stage0','ideation','structure','write','evaluate','presentation','qa','submit','c4uml','formats','settings'];
+    const validPages = ['stage0','ideation','structure','write','evaluate','presentation','qa','submit','c4uml','formats','settings','feedback'];
     if (hash && validPages.includes(hash)) {
       const btn = document.getElementById('btn-' + hash);
       goPage(hash, btn);

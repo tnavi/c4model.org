@@ -179,28 +179,28 @@
     /* ===== SCORE BAR ===== */
     .score-bar {
       position: sticky; bottom: 0; z-index: 100;
-      background: #1A2535;
-      color: #EAE3CE;
+      background: #C0392B;
+      color: #fff;
       padding: 1rem 1.5rem;
-      border-top: 2px solid #2A9BAD;
+      border-top: 2px solid #E74C3C;
     }
     .score-top { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
-    .score-num { font-size: 2rem; font-weight: bold; color: #D4AF6A; }
-    .score-denom { font-size: 0.85rem; color: #9A9480; }
+    .score-num { font-size: 2rem; font-weight: bold; color: #fff; }
+    .score-denom { font-size: 0.85rem; color: rgba(255,255,255,0.75); }
     .score-axes { display: flex; gap: 1.25rem; flex-wrap: wrap; flex: 1; }
     .axis-item { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; }
-    .axis-label { font-size: 0.72rem; color: #9A9480; white-space: nowrap; }
-    .axis-bar { width: 60px; height: 4px; background: #3A3A5A; border-radius: 2px; }
-    .axis-bar-fill { height: 100%; border-radius: 2px; background: #D4AF6A; transition: width 0.3s; }
+    .axis-label { font-size: 0.72rem; color: rgba(255,255,255,0.85); white-space: nowrap; }
+    .axis-bar { width: 60px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; }
+    .axis-bar-fill { height: 100%; border-radius: 2px; background: #fff; transition: width 0.3s; }
     .btn-analyze {
-      padding: 0.7rem 1.6rem; background: #3A3A5A; color: #9A9480;
-      border: 1px solid #5A5A7A; border-radius: 6px;
+      padding: 0.7rem 1.6rem; background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.4); border-radius: 6px;
       font-size: 1rem; cursor: not-allowed; white-space: nowrap;
     }
     .btn-analyze.ready {
-      background: #2A9BAD; color: #fff; cursor: pointer; border-color: #2A9BAD;
+      background: #fff; color: #C0392B; cursor: pointer; border-color: #fff; font-weight: bold;
     }
-    .score-hint { font-size: 0.85rem; color: #9A9480; margin-top: 0.5rem; }
+    .score-hint { font-size: 0.85rem; color: rgba(255,255,255,0.8); margin-top: 0.5rem; }
 
     /* ===== SECTION DIVIDER ===== */
     .stage-block {
@@ -920,7 +920,11 @@ Rel(d, p, "図コード送信")
         開発：奥村 治 / C4モデル研究会®<br>
         バックエンド：Cloudflare Workers + D1<br>
         AI：Claude API (Anthropic)<br>
-        図解：PlantUML Server
+        図解：PlantUML Server<br>
+        © 2025–2026 C4モデル研究会® / Osamu Okumura. All rights reserved.
+      </p>
+      <p style="font-size:0.85rem; margin-top:0.75rem;">
+        <a href="https://c4model.org/">← c4model.org トップへ戻る</a>
       </p>
     </div>
   </section>

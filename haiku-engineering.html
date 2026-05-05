@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>俳句工学入門 | Haiku Engineering — c4model.org</title>
+<meta name="description" content="松尾芭蕉の俳句をC4モデルで構造解析。動画×図解×工学の三位一体で、俳句の深層に迫る新しい入門書プロジェクト。">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+<style>
+/* ════════════════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════════════════ */
+:root {
+  --white:      #FFFFFF;
+  --bg:         #FAFAF8;
+  --bg-alt:     #F4F1EC;
+  --ink:        #1A1A2E;
+  --ink-mid:    #3D3D5C;
+  --ink-lite:   #7A7A9A;
+  --gold:       #B8860B;
+  --gold-lt:    #D4A01A;
+  --teal:       #1A7A8A;
+  --teal-lt:    #2A9BAD;
+  --sage:       #4A7A5A;
+  --border:     #D8D4CA;
+  --border-lt:  #ECEAE4;
+  --shadow:     rgba(26,26,46,0.08);
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+  --font-body:    'Source Serif 4', Georgia, serif;
+  --fs-hero:    clamp(2.8rem, 6vw, 5rem);
+  --fs-h2:      clamp(1.8rem, 3.5vw, 2.8rem);
+  --fs-h3:      clamp(1.3rem, 2vw, 1.8rem);
+  --fs-body:    1.1rem;
+  --fs-mono:    0.82rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.75;
+}
+
+/* ── NAVIGATION ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250,250,248,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 2.5rem;
+}
+.nav-logo {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.nav-links {
+  display: flex; gap: 2rem; list-style: none;
+}
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: 0.06em;
+  color: var(--ink-mid);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--gold); }
+.nav-right { display: flex; align-items: center; gap: 1rem; }
+
+/* ── LANG TOGGLE ── */
+.lang-toggle { display: flex; border: 1px solid var(--border); }
+.lang-btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem; letter-spacing: 0.1em;
+  padding: 0.35rem 0.85rem;
+  background: var(--bg); color: var(--ink-lite);
+  border: none; border-right: 1px solid var(--border);
+  cursor: pointer; transition: all 0.15s;
+}
+.lang-btn:last-child { border-right: none; }
+.lang-btn.active { background: var(--ink); color: var(--bg); }
+
+.nav-cta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); letter-spacing: 0.08em;
+  padding: 0.5rem 1.2rem;
+  background: var(--ink); color: var(--bg);
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.nav-cta:hover { background: var(--gold); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 70vh;
+  display: flex; align-items: center;
+  background: var(--ink);
+  position: relative; overflow: hidden;
+  padding: 6rem 2.5rem;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 80% 50%, rgba(184,134,11,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(26,122,138,0.1) 0%, transparent 50%);
+}
+.hero-inner { max-width: 900px; margin: 0 auto; position: relative; }
+
+.hero-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); letter-spacing: 0.12em;
+  color: var(--gold);
+  border: 1px solid rgba(184,134,11,0.4);
+  padding: 0.3rem 0.9rem;
+  margin-bottom: 2rem;
+}
+.hero-haiku {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  font-style: italic;
+  color: rgba(250,250,248,0.55);
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.04em;
+}
+.hero-h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-hero);
+  font-weight: 900;
+  color: var(--bg);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.01em;
+}
+.hero-h1 em {
+  font-style: italic;
+  color: var(--gold);
+}
+.hero-sub {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(250,250,248,0.7);
+  max-width: 580px;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+.hero-badges {
+  display: flex; flex-wrap: wrap; gap: 0.75rem;
+}
+.hero-badge {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); letter-spacing: 0.08em;
+  padding: 0.45rem 1rem;
+  border: 1px solid rgba(250,250,248,0.2);
+  color: rgba(250,250,248,0.6);
+}
+.hero-badge.accent { border-color: var(--gold); color: var(--gold); }
+
+/* ── SECTION BASE ── */
+section { padding: 5rem 2.5rem; }
+.section-inner { max-width: 960px; margin: 0 auto; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); letter-spacing: 0.14em;
+  color: var(--ink-lite);
+  text-transform: lowercase;
+  padding-left: 1.2rem;
+  border-left: 2px solid var(--gold);
+  margin-bottom: 1.5rem;
+}
+.section-h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+.section-lead {
+  color: var(--ink-mid);
+  max-width: 620px;
+  margin-bottom: 3rem;
+  line-height: 1.8;
+}
+
+/* ── THREE PILLARS ── */
+#pillars { background: var(--bg-alt); }
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+  margin-top: 2rem;
+}
+.pillar {
+  padding: 2.5rem 2rem;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.pillar:last-child { border-right: none; }
+.pillar-num {
+  font-family: var(--font-mono);
+  font-size: 0.72rem; letter-spacing: 0.1em;
+  color: var(--ink-lite);
+  margin-bottom: 1rem;
+}
+.pillar-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+.pillar-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--ink);
+}
+.pillar-title em { font-style: italic; color: var(--gold); }
+.pillar-body { font-size: 0.95rem; color: var(--ink-mid); line-height: 1.7; }
+.pillar-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem; letter-spacing: 0.1em;
+  padding: 0.2rem 0.6rem;
+  margin-top: 1rem;
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* ── BOOK STRUCTURE (SPIRAL) ── */
+#structure { background: var(--bg); }
+.spiral-stack { display: flex; flex-direction: column; gap: 0; }
+.spiral-item {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--layer-color);
+  padding: 1.5rem 1.75rem;
+  margin-left: var(--indent, 0px);
+  width: calc(100% - var(--indent, 0px));
+  transition: transform 0.25s, box-shadow 0.25s;
+  cursor: default;
+  margin-bottom: 2px;
+}
+.spiral-item:hover {
+  transform: translateX(5px) translateY(-2px);
+  box-shadow: -5px 4px 0 var(--layer-color), 0 8px 24px var(--shadow);
+  position: relative; z-index: 1;
+}
+.spiral-item[data-layer="1"] { --indent: 0px;   --layer-color: var(--gold);  }
+.spiral-item[data-layer="2"] { --indent: 2rem;  --layer-color: var(--teal);  }
+.spiral-item[data-layer="3"] { --indent: 4rem;  --layer-color: var(--sage);  }
+.spiral-item[data-layer="4"] { --indent: 6rem;  --layer-color: #8B4A8B;      }
+
+.spiral-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem; letter-spacing: 0.12em;
+  color: var(--ink-lite);
+  margin-bottom: 0.35rem;
+}
+.spiral-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+.spiral-body { font-size: 0.95rem; color: var(--ink-mid); }
+.spiral-chapters {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.ch-tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem; letter-spacing: 0.08em;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--border);
+  color: var(--ink-mid);
+}
+
+/* ── HAIKU TEMPLATE ── */
+#template { background: var(--bg-alt); }
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+}
+.t-step {
+  padding: 1.75rem 1.25rem;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+.t-step:last-child { border-right: none; }
+.t-num {
+  font-family: var(--font-mono);
+  font-size: 0.65rem; letter-spacing: 0.1em;
+  color: var(--ink-lite);
+  margin-bottom: 0.75rem;
+}
+.t-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+.t-title {
+  font-family: var(--font-display);
+  font-size: 1rem; font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+.t-body { font-size: 0.82rem; color: var(--ink-mid); line-height: 1.6; }
+
+/* ── C4 DIAGRAM ── */
+#c4demo { background: var(--bg); }
+.haiku-highlight {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 2.5rem 3rem;
+  margin-bottom: 3rem;
+  border-left: 5px solid var(--gold);
+  position: relative;
+}
+.haiku-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-style: italic;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+.haiku-credit {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); letter-spacing: 0.08em;
+  color: rgba(250,250,248,0.5);
+}
+.diagram-tabs {
+  display: flex; gap: 0;
+  border: 1px solid var(--border);
+  width: fit-content;
+  margin-bottom: 2rem;
+}
+.dtab {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); letter-spacing: 0.08em;
+  padding: 0.6rem 1.4rem;
+  background: var(--bg);
+  color: var(--ink-lite);
+  border: none; border-right: 1px solid var(--border);
+  cursor: pointer; transition: all 0.2s;
+}
+.dtab:last-child { border-right: none; }
+.dtab.active { background: var(--ink); color: var(--bg); }
+.diagram-panel { display: none; }
+.diagram-panel.active { display: block; }
+.puml-wrap {
+  border: 1px solid var(--border);
+  background: var(--white);
+  padding: 1.5rem;
+  text-align: center;
+  min-height: 200px;
+  position: relative;
+}
+.puml-wrap img { max-width: 100%; height: auto; }
+.puml-loading {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); color: var(--ink-lite);
+  padding: 3rem;
+}
+
+/* ── VIDEO / QR SECTION ── */
+#videos { background: var(--bg-alt); }
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+}
+.video-card {
+  padding: 2rem 1.75rem;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.video-card:last-child { border-right: none; }
+.video-card-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.video-num {
+  font-family: var(--font-mono);
+  font-size: 0.65rem; letter-spacing: 0.1em; color: var(--ink-lite);
+}
+.video-qr {
+  width: 64px; height: 64px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; color: var(--ink-lite);
+  font-family: var(--font-mono);
+  text-align: center; line-height: 1.4;
+}
+.video-haiku {
+  font-family: var(--font-display);
+  font-size: 1.15rem; font-style: italic;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+.video-desc { font-size: 0.88rem; color: var(--ink-mid); line-height: 1.6; }
+.video-tags {
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+  margin-top: 1rem;
+}
+.vtag {
+  font-family: var(--font-mono);
+  font-size: 0.62rem; letter-spacing: 0.08em;
+  padding: 0.15rem 0.5rem;
+  background: var(--ink); color: var(--bg);
+}
+
+/* ── DOJO CTA ── */
+#dojo-cta {
+  background: var(--ink);
+  padding: 6rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+#dojo-cta::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(184,134,11,0.15) 0%, transparent 60%);
+}
+.cta-inner { max-width: 700px; margin: 0 auto; position: relative; }
+.cta-tag {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); letter-spacing: 0.14em;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+.cta-h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  color: var(--bg);
+  line-height: 1.2;
+  margin-bottom: 1.25rem;
+}
+.cta-sub {
+  color: rgba(250,250,248,0.65);
+  max-width: 500px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+}
+.cta-buttons { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+.btn-primary {
+  font-family: var(--font-mono);
+  font-size: 0.85rem; letter-spacing: 0.1em;
+  padding: 0.9rem 2.4rem;
+  background: var(--gold); color: var(--ink);
+  border: none; cursor: pointer; text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: var(--gold-lt); }
+.btn-outline {
+  font-family: var(--font-mono);
+  font-size: 0.85rem; letter-spacing: 0.1em;
+  padding: 0.9rem 2.4rem;
+  background: transparent; color: rgba(250,250,248,0.7);
+  border: 1px solid rgba(250,250,248,0.25);
+  cursor: pointer; text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── AUTHOR ── */
+#author { background: var(--bg-alt); }
+.author-card {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  background: var(--white);
+}
+.author-left {
+  padding: 3rem 2.5rem;
+  border-right: 1px solid var(--border);
+  background: var(--ink);
+  color: var(--bg);
+}
+.author-mark {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); letter-spacing: 0.1em;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+.author-name {
+  font-family: var(--font-display);
+  font-size: 1.8rem; font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+.author-name-en {
+  font-family: var(--font-mono);
+  font-size: 0.8rem; color: rgba(250,250,248,0.5);
+  margin-bottom: 2rem;
+}
+.author-org {
+  font-family: var(--font-mono);
+  font-size: 0.75rem; letter-spacing: 0.08em;
+  color: var(--gold);
+  padding: 0.4rem 0.9rem;
+  border: 1px solid rgba(184,134,11,0.4);
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+.author-email {
+  font-family: var(--font-mono);
+  font-size: 0.72rem; color: rgba(250,250,248,0.5);
+}
+.author-right { padding: 3rem 2.5rem; }
+.author-bio {
+  color: var(--ink-mid);
+  line-height: 1.85;
+  margin-bottom: 1.5rem;
+}
+.author-career {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1px solid var(--border);
+}
+.career-item {
+  display: flex;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-lt);
+  gap: 1rem;
+  align-items: baseline;
+}
+.career-item:last-child { border-bottom: none; }
+.career-era {
+  font-family: var(--font-mono);
+  font-size: 0.7rem; letter-spacing: 0.08em;
+  color: var(--ink-lite);
+  white-space: nowrap;
+  min-width: 80px;
+}
+.career-role { font-size: 0.9rem; color: var(--ink-mid); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink);
+  padding: 2.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 1rem;
+}
+.footer-logo {
+  font-family: var(--font-mono);
+  font-size: 0.85rem; letter-spacing: 0.08em;
+  color: rgba(250,250,248,0.5);
+}
+.footer-copy {
+  font-family: var(--font-mono);
+  font-size: 0.7rem; letter-spacing: 0.06em;
+  color: rgba(250,250,248,0.3);
+}
+
+/* ── REVEAL ANIMATION ── */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 0.75rem 1.25rem; }
+  .nav-links { display: none; }
+  section { padding: 3.5rem 1.25rem; }
+  .pillars-grid, .template-grid, .video-grid { grid-template-columns: 1fr; }
+  .pillar, .t-step, .video-card { border-right: none; border-bottom: 1px solid var(--border); }
+  .pillar:last-child, .t-step:last-child, .video-card:last-child { border-bottom: none; }
+  .spiral-item[data-layer="2"] { --indent: 1rem; }
+  .spiral-item[data-layer="3"] { --indent: 2rem; }
+  .spiral-item[data-layer="4"] { --indent: 3rem; }
+  .author-card { grid-template-columns: 1fr; }
+  .author-left { border-right: none; border-bottom: 1px solid var(--border); }
+  footer { flex-direction: column; text-align: center; }
+}
+/* ── FADESHEET SYSTEM ── */
+#fadesheet { background: var(--bg); }
+.fs-layout { display: grid; grid-template-columns: 350px 1fr; gap: 2rem; margin-top: 2rem; align-items: start; }
+.fs-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+.fs-panel { background: var(--white); border: 1px solid var(--border); padding: 1.5rem; }
+.fs-panel h3 { font-family: var(--font-display); font-size: 1.1rem; color: var(--ink); margin-bottom: 1rem; border-bottom: 1px solid var(--border-lt); padding-bottom: 0.5rem; }
+.fs-form-group { margin-bottom: 1rem; }
+.fs-form-group label { display: block; font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-mid); margin-bottom: 0.25rem; letter-spacing: 0.05em; }
+.fs-input, .fs-textarea { width: 100%; padding: 0.6rem; border: 1px solid var(--border); background: var(--bg-alt); font-family: var(--font-body); font-size: 0.95rem; color: var(--ink); transition: border-color 0.2s; }
+.fs-input:focus, .fs-textarea:focus { outline: none; border-color: var(--gold); }
+.fs-textarea { resize: vertical; min-height: 80px; }
+.fs-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+.fs-btn { flex: 1; padding: 0.6rem; border: none; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.05em; cursor: pointer; transition: background 0.2s; color: var(--bg); text-align: center; }
+.fs-btn-primary { background: var(--ink); }
+.fs-btn-primary:hover { background: var(--gold); }
+.fs-btn-secondary { background: var(--sage); }
+.fs-btn-secondary:hover { background: #3A6A4A; }
+.fs-btn-outline { background: transparent; border: 1px solid var(--border); color: var(--ink); }
+.fs-btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+.fs-btn-danger { background: #8B4A4A; }
+.fs-btn-danger:hover { background: #6A3A3A; }
+
+.db-list { list-style: none; max-height: 300px; overflow-y: auto; }
+.db-item { padding: 0.75rem; border-bottom: 1px solid var(--border-lt); cursor: pointer; transition: background 0.2s; }
+.db-item:hover { background: var(--bg-alt); }
+.db-item:last-child { border-bottom: none; }
+.db-title { font-weight: 700; font-size: 0.9rem; color: var(--ink); margin-bottom: 0.2rem; }
+.db-date { font-family: var(--font-mono); font-size: 0.65rem; color: var(--ink-lite); }
+
+.fs-preview-wrap { position: relative; }
+.fs-preview { background: var(--white); border: 1px solid var(--border); padding: 3rem 4rem; position: relative; min-height: 800px; }
+.pdf-header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid var(--ink); padding-bottom: 1rem; }
+.pdf-title { font-family: var(--font-display); font-size: 2rem; color: var(--ink); margin-bottom: 0.5rem; }
+.pdf-meta { font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-mid); display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+.pdf-section { margin-bottom: 2rem; }
+.pdf-section-title { font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 0.5rem; border-left: 3px solid var(--gold); padding-left: 0.5rem; }
+.pdf-haiku { font-family: var(--font-display); font-size: 2.5rem; text-align: center; font-style: italic; margin: 2rem 0; letter-spacing: 0.1em; }
+.pdf-text { font-size: 1rem; line-height: 1.8; color: var(--ink); white-space: pre-wrap; }
+.pdf-diagram { text-align: center; margin: 2rem 0; }
+.pdf-diagram img { max-width: 100%; height: auto; border: 1px solid var(--border); }
+.pdf-code { background: var(--bg-alt); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-mid); white-space: pre-wrap; overflow-x: auto; border: 1px solid var(--border); text-align: left; }
+.pdf-watermark { position: absolute; bottom: 1.5rem; right: 2rem; font-family: var(--font-mono); font-size: 0.65rem; color: var(--ink-lite); text-align: right; }
+
+@media (max-width: 900px) {
+  .fs-layout { grid-template-columns: 1fr; }
+  .fs-preview { padding: 1.5rem; }
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<nav>
+  <a href="https://c4model.org" class="nav-logo">c4model.org</a>
+  <ul class="nav-links">
+    <li><a href="#pillars">三位一体</a></li>
+    <li><a href="#structure">書籍構成</a></li>
+    <li><a href="#c4demo">C4図解</a></li>
+    <li><a href="#videos">動画</a></li>
+    <li><a href="#dojo-cta">論文道場</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="ja" onclick="setLang('ja')">日本語</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
+    <a href="https://osamuokumura.github.io/ronbun-dojo/" class="nav-cta" target="_blank">論文道場 →</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">新刊プロジェクト · 2025</div>
+    <div class="hero-haiku">
+      <span data-ja>古池や　蛙飛びこむ　水の音</span>
+      <span data-en style="display:none">furuike ya / kawazu tobikomu / mizu no oto</span>
+    </div>
+    <h1 class="hero-h1">
+      <span data-ja>俳句工学<em>入門</em></span>
+      <span data-en style="display:none">Haiku <em>Engineering</em></span>
+    </h1>
+    <p class="hero-sub">
+      <span data-ja>松尾芭蕉の俳句をC4モデルで構造解析する。<br>動画 × 図解 × 工学の三位一体で、俳句の深層を読み解く<br>まったく新しい入門書。</span>
+      <span data-en style="display:none">Structural analysis of Bashō's haiku using the C4 Model.<br>A completely new introduction — video × diagram × engineering,<br>reading the deep structure of haiku.</span>
+    </p>
+    <div class="hero-badges">
+      <span class="hero-badge accent">🎥 動画連動</span>
+      <span class="hero-badge accent">📐 C4モデル図解</span>
+      <span class="hero-badge">松尾芭蕉 · 小林一茶</span>
+      <span class="hero-badge">健康 × 俳句 × 工学</span>
+      <span class="hero-badge">高齢者対応設計</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ THREE PILLARS ═══════════════════ -->
+<section id="pillars">
+  <div class="section-inner">
+    <div class="section-label reveal">concept · 三位一体構造</div>
+    <h2 class="section-h2 reveal">
+      <span data-ja>普通の俳句入門書には<br>絶対にできない構成</span>
+      <span data-en style="display:none">A structure no ordinary<br>haiku primer can match</span>
+    </h2>
+    <p class="section-lead reveal">
+      <span data-ja>既公開の「解説」動画と「C4モデル応用事例研究」動画を軸に、書籍・図解・工学分析を有機的に統合。読者は俳句をまず体験し、次に構造で理解できる。</span>
+      <span data-en style="display:none">The already-published "Commentary" and "C4 Model Case Study" videos anchor the book, organically integrating diagrams and engineering analysis. Readers first experience haiku, then understand it structurally.</span>
+    </p>
+    <div class="pillars-grid reveal">
+      <div class="pillar">
+        <div class="pillar-num">01 / Video</div>
+        <div class="pillar-icon">🎥</div>
+        <h3 class="pillar-title"><em>動画</em>で体験</h3>
+        <p class="pillar-body">QRコードからYouTube動画へ直結。視覚・聴覚で俳句の音・動き・余韻を体感してから書籍へ戻る。初心者・高齢者に最適な「入口」。</p>
+        <span class="pillar-tag">QR → YouTube</span>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">02 / Diagram</div>
+        <div class="pillar-icon">📐</div>
+        <h3 class="pillar-title"><em>図解</em>で理解</h3>
+        <p class="pillar-body">C4モデルL1〜L3、シーケンス図、アクティビティ図で俳句の構造を可視化。「なんとなく好き」を「なぜ好きか」へ昇華する。</p>
+        <span class="pillar-tag">PlantUML C4</span>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">03 / Engineering</div>
+        <div class="pillar-icon">⚙️</div>
+        <h3 class="pillar-title"><em>工学</em>で再現</h3>
+        <p class="pillar-body">季語・音韻・余白の設計法則を工学的に抽出。「偶然生まれた名句」を「再現可能な創作プロセス」へ変換する。</p>
+        <span class="pillar-tag">Haiku Engineering</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ BOOK STRUCTURE ═══════════════════ -->
+<section id="structure">
+  <div class="section-inner">
+    <div class="section-label reveal">book structure · 書籍構成</div>
+    <h2 class="section-h2 reveal">
+      <span data-ja>C4モデルで読む<br>書籍のアーキテクチャ</span>
+      <span data-en style="display:none">The book's architecture<br>read through the C4 Model</span>
+    </h2>
+    <p class="section-lead reveal">
+      <span data-ja>書籍そのものをC4モデルの4層構造で設計。第1部（コンテキスト）→第2部（コンテナ）→第3部（コンポーネント）→第4部（実践）へと階層的に深化する。</span>
+      <span data-en style="display:none">The book itself is designed in the C4 Model's 4-layer structure, deepening hierarchically from Part 1 (Context) → Part 2 (Container) → Part 3 (Component) → Part 4 (Practice).</span>
+    </p>
+    <div class="spiral-stack reveal">
+      <div class="spiral-item" data-layer="1">
+        <div class="spiral-tag">L1 · CONTEXT — 第1部</div>
+        <div class="spiral-title">俳句の世界へようこそ</div>
+        <div class="spiral-body">俳句とは何か・C4モデルとは何か・この本の使い方。動画を入口に、初心者・高齢者が安心して入れる序章。</div>
+        <div class="spiral-chapters">
+          <span class="ch-tag">第1章：まずは動画で味わう</span>
+          <span class="ch-tag">第2章：俳句工学の考え方</span>
+          <span class="ch-tag">第3章：C4モデルとは</span>
+        </div>
+      </div>
+      <div class="spiral-item" data-layer="2">
+        <div class="spiral-tag">L2 · CONTAINER — 第2部</div>
+        <div class="spiral-title">芭蕉の名句を工学的に分解する</div>
+        <div class="spiral-body">古池や・夏草や・閑さや の3句をC4モデルL1〜L3で完全分解。各句ごとに統一フォーマット（動画QR→C4図→認知プロセス→実践ワーク）で解説。</div>
+        <div class="spiral-chapters">
+          <span class="ch-tag">古池や（音の設計）</span>
+          <span class="ch-tag">夏草や（時間の余白）</span>
+          <span class="ch-tag">閑さや（対比の工学）</span>
+        </div>
+      </div>
+      <div class="spiral-item" data-layer="3">
+        <div class="spiral-tag">L3 · COMPONENT — 第3部</div>
+        <div class="spiral-title">C4モデル応用事例研究</div>
+        <div class="spiral-body">芭蕉の旅路のC4モデル化・一茶と子規の比較モデル・季語辞書のコンポーネント化・読者感情のシーケンス図化。専門的なのに分かりやすい「研究成果の翻訳」章。</div>
+        <div class="spiral-chapters">
+          <span class="ch-tag">旅路モデル</span>
+          <span class="ch-tag">俳人比較</span>
+          <span class="ch-tag">感情シーケンス</span>
+          <span class="ch-tag">俳句生成アルゴリズム</span>
+        </div>
+      </div>
+      <div class="spiral-item" data-layer="4">
+        <div class="spiral-tag">L4 · CODE — 第4部</div>
+        <div class="spiral-title">あなたも作れる "工学的俳句"</div>
+        <div class="spiral-body">散歩しながら音を探す・季語を変えてみる・C4テンプレートで俳句を設計する。健康×俳句×工学が自然に融合する実践ワーク集。</div>
+        <div class="spiral-chapters">
+          <span class="ch-tag">散歩俳句ワーク</span>
+          <span class="ch-tag">季語置換実験</span>
+          <span class="ch-tag">C4テンプレート創作</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ HAIKU TEMPLATE ═══════════════════ -->
+<section id="template">
+  <div class="section-inner">
+    <div class="section-label reveal">unified format · 統一フォーマット</div>
+    <h2 class="section-h2 reveal">
+      <span data-ja>1句につき、この5ステップで解説</span>
+      <span data-en style="display:none">5 steps to analyze each haiku</span>
+    </h2>
+    <p class="section-lead reveal">
+      <span data-ja>動画と連動させるため、すべての俳句を同じフォーマットで解説。初心者でも迷わず読み進められる。</span>
+      <span data-en style="display:none">To synchronize with the videos, every haiku is explained in the same format. Even beginners can read through without getting lost.</span>
+    </p>
+    <div class="template-grid reveal">
+      <div class="t-step">
+        <div class="t-num">STEP 01</div>
+        <div class="t-icon">📱</div>
+        <div class="t-title">動画で<br>体験する</div>
+        <p class="t-body">QRコードから動画へ。音・映像・リズムで俳句を先に感じる。</p>
+      </div>
+      <div class="t-step">
+        <div class="t-num">STEP 02</div>
+        <div class="t-icon">🗺️</div>
+        <div class="t-title">C4モデルで<br>構造化する</div>
+        <p class="t-body">コンテキスト図→コンポーネント図→シーケンス図の3層で解析。</p>
+      </div>
+      <div class="t-step">
+        <div class="t-num">STEP 03</div>
+        <div class="t-icon">🧠</div>
+        <div class="t-title">認知プロセスを<br>追う</div>
+        <p class="t-body">読者の脳内で何が起きているか。情景が浮かぶ仕組みを科学する。</p>
+      </div>
+      <div class="t-step">
+        <div class="t-num">STEP 04</div>
+        <div class="t-icon">⚗️</div>
+        <div class="t-title">工学的<br>ポイントを抽出</div>
+        <p class="t-body">季語・音韻・余白・対比の設計法則を数式なしで言語化する。</p>
+      </div>
+      <div class="t-step">
+        <div class="t-num">STEP 05</div>
+        <div class="t-icon">✍️</div>
+        <div class="t-title">実践ワークで<br>自分の句へ</div>
+        <p class="t-body">同じ構造で俳句を作る。散歩・季語変換・C4テンプレート活用。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ C4 DEMO ═══════════════════ -->
+<section id="c4demo">
+  <div class="section-inner">
+    <div class="section-label reveal">live c4 diagram · C4図解デモ</div>
+    <h2 class="section-h2 reveal">
+      <span data-ja>「古池や」をC4モデルで読む</span>
+      <span data-en style="display:none">Reading "Old Pond" through the C4 Model</span>
+    </h2>
+    <p class="section-lead reveal">
+      <span data-ja>書籍に掲載するC4図のライブプレビュー。L1・L2・L3の3層で俳句の構造を完全可視化する。</span>
+      <span data-en style="display:none">Live preview of the C4 diagrams in the book. Three layers — L1, L2, L3 — completely visualize the structure of the haiku.</span>
+    </p>
+
+    <div class="haiku-highlight reveal">
+      <div class="haiku-text">古池や　蛙飛びこむ　水の音</div>
+      <div class="haiku-credit">— 松尾芭蕉　Matsuo Bashō, c. 1686</div>
+    </div>
+
+    <div class="diagram-tabs reveal">
+      <button class="dtab active" onclick="switchTab('ctx')">L1 · Context</button>
+      <button class="dtab" onclick="switchTab('ctr')">L2 · Container</button>
+      <button class="dtab" onclick="switchTab('cmp')">L3 · Component</button>
+    </div>
+
+    <!-- L1 Context -->
+    <div class="diagram-panel active" id="panel-ctx">
+      <div class="puml-wrap">
+        <div class="puml-loading" id="load-ctx">📐 図を読み込み中…</div>
+        <img id="puml-ctx" class="puml-svg" alt="L1 Context — 古池や" style="display:none; max-width:100%;">
+      </div>
+    </div>
+
+    <!-- L2 Container -->
+    <div class="diagram-panel" id="panel-ctr">
+      <div class="puml-wrap">
+        <div class="puml-loading" id="load-ctr">📐 図を読み込み中…</div>
+        <img id="puml-ctr" class="puml-svg" alt="L2 Container — 古池や" style="display:none; max-width:100%;">
+      </div>
+    </div>
+
+    <!-- L3 Component -->
+    <div class="diagram-panel" id="panel-cmp">
+      <div class="puml-wrap">
+        <div class="puml-loading" id="load-cmp">📐 図を読み込み中…</div>
+        <img id="puml-cmp" class="puml-svg" alt="L3 Component — 古池や" style="display:none; max-width:100%;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ VIDEOS ═══════════════════ -->
+<section id="videos">
+  <div class="section-inner">
+    <div class="section-label reveal">published videos · 公開済み動画</div>
+    <h2 class="section-h2 reveal">
+      <span data-ja>すでに公開中の<br>「図でみる俳句」シリーズ</span>
+      <span data-en style="display:none">The already-published<br>"Haiku in Diagrams" series</span>
+    </h2>
+    <p class="section-lead reveal">
+      <span data-ja>書籍のQRコードで読み取れる動画は、すでにYouTubeで公開中。動画が「入口」となり、書籍が「深化」の場となる。</span>
+      <span data-en style="display:none">The videos accessible via QR codes in the book are already on YouTube. The video is the "entry point"; the book is the place of "deepening."</span>
+    </p>
+    <div class="video-grid reveal">
+      <div class="video-card">
+        <div class="video-card-top">
+          <div class="video-num">VIDEO 01 · 解説編</div>
+          <div class="video-qr">QR<br>Code</div>
+        </div>
+        <div class="video-haiku">古池や　蛙飛びこむ　水の音</div>
+        <p class="video-desc">芭蕉の代表句をC4モデルで初めて解説した動画。静けさと音の対比、時間の構造を視覚化。</p>
+        <div class="video-tags">
+          <span class="vtag">音の設計</span>
+          <span class="vtag">C4 L1-L2</span>
+          <span class="vtag">芭蕉</span>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-card-top">
+          <div class="video-num">VIDEO 02 · C4応用事例</div>
+          <div class="video-qr">QR<br>Code</div>
+        </div>
+        <div class="video-haiku">閑さや　岩にしみ入る　蝉の声</div>
+        <p class="video-desc">「静」の中に「動」を埋め込む構造。蝉の声が岩に吸収される認知プロセスをシーケンス図で追う。</p>
+        <div class="video-tags">
+          <span class="vtag">対比の工学</span>
+          <span class="vtag">シーケンス図</span>
+          <span class="vtag">子ども向けvol.2</span>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-card-top">
+          <div class="video-num">VIDEO 03 · C4応用事例</div>
+          <div class="video-qr">QR<br>Code</div>
+        </div>
+        <div class="video-haiku">夏草や　兵どもが　夢の跡</div>
+        <p class="video-desc">時間軸の多層構造。「現在の夏草」「過去の戦場」「永遠の無常観」を3層のC4モデルで可視化。</p>
+        <div class="video-tags">
+          <span class="vtag">時間の余白</span>
+          <span class="vtag">C4 L1-L3</span>
+          <span class="vtag">図解シリーズ第4弾</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FADESHEET SYSTEM ═══════════════════ -->
+<section id="fadesheet">
+  <div class="section-inner" style="max-width: 1200px;">
+    <div class="section-label reveal">system · 俳句工学システム</div>
+    <h2 class="section-h2 reveal">
+      <span data-ja>Fadesheet<br>俳句構造解析エンジン</span>
+      <span data-en style="display:none">Fadesheet<br>Haiku Structure Analysis Engine</span>
+    </h2>
+    <p class="section-lead reveal">
+      <span data-ja>あなたの俳句を入力し、C4モデルによる構造図と評価アドバイスを生成・保存・PDF出力します。</span>
+      <span data-en style="display:none">Input your haiku to generate, save, and export a C4 model structural diagram and evaluation advice as a PDF.</span>
+    </p>
+
+    <div class="fs-layout reveal">
+      <div class="fs-sidebar">
+        <div class="fs-panel">
+          <h3>入力フォーム</h3>
+          <div class="fs-form-group">
+            <label>氏名 / Name</label>
+            <input type="text" id="fs-name" class="fs-input" placeholder="例: 奥村治">
+          </div>
+          <div class="fs-form-group">
+            <label>所属 / Affiliation</label>
+            <input type="text" id="fs-org" class="fs-input" placeholder="例: C4モデル研究会">
+          </div>
+          <div class="fs-form-group">
+            <label>俳句名（題名） / Title</label>
+            <input type="text" id="fs-title" class="fs-input" placeholder="例: 春の訪れ">
+          </div>
+          <div class="fs-form-group">
+            <label>俳句（17音） / Haiku</label>
+            <textarea id="fs-haiku" class="fs-textarea" placeholder="五・七・五 で入力してください"></textarea>
+          </div>
+          <div class="fs-form-group">
+            <label>句の背景・概説 / Background</label>
+            <textarea id="fs-bg" class="fs-textarea" placeholder="この句を詠んだ状況や込めた思い"></textarea>
+          </div>
+          <div class="fs-form-group" style="display:flex; gap:1rem;">
+            <div style="flex:1;">
+              <label>制作時期 / Date</label>
+              <input type="text" id="fs-date" class="fs-input" placeholder="例: 2026年春">
+            </div>
+            <div style="flex:1;">
+              <label>制作場所 / Location</label>
+              <input type="text" id="fs-loc" class="fs-input" placeholder="例: 京都">
+            </div>
+          </div>
+          <div class="fs-actions">
+            <button class="fs-btn fs-btn-primary" onclick="generateFadesheet()">解析生成 (Generate)</button>
+            <button class="fs-btn fs-btn-outline" onclick="clearFadesheet()">クリア (Clear)</button>
+          </div>
+          <div class="fs-actions">
+            <button class="fs-btn fs-btn-secondary" onclick="saveFadesheet()">DB保存 (Save)</button>
+            <button class="fs-btn fs-btn-danger" onclick="downloadPDF()">PDF出力 (Export)</button>
+          </div>
+        </div>
+
+        <div class="fs-panel">
+          <h3>保存データ (DB)</h3>
+          <ul class="db-list" id="db-list">
+            <!-- DB items will be injected here -->
+          </ul>
+        </div>
+      </div>
+
+      <div class="fs-preview-wrap">
+        <div id="fs-preview" class="fs-preview" style="display:none;">
+          <div class="pdf-header">
+            <div class="pdf-title" id="out-title">題名</div>
+            <div class="pdf-meta">
+              <span id="out-author">氏名 (所属)</span>
+              <span>|</span>
+              <span id="out-dateloc">時期 @ 場所</span>
+            </div>
+          </div>
+          
+          <div class="pdf-haiku" id="out-haiku">俳句</div>
+          
+          <div class="pdf-section">
+            <div class="pdf-section-title">BACKGROUND / 背景・概説</div>
+            <div class="pdf-text" id="out-bg"></div>
+          </div>
+          
+          <div class="pdf-section">
+            <div class="pdf-section-title">C4 MODEL DIAGRAM / 構造解析図 (L2)</div>
+            <div class="pdf-diagram">
+              <div id="load-fs-puml" style="font-family:monospace; color:#888;">図を生成中...</div>
+              <img id="out-puml-img" style="display:none; margin: 0 auto;">
+            </div>
+            <div class="pdf-text" id="out-puml-desc" style="font-size:0.9rem; margin-top:1rem; color:#444;"></div>
+          </div>
+          
+          <div class="pdf-section">
+            <div class="pdf-section-title">EVALUATION & ADVICE / 評価とアドバイス</div>
+            <div class="pdf-text" id="out-advice" style="background:#F4F1EC; padding:1.5rem; border-left:3px solid #1A7A8A;"></div>
+          </div>
+          
+          <div class="pdf-section">
+            <div class="pdf-section-title">PLANTUML CODE / ソースコード</div>
+            <div class="pdf-code" id="out-code"></div>
+          </div>
+          
+          <div class="pdf-watermark">Generated by Haiku Engineering Fadesheet System<br>c4model.org</div>
+        </div>
+        <div id="fs-placeholder" class="fs-panel" style="display:flex; align-items:center; justify-content:center; min-height:800px; color:#aaa; font-family:var(--font-mono);">
+          左のフォームに入力して「解析生成」をクリックしてください。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ DOJO CTA ═══════════════════ -->
+<section id="dojo-cta">
+  <div class="cta-inner">
+    <div class="cta-tag reveal">📘 THESIS DOJO · 論文道場</div>
+    <h2 class="cta-h2 reveal">
+      <span data-ja>C4モデルで論文を書く<br>AI学術支援システム</span>
+      <span data-en style="display:none">Write papers with the C4 Model<br>AI Academic Support System</span>
+    </h2>
+    <p class="cta-sub reveal">
+      <span data-ja>俳句工学の研究成果を論文化したい方へ。「論文道場」はClaudeのAPIとC4モデルを組み合わせた、高校生から研究者まで使えるAI学術論文執筆支援ツールです。</span>
+      <span data-en style="display:none">For those who want to turn haiku engineering research into an academic paper. "Thesis Dojo" is an AI academic writing support tool for everyone from high school students to researchers, combining the Claude API with the C4 Model.</span>
+    </p>
+    <div class="cta-buttons reveal">
+      <a href="https://osamuokumura.github.io/ronbun-dojo/" target="_blank" class="btn-primary">論文道場を開く →</a>
+      <a href="https://c4model.org" target="_blank" class="btn-outline">c4model.org へ</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ AUTHOR ═══════════════════ -->
+<section id="author">
+  <div class="section-inner">
+    <div class="section-label reveal">author · 著者</div>
+    <div class="author-card reveal">
+      <div class="author-left">
+        <div class="author-mark">C4モデル研究会®</div>
+        <div class="author-name">奥村治</div>
+        <div class="author-name-en">Osamu Okumura</div>
+        <div class="author-org">C4 Model Study Group®</div>
+        <div class="author-email">c4model.study@gmail.com</div>
+      </div>
+      <div class="author-right">
+        <p class="author-bio">
+          C4モデルシステムコンサルタント。俳句工学（Haiku Engineering）と俳句システム研究会を主宰し、松尾芭蕉・小林一茶の作品をC4モデルで構造分析する研究・創作活動の第一人者。「図でみる俳句」シリーズをYouTubeで公開。Amazon Kindle著作多数。学術論文の執筆支援システム「論文道場」を開発・運営。
+        </p>
+        <div class="author-career">
+          <div class="career-item">
+            <span class="career-era">現在</span>
+            <span class="career-role">C4モデルシステムコンサルタント・C4モデル研究会® 主宰</span>
+          </div>
+          <div class="career-item">
+            <span class="career-era">前職</span>
+            <span class="career-role">大阪ガスシンクタンク 関西新技術研究所（KRI）事業戦略主席コンサルタント</span>
+          </div>
+          <div class="career-item">
+            <span class="career-era">前々職</span>
+            <span class="career-role">電通PRコンサルティング 企画調査局ディレクター</span>
+          </div>
+          <div class="career-item">
+            <span class="career-era">学歴</span>
+            <span class="career-role">Newport University Ph.D. / 都立産業技術大学院大学 M.S. / 中央大学 B.A.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+  <div class="footer-logo">c4model.org · C4 Model Study Group®</div>
+  <div class="footer-copy">© 2025 Osamu Okumura · 奥村治 · All rights reserved</div>
+</footer>
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script>
+/* ── PlantUML Encoder ── */
+const PUML_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
+function encode64(data) {
+  let r = '';
+  for (let i = 0; i < data.length; i += 3) {
+    const b = [data[i]||0, data[i+1]||0, data[i+2]||0];
+    r += PUML_CHARS[(b[0]>>2)&0x3F];
+    r += PUML_CHARS[((b[0]&3)<<4)|((b[1]>>4)&0xF)];
+    r += PUML_CHARS[((b[1]&0xF)<<2)|((b[2]>>6)&3)];
+    r += PUML_CHARS[b[2]&0x3F];
+  }
+  return r;
+}
+function deflateRaw(str) {
+  const data = new TextEncoder().encode(str);
+  const chunks = [];
+  const BSIZE = 32768;
+  for (let i = 0; i < data.length; i += BSIZE) {
+    const chunk = data.slice(i, i + BSIZE);
+    const last = (i + BSIZE >= data.length) ? 1 : 0;
+    const len = chunk.length;
+    const nlen = (~len) & 0xFFFF;
+    chunks.push(last, len&0xFF, (len>>8)&0xFF, nlen&0xFF, (nlen>>8)&0xFF);
+    chunk.forEach(b => chunks.push(b));
+  }
+  let s1 = 1, s2 = 0;
+  data.forEach(b => { s1=(s1+b)%65521; s2=(s2+s1)%65521; });
+  const adler = (s2<<16)|s1;
+  return new Uint8Array([0x78,0x01,...chunks,(adler>>24)&0xFF,(adler>>16)&0xFF,(adler>>8)&0xFF,adler&0xFF]);
+}
+function encodePuml(puml) { return '~1' + encode64(deflateRaw(puml)); }
+function renderPuml(puml, imgEl, loadEl) {
+  const enc = encodePuml(puml);
+  imgEl.onload = () => { loadEl.style.display='none'; imgEl.style.display='block'; };
+  imgEl.onerror = () => {
+    imgEl.src = `https://kroki.io/plantuml/svg/${btoa(unescape(encodeURIComponent(puml)))}`;
+    imgEl.onerror = () => { loadEl.textContent = '⚠ 図の読み込みに失敗しました'; };
+  };
+  imgEl.src = `https://www.plantuml.com/plantuml/svg/${enc}`;
+}
+
+/* ── PlantUML Definitions ── */
+const PUML_CTX = `@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+skinparam backgroundColor #FAFAF8
+skinparam defaultFontName "Source Serif 4"
+skinparam defaultFontSize 13
+skinparam ArrowColor #1A7A8A
+title L1 Context — 古池や（ふるいけや）
+
+Person(reader, "読者 / Reader", "俳句を読む人\\nA person reading haiku")
+System(haiku, "古池や\\n（俳句システム）", "芭蕉の句が生み出す\\n美的体験の場")
+System_Ext(season, "季語システム", "蛙（春）\\nKigo: Frog = Spring")
+System_Ext(sound, "音響システム", "水の音・静寂\\nSound of water / Silence")
+System_Ext(time, "時間システム", "刹那と永遠\\nMoment and Eternity")
+
+Rel(reader, haiku, "情景を想像する", "認知プロセス")
+Rel(haiku, season, "季節感を呼び起こす")
+Rel(haiku, sound, "音を体験させる")
+Rel(haiku, time, "時間を止める")
+@enduml`;
+
+const PUML_CTR = `@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+skinparam backgroundColor #FAFAF8
+skinparam defaultFontName "Source Serif 4"
+skinparam defaultFontSize 13
+skinparam ArrowColor #1A7A8A
+title L2 Container — 古池や の構造
+
+Person(reader, "読者", "俳句を読む人")
+
+System_Boundary(h, "古池や　蛙飛びこむ　水の音") {
+  Container(ku1, "古池や", "第1句", "静けさの舞台設定\\n古い池 = 永遠・歴史")
+  Container(ku2, "蛙飛びこむ", "第2句", "突発的な動き\\n蛙 = 生命・春")
+  Container(ku3, "水の音", "第3句", "音の余韻\\n聴覚 = 余白の設計")
+}
+
+Rel(reader, ku1, "視覚的情景を受け取る")
+Rel(ku1, ku2, "静 → 動 の転換")
+Rel(ku2, ku3, "動 → 音 → 余韻")
+Rel(ku3, reader, "余白で想像を促す", "認知の完結")
+@enduml`;
+
+const PUML_CMP = `@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+skinparam backgroundColor #FAFAF8
+skinparam defaultFontName "Source Serif 4"
+skinparam defaultFontSize 13
+skinparam ArrowColor #1A7A8A
+title L3 Component — 古池や の工学的分解
+
+Container_Boundary(ku2, "蛙飛びこむ（第2句コンテナ）") {
+  Component(kigo, "季語コンポーネント", "蛙（春）", "春の訪れ・生命感\\nKigo: 5音の感情圧縮")
+  Component(verb, "動詞コンポーネント", "飛びこむ", "瞬間の動き\\n過去形で完了を示す")
+  Component(agent, "主体コンポーネント", "蛙（主語）", "自然の意志ある存在\\n人間不在の構造")
+}
+
+Container_Boundary(ku3, "水の音（第3句コンテナ）") {
+  Component(sound2, "音響コンポーネント", "水の音", "聴覚刺激\\n想像を完結させる")
+  Component(blank, "余白コンポーネント", "省略された情景", "読者の脳が補完\\n17音の外にある世界")
+}
+
+Rel(kigo, verb, "生命 × 動き の合成")
+Rel(verb, sound2, "行為 → 結果 の因果")
+Rel(sound2, blank, "音が消えた後の沈黙")
+@enduml`;
+
+/* ── Tab Switcher ── */
+const panels = { ctx: 'panel-ctx', ctr: 'panel-ctr', cmp: 'panel-cmp' };
+const loaded = {};
+function switchTab(key) {
+  document.querySelectorAll('.diagram-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.dtab').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + key).classList.add('active');
+  event.target.classList.add('active');
+  if (!loaded[key]) { loadDiagram(key); loaded[key] = true; }
+}
+function loadDiagram(key) {
+  const map = {
+    ctx: { puml: PUML_CTX, img: 'puml-ctx', load: 'load-ctx' },
+    ctr: { puml: PUML_CTR, img: 'puml-ctr', load: 'load-ctr' },
+    cmp: { puml: PUML_CMP, img: 'puml-cmp', load: 'load-cmp' }
+  };
+  const m = map[key];
+  renderPuml(m.puml, document.getElementById(m.img), document.getElementById(m.load));
+}
+// Load L1 on page ready
+window.addEventListener('load', () => { loadDiagram('ctx'); loaded.ctx = true; });
+
+/* ── Lang Toggle ── */
+function setLang(lang) {
+  document.querySelectorAll('[data-en]').forEach(el => el.style.display = lang==='en' ? '' : 'none');
+  document.querySelectorAll('[data-ja]').forEach(el => el.style.display = lang==='ja' ? '' : 'none');
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang===lang));
+  document.documentElement.lang = lang;
+  localStorage.setItem('c4-lang', lang);
+}
+setLang(localStorage.getItem('c4-lang') || 'ja');
+
+/* ── Scroll Reveal ── */
+const observer = new IntersectionObserver(
+  entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
+  { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+);
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── FADESHEET SYSTEM LOGIC ── */
+let currentFadesheetId = null;
+
+function generateFadesheet() {
+  const name = document.getElementById('fs-name').value || '名無し';
+  const org = document.getElementById('fs-org').value || '無所属';
+  const title = document.getElementById('fs-title').value || '無題';
+  const haiku = document.getElementById('fs-haiku').value || '（俳句未入力）';
+  const bg = document.getElementById('fs-bg').value || '背景情報なし';
+  const date = document.getElementById('fs-date').value || '不明';
+  const loc = document.getElementById('fs-loc').value || '不明';
+
+  document.getElementById('out-title').innerText = title;
+  document.getElementById('out-author').innerText = `${name} (${org})`;
+  document.getElementById('out-dateloc').innerText = `${date} @ ${loc}`;
+  document.getElementById('out-haiku').innerText = haiku.replace(/\n/g, '　');
+  document.getElementById('out-bg').innerText = bg;
+
+  const haikuLine = haiku.replace(/\n/g, ' ');
+  const pumlCode = `@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName "Source Serif 4"
+skinparam defaultFontSize 13
+skinparam ArrowColor #1A7A8A
+title L2 Container — ${title}
+
+Person(reader, "読者", "俳句を読む人")
+
+System_Boundary(h, "${haikuLine}") {
+  Container(ku1, "上五", "第1句", "情景の提示")
+  Container(ku2, "中七", "第2句", "展開・動き")
+  Container(ku3, "下五", "第3句", "結び・余韻")
+}
+
+Rel(reader, ku1, "視覚・聴覚を受け取る")
+Rel(ku1, ku2, "意味の接続・飛躍")
+Rel(ku2, ku3, "情景の収束")
+Rel(ku3, reader, "余白で想像を促す")
+@enduml`;
+  
+  document.getElementById('out-code').innerText = pumlCode;
+  
+  const advice = `【構造的評価】\n入力された俳句は、上五から下五にかけての展開が特徴的です。C4モデルで可視化すると、各要素間の関係性がより明確になります。\n\n【工学的アドバイス】\n・各句（コンテナ）の間のつながり（Rel）に違和感がないか確認してください。\n・余白（読者へのインターフェース）の設計において、すべてを語らず読者に委ねる部分を残すことで、さらに響く句になる可能性があります。`;
+  document.getElementById('out-advice').innerText = advice;
+  
+  const desc = `このC4モデル（Container図）は、入力された俳句の基本構造を3つの層（上五・中七・下五）に分割し、読者との認知プロセスを定義したものです。`;
+  document.getElementById('out-puml-desc').innerText = desc;
+
+  document.getElementById('out-puml-img').style.display = 'none';
+  document.getElementById('load-fs-puml').style.display = 'block';
+  renderPuml(pumlCode, document.getElementById('out-puml-img'), document.getElementById('load-fs-puml'));
+
+  document.getElementById('fs-placeholder').style.display = 'none';
+  document.getElementById('fs-preview').style.display = 'block';
+}
+
+function clearFadesheet() {
+  document.getElementById('fs-name').value = '';
+  document.getElementById('fs-org').value = '';
+  document.getElementById('fs-title').value = '';
+  document.getElementById('fs-haiku').value = '';
+  document.getElementById('fs-bg').value = '';
+  document.getElementById('fs-date').value = '';
+  document.getElementById('fs-loc').value = '';
+  document.getElementById('fs-preview').style.display = 'none';
+  document.getElementById('fs-placeholder').style.display = 'flex';
+  currentFadesheetId = null;
+}
+
+function saveFadesheet() {
+  const data = {
+    id: currentFadesheetId || Date.now().toString(),
+    timestamp: new Date().toLocaleString(),
+    name: document.getElementById('fs-name').value,
+    org: document.getElementById('fs-org').value,
+    title: document.getElementById('fs-title').value,
+    haiku: document.getElementById('fs-haiku').value,
+    bg: document.getElementById('fs-bg').value,
+    date: document.getElementById('fs-date').value,
+    loc: document.getElementById('fs-loc').value
+  };
+  
+  let db = JSON.parse(localStorage.getItem('fadesheetDB') || '[]');
+  const idx = db.findIndex(item => item.id === data.id);
+  if (idx > -1) {
+    db[idx] = data;
+  } else {
+    db.unshift(data);
+  }
+  localStorage.setItem('fadesheetDB', JSON.stringify(db));
+  currentFadesheetId = data.id;
+  alert('データベースに保存しました。');
+  renderDBList();
+}
+
+function renderDBList() {
+  const listEl = document.getElementById('db-list');
+  if(!listEl) return;
+  listEl.innerHTML = '';
+  const db = JSON.parse(localStorage.getItem('fadesheetDB') || '[]');
+  
+  if (db.length === 0) {
+    listEl.innerHTML = '<li style="font-size:0.8rem; color:#888;">保存されたデータはありません</li>';
+    return;
+  }
+  
+  db.forEach(item => {
+    const li = document.createElement('li');
+    li.className = 'db-item';
+    li.innerHTML = `
+      <div class="db-title">${item.title || '無題'}</div>
+      <div class="db-date">${item.timestamp} / ${item.name}</div>
+    `;
+    li.onclick = () => loadFadesheet(item.id);
+    listEl.appendChild(li);
+  });
+}
+
+function loadFadesheet(id) {
+  const db = JSON.parse(localStorage.getItem('fadesheetDB') || '[]');
+  const item = db.find(i => i.id === id);
+  if (!item) return;
+  
+  document.getElementById('fs-name').value = item.name || '';
+  document.getElementById('fs-org').value = item.org || '';
+  document.getElementById('fs-title').value = item.title || '';
+  document.getElementById('fs-haiku').value = item.haiku || '';
+  document.getElementById('fs-bg').value = item.bg || '';
+  document.getElementById('fs-date').value = item.date || '';
+  document.getElementById('fs-loc').value = item.loc || '';
+  currentFadesheetId = item.id;
+  
+  generateFadesheet();
+  document.getElementById('fs-preview').scrollIntoView({ behavior: 'smooth' });
+}
+
+function downloadPDF() {
+  const el = document.getElementById('fs-preview');
+  if (el.style.display === 'none') {
+    alert('先に「解析生成」を行ってください。');
+    return;
+  }
+  
+  const title = document.getElementById('out-title').innerText || 'haiku';
+  const opt = {
+    margin:       10,
+    filename:     `Fadesheet_${title}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  html2pdf().set(opt).from(el).save();
+}
+
+window.addEventListener('load', () => {
+  if(document.getElementById('db-list')) {
+    renderDBList();
+  }
+});
+</script>
+
+</body>
+</html>

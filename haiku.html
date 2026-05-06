@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>俳句工学入門 — Haiku Engineering | c4model.org</title>
+  <meta name="description" content="あなたの俳句をAIがC4モデルで可視化・添削・評価。子供からお年寄りまで、初心者歓迎。Haiku Engineering — AI analysis for everyone." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #1A1008;
+      --paper:     #F8F3E8;
+      --paper2:    #F0E8D4;
+      --paper3:    #E8DEC4;
+      --brush:     #8B2020;
+      --gold:      #B8860B;
+      --gold2:     #DAA520;
+      --teal:      #1A5C6A;
+      --muted:     #5A4A35;
+      --border:    rgba(139,32,32,0.2);
+      --shadow:    rgba(26,16,8,0.12);
+    }
+
+    html { scroll-behavior: smooth; font-size: 17px; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Noto Serif JP', 'Georgia', serif;
+      line-height: 1.85;
+      min-height: 100vh;
+    }
+
+    /* ===== DECORATIVE BACKGROUND ===== */
+    body::before {
+      content: '';
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-image:
+        radial-gradient(ellipse at 10% 20%, rgba(184,134,11,0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 80%, rgba(139,32,32,0.04) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ===== TOP NAV ===== */
+    .topnav {
+      background: rgba(248,243,232,0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 2px solid var(--border);
+      padding: 0.7rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+      position: sticky; top: 0; z-index: 200;
+    }
+    .topnav-left { display: flex; align-items: center; gap: 1rem; }
+    .topnav a { color: var(--brush); font-size: 0.85rem; text-decoration: none; }
+    .topnav a:hover { text-decoration: underline; }
+    .topnav-title { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--ink); }
+    .lang-btn {
+      font-size: 0.78rem; padding: 0.3rem 0.8rem;
+      border: 1px solid var(--border); border-radius: 4px;
+      background: transparent; cursor: pointer; color: var(--muted);
+    }
+    .lang-btn.active { background: var(--brush); color: #fff; border-color: var(--brush); }
+
+    /* ===== HERO ===== */
+    .hero {
+      text-align: center;
+      padding: 4rem 1.5rem 3rem;
+      position: relative; z-index: 1;
+      max-width: 860px; margin: 0 auto;
+    }
+    .hero-kigo {
+      font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--brush); margin-bottom: 1.5rem;
+    }
+    .hero-haiku {
+      font-family: 'Noto Serif JP', serif;
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 300;
+      color: var(--ink);
+      line-height: 1.8;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.15em;
+    }
+    .hero-haiku-en {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      color: var(--muted);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    .hero-desc { font-size: 1rem; color: var(--muted); max-width: 640px; margin: 0 auto 0.75rem; }
+    .hero-desc-en { font-size: 0.92rem; color: var(--muted); max-width: 640px; margin: 0 auto 2rem; font-family: 'IM Fell English', serif; font-style: italic; }
+
+    .divider {
+      width: 120px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      margin: 1.5rem auto;
+    }
+
+    /* ===== STEPS ===== */
+    .steps-bar {
+      display: flex; justify-content: center; gap: 0; flex-wrap: nowrap;
+      max-width: 700px; margin: 0 auto 2.5rem;
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+      background: var(--paper2);
+    }
+    .step-tab {
+      flex: 1; padding: 0.6rem 0.5rem; text-align: center;
+      font-size: 0.75rem; color: var(--muted); cursor: pointer;
+      border-right: 1px solid var(--border); transition: all 0.2s;
+      position: relative;
+    }
+    .step-tab:last-child { border-right: none; }
+    .step-tab.active { background: var(--brush); color: #fff; }
+    .step-tab .step-num { font-size: 1rem; font-weight: bold; display: block; }
+
+    /* ===== MAIN CARD ===== */
+    .main-card {
+      max-width: 820px; margin: 0 auto 3rem;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 4px 32px var(--shadow);
+      overflow: hidden;
+      position: relative; z-index: 1;
+      padding: 2rem;
+    }
+
+    /* ===== FORM ===== */
+    .form-group { margin-bottom: 1.25rem; }
+    label {
+      display: block; font-size: 0.9rem; color: var(--ink);
+      margin-bottom: 0.3rem; font-weight: bold;
+    }
+    label .req { color: var(--brush); margin-left: 3px; }
+    label .opt { color: var(--muted); font-size: 0.78rem; font-weight: normal; margin-left: 6px; }
+    input[type="text"], input[type="email"], input[type="number"],
+    textarea, select {
+      width: 100%; padding: 0.65rem 0.9rem;
+      border: 1px solid var(--border); border-radius: 6px;
+      font-size: 0.95rem; font-family: 'Noto Serif JP', serif;
+      background: var(--paper2); color: var(--ink);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--brush);
+      box-shadow: 0 0 0 3px rgba(139,32,32,0.12);
+    }
+    textarea { resize: vertical; }
+
+    /* 俳句入力 特別スタイル */
+    #haikuInput {
+      font-size: 1.8rem; font-weight: 300; text-align: center;
+      letter-spacing: 0.2em; line-height: 2;
+      min-height: 80px; padding: 1rem;
+      font-family: 'Noto Serif JP', serif;
+      background: #FFFDF5;
+      border: 2px solid var(--border);
+    }
+    #haikuInput:focus { border-color: var(--brush); }
+    .char-display {
+      text-align: right; font-size: 0.82rem; margin-top: 0.3rem;
+      color: var(--muted);
+    }
+    .char-display .count { font-weight: bold; font-size: 1rem; }
+    .char-display .count.valid { color: var(--teal); }
+    .char-display .count.invalid { color: var(--brush); }
+
+    /* ===== SECTION TITLE ===== */
+    .section-tag {
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--brush); margin-bottom: 0.5rem; font-weight: bold;
+    }
+    h2 { font-size: 1.4rem; color: var(--ink); margin-bottom: 0.75rem; font-weight: 700; }
+    h3 { font-size: 1.1rem; color: var(--ink); margin-bottom: 0.6rem; }
+
+    /* ===== BUTTONS ===== */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--brush); color: #fff;
+      padding: 0.75rem 2rem; border-radius: 6px;
+      font-size: 1rem; font-family: 'Noto Serif JP', serif;
+      border: none; cursor: pointer; font-weight: bold;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #6A1010; transform: translateY(-1px); }
+    .btn-primary:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: transparent; color: var(--brush);
+      padding: 0.65rem 1.5rem; border-radius: 6px;
+      font-size: 0.95rem; font-family: 'Noto Serif JP', serif;
+      border: 1px solid var(--brush); cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: var(--brush); color: #fff; }
+    .btn-teal {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--teal); color: #fff;
+      padding: 0.75rem 2rem; border-radius: 6px;
+      font-size: 1rem; font-family: 'Noto Serif JP', serif;
+      border: none; cursor: pointer; font-weight: bold;
+      transition: background 0.2s;
+    }
+    .btn-teal:hover { background: #0D3D47; }
+
+    /* ===== C4 DIAGRAM ===== */
+    .c4-diagram {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 640px) { .c4-diagram { grid-template-columns: repeat(2, 1fr); } }
+    .c4-layer {
+      border-radius: 8px; padding: 1rem 0.75rem; text-align: center;
+      border: 1px solid var(--border);
+    }
+    .c4-layer.l1 { background: #FFF5F5; border-color: rgba(139,32,32,0.3); }
+    .c4-layer.l2 { background: #F5F0FF; border-color: rgba(100,70,180,0.3); }
+    .c4-layer.l3 { background: #F0F8FF; border-color: rgba(26,92,106,0.3); }
+    .c4-layer.l4 { background: #F5FFF0; border-color: rgba(30,100,30,0.3); }
+    .c4-layer-tag { font-size: 0.65rem; font-weight: bold; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+    .l1 .c4-layer-tag { color: var(--brush); }
+    .l2 .c4-layer-tag { color: #6446B4; }
+    .l3 .c4-layer-tag { color: var(--teal); }
+    .l4 .c4-layer-tag { color: #1E641E; }
+    .c4-layer-title { font-size: 0.82rem; font-weight: bold; color: var(--ink); margin-bottom: 0.3rem; }
+    .c4-layer-content { font-size: 0.8rem; color: var(--muted); line-height: 1.6; min-height: 40px; }
+
+    /* ===== SCORE DISPLAY ===== */
+    .score-box {
+      background: var(--paper2); border: 2px solid var(--gold);
+      border-radius: 12px; padding: 1.5rem; text-align: center; margin: 1.5rem 0;
+    }
+    .score-num { font-family: 'Cinzel', serif; font-size: 4rem; color: var(--brush); font-weight: 600; line-height: 1; }
+    .score-denom { font-size: 1.2rem; color: var(--muted); }
+    .score-label { font-size: 0.85rem; color: var(--muted); margin-top: 0.4rem; }
+    .stars { font-size: 1.8rem; margin: 0.5rem 0; letter-spacing: 0.2rem; }
+
+    /* 表彰状バッジ */
+    .award-badge {
+      display: none;
+      background: linear-gradient(135deg, #FFF8DC, #FFD700, #FFF8DC);
+      border: 3px double var(--gold);
+      border-radius: 10px; padding: 1rem 1.5rem;
+      text-align: center; margin: 1rem 0;
+    }
+    .award-badge.show { display: block; }
+    .award-title { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #8B6914; font-weight: 600; }
+    .award-stars { font-size: 2rem; letter-spacing: 0.3rem; margin: 0.3rem 0; }
+
+    /* ===== LOADING ===== */
+    .loading {
+      display: none; text-align: center; padding: 2rem;
+    }
+    .loading.show { display: block; }
+    .loading-haiku {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1rem; color: var(--muted);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+    .loading-dots::after {
+      content: '・・・';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0%{content:''}25%{content:'・'}50%{content:'・・'}75%{content:'・・・'}
+    }
+
+    /* ===== RESULT PANEL ===== */
+    .result-panel {
+      display: none; border-top: 2px solid var(--border); padding-top: 1.5rem; margin-top: 1.5rem;
+    }
+    .result-panel.show { display: block; animation: fadeIn 0.5s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+    .result-section { margin-bottom: 1.5rem; }
+    .result-text {
+      background: var(--paper2); border-left: 3px solid var(--brush);
+      padding: 1rem 1.25rem; border-radius: 0 6px 6px 0;
+      font-size: 0.92rem; line-height: 1.85; color: var(--ink);
+      white-space: pre-wrap;
+    }
+    .result-text-en {
+      background: #F8F5FF; border-left: 3px solid var(--teal);
+      padding: 1rem 1.25rem; border-radius: 0 6px 6px 0;
+      font-size: 0.9rem; line-height: 1.85; color: var(--ink);
+      font-family: 'IM Fell English', serif; font-style: italic;
+      white-space: pre-wrap; margin-top: 0.75rem;
+    }
+
+    /* 添削アドバイス（オプトイン後） */
+    .advice-box {
+      display: none;
+      background: #FFF8F0; border: 1px solid var(--gold);
+      border-radius: 8px; padding: 1.25rem; margin-top: 1rem;
+    }
+    .advice-box.show { display: block; animation: fadeIn 0.4s ease; }
+
+    /* ===== PROFILE FORM ===== */
+    .profile-section {
+      display: none;
+      background: var(--paper2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.5rem; margin-top: 1.5rem;
+    }
+    .profile-section.show { display: block; animation: fadeIn 0.4s ease; }
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 580px) { .profile-grid { grid-template-columns: 1fr; } }
+
+    /* ===== PDF BUTTON ===== */
+    .pdf-btn-wrap { margin-top: 1.5rem; text-align: center; display: none; }
+    .pdf-btn-wrap.show { display: block; }
+
+    /* ===== FEATURE CARDS ===== */
+    .features {
+      max-width: 820px; margin: 0 auto 3rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem; position: relative; z-index: 1;
+    }
+    .feature-card {
+      background: var(--paper); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.25rem; text-align: center;
+    }
+    .feature-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .feature-title { font-size: 0.9rem; font-weight: bold; color: var(--ink); margin-bottom: 0.3rem; }
+    .feature-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center; padding: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem; color: var(--muted);
+      position: relative; z-index: 1;
+    }
+    footer a { color: var(--brush); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      .main-card { padding: 1.25rem; }
+      .hero { padding: 2.5rem 1rem 2rem; }
+    }
+
+    /* ===== HIDDEN BY LANG ===== */
+    .ja-only, .en-only { transition: opacity 0.3s; }
+    body.lang-en .ja-only { display: none; }
+    body.lang-ja .en-only { display: none; }
+    /* ===== TRANSPLANTED FROM HAIKU-ENGINEERING ===== */
+    .section-inner { max-width: 960px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.82rem; letter-spacing: 0.14em;
+      color: var(--muted); text-transform: lowercase;
+      padding-left: 1.2rem; border-left: 2px solid var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .section-h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 700; color: var(--ink);
+      margin-bottom: 1rem; line-height: 1.2;
+    }
+    .section-lead { color: var(--muted); max-width: 620px; margin-bottom: 3rem; line-height: 1.8; }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── THREE PILLARS ── */
+    #pillars { background: var(--paper2); padding: 5rem 1.5rem; }
+    .pillars-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0;
+      border: 1px solid var(--border); margin-top: 2rem; background: var(--paper);
+    }
+    .pillar { padding: 2.5rem 2rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .pillar-num { font-size: 0.72rem; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1rem; }
+    .pillar-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .pillar-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--ink); }
+    .pillar-title em { font-style: italic; color: var(--gold); }
+    .pillar-body { font-size: 0.95rem; color: var(--muted); line-height: 1.7; }
+
+    /* ── BOOK STRUCTURE (SPIRAL) ── */
+    #structure { background: var(--paper); padding: 5rem 1.5rem; }
+    .spiral-stack { display: flex; flex-direction: column; gap: 0; }
+    .spiral-item {
+      background: var(--paper); border: 1px solid var(--border);
+      border-left: 4px solid var(--layer-color); padding: 1.5rem 1.75rem;
+      margin-left: var(--indent, 0px); width: calc(100% - var(--indent, 0px));
+      transition: transform 0.25s, box-shadow 0.25s; cursor: default; margin-bottom: 2px;
+    }
+    .spiral-item:hover { transform: translateX(5px) translateY(-2px); box-shadow: -5px 4px 0 var(--layer-color), 0 8px 24px rgba(26,16,8,0.1); position: relative; z-index: 1; }
+    .spiral-item[data-layer="1"] { --indent: 0px;   --layer-color: var(--gold);  }
+    .spiral-item[data-layer="2"] { --indent: 2rem;  --layer-color: var(--teal);  }
+    .spiral-item[data-layer="3"] { --indent: 4rem;  --layer-color: #4A7A5A;  }
+    .spiral-item[data-layer="4"] { --indent: 6rem;  --layer-color: #8B4A8B;      }
+    @media (max-width: 640px) {
+      .spiral-item[data-layer="2"] { --indent: 1rem; }
+      .spiral-item[data-layer="3"] { --indent: 2rem; }
+      .spiral-item[data-layer="4"] { --indent: 3rem; }
+    }
+    .spiral-tag { font-size: 0.7rem; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 0.35rem; }
+    .spiral-title { font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; }
+    .spiral-body { font-size: 0.95rem; color: var(--muted); }
+
+    /* ── VIDEO / QR SECTION ── */
+    #videos { background: var(--paper2); padding: 5rem 1.5rem; }
+    .video-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0;
+      border: 1px solid var(--border); background: var(--paper);
+    }
+    .video-card { padding: 2rem 1.75rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .video-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
+    .video-num { font-size: 0.65rem; letter-spacing: 0.1em; color: var(--muted); }
+    .video-qr { width: 64px; height: 64px; background: var(--paper2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: var(--muted); text-align: center; }
+    .video-haiku { font-size: 1.15rem; font-style: italic; color: var(--ink); margin-bottom: 0.5rem; }
+    .video-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── AUTHOR ── */
+    #author { background: var(--paper); padding: 5rem 1.5rem; }
+    .author-card { display: grid; grid-template-columns: 1fr 2fr; gap: 0; border: 1px solid var(--border); background: var(--paper); }
+    @media (max-width: 640px) { .author-card { grid-template-columns: 1fr; } }
+    .author-left { padding: 3rem 2.5rem; border-right: 1px solid var(--border); background: var(--ink); color: var(--paper); }
+    .author-mark { font-size: 0.82rem; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 1rem; }
+    .author-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .author-name-en { font-size: 0.8rem; color: rgba(250,250,248,0.5); margin-bottom: 2rem; }
+    .author-org { font-size: 0.75rem; letter-spacing: 0.08em; color: var(--gold); padding: 0.4rem 0.9rem; border: 1px solid rgba(184,134,11,0.4); display: inline-block; margin-bottom: 1.5rem; }
+    .author-right { padding: 3rem 2.5rem; }
+    .author-bio { color: var(--muted); line-height: 1.85; margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body class="lang-ja">
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="topnav-left">
+    <a href="https://c4model.org/">← c4model.org</a>
+    <span class="topnav-title">俳句工学入門 / Haiku Engineering</span>
+  </div>
+  <div style="display:flex; gap:0.5rem; align-items:center;">
+    <button class="lang-btn active" id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button class="lang-btn" id="btnEn" onclick="setLang('en')">English</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-kigo ja-only">俳句工学入門 — C4モデル×AI添削サービス</p>
+  <p class="hero-kigo en-only">Haiku Engineering — AI Analysis & Critique with the C4 Model</p>
+
+  <div class="hero-haiku ja-only">
+    古池や<br>蛙飛び込む<br>水の音
+  </div>
+  <div class="hero-haiku en-only" style="font-family:'IM Fell English',serif; font-style:italic;">
+    The old silent pond…<br>A frog jumps into the pond.<br>Splash! Silence again.
+  </div>
+
+  <div class="divider"></div>
+
+  <p class="hero-desc ja-only">
+    あなたの俳句を入力するだけ。AIがC4モデルで構造を可視化し、添削・評価・アドバイスまでサポートします。<br>
+    <strong>子供から俳句愛好家まで、初心者大歓迎。</strong>
+  </p>
+  <p class="hero-desc en-only">
+    Just type your haiku. Our AI visualizes the structure using the C4 Model, then critiques, scores, and advises.<br>
+    <strong>Welcoming everyone — from beginners to haiku enthusiasts worldwide.</strong>
+  </p>
+
+  <p class="hero-desc-en ja-only" style="font-size:0.88rem; color:var(--muted);">
+    Enter your haiku → C4 structural diagram → AI critique & score → PDF save
+  </p>
+  <p class="hero-desc-en en-only" style="font-size:0.88rem; color:var(--muted);">
+    俳句を入力 → C4構造図 → AI添削&スコア → PDF保存
+  </p>
+</div>
+
+<!-- FEATURE CARDS -->
+<div class="features">
+  <div class="feature-card">
+    <div class="feature-icon">🖊</div>
+    <div class="feature-title ja-only">俳句を入力</div>
+    <div class="feature-title en-only">Enter Your Haiku</div>
+    <div class="feature-desc ja-only">17音を入力するだけ。季語・作者名・背景も任意で追加できます。</div>
+    <div class="feature-desc en-only">Just type 17 syllables. Season word, author name, and background are optional.</div>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📐</div>
+    <div class="feature-title ja-only">C4モデル図解</div>
+    <div class="feature-title en-only">C4 Structure Diagram</div>
+    <div class="feature-desc ja-only">L1〜L4の4層で句の構造を可視化。世界→枠組→論点→言葉を解剖します。</div>
+    <div class="feature-desc en-only">Visualize the haiku across 4 layers: Context, Container, Component, Code.</div>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🎯</div>
+    <div class="feature-title ja-only">AI添削・評価</div>
+    <div class="feature-title en-only">AI Critique & Score</div>
+    <div class="feature-desc ja-only">100点満点で評価。90点以上は⭐⭐⭐⭐表彰。具体的なアドバイス付き。</div>
+    <div class="feature-desc en-only">Scored out of 100. 90+ earns a ⭐⭐⭐⭐ award. With specific advice.</div>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📄</div>
+    <div class="feature-title ja-only">PDF保存</div>
+    <div class="feature-title en-only">Save as PDF</div>
+    <div class="feature-desc ja-only">結果をPDFで保存。氏名・年齢・職業を登録すればDBにも記録できます。</div>
+    <div class="feature-desc en-only">Save your results as PDF. Register to keep records in our database.</div>
+  </div>
+</div>
+
+<!-- STEP TABS -->
+<div style="max-width:820px; margin:0 auto; padding:0 1rem; position:relative; z-index:1;">
+  <div class="steps-bar">
+    <div class="step-tab active" id="tab1">
+      <span class="step-num">1</span>
+      <span class="ja-only">俳句入力</span><span class="en-only">Input</span>
+    </div>
+    <div class="step-tab" id="tab2">
+      <span class="step-num">2</span>
+      <span class="ja-only">C4図解</span><span class="en-only">C4 Diagram</span>
+    </div>
+    <div class="step-tab" id="tab3">
+      <span class="step-num">3</span>
+      <span class="ja-only">添削・評価</span><span class="en-only">Critique</span>
+    </div>
+    <div class="step-tab" id="tab4">
+      <span class="step-num">4</span>
+      <span class="ja-only">PDF保存</span><span class="en-only">Save PDF</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CARD -->
+<div class="main-card" id="mainCard">
+
+  <!-- STEP 1: 俳句入力 -->
+  <div id="step1">
+    <p class="section-tag ja-only">STEP 1 · 俳句を入力してください</p>
+    <p class="section-tag en-only">STEP 1 · Enter Your Haiku</p>
+    <h2 class="ja-only">あなたの一句を聴かせてください</h2>
+    <h2 class="en-only">Share your haiku with us</h2>
+
+    <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1.5rem;" class="ja-only">
+      ＊ 俳句（17音）の入力だけが必須です。それ以外はすべて任意です。どうぞ気軽に入力してください。
+    </p>
+    <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1.5rem;" class="en-only">
+      ＊ Only the haiku (17 syllables) is required. Everything else is optional. Please feel free to enter.
+    </p>
+
+    <div class="form-group">
+      <label>
+        <span class="ja-only">俳句（17音）<span class="req">*</span></span>
+        <span class="en-only">Your Haiku (17 syllables) <span class="req">*</span></span>
+      </label>
+      <textarea id="haikuInput" rows="3"
+        placeholder="古池や 蛙飛び込む 水の音"
+        oninput="countChars(this)"></textarea>
+      <div class="char-display">
+        <span class="ja-only">文字数（空白除く）：</span>
+        <span class="en-only">Characters (excl. spaces): </span>
+        <span class="count" id="charCount">0</span>
+        <span class="ja-only"> 音（17音で✓）</span>
+        <span class="en-only"> (17 = ✓)</span>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div class="form-group">
+        <label>
+          <span class="ja-only">句の題名・テーマ<span class="opt">任意</span></span>
+          <span class="en-only">Title / Theme <span class="opt">optional</span></span>
+        </label>
+        <input type="text" id="haikuTitle" placeholder="例: 春の池にて / Old Pond in Spring" />
+      </div>
+      <div class="form-group">
+        <label>
+          <span class="ja-only">季語（わかれば）<span class="opt">任意</span></span>
+          <span class="en-only">Season Word (kigo) <span class="opt">optional</span></span>
+        </label>
+        <input type="text" id="kigo" placeholder="例: 蛙（春）/ frog (spring)" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <span class="ja-only">作句の背景・気持ち<span class="opt">任意・どんなことでも</span></span>
+        <span class="en-only">Background / Feeling <span class="opt">optional — anything goes</span></span>
+      </label>
+      <textarea id="background" rows="2"
+        placeholder="例: 散歩中に池のそばで蛙が跳んだとき…/ I was walking by a pond when a frog jumped…"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <span class="ja-only">俳句の経験<span class="opt">任意</span></span>
+        <span class="en-only">Experience Level <span class="opt">optional</span></span>
+      </label>
+      <select id="experience">
+        <option value="">-- 選んでください / Please select --</option>
+        <option value="beginner_ja">初心者（はじめて）/ Beginner</option>
+        <option value="hobby_ja">趣味で詠んでいる / Hobby poet</option>
+        <option value="club_ja">俳句サークル・俳句誌に投稿 / Haiku club/magazine</option>
+        <option value="teacher_ja">俳句を教えている / Haiku teacher</option>
+        <option value="student_ja">学校の授業・課題 / School assignment</option>
+        <option value="senior_ja">シニア・生涯学習 / Senior learner</option>
+        <option value="international">International Haiku enthusiast (English)</option>
+      </select>
+    </div>
+
+    <div style="text-align:center; margin-top:2rem;">
+      <button class="btn-primary" onclick="startAnalysis()" id="btnAnalyze">
+        <span class="ja-only">🔍 C4モデルで分析する</span>
+        <span class="en-only">🔍 Analyze with C4 Model</span>
+      </button>
+      <p style="font-size:0.8rem; color:var(--muted); margin-top:0.75rem;" class="ja-only">
+        ※ 17音の俳句が入力されていると分析ボタンが有効になります
+      </p>
+      <p style="font-size:0.8rem; color:var(--muted); margin-top:0.75rem;" class="en-only">
+        ※ The button activates once a 17-syllable haiku is entered
+      </p>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" id="loadingBox">
+    <div style="font-size:2rem; margin-bottom:1rem;">🎋</div>
+    <div class="loading-haiku ja-only">C4モデルで構造を解析中<span class="loading-dots"></span></div>
+    <div class="loading-haiku en-only">Analyzing structure with C4 Model<span class="loading-dots"></span></div>
+    <p style="font-size:0.82rem; color:var(--muted); margin-top:0.75rem;" class="ja-only">AIが俳句の世界を4層で読み解いています</p>
+    <p style="font-size:0.82rem; color:var(--muted); margin-top:0.75rem;" class="en-only">AI is reading your haiku across 4 layers</p>
+  </div>
+
+  <!-- RESULT PANEL -->
+  <div class="result-panel" id="resultPanel">
+
+    <!-- C4 DIAGRAM -->
+    <div class="result-section">
+      <p class="section-tag ja-only">STEP 2 · C4モデル構造図</p>
+      <p class="section-tag en-only">STEP 2 · C4 Model Structure Diagram</p>
+      <h3 class="ja-only">あなたの俳句の「設計図」</h3>
+      <h3 class="en-only">Your Haiku's Blueprint</h3>
+
+      <div style="background:var(--paper2); border:1px solid var(--border); border-radius:8px; padding:1rem; text-align:center; margin-bottom:1rem;">
+        <div style="font-size:1.3rem; letter-spacing:0.2em; font-family:'Noto Serif JP',serif;" id="displayHaiku">—</div>
+      </div>
+
+      <div class="c4-diagram" id="c4Diagram">
+        <div class="c4-layer l1">
+          <div class="c4-layer-tag">L1 · CONTEXT</div>
+          <div class="c4-layer-title ja-only">世界観・背景</div>
+          <div class="c4-layer-title en-only">World & Background</div>
+          <div class="c4-layer-content" id="l1content">—</div>
+        </div>
+        <div class="c4-layer l2">
+          <div class="c4-layer-tag">L2 · CONTAINER</div>
+          <div class="c4-layer-title ja-only">句の構造</div>
+          <div class="c4-layer-title en-only">Structure</div>
+          <div class="c4-layer-content" id="l2content">—</div>
+        </div>
+        <div class="c4-layer l3">
+          <div class="c4-layer-tag">L3 · COMPONENT</div>
+          <div class="c4-layer-title ja-only">論点・イメージ</div>
+          <div class="c4-layer-title en-only">Images & Themes</div>
+          <div class="c4-layer-content" id="l3content">—</div>
+        </div>
+        <div class="c4-layer l4">
+          <div class="c4-layer-tag">L4 · CODE</div>
+          <div class="c4-layer-title ja-only">語・切れ字</div>
+          <div class="c4-layer-title en-only">Words & Kireji</div>
+          <div class="c4-layer-content" id="l4content">—</div>
+        </div>
+      </div>
+
+      <div class="result-text" id="c4Explanation">—</div>
+      <div class="result-text-en" id="c4ExplanationEn" style="display:none;">—</div>
+    </div>
+
+    <!-- CRITIQUE OPTIN -->
+    <div class="result-section" id="critiqueOptIn">
+      <div style="background:var(--paper2); border:2px solid var(--gold); border-radius:10px; padding:1.5rem; text-align:center;">
+        <div style="font-size:1.5rem; margin-bottom:0.5rem;">🎯</div>
+        <p style="font-size:1rem; font-weight:bold; color:var(--ink); margin-bottom:0.5rem;" class="ja-only">
+          あなたの俳句を AIが添削・評価します。<br>トライしますか？
+        </p>
+        <p style="font-size:1rem; font-weight:bold; color:var(--ink); margin-bottom:0.5rem;" class="en-only">
+          Would you like AI to critique and score your haiku?
+        </p>
+        <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1rem;" class="ja-only">
+          100点満点で評価し、具体的なアドバイスをお伝えします。90点以上の方には表彰状（⭐⭐⭐⭐）を贈呈！
+        </p>
+        <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1rem;" class="en-only">
+          Scored out of 100 with specific advice. 90+ earns a ⭐⭐⭐⭐ Award Certificate!
+        </p>
+        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+          <button class="btn-primary" onclick="requestCritique()">
+            <span class="ja-only">✅ はい、お願いします！</span>
+            <span class="en-only">✅ Yes, please!</span>
+          </button>
+          <button class="btn-secondary" onclick="skipCritique()">
+            <span class="ja-only">今回はスキップ</span>
+            <span class="en-only">Skip for now</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRITIQUE RESULT -->
+    <div class="result-section" id="critiqueResult" style="display:none;">
+      <p class="section-tag ja-only">STEP 3 · AI添削・評価</p>
+      <p class="section-tag en-only">STEP 3 · AI Critique & Score</p>
+
+      <div class="score-box">
+        <div class="score-num" id="scoreNum">—</div>
+        <div class="score-denom ja-only">/ 100点</div>
+        <div class="score-denom en-only">/ 100 points</div>
+        <div class="stars" id="starsDisplay">—</div>
+        <div class="score-label" id="scoreLabel">—</div>
+      </div>
+
+      <div class="award-badge" id="awardBadge">
+        <div class="award-title ja-only">🏆 優秀作品賞 · Excellence Award</div>
+        <div class="award-title en-only">🏆 Excellence Award · 優秀作品賞</div>
+        <div class="award-stars">⭐⭐⭐⭐</div>
+        <div style="font-size:0.85rem; color:#8B6914;" class="ja-only">90点以上の優れた俳句に贈られます</div>
+        <div style="font-size:0.85rem; color:#8B6914;" class="en-only">Awarded for outstanding haiku (90+ points)</div>
+      </div>
+
+      <div class="result-text" id="critiqueText">—</div>
+      <div class="result-text-en" id="critiqueTextEn" style="display:none;">—</div>
+
+      <div class="advice-box" id="adviceBox">
+        <h3 style="margin-bottom:0.75rem;" class="ja-only">💡 改善アドバイス</h3>
+        <h3 style="margin-bottom:0.75rem;" class="en-only">💡 Improvement Advice</h3>
+        <div class="result-text" id="adviceText" style="border-left-color:var(--gold);">—</div>
+        <div class="result-text-en" id="adviceTextEn" style="display:none; border-left-color:var(--gold);">—</div>
+      </div>
+    </div>
+
+    <!-- PROFILE + PDF SECTION -->
+    <div id="profileSection" class="profile-section">
+      <p class="section-tag ja-only">STEP 4 · プロフィール登録 &amp; PDF保存</p>
+      <p class="section-tag en-only">STEP 4 · Register Profile &amp; Save PDF</p>
+      <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1.25rem;" class="ja-only">
+        結果をPDFで保存できます。以下の情報を入力するとデータベースに記録・再生も可能になります。（すべて任意です）
+      </p>
+      <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1.25rem;" class="en-only">
+        Save your results as PDF. Fill in the fields below to store and retrieve your record in our database. (All optional)
+      </p>
+
+      <div class="profile-grid">
+        <div class="form-group">
+          <label>
+            <span class="ja-only">お名前 / ペンネーム<span class="opt">任意</span></span>
+            <span class="en-only">Name / Pen name <span class="opt">optional</span></span>
+          </label>
+          <input type="text" id="userName" placeholder="例: 松尾 太郎 / Taro Matsuo" />
+        </div>
+        <div class="form-group">
+          <label>
+            <span class="ja-only">年齢<span class="opt">任意</span></span>
+            <span class="en-only">Age <span class="opt">optional</span></span>
+          </label>
+          <input type="number" id="userAge" min="5" max="120" placeholder="例: 65" />
+        </div>
+        <div class="form-group">
+          <label>
+            <span class="ja-only">職業・立場<span class="opt">任意</span></span>
+            <span class="en-only">Occupation <span class="opt">optional</span></span>
+          </label>
+          <select id="userOccupation">
+            <option value="">-- 選択 / Select --</option>
+            <option value="elementary">小学生 / Elementary school</option>
+            <option value="middle">中学生 / Middle school</option>
+            <option value="high">高校生 / High school</option>
+            <option value="university">大学生 / University</option>
+            <option value="housewife">主婦・主夫 / Homemaker</option>
+            <option value="company">会社員 / Office worker</option>
+            <option value="selfemployed">自営業 / Self-employed</option>
+            <option value="retired">退職・無職 / Retired</option>
+            <option value="senior">シニア / Senior</option>
+            <option value="teacher">教員 / Teacher</option>
+            <option value="other">その他 / Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>
+            <span class="ja-only">メールアドレス<span class="opt">任意・結果送付用</span></span>
+            <span class="en-only">Email <span class="opt">optional — for sending results</span></span>
+          </label>
+          <input type="email" id="userEmail" placeholder="例: haiku@example.com" />
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:1.25rem; display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
+        <button class="btn-teal" onclick="savePDF()" id="btnPdf">
+          <span class="ja-only">📄 PDFで保存する</span>
+          <span class="en-only">📄 Save as PDF</span>
+        </button>
+        <button class="btn-secondary" onclick="saveToDb()" id="btnDb">
+          <span class="ja-only">💾 DBに記録する</span>
+          <span class="en-only">💾 Save to Database</span>
+        </button>
+        <button class="btn-secondary" onclick="resetAll()">
+          <span class="ja-only">🔄 新しい俳句を入力</span>
+          <span class="en-only">🔄 Analyze Another</span>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /result-panel -->
+</div><!-- /main-card -->
+
+<!-- ═══════════════════ THREE PILLARS ═══════════════════ -->
+<section id="pillars">
+  <div class="section-inner">
+    <div class="section-label reveal">concept · 三位一体構造</div>
+    <h2 class="section-h2 reveal">
+      <span class="ja-only">普通の俳句入門書には<br>絶対にできない構成</span>
+      <span class="en-only">A structure no ordinary<br>haiku primer can match</span>
+    </h2>
+    <p class="section-lead reveal">
+      <span class="ja-only">既公開の「解説」動画と「C4モデル応用事例研究」動画を軸に、書籍・図解・工学分析を有機的に統合。読者は俳句をまず体験し、次に構造で理解できる。</span>
+      <span class="en-only">The already-published "Commentary" and "C4 Model Case Study" videos anchor the book, organically integrating diagrams and engineering analysis. Readers first experience haiku, then understand it structurally.</span>
+    </p>
+    <div class="pillars-grid reveal">
+      <div class="pillar">
+        <div class="pillar-num">01 / Video</div>
+        <div class="pillar-icon">🎥</div>
+        <h3 class="pillar-title"><em>動画</em>で体験</h3>
+        <p class="pillar-body">QRコードからYouTube動画へ直結。視覚・聴覚で俳句の音・動き・余韻を体感してから書籍へ戻る。初心者・高齢者に最適な「入口」。</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">02 / Diagram</div>
+        <div class="pillar-icon">📐</div>
+        <h3 class="pillar-title"><em>図解</em>で理解</h3>
+        <p class="pillar-body">C4モデルL1〜L3、シーケンス図、アクティビティ図で俳句の構造を可視化。「なんとなく好き」を「なぜ好きか」へ昇華する。</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">03 / Engineering</div>
+        <div class="pillar-icon">⚙️</div>
+        <h3 class="pillar-title"><em>工学</em>で再現</h3>
+        <p class="pillar-body">季語・音韻・余白の設計法則を工学的に抽出。「偶然生まれた名句」を「再現可能な創作プロセス」へ変換する。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ BOOK STRUCTURE ═══════════════════ -->
+<section id="structure">
+  <div class="section-inner">
+    <div class="section-label reveal">book structure · 書籍構成</div>
+    <h2 class="section-h2 reveal">
+      <span class="ja-only">C4モデルで読む<br>書籍のアーキテクチャ</span>
+      <span class="en-only">The book's architecture<br>read through the C4 Model</span>
+    </h2>
+    <p class="section-lead reveal">
+      <span class="ja-only">書籍そのものをC4モデルの4層構造で設計。第1部（コンテキスト）→第2部（コンテナ）→第3部（コンポーネント）→第4部（実践）へと階層的に深化する。</span>
+      <span class="en-only">The book itself is designed in the C4 Model's 4-layer structure, deepening hierarchically from Part 1 (Context) → Part 2 (Container) → Part 3 (Component) → Part 4 (Practice).</span>
+    </p>
+    <div class="spiral-stack reveal">
+      <div class="spiral-item" data-layer="1">
+        <div class="spiral-tag">L1 · CONTEXT — 第1部</div>
+        <div class="spiral-title">俳句の世界へようこそ</div>
+        <div class="spiral-body">俳句とは何か・C4モデルとは何か・この本の使い方。動画を入口に、初心者・高齢者が安心して入れる序章。</div>
+      </div>
+      <div class="spiral-item" data-layer="2">
+        <div class="spiral-tag">L2 · CONTAINER — 第2部</div>
+        <div class="spiral-title">芭蕉の名句を工学的に分解する</div>
+        <div class="spiral-body">古池や・夏草や・閑さや の3句をC4モデルL1〜L3で完全分解。各句ごとに統一フォーマット（動画QR→C4図→認知プロセス→実践ワーク）で解説。</div>
+      </div>
+      <div class="spiral-item" data-layer="3">
+        <div class="spiral-tag">L3 · COMPONENT — 第3部</div>
+        <div class="spiral-title">C4モデル応用事例研究</div>
+        <div class="spiral-body">芭蕉の旅路のC4モデル化・一茶と子規の比較モデル・季語辞書のコンポーネント化・読者感情のシーケンス図化。専門的なのに分かりやすい「研究成果の翻訳」章。</div>
+      </div>
+      <div class="spiral-item" data-layer="4">
+        <div class="spiral-tag">L4 · CODE — 第4部</div>
+        <div class="spiral-title">あなたも作れる "工学的俳句"</div>
+        <div class="spiral-body">散歩しながら音を探す・季語を変えてみる・C4テンプレートで俳句を設計する。健康×俳句×工学が自然に融合する実践ワーク集。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ C4 DEMO ═══════════════════ -->
+<section id="c4demo" style="padding: 5rem 1.5rem; background: var(--paper2);">
+  <div class="section-inner">
+    <div class="section-label reveal">live c4 diagram · C4図解デモ</div>
+    <h2 class="section-h2 reveal">
+      <span class="ja-only">「古池や」をC4モデルで読む</span>
+      <span class="en-only">Reading "Old Pond" through the C4 Model</span>
+    </h2>
+    <p class="section-lead reveal">
+      <span class="ja-only">書籍に掲載するC4図のライブプレビュー。L1・L2・L3の3層で俳句の構造を完全可視化する。</span>
+      <span class="en-only">Live preview of the C4 diagrams in the book. Three layers — L1, L2, L3 — completely visualize the structure of the haiku.</span>
+    </p>
+
+    <div class="haiku-highlight reveal" style="text-align:center; margin-bottom:2rem; font-size:1.5rem; font-style:italic;">
+      <div class="haiku-text" style="color:var(--ink);">古池や　蛙飛びこむ　水の音</div>
+      <div class="haiku-credit" style="font-size:0.9rem; color:var(--muted); margin-top:0.5rem;">— 松尾芭蕉　Matsuo Bashō, c. 1686</div>
+    </div>
+
+    <div class="diagram-tabs reveal" style="display:flex; justify-content:center; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+      <button class="dtab active" onclick="switchTab('ctx')" style="padding:0.5rem 1rem; cursor:pointer; background:var(--bg); border:1px solid var(--border);">L1 · Context</button>
+      <button class="dtab" onclick="switchTab('ctr')" style="padding:0.5rem 1rem; cursor:pointer; background:var(--bg); border:1px solid var(--border);">L2 · Container</button>
+      <button class="dtab" onclick="switchTab('cmp')" style="padding:0.5rem 1rem; cursor:pointer; background:var(--bg); border:1px solid var(--border);">L3 · Component</button>
+    </div>
+
+    <!-- L1 Context -->
+    <div class="diagram-panel active" id="panel-ctx" style="background:#fff; padding:1.5rem; border:1px solid var(--border);">
+      <div class="puml-wrap" style="text-align:center; min-height:300px; display:flex; align-items:center; justify-content:center;">
+        <div class="puml-loading" id="load-ctx">📐 図を読み込み中…</div>
+        <img id="puml-ctx" class="puml-svg" alt="L1 Context — 古池や" style="display:none; max-width:100%; margin:0 auto;">
+      </div>
+    </div>
+
+    <!-- L2 Container -->
+    <div class="diagram-panel" id="panel-ctr" style="display:none; background:#fff; padding:1.5rem; border:1px solid var(--border);">
+      <div class="puml-wrap" style="text-align:center; min-height:300px; display:flex; align-items:center; justify-content:center;">
+        <div class="puml-loading" id="load-ctr">📐 図を読み込み中…</div>
+        <img id="puml-ctr" class="puml-svg" alt="L2 Container — 古池や" style="display:none; max-width:100%; margin:0 auto;">
+      </div>
+    </div>
+
+    <!-- L3 Component -->
+    <div class="diagram-panel" id="panel-cmp" style="display:none; background:#fff; padding:1.5rem; border:1px solid var(--border);">
+      <div class="puml-wrap" style="text-align:center; min-height:300px; display:flex; align-items:center; justify-content:center;">
+        <div class="puml-loading" id="load-cmp">📐 図を読み込み中…</div>
+        <img id="puml-cmp" class="puml-svg" alt="L3 Component — 古池や" style="display:none; max-width:100%; margin:0 auto;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ VIDEOS ═══════════════════ -->
+<section id="videos">
+  <div class="section-inner">
+    <div class="section-label reveal">published videos · 公開済み動画</div>
+    <h2 class="section-h2 reveal">
+      <span class="ja-only">すでに公開中の<br>「図でみる俳句」シリーズ</span>
+      <span class="en-only">The already-published<br>"Haiku in Diagrams" series</span>
+    </h2>
+    <p class="section-lead reveal">
+      <span class="ja-only">書籍のQRコードで読み取れる動画は、すでにYouTubeで公開中。動画が「入口」となり、書籍が「深化」の場となる。</span>
+      <span class="en-only">The videos accessible via QR codes in the book are already on YouTube. The video is the "entry point"; the book is the place of "deepening."</span>
+    </p>
+    <div class="video-grid reveal">
+      <div class="video-card">
+        <div class="video-card-top">
+          <div class="video-num">VIDEO 01 · 解説編</div>
+          <div class="video-qr">QR<br>Code</div>
+        </div>
+        <div class="video-haiku">古池や　蛙飛びこむ　水の音</div>
+        <p class="video-desc">芭蕉の代表句をC4モデルで初めて解説した動画。静けさと音の対比、時間の構造を視覚化。</p>
+      </div>
+      <div class="video-card">
+        <div class="video-card-top">
+          <div class="video-num">VIDEO 02 · C4応用事例</div>
+          <div class="video-qr">QR<br>Code</div>
+        </div>
+        <div class="video-haiku">閑さや　岩にしみ入る　蝉の声</div>
+        <p class="video-desc">「静」の中に「動」を埋め込む構造。蝉の声が岩に吸収される認知プロセスをシーケンス図で追う。</p>
+      </div>
+      <div class="video-card">
+        <div class="video-card-top">
+          <div class="video-num">VIDEO 03 · C4応用事例</div>
+          <div class="video-qr">QR<br>Code</div>
+        </div>
+        <div class="video-haiku">夏草や　兵どもが　夢の跡</div>
+        <p class="video-desc">時間軸の多層構造。「現在の夏草」「過去の戦場」「永遠の無常観」を3層のC4モデルで可視化。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ AUTHOR ═══════════════════ -->
+<section id="author">
+  <div class="section-inner">
+    <div class="section-label reveal">author · 著者</div>
+    <div class="author-card reveal">
+      <div class="author-left">
+        <div class="author-mark">C4モデル研究会®</div>
+        <div class="author-name">奥村治</div>
+        <div class="author-name-en">Osamu Okumura</div>
+        <div class="author-org">C4 Model Study Group®</div>
+      </div>
+      <div class="author-right">
+        <p class="author-bio">
+          C4モデルシステムコンサルタント。俳句工学（Haiku Engineering）と俳句システム研究会を主宰し、松尾芭蕉・小林一茶の作品をC4モデルで構造分析する研究・創作活動の第一人者。「図でみる俳句」シリーズをYouTubeで公開。Amazon Kindle著作多数。学術論文の執筆支援システム「論文道場」を開発・運営。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ── PlantUML Encoder ── */
+const PUML_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
+function encode64(data) {
+  let r = '';
+  for (let i = 0; i < data.length; i += 3) {
+    const b = [data[i]||0, data[i+1]||0, data[i+2]||0];
+    r += PUML_CHARS[(b[0]>>2)&0x3F];
+    r += PUML_CHARS[((b[0]&3)<<4)|((b[1]>>4)&0xF)];
+    r += PUML_CHARS[((b[1]&0xF)<<2)|((b[2]>>6)&3)];
+    r += PUML_CHARS[b[2]&0x3F];
+  }
+  return r;
+}
+function deflateRaw(str) {
+  const data = new TextEncoder().encode(str);
+  const chunks = [];
+  const BSIZE = 32768;
+  for (let i = 0; i < data.length; i += BSIZE) {
+    const chunk = data.slice(i, i + BSIZE);
+    const last = (i + BSIZE >= data.length) ? 1 : 0;
+    const len = chunk.length;
+    const nlen = (~len) & 0xFFFF;
+    chunks.push(last, len&0xFF, (len>>8)&0xFF, nlen&0xFF, (nlen>>8)&0xFF);
+    chunk.forEach(b => chunks.push(b));
+  }
+  let s1 = 1, s2 = 0;
+  data.forEach(b => { s1=(s1+b)%65521; s2=(s2+s1)%65521; });
+  const adler = (s2<<16)|s1;
+  return new Uint8Array([0x78,0x01,...chunks,(adler>>24)&0xFF,(adler>>16)&0xFF,(adler>>8)&0xFF,adler&0xFF]);
+}
+function encodePuml(puml) { return '~1' + encode64(deflateRaw(puml)); }
+function renderPuml(puml, imgEl, loadEl) {
+  const enc = encodePuml(puml);
+  imgEl.onload = () => { loadEl.style.display='none'; imgEl.style.display='block'; };
+  imgEl.onerror = () => {
+    imgEl.src = \`https://kroki.io/plantuml/svg/\${btoa(unescape(encodeURIComponent(puml)))}\`;
+    imgEl.onerror = () => { loadEl.textContent = '⚠ 図の読み込みに失敗しました'; };
+  };
+  imgEl.src = \`https://www.plantuml.com/plantuml/svg/\${enc}\`;
+}
+
+/* ── PlantUML Definitions ── */
+const PUML_CTX = \`@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+skinparam backgroundColor #FAFAF8
+skinparam defaultFontName "Source Serif 4"
+skinparam defaultFontSize 13
+skinparam ArrowColor #1A7A8A
+title L1 Context — 古池や（ふるいけや）
+
+Person(reader, "読者 / Reader", "俳句を読む人\\nA person reading haiku")
+System(haiku, "古池や\\n（俳句システム）", "芭蕉の句が生み出す\\n美的体験の場")
+System_Ext(season, "季語システム", "蛙（春）\\nKigo: Frog = Spring")
+System_Ext(sound, "音響システム", "水の音・静寂\\nSound of water / Silence")
+System_Ext(time, "時間システム", "刹那と永遠\\nMoment and Eternity")
+
+Rel(reader, haiku, "情景を想像する", "認知プロセス")
+Rel(haiku, season, "季節感を呼び起こす")
+Rel(haiku, sound, "音を体験させる")
+Rel(haiku, time, "時間を止める")
+@enduml\`;
+
+const PUML_CTR = \`@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+skinparam backgroundColor #FAFAF8
+skinparam defaultFontName "Source Serif 4"
+skinparam defaultFontSize 13
+skinparam ArrowColor #1A7A8A
+title L2 Container — 古池や の構造
+
+Person(reader, "読者", "俳句を読む人")
+
+System_Boundary(h, "古池や　蛙飛びこむ　水の音") {
+  Container(ku1, "古池や", "第1句", "静けさの舞台設定\\n古い池 = 永遠・歴史")
+  Container(ku2, "蛙飛びこむ", "第2句", "突発的な動き\\n蛙 = 生命・春")
+  Container(ku3, "水の音", "第3句", "音の余韻\\n聴覚 = 余白の設計")
+}
+
+Rel(reader, ku1, "視覚的情景を受け取る")
+Rel(ku1, ku2, "静 → 動 の転換")
+Rel(ku2, ku3, "動 → 音 → 余韻")
+Rel(ku3, reader, "余白で想像を促す", "認知の完結")
+@enduml\`;
+
+const PUML_CMP = \`@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+skinparam backgroundColor #FAFAF8
+skinparam defaultFontName "Source Serif 4"
+skinparam defaultFontSize 13
+skinparam ArrowColor #1A7A8A
+title L3 Component — 古池や の工学的分解
+
+Container_Boundary(ku2, "蛙飛びこむ（第2句コンテナ）") {
+  Component(kigo, "季語コンポーネント", "蛙（春）", "春の訪れ・生命感\\nKigo: 5音の感情圧縮")
+  Component(verb, "動詞コンポーネント", "飛びこむ", "瞬間の動き\\n過去形で完了を示す")
+  Component(agent, "主体コンポーネント", "蛙（主語）", "自然の意志ある存在\\n人間不在の構造")
+}
+
+Container_Boundary(ku3, "水の音（第3句コンテナ）") {
+  Component(sound2, "音響コンポーネント", "水の音", "聴覚刺激\\n想像を完結させる")
+  Component(blank, "余白コンポーネント", "省略された情景", "読者の脳が補完\\n17音の外にある世界")
+}
+
+Rel(kigo, verb, "生命 × 動き の合成")
+Rel(verb, sound2, "行為 → 結果 の因果")
+Rel(sound2, blank, "音が消えた後の沈黙")
+@enduml\`;
+
+/* ── Tab Switcher ── */
+const loaded = {};
+function switchTab(key) {
+  document.querySelectorAll('.diagram-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.dtab').forEach(b => {
+    b.classList.remove('active');
+    b.style.fontWeight = 'normal';
+    b.style.background = 'var(--bg)';
+  });
+  document.getElementById('panel-' + key).style.display = 'block';
+  event.target.classList.add('active');
+  event.target.style.fontWeight = 'bold';
+  event.target.style.background = '#eee';
+  if (!loaded[key]) { loadDiagram(key); loaded[key] = true; }
+}
+function loadDiagram(key) {
+  const map = {
+    ctx: { puml: PUML_CTX, img: 'puml-ctx', load: 'load-ctx' },
+    ctr: { puml: PUML_CTR, img: 'puml-ctr', load: 'load-ctr' },
+    cmp: { puml: PUML_CMP, img: 'puml-cmp', load: 'load-cmp' }
+  };
+  const m = map[key];
+  renderPuml(m.puml, document.getElementById(m.img), document.getElementById(m.load));
+}
+window.addEventListener('load', () => { loadDiagram('ctx'); loaded.ctx = true; });
+
+/* ── Scroll Reveal ── */
+const observer = new IntersectionObserver(
+  entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
+  { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+);
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    <a href="https://c4model.org/">c4model.org</a> · C4モデル研究会® / C4 Model Study Group®<br>
+    © 2025–2026 Osamu Okumura · <a href="mailto:info@c4model.org">info@c4model.org</a>
+  </p>
+</footer>
+
+<script>
+/* ===== LANG SWITCH ===== */
+function setLang(lang) {
+  document.body.className = 'lang-' + lang;
+  document.getElementById('btnJa').className = 'lang-btn' + (lang==='ja'?' active':'');
+  document.getElementById('btnEn').className = 'lang-btn' + (lang==='en'?' active':'');
+  if (lang === 'en') {
+    document.querySelectorAll('.result-text-en').forEach(el => el.style.display='block');
+  } else {
+    document.querySelectorAll('.result-text-en').forEach(el => el.style.display='none');
+  }
+}
+
+/* ===== CHAR COUNT（俳句の音数を正確に計測）===== */
+function countChars(el) {
+  // 空白・句読点・記号を除いた文字数をカウント
+  // 拗音（ゃゅょ）小文字は独立した音としてカウントしない
+  const txt = el.value.replace(/[\s　、。・「」『』（）\(\)\-ー]/g, '');
+  // 拗音の小文字は前の音と合体するので-1
+  const small = (txt.match(/[ぁぃぅぇぉっゃゅょァィゥェォッャュョ]/g)||[]).length;
+  const count = [...txt].length - small;
+  const span = document.getElementById('charCount');
+  span.textContent = count;
+  span.className = 'count ' + (count === 17 ? 'valid' : 'invalid');
+  document.getElementById('btnAnalyze').disabled = count !== 17;
+}
+
+/* ===== STEP TABS ===== */
+function setActiveTab(n) {
+  for(let i=1;i<=4;i++){
+    document.getElementById('tab'+i).className = 'step-tab' + (i===n?' active':'');
+  }
+}
+
+/* ===== ANALYSIS ===== */
+async function startAnalysis() {
+  const haiku = document.getElementById('haikuInput').value.trim();
+  if (!haiku) return;
+  const isEn = document.body.classList.contains('lang-en');
+  const title = document.getElementById('haikuTitle').value.trim();
+  const kigo  = document.getElementById('kigo').value.trim();
+  const bg    = document.getElementById('background').value.trim();
+  const exp   = document.getElementById('experience').value;
+
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('loadingBox').classList.add('show');
+  setActiveTab(2);
+
+  /*
+   * C4モデルの定義（奥村治 ResearchGate論文 DOI:10.13140/RG.2.2.20249.89444 準拠）
+   * L1 Context   = 俳句の「世界観・背景・時代・社会的文脈・季語の文化的意味」
+   * L2 Container = 俳句の「形式的構造＝上五・中七・下五の配置と切れ字の位置」
+   * L3 Component = 俳句の「主要な意味要素・イメージ・感情・対比・象徴」
+   * L4 Code      = 俳句の「個々の語彙・音・リズム・文法・切れ字の機能」
+   */
+  const prompt = `あなたは俳句研究者であり、C4モデルによる俳句構造分析の専門家です。
+奥村治氏の先行研究（DOI:10.13140/RG.2.2.20249.89444）に基づき、以下の4層定義でこの俳句を分析してください。
+
+【俳句】：「${haiku}」
+${title ? '【題名・テーマ】：' + title : ''}
+${kigo ? '【季語】：' + kigo : ''}
+${bg ? '【作句の背景・気持ち】：' + bg : ''}
+${exp ? '【作者の経験】：' + exp : ''}
+
+【C4モデル4層の定義（論文準拠）】
+- L1 Context（文脈）：この俳句の「世界観・時代・場所・社会的背景・季語が持つ文化的意味・俳句が詠まれた状況」
+- L2 Container（容器）：この俳句の「形式的構造＝上五・中七・下五それぞれの働きと切れ字の位置・句全体の論理的枠組み」
+- L3 Component（構成要素）：この俳句の「主要な意味要素・中心的イメージ・感情・対比・象徴・主題」
+- L4 Code（コード）：この俳句の「個々の語彙選択・音のリズム・文語文法・切れ字の機能・擬音・色彩語など」
+
+JSONのみで回答してください（マークダウン不可）：
+{
+  "l1_ja": "L1 Contextの分析（俳句の文化的世界観・背景・季語の意味を2〜3文で）",
+  "l2_ja": "L2 Containerの分析（上五・中七・下五の構造と切れ字の位置を2〜3文で）",
+  "l3_ja": "L3 Componentの分析（主要イメージ・感情・対比・象徴を2〜3文で）",
+  "l4_ja": "L4 Codeの分析（語彙・音・リズム・文法・切れ字機能を2〜3文で）",
+  "explanation_ja": "4層を統合した俳句の総合解説（誰にでもわかるやさしい言葉で4〜5文）",
+  "l1_en": "L1 Context analysis in English (2-3 sentences: cultural world, season, background)",
+  "l2_en": "L2 Container analysis in English (2-3 sentences: 5-7-5 structure, kireji position)",
+  "l3_en": "L3 Component analysis in English (2-3 sentences: images, emotions, contrast, symbols)",
+  "l4_en": "L4 Code analysis in English (2-3 sentences: word choice, rhythm, grammar, kireji function)",
+  "explanation_en": "Integrated analysis in English (4-5 sentences, accessible to general readers)"
+}`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1500,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const raw = (data.content||[]).map(i=>i.text||'').join('');
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const json = JSON.parse(clean);
+
+    document.getElementById('displayHaiku').textContent = haiku;
+    document.getElementById('l1content').textContent = isEn ? json.l1_en : json.l1_ja;
+    document.getElementById('l2content').textContent = isEn ? json.l2_en : json.l2_ja;
+    document.getElementById('l3content').textContent = isEn ? json.l3_en : json.l3_ja;
+    document.getElementById('l4content').textContent = isEn ? json.l4_en : json.l4_ja;
+    document.getElementById('c4Explanation').textContent = json.explanation_ja;
+    document.getElementById('c4ExplanationEn').textContent = json.explanation_en;
+    if (isEn) document.getElementById('c4ExplanationEn').style.display='block';
+
+    window._analysisData = json;
+    window._haiku = haiku;
+    window._title = title;
+    window._kigo = kigo;
+
+    document.getElementById('loadingBox').classList.remove('show');
+    document.getElementById('resultPanel').classList.add('show');
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('loadingBox').classList.remove('show');
+    document.getElementById('step1').style.display='block';
+    alert('分析中にエラーが発生しました。\n詳細：' + e.message);
+  }
+}
+
+/* ===== CRITIQUE ===== */
+async function requestCritique() {
+  document.getElementById('critiqueOptIn').style.display='none';
+  setActiveTab(3);
+  const isEn = document.body.classList.contains('lang-en');
+  const haiku = window._haiku || '';
+  const d = window._analysisData || {};
+
+  const loadDiv = document.createElement('div');
+  loadDiv.className = 'loading show';
+  loadDiv.innerHTML = `<div style="font-size:2rem;margin-bottom:1rem">🎯</div>
+    <div class="loading-haiku">採点・添削中<span class="loading-dots"></span></div>`;
+  document.getElementById('critiqueResult').before(loadDiv);
+
+  const prompt = `あなたは、高齢者の初心者（アマチュア）にも優しく丁寧に教える、ベテランの俳句指導者（選者）です。
+以下の俳句を100点満点で評価・添削し、初心者が感動し、かつ具体的に学べるアドバイスを提供してください。
+
+【俳句】：「${haiku}」
+【C4分析（参考）】
+L1: ${d.l1_ja||''}
+L2: ${d.l2_ja||''}
+L3: ${d.l3_ja||''}
+L4: ${d.l4_ja||''}
+
+【評価基準（各20点）】
+① 季語の適切さ（無季や季重なりがないか、季節感が情景と合っているか）
+② 五七五のリズム（字余り・字足らずのチェックと、その効果の是非）
+③ 映像・情景・感情の喚起力（具体的な情景が目に浮かぶか）
+④ 文法と切れ（助詞「てにをは」の正確さ、切れ字の効果的な使用）
+⑤ 独創性・新鮮さ（ありきたりな表現になっていないか）
+
+【出力の条件】
+- 高齢者の初心者が読んで「なるほど！」と腑に落ちるよう、専門用語は控えめにするか、わかりやすく解説してください。
+- 良い点はしっかりと褒め（感動を与え）、改善点は「字余り」「季語の検討」「文法・助詞の微調整」など具体的な理由を添えて優しく提案してください。
+
+JSONのみで回答（マークダウン不可）：
+{
+  "score": <0〜100の整数>,
+  "breakdown": {"kigo":0〜20, "rhythm":0〜20, "imagery":0〜20, "kireji":0〜20, "originality":0〜20},
+  "critique_ja": "添削コメント（良い点を褒める。具体的に・やさしく・励ます口調で・4〜5文）",
+  "advice_ja": "改善アドバイス（字余り・文法・季語に関する具体的な指摘と、より良くなる言葉の提案・2〜3文）",
+  "revised_ja": "改善案の俳句（1句。文法やリズムを整えたもの。直す必要がなければ元の句）",
+  "critique_en": "English critique (4-5 sentences, encouraging, tailored for beginners)",
+  "advice_en": "English improvement advice (2-3 sentences with specific suggestions on syllables, grammar, and kigo)",
+  "revised_en": "English translation of revised haiku (1 line)"
+}`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1200,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const raw = (data.content||[]).map(i=>i.text||'').join('');
+    const json = JSON.parse(raw.replace(/```json|```/g,'').trim());
+
+    loadDiv.remove();
+    window._score = json.score;
+    window._critiqueData = json;
+
+    // Score display
+    document.getElementById('scoreNum').textContent = json.score;
+    const s = json.score;
+    const stars = s>=90?'⭐⭐⭐⭐':s>=75?'⭐⭐⭐':s>=60?'⭐⭐':'⭐';
+    const lbl = s>=90?'優秀作品賞！':s>=75?'大変よくできました':s>=60?'なかなかの出来です':'もう少し練習しましょう';
+    document.getElementById('starsDisplay').textContent = stars;
+    document.getElementById('scoreLabel').textContent = isEn ?
+      (s>=90?'Excellence Award!':s>=75?'Well done!':s>=60?'Good effort!':'Keep practicing!') : lbl;
+
+    // Breakdown
+    const bd = json.breakdown || {};
+    const bdHtml = `
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0;text-align:center;font-size:0.78rem;">
+        <div style="background:#FFF5F5;border:1px solid #f99;border-radius:5px;padding:6px;"><b>季語</b><br>${bd.kigo||'—'}/20</div>
+        <div style="background:#F5F0FF;border:1px solid #99f;border-radius:5px;padding:6px;"><b>リズム</b><br>${bd.rhythm||'—'}/20</div>
+        <div style="background:#F0F8FF;border:1px solid #9cf;border-radius:5px;padding:6px;"><b>映像</b><br>${bd.imagery||'—'}/20</div>
+        <div style="background:#FFF5F0;border:1px solid #fa9;border-radius:5px;padding:6px;"><b>切れ</b><br>${bd.kireji||'—'}/20</div>
+        <div style="background:#F5FFF0;border:1px solid #9f9;border-radius:5px;padding:6px;"><b>独創性</b><br>${bd.originality||'—'}/20</div>
+      </div>`;
+    document.getElementById('scoreBox_breakdown') && (document.getElementById('scoreBox_breakdown').innerHTML = bdHtml);
+
+    if (s >= 90) document.getElementById('awardBadge').classList.add('show');
+
+    document.getElementById('critiqueText').textContent = json.critique_ja;
+    document.getElementById('critiqueTextEn').textContent = json.critique_en;
+    if (isEn) document.getElementById('critiqueTextEn').style.display='block';
+
+    document.getElementById('adviceText').textContent = json.advice_ja +
+      (json.revised_ja && json.revised_ja !== window._haiku ? '\n\n💡 改善案：「' + json.revised_ja + '」' : '');
+    document.getElementById('adviceTextEn').textContent = json.advice_en +
+      (json.revised_en ? '\n\n💡 Suggested revision: "' + json.revised_en + '"' : '');
+    document.getElementById('adviceBox').classList.add('show');
+    if (isEn) document.getElementById('adviceTextEn').style.display='block';
+
+    document.getElementById('critiqueResult').style.display='block';
+    document.getElementById('profileSection').classList.add('show');
+    setActiveTab(4);
+
+  } catch(e) {
+    console.error(e);
+    loadDiv.remove();
+    alert('採点中にエラーが発生しました。\n' + e.message);
+    document.getElementById('critiqueOptIn').style.display='block';
+  }
+}
+
+function skipCritique() {
+  document.getElementById('critiqueOptIn').style.display='none';
+  document.getElementById('profileSection').classList.add('show');
+  setActiveTab(4);
+}
+
+/* ===== PDF SAVE（白紙バグ修正版）===== */
+function savePDF() {
+  const haiku   = window._haiku || document.getElementById('haikuInput').value.trim() || '（未入力）';
+  const d       = window._analysisData || {};
+  const c       = window._critiqueData || {};
+  const score   = (window._score !== null && window._score !== undefined) ? window._score : null;
+  const title   = window._title || document.getElementById('haikuTitle').value || '';
+  const kigo    = window._kigo  || document.getElementById('kigo').value || '';
+  const name    = document.getElementById('userName').value || '—';
+  const age     = document.getElementById('userAge').value  || '—';
+  const occ     = document.getElementById('userOccupation').selectedOptions[0]?.text || '—';
+  const email   = document.getElementById('userEmail').value || '—';
+  const date    = new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric'});
+  const stars   = score!==null ? (score>=90?'⭐⭐⭐⭐':score>=75?'⭐⭐⭐':score>=60?'⭐⭐':'⭐') : '';
+  const bd      = c.breakdown || {};
+
+  // QRコード用URL（c4model.orgのhaikuページ）
+  const qrUrl   = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' +
+                  encodeURIComponent('https://c4model.org/haiku.html');
+
+  const awardSection = (score !== null && score >= 90) ? `
+    <div style="background:linear-gradient(135deg,#FFF8DC,#FFD700,#FFF8DC);border:3px double #B8860B;border-radius:10px;padding:16px;text-align:center;margin:16px 0;">
+      <div style="font-family:'Cinzel',serif;font-size:1.2rem;color:#8B6914;font-weight:bold;">🏆 優秀作品賞 · Excellence Award ⭐⭐⭐⭐</div>
+      <div style="font-size:0.85rem;color:#8B6914;margin-top:4px;">90点以上の優れた俳句に贈られます / Awarded for outstanding haiku (90+ points)</div>
+    </div>` : '';
+
+  const scoreSection = score !== null ? `
+    <h2 style="color:#1A5C6A;border-left:4px solid #1A5C6A;padding-left:10px;margin:24px 0 8px;">AI添削・評価</h2>
+    ${awardSection}
+    <div style="text-align:center;margin:12px 0;">
+      <span style="font-size:3.5rem;font-weight:bold;color:#8B2020;">${score}</span>
+      <span style="font-size:1.2rem;color:#5A4A35;"> / 100点　${stars}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0;text-align:center;font-size:0.78rem;">
+      <div style="background:#FFF5F5;border:1px solid #f99;border-radius:5px;padding:6px;"><b>季語</b><br>${bd.kigo||'—'}/20</div>
+      <div style="background:#F5F0FF;border:1px solid #99f;border-radius:5px;padding:6px;"><b>リズム</b><br>${bd.rhythm||'—'}/20</div>
+      <div style="background:#F0F8FF;border:1px solid #9cf;border-radius:5px;padding:6px;"><b>映像</b><br>${bd.imagery||'—'}/20</div>
+      <div style="background:#FFF5F0;border:1px solid #fa9;border-radius:5px;padding:6px;"><b>切れ</b><br>${bd.kireji||'—'}/20</div>
+      <div style="background:#F5FFF0;border:1px solid #9f9;border-radius:5px;padding:6px;"><b>独創性</b><br>${bd.originality||'—'}/20</div>
+    </div>
+    <div style="background:#F8F3E8;padding:14px 18px;border-left:4px solid #8B2020;border-radius:0 6px 6px 0;margin:10px 0;font-size:0.92rem;line-height:1.85;white-space:pre-wrap;">${c.critique_ja||'—'}</div>
+    <h3 style="color:#B8860B;margin:16px 0 6px;">💡 改善アドバイス</h3>
+    <div style="background:#FFFBF0;padding:14px 18px;border-left:4px solid #B8860B;border-radius:0 6px 6px 0;font-size:0.92rem;line-height:1.85;white-space:pre-wrap;">${
+      (c.advice_ja||'—') + (c.revised_ja && c.revised_ja !== haiku ? '\n\n💡 改善案：「' + c.revised_ja + '」' : '')
+    }</div>` : '';
+
+  // PDF HTML文字列を直接構築（ポップアップ非依存）
+  const pdfContent = `<!DOCTYPE html>
+<html lang="ja"><head>
+<meta charset="UTF-8">
+<title>俳句C4分析レポート</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Cinzel:wght@600&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  body { font-family:'Noto Serif JP',Georgia,serif; font-size:13px; color:#1A1008; background:#fff; line-height:1.85; }
+  h1 { font-family:'Cinzel',serif; font-size:1.3rem; color:#8B2020; border-bottom:2px solid #8B2020; padding-bottom:6px; margin-bottom:16px; }
+  h2 { font-size:1rem; color:#1A5C6A; border-left:4px solid #1A5C6A; padding-left:10px; margin:20px 0 8px; }
+  h3 { font-size:0.9rem; color:#B8860B; margin:14px 0 6px; }
+  .haiku-box { font-size:1.8rem; text-align:center; letter-spacing:0.25em; padding:20px; background:#FFFDF5; border:1px solid #D4C8A8; border-radius:8px; margin:14px 0; font-weight:300; }
+  .meta { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; font-size:0.82rem; margin-bottom:14px; }
+  .meta-item { background:#F8F3E8; padding:6px 10px; border-radius:4px; }
+  .meta-label { color:#8B6914; font-size:0.72rem; font-weight:bold; }
+  .c4-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:12px 0; }
+  .c4-item { padding:10px 8px; border-radius:6px; font-size:0.78rem; text-align:center; line-height:1.6; }
+  .l1 { background:#FFF5F5; border:1px solid #F9AAAA; }
+  .l2 { background:#F5F0FF; border:1px solid #AAA0FF; }
+  .l3 { background:#F0F8FF; border:1px solid #A0CCFF; }
+  .l4 { background:#F5FFF0; border:1px solid #A0F0A0; }
+  .c4-tag { font-weight:bold; font-size:0.7rem; margin-bottom:4px; }
+  .l1 .c4-tag{color:#8B2020;} .l2 .c4-tag{color:#6446B4;} .l3 .c4-tag{color:#1A5C6A;} .l4 .c4-tag{color:#1E641E;}
+  .box { background:#F8F3E8; padding:12px 16px; border-left:4px solid #8B2020; border-radius:0 6px 6px 0; margin:8px 0; font-size:0.88rem; line-height:1.85; white-space:pre-wrap; }
+  .footer { margin-top:32px; text-align:center; font-size:0.72rem; color:#5A4A35; border-top:1px solid #D4C8A8; padding-top:10px; }
+  .qr-wrap { float:right; text-align:center; margin:0 0 10px 16px; }
+  .qr-wrap img { width:90px; height:90px; }
+  .qr-label { font-size:0.65rem; color:#5A4A35; margin-top:3px; }
+  .rg-note { background:#F0F8FF; border:1px solid #A0CCFF; border-radius:6px; padding:10px 14px; font-size:0.78rem; color:#1A5C6A; margin:12px 0; }
+</style>
+</head><body>
+
+<div class="qr-wrap">
+  <img src="${qrUrl}" alt="QR Code - c4model.org/haiku.html" />
+  <div class="qr-label">c4model.org/haiku.html</div>
+</div>
+
+<h1>俳句C4モデル構造分析レポート</h1>
+
+<div class="meta">
+  <div class="meta-item"><div class="meta-label">氏名</div>${name}</div>
+  <div class="meta-item"><div class="meta-label">年齢</div>${age}</div>
+  <div class="meta-item"><div class="meta-label">職業</div>${occ}</div>
+  <div class="meta-item"><div class="meta-label">分析日</div>${date}</div>
+  <div class="meta-item"><div class="meta-label">メール</div>${email}</div>
+  ${title ? `<div class="meta-item"><div class="meta-label">題名</div>${title}</div>` : ''}
+  ${kigo  ? `<div class="meta-item"><div class="meta-label">季語</div>${kigo}</div>` : ''}
+</div>
+
+<div class="haiku-box">${haiku}</div>
+
+<div class="rg-note">
+  📖 本分析はC4モデル（Simon Brown, 2018）を俳句に応用した奥村治の研究手法（DOI:10.13140/RG.2.2.20249.89444）に基づいています。<br>
+  This analysis applies Osamu Okumura's methodology for haiku structural analysis using the C4 Model.
+</div>
+
+<h2>C4モデル構造図（L1〜L4）</h2>
+<div class="c4-grid">
+  <div class="c4-item l1"><div class="c4-tag">L1 · Context</div><div class="c4-title" style="font-weight:bold;font-size:0.75rem;margin-bottom:4px;">世界観・背景</div>${d.l1_ja||'—'}</div>
+  <div class="c4-item l2"><div class="c4-tag">L2 · Container</div><div class="c4-title" style="font-weight:bold;font-size:0.75rem;margin-bottom:4px;">句の構造</div>${d.l2_ja||'—'}</div>
+  <div class="c4-item l3"><div class="c4-tag">L3 · Component</div><div class="c4-title" style="font-weight:bold;font-size:0.75rem;margin-bottom:4px;">意味要素</div>${d.l3_ja||'—'}</div>
+  <div class="c4-item l4"><div class="c4-tag">L4 · Code</div><div class="c4-title" style="font-weight:bold;font-size:0.75rem;margin-bottom:4px;">語彙・音</div>${d.l4_ja||'—'}</div>
+</div>
+
+<h2>C4構造の統合解説</h2>
+<div class="box">${d.explanation_ja||'—'}</div>
+
+${scoreSection}
+
+<div class="footer">
+  c4model.org &nbsp;·&nbsp; C4モデル研究会® / C4 Model Study Group® &nbsp;·&nbsp; info@c4model.org<br>
+  Powered by Claude AI (Anthropic) + C4 Model Method (Osamu Okumura, AIIT)<br>
+  © 2025–2026 Osamu Okumura. All rights reserved.
+</div>
+
+</body></html>`;
+
+  // Blobを使って新しいウィンドウに表示（白紙バグ防止）
+  const blob = new Blob([pdfContent], {type: 'text/html;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if (!win) {
+    alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    return;
+  }
+  win.onload = () => {
+    setTimeout(() => {
+      win.print();
+      URL.revokeObjectURL(url);
+    }, 1200);
+  };
+}
+
+/* ===== DB SAVE ===== */
+async function saveToDb() {
+  const record = {
+    haiku:      window._haiku || '',
+    score:      window._score ?? null,
+    name:       document.getElementById('userName').value,
+    age:        document.getElementById('userAge').value,
+    occupation: document.getElementById('userOccupation').value,
+    email:      document.getElementById('userEmail').value,
+    experience: document.getElementById('experience').value,
+    title:      window._title || '',
+    kigo:       window._kigo  || '',
+    timestamp:  new Date().toISOString(),
+    l1: document.getElementById('l1content').textContent,
+    l2: document.getElementById('l2content').textContent,
+    l3: document.getElementById('l3content').textContent,
+    l4: document.getElementById('l4content').textContent,
+  };
+  try {
+    await window.storage.set('haiku:' + Date.now(), JSON.stringify(record));
+    alert('✅ データベースに保存しました！\nSaved to database!');
+  } catch(e) {
+    alert('保存に失敗しました / Save failed: ' + e.message);
+  }
+}
+
+/* ===== RESET ===== */
+function resetAll() {
+  ['haikuInput','haikuTitle','kigo','background','userName','userAge','userEmail'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.value='';
+  });
+  document.getElementById('charCount').textContent = '0';
+  document.getElementById('charCount').className = 'count';
+  document.getElementById('step1').style.display = 'block';
+  document.getElementById('loadingBox').classList.remove('show');
+  document.getElementById('resultPanel').classList.remove('show');
+  document.getElementById('critiqueOptIn').style.display = 'block';
+  document.getElementById('critiqueResult').style.display = 'none';
+  document.getElementById('profileSection').classList.remove('show');
+  document.getElementById('awardBadge').classList.remove('show');
+  document.getElementById('adviceBox').classList.remove('show');
+  ['l1content','l2content','l3content','l4content','c4Explanation','c4ExplanationEn',
+   'critiqueText','critiqueTextEn','adviceText','adviceTextEn','scoreNum','starsDisplay','scoreLabel']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='—'; });
+  window._analysisData=null; window._haiku=null; window._score=null;
+  window._critiqueData=null; window._title=''; window._kigo='';
+  setActiveTab(1);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+
+</body>
+</html>

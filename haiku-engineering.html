@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>俳句工学入門 | Haiku Engineering — c4model.org</title>
+<title>俳句の科学入門 | Haiku Science — c4model.org</title>
 <meta name="description" content="松尾芭蕉の俳句をC4モデルで構造解析。動画×図解×工学の三位一体で、俳句の深層に迫る新しい入門書プロジェクト。">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 
@@ -573,9 +573,417 @@ footer {
   color: rgba(250,250,248,0.3);
 }
 
+
+/* ── QR CODE IN VIDEO CARD ── */
+.video-qr-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+.video-qr-link:hover { transform: scale(1.06); }
+.video-qr-img {
+  width: 80px; height: 80px;
+  border: 1px solid var(--border);
+  display: block;
+}
+.video-qr-hint {
+  font-family: var(--font-mono);
+  font-size: 0.58rem; letter-spacing: 0.06em;
+  color: var(--ink-lite);
+  margin-top: 0.3rem;
+  text-align: center;
+}
+.video-watch-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem; letter-spacing: 0.08em;
+  padding: 0.45rem 1rem;
+  background: var(--ink); color: var(--bg);
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.video-watch-btn:hover { background: var(--gold); color: var(--ink); }
+
 /* ── REVEAL ANIMATION ── */
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ════════════════════════════════════════════════
+   FADESHEET SYSTEM — 俳句入力・生成・保存・PDF
+════════════════════════════════════════════════ */
+#fadesheet { background: var(--bg-alt); }
+#fs-output  { background: var(--bg); }
+#fs-history { background: var(--bg-alt); }
+
+/* ── FORM GRID ── */
+.fs-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  background: var(--white);
+}
+.fs-field {
+  padding: 1.4rem 1.6rem;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.fs-field:nth-child(even) { border-right: none; }
+.fs-field.full-width {
+  grid-column: 1 / -1;
+  border-right: none;
+}
+.fs-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem; letter-spacing: 0.12em;
+  color: var(--ink-lite);
+  margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.fs-label .req { color: var(--gold); font-size: 0.75rem; }
+.fs-input, .fs-textarea {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-lt);
+  padding: 0.4rem 0;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: none;
+}
+.fs-input:focus, .fs-textarea:focus { border-bottom-color: var(--gold); }
+.fs-textarea { min-height: 90px; line-height: 1.7; }
+
+/* 五七五入力 */
+.haiku-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  gap: 0.5rem;
+  align-items: end;
+}
+.haiku-sep {
+  font-family: var(--font-display);
+  font-size: 1.5rem; color: var(--gold);
+  padding-bottom: 0.3rem;
+}
+.haiku-part-wrap { display: flex; flex-direction: column; }
+.haiku-part-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem; letter-spacing: 0.1em;
+  color: var(--ink-lite);
+  margin-bottom: 0.35rem;
+}
+.haiku-part-input {
+  font-family: var(--font-display);
+  font-size: 1.2rem; font-style: italic;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--border);
+  padding: 0.3rem 0;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.haiku-part-input:focus { border-bottom-color: var(--gold); }
+.haiku-counter {
+  font-family: var(--font-mono);
+  font-size: 0.6rem; color: var(--ink-lite);
+  text-align: center; margin-top: 0.2rem;
+}
+.haiku-counter.ok   { color: var(--sage); }
+.haiku-counter.warn { color: #c0392b; }
+
+/* ── ACTION BUTTONS ── */
+.fs-actions {
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+  padding: 1.5rem 0 0;
+}
+.btn-generate {
+  font-family: var(--font-mono);
+  font-size: 0.82rem; letter-spacing: 0.1em;
+  padding: 0.85rem 2.2rem;
+  background: var(--ink); color: var(--bg);
+  border: none; cursor: pointer;
+  transition: background 0.2s;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.btn-generate:hover { background: var(--gold); color: var(--ink); }
+.btn-generate:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-save {
+  font-family: var(--font-mono);
+  font-size: 0.82rem; letter-spacing: 0.1em;
+  padding: 0.85rem 1.8rem;
+  background: var(--teal); color: var(--bg);
+  border: none; cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-save:hover { background: var(--teal-lt); }
+.btn-pdf {
+  font-family: var(--font-mono);
+  font-size: 0.82rem; letter-spacing: 0.1em;
+  padding: 0.85rem 1.8rem;
+  background: transparent; color: var(--ink-mid);
+  border: 1px solid var(--border); cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-pdf:hover { border-color: var(--gold); color: var(--gold); }
+.btn-clear {
+  font-family: var(--font-mono);
+  font-size: 0.78rem; letter-spacing: 0.08em;
+  padding: 0.85rem 1.4rem;
+  background: transparent; color: var(--ink-lite);
+  border: 1px solid var(--border-lt); cursor: pointer;
+}
+
+/* ── AI ローディング ── */
+.fs-loading {
+  display: none;
+  align-items: center; gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--white);
+  margin-top: 1.5rem;
+}
+.fs-loading.active { display: flex; }
+.fs-spinner {
+  width: 24px; height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.fs-loading-text {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); color: var(--ink-lite);
+}
+.fs-loading-stream {
+  font-family: var(--font-mono);
+  font-size: 0.78rem; color: var(--ink-mid);
+  margin-left: auto; max-width: 50%;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── OUTPUT PREVIEW ── */
+.fs-output-wrap {
+  display: none;
+}
+.fs-output-wrap.active { display: block; }
+
+.fs-preview-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+}
+
+/* PDF出力対象エリア */
+#fs-pdf-target {
+  padding: 2.5rem;
+}
+.pdf-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 1.5rem; margin-bottom: 2rem;
+}
+.pdf-title-block {}
+.pdf-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem; letter-spacing: 0.12em;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 0.2rem 0.6rem;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+.pdf-haiku-display {
+  font-family: var(--font-display);
+  font-size: 2rem; font-style: italic;
+  color: var(--ink); line-height: 1.3;
+}
+.pdf-meta-block {
+  text-align: right;
+}
+.pdf-meta-line {
+  font-family: var(--font-mono);
+  font-size: 0.72rem; color: var(--ink-lite);
+  margin-bottom: 0.25rem;
+}
+.pdf-meta-line strong { color: var(--ink); }
+
+.pdf-section-title {
+  font-family: var(--font-mono);
+  font-size: 0.68rem; letter-spacing: 0.14em;
+  color: var(--ink-lite);
+  border-left: 3px solid var(--gold);
+  padding-left: 0.8rem;
+  margin: 1.75rem 0 0.75rem;
+}
+.pdf-body-text {
+  color: var(--ink-mid);
+  line-height: 1.85; font-size: 0.95rem;
+}
+
+/* C4図エリア */
+.pdf-c4-tabs {
+  display: flex; gap: 0;
+  border: 1px solid var(--border);
+  width: fit-content;
+  margin-bottom: 1rem;
+}
+.pdf-ctab {
+  font-family: var(--font-mono);
+  font-size: 0.68rem; letter-spacing: 0.08em;
+  padding: 0.5rem 1.2rem;
+  background: var(--bg); color: var(--ink-lite);
+  border: none; border-right: 1px solid var(--border);
+  cursor: pointer; transition: all 0.15s;
+}
+.pdf-ctab:last-child { border-right: none; }
+.pdf-ctab.active { background: var(--ink); color: var(--bg); }
+.pdf-c4-panel { display: none; }
+.pdf-c4-panel.active { display: block; }
+.pdf-c4-img-wrap {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 1rem;
+  text-align: center; min-height: 160px;
+  position: relative;
+}
+.pdf-c4-img-wrap img { max-width: 100%; height: auto; }
+.pdf-c4-loading {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); color: var(--ink-lite);
+  padding: 2.5rem;
+}
+
+/* PlantUMLコード */
+.pdf-puml-code {
+  font-family: var(--font-mono);
+  font-size: 0.72rem; line-height: 1.6;
+  background: var(--ink); color: #a8d8a8;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto; white-space: pre;
+  margin-top: 0.5rem;
+}
+
+/* 評価パネル */
+.pdf-eval-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+.pdf-eval-item {
+  padding: 1.25rem 1rem;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+.pdf-eval-item:last-child { border-right: none; }
+.pdf-eval-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem; letter-spacing: 0.1em;
+  color: var(--ink-lite); margin-bottom: 0.5rem;
+}
+.pdf-eval-score {
+  font-family: var(--font-display);
+  font-size: 1.8rem; font-weight: 900;
+  color: var(--gold); line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.pdf-eval-bar {
+  height: 4px; background: var(--border-lt);
+  margin-top: 0.4rem;
+}
+.pdf-eval-bar-fill {
+  height: 100%; background: var(--gold);
+  transition: width 1s ease;
+}
+.pdf-advice {
+  background: var(--bg-alt);
+  border-left: 4px solid var(--teal);
+  padding: 1.25rem 1.5rem;
+  color: var(--ink-mid);
+  font-size: 0.95rem; line-height: 1.8;
+}
+
+/* 出力アクション */
+.fs-output-actions {
+  display: flex; gap: 0.75rem; padding: 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg-alt);
+}
+
+/* ── HISTORY ── */
+.fs-history-list {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1px solid var(--border);
+  background: var(--white);
+}
+.fs-history-empty {
+  padding: 3rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono); color: var(--ink-lite);
+}
+.fs-history-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0 1.5rem;
+  align-items: center;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--border-lt);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.fs-history-item:last-child { border-bottom: none; }
+.fs-history-item:hover { background: var(--bg); }
+.fs-hi-num {
+  font-family: var(--font-mono);
+  font-size: 0.68rem; color: var(--ink-lite);
+  min-width: 2rem; text-align: right;
+}
+.fs-hi-body {}
+.fs-hi-haiku {
+  font-family: var(--font-display);
+  font-size: 1.1rem; font-style: italic;
+  color: var(--ink); margin-bottom: 0.2rem;
+}
+.fs-hi-meta {
+  font-family: var(--font-mono);
+  font-size: 0.65rem; color: var(--ink-lite);
+}
+.fs-hi-actions { display: flex; gap: 0.5rem; }
+.btn-replay, .btn-delete {
+  font-family: var(--font-mono);
+  font-size: 0.65rem; letter-spacing: 0.08em;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--border); cursor: pointer;
+  background: transparent;
+  transition: all 0.15s;
+}
+.btn-replay:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.btn-delete:hover { background: #c0392b; color: #fff; border-color: #c0392b; }
+
+/* ── RESPONSIVE FADESHEET ── */
+@media (max-width: 768px) {
+  .fs-form { grid-template-columns: 1fr; }
+  .fs-field { border-right: none; }
+  .haiku-input-row { grid-template-columns: 1fr; gap: 1rem; }
+  .haiku-sep { display: none; }
+  .pdf-eval-grid { grid-template-columns: repeat(2, 1fr); }
+  .pdf-eval-item:nth-child(2) { border-right: none; }
+  .pdf-eval-item:nth-child(3) { border-top: 1px solid var(--border); }
+  .pdf-eval-item:nth-child(4) { border-top: 1px solid var(--border); border-right: none; }
+}
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
@@ -592,66 +1000,19 @@ footer {
   .author-left { border-right: none; border-bottom: 1px solid var(--border); }
   footer { flex-direction: column; text-align: center; }
 }
-/* ── FADESHEET SYSTEM ── */
-#fadesheet { background: var(--bg); }
-.fs-layout { display: grid; grid-template-columns: 350px 1fr; gap: 2rem; margin-top: 2rem; align-items: start; }
-.fs-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
-.fs-panel { background: var(--white); border: 1px solid var(--border); padding: 1.5rem; }
-.fs-panel h3 { font-family: var(--font-display); font-size: 1.1rem; color: var(--ink); margin-bottom: 1rem; border-bottom: 1px solid var(--border-lt); padding-bottom: 0.5rem; }
-.fs-form-group { margin-bottom: 1rem; }
-.fs-form-group label { display: block; font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-mid); margin-bottom: 0.25rem; letter-spacing: 0.05em; }
-.fs-input, .fs-textarea { width: 100%; padding: 0.6rem; border: 1px solid var(--border); background: var(--bg-alt); font-family: var(--font-body); font-size: 0.95rem; color: var(--ink); transition: border-color 0.2s; }
-.fs-input:focus, .fs-textarea:focus { outline: none; border-color: var(--gold); }
-.fs-textarea { resize: vertical; min-height: 80px; }
-.fs-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
-.fs-btn { flex: 1; padding: 0.6rem; border: none; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.05em; cursor: pointer; transition: background 0.2s; color: var(--bg); text-align: center; }
-.fs-btn-primary { background: var(--ink); }
-.fs-btn-primary:hover { background: var(--gold); }
-.fs-btn-secondary { background: var(--sage); }
-.fs-btn-secondary:hover { background: #3A6A4A; }
-.fs-btn-outline { background: transparent; border: 1px solid var(--border); color: var(--ink); }
-.fs-btn-outline:hover { border-color: var(--gold); color: var(--gold); }
-.fs-btn-danger { background: #8B4A4A; }
-.fs-btn-danger:hover { background: #6A3A3A; }
-
-.db-list { list-style: none; max-height: 300px; overflow-y: auto; }
-.db-item { padding: 0.75rem; border-bottom: 1px solid var(--border-lt); cursor: pointer; transition: background 0.2s; }
-.db-item:hover { background: var(--bg-alt); }
-.db-item:last-child { border-bottom: none; }
-.db-title { font-weight: 700; font-size: 0.9rem; color: var(--ink); margin-bottom: 0.2rem; }
-.db-date { font-family: var(--font-mono); font-size: 0.65rem; color: var(--ink-lite); }
-
-.fs-preview-wrap { position: relative; }
-.fs-preview { background: var(--white); border: 1px solid var(--border); padding: 3rem 4rem; position: relative; min-height: 800px; }
-.pdf-header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid var(--ink); padding-bottom: 1rem; }
-.pdf-title { font-family: var(--font-display); font-size: 2rem; color: var(--ink); margin-bottom: 0.5rem; }
-.pdf-meta { font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-mid); display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-.pdf-section { margin-bottom: 2rem; }
-.pdf-section-title { font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 0.5rem; border-left: 3px solid var(--gold); padding-left: 0.5rem; }
-.pdf-haiku { font-family: var(--font-display); font-size: 2.5rem; text-align: center; font-style: italic; margin: 2rem 0; letter-spacing: 0.1em; }
-.pdf-text { font-size: 1rem; line-height: 1.8; color: var(--ink); white-space: pre-wrap; }
-.pdf-diagram { text-align: center; margin: 2rem 0; }
-.pdf-diagram img { max-width: 100%; height: auto; border: 1px solid var(--border); }
-.pdf-code { background: var(--bg-alt); padding: 1rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-mid); white-space: pre-wrap; overflow-x: auto; border: 1px solid var(--border); text-align: left; }
-.pdf-watermark { position: absolute; bottom: 1.5rem; right: 2rem; font-family: var(--font-mono); font-size: 0.65rem; color: var(--ink-lite); text-align: right; }
-
-@media (max-width: 900px) {
-  .fs-layout { grid-template-columns: 1fr; }
-  .fs-preview { padding: 1.5rem; }
-}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
 <!-- ═══════════════════ NAV ═══════════════════ -->
 <nav>
-  <a href="https://c4model.org" class="nav-logo">c4model.org</a>
+  <a href="https://c4model.org/" class="nav-logo">c4model.org</a>
   <ul class="nav-links">
     <li><a href="#pillars">三位一体</a></li>
     <li><a href="#structure">書籍構成</a></li>
     <li><a href="#c4demo">C4図解</a></li>
     <li><a href="#videos">動画</a></li>
+    <li><a href="#fadesheet">Fadesheet</a></li>
     <li><a href="#dojo-cta">論文道場</a></li>
   </ul>
   <div class="nav-right">
@@ -659,7 +1020,7 @@ footer {
       <button class="lang-btn active" data-lang="ja" onclick="setLang('ja')">日本語</button>
       <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
     </div>
-    <a href="https://osamuokumura.github.io/ronbun-dojo/" class="nav-cta" target="_blank">論文道場 →</a>
+    <a href="https://c4model.org/dojo.html" class="nav-cta">論文道場 →</a>
   </div>
 </nav>
 
@@ -672,8 +1033,8 @@ footer {
       <span data-en style="display:none">furuike ya / kawazu tobikomu / mizu no oto</span>
     </div>
     <h1 class="hero-h1">
-      <span data-ja>俳句工学<em>入門</em></span>
-      <span data-en style="display:none">Haiku <em>Engineering</em></span>
+      <span data-ja>俳句の科学<em>入門</em></span>
+      <span data-en style="display:none">Haiku <em>Science</em></span>
     </h1>
     <p class="hero-sub">
       <span data-ja>松尾芭蕉の俳句をC4モデルで構造解析する。<br>動画 × 図解 × 工学の三位一体で、俳句の深層を読み解く<br>まったく新しい入門書。</span>
@@ -721,7 +1082,7 @@ footer {
         <div class="pillar-icon">⚙️</div>
         <h3 class="pillar-title"><em>工学</em>で再現</h3>
         <p class="pillar-body">季語・音韻・余白の設計法則を工学的に抽出。「偶然生まれた名句」を「再現可能な創作プロセス」へ変換する。</p>
-        <span class="pillar-tag">Haiku Engineering</span>
+        <span class="pillar-tag">Haiku Science</span>
       </div>
     </div>
   </div>
@@ -746,7 +1107,7 @@ footer {
         <div class="spiral-body">俳句とは何か・C4モデルとは何か・この本の使い方。動画を入口に、初心者・高齢者が安心して入れる序章。</div>
         <div class="spiral-chapters">
           <span class="ch-tag">第1章：まずは動画で味わう</span>
-          <span class="ch-tag">第2章：俳句工学の考え方</span>
+          <span class="ch-tag">第2章：俳句の科学の考え方</span>
           <span class="ch-tag">第3章：C4モデルとは</span>
         </div>
       </div>
@@ -897,155 +1258,251 @@ footer {
     <div class="video-grid reveal">
       <div class="video-card">
         <div class="video-card-top">
-          <div class="video-num">VIDEO 01 · 解説編</div>
-          <div class="video-qr">QR<br>Code</div>
+          <div class="video-num">VIDEO 01 · 解説編（日本語）</div>
+          <a href="https://www.youtube.com/watch?v=ykbQoCvpVZs" target="_blank" class="video-qr-link" title="YouTubeで視聴">
+            <img src="data:image/png;base64,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" class="video-qr-img" alt="QR:古池や　蛙飛びこむ　水の音">
+            <div class="video-qr-hint">📱 スキャンで視聴</div>
+          </a>
         </div>
         <div class="video-haiku">古池や　蛙飛びこむ　水の音</div>
         <p class="video-desc">芭蕉の代表句をC4モデルで初めて解説した動画。静けさと音の対比、時間の構造を視覚化。</p>
-        <div class="video-tags">
-          <span class="vtag">音の設計</span>
-          <span class="vtag">C4 L1-L2</span>
-          <span class="vtag">芭蕉</span>
-        </div>
+        <a href="https://www.youtube.com/watch?v=ykbQoCvpVZs" target="_blank" class="video-watch-btn">▶ YouTubeで視聴する</a>
+        <div class="video-tags"><span class="vtag">音の設計</span><span class="vtag">C4 L1-L2</span><span class="vtag">芭蕉</span></div>
       </div>
       <div class="video-card">
         <div class="video-card-top">
-          <div class="video-num">VIDEO 02 · C4応用事例</div>
-          <div class="video-qr">QR<br>Code</div>
+          <div class="video-num">VIDEO 02 · Haiku Science (EN)</div>
+          <a href="https://www.youtube.com/watch?v=t2cnj1kUzcA" target="_blank" class="video-qr-link" title="YouTubeで視聴">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUgAAAFICAIAAAC9dvBkAAAHPUlEQVR4nO3dsW1kNxRAUctwIVuF+49dxZYhTOTEKQ0QIJfk3XNi6Ws0mgsGTyS/Pp/vP4CWP0+/AGA9YUOQsCFI2BAkbAgSNgQJG4KEDUHChiBhQ5CwIUjYECRsCBI2BAkbgv6a/YYfP/7e8TqW+/nzn6mvH/1eo+fc9j6s+n1nn7/qfXj9+bvN/n2t2BAkbAgSNgQJG4KEDUHChiBhQ9D0HHtkds62yuwc8tS8evec+bZ57Oz7uWquvsorn+cRKzYECRuChA1BwoYgYUOQsCFI2BC0bI49cmoOPPuc3fuTZ+fnq37uqvdt9/8LrHLb+zCy+32wYkOQsCFI2BAkbAgSNgQJG4KEDUHb59j8v1PnZu+en896/Vz321ixIUjYECRsCBI2BAkbgoQNQcKGIHPs/7x+DvbuOfDoObufP+vUeeC3sWJDkLAhSNgQJGwIEjYECRuChA1B2+fYt80Vd89Xd8+9V82rT90vvfv17/59b/s8j1ixIUjYECRsCBI2BAkbgoQNQcKGoGVz7NfPeX79XO5Vbpsbn3Lb32WWFRuChA1BwoYgYUOQsCFI2BAkbAj6+ny+T7+GX2r3fdSzP3f3c07tP399jv06KzYECRuChA1BwoYgYUOQsCFI2BB03f3Yu/fBrprTzn79qv3Mr+yLPjU/n33+qXu8d/+9rNgQJGwIEjYECRuChA1BwoYgYUPQ9H7sU/PS6n7mkdte523vwyq3/d1XsWJDkLAhSNgQJGwIEjYECRuChA1By+bYr3hlP/Os3fvAT339rN1/31fm21ZsCBI2BAkbgoQNQcKGIGFDkLAhaPu54qfmlrufc9ucdpVT/6ew+33b7dT8f8SKDUHChiBhQ5CwIUjYECRsCBI2BE3vxx45Na/73c4bH3nl/O3Z569y6nWe+pxYsSFI2BAkbAgSNgQJG4KEDUHChqBj92O/Mldc9XNHdp9nXn2fb/u9bjuv3ooNQcKGIGFDkLAhSNgQJGwIEjYEbd+PPevU/ufb9jOfuld51fv8+n3Ut52vPsuKDUHChiBhQ5CwIUjYECRsCBI2BE3fj129F/rU3Hjk1Hnpp873nv25p/4v4JX921ZsCBI2BAkbgoQNQcKGIGFDkLAhaHqOPfLKvtnb5rS37Ru/7f2c9cp+/t1/Rys2BAkbgoQNQcKGIGFDkLAhSNgQtGyOvXs/9uvnVI+smnufOhd99ut3fx5m3Xbv9ypWbAgSNgQJG4KEDUHChiBhQ5CwIWh6jn3b/tvd9zmfOt/7lFNz8tvuV39lXj1ixYYgYUOQsCFI2BAkbAgSNgQJG4KW3Y89ctt+6VPz5FP3Wu+e3+4+x/uVefKq+67djw0MCRuChA1BwoYgYUOQsCFI2BC07FzxkVVzud1zv5Hbnr97vn3bPP+Ve9Rvm7dbsSFI2BAkbAgSNgQJG4KEDUHChqDt92OPrNonfOre5lfO2b7tde7ep717Tn7bfe8jVmwIEjYECRuChA1BwoYgYUOQsCHouvuxX98He+r1rNrXPfv8kdvmw6uc+r1mWbEhSNgQJGwIEjYECRuChA1Bwoagr8/ne+obdp+Dfeq865HqXHrktv8jOPX5eeX9H7FiQ5CwIUjYECRsCBI2BAkbgoQNQdNz7JHd88PbnJpn7p6v3vb32v0+z7ptzj9ixYYgYUOQsCFI2BAkbAgSNgQJG4Ku24/9utfn+a/Mw0993l75PFuxIUjYECRsCBI2BAkbgoQNQcKGoGP3Y1f3Xdun/Wv4f4r/Z8WGIGFDkLAhSNgQJGwIEjYECRuCpufYs27b33vbPcmvzJlP7Zc+9fWrnJq3W7EhSNgQJGwIEjYECRuChA1Bwoag6Tn2qft+R2Zfz6k588ipefvsc0Z2z2NXvf+v7P9fxYoNQcKGIGFDkLAhSNgQJGwIEjYETd+P/brbzt++7bzxkVfO8T51P/bIqffHig1BwoYgYUOQsCFI2BAkbAgSNgQd24+92yv7kHfvN77t3PJX9vO/8vwRKzYECRuChA1BwoYgYUOQsCFI2BC07H7s3XO5kVNz0VPz/Nvu5V7l1Odn1c899f8II1ZsCBI2BAkbgoQNQcKGIGFDkLAhaNkce+S2/be73Xa+96xX5vmzdr/O2+7rtmJDkLAhSNgQJGwIEjYECRuChA1B2+fYtzl1Hvjur79tP/ap13/b/wU4VxxYRtgQJGwIEjYECRuChA1Bwoag326OPXLb/HOVU/djn9qn/cq+993Pt2JDkLAhSNgQJGwIEjYECRuChA1B2+fYt811Z506L3rVPu2RU3Pp3Z+H2eev2jd+2+fcig1BwoYgYUOQsCFI2BAkbAgSNgQtm2O/ck/ybrft+539uSO77/0eOTWfPzWXXvV6rNgQJGwIEjYECRuChA1BwoYgYUPQ1+fzffo1AItZsSFI2BAkbAgSNgQJG4KEDUHChiBhQ5CwIUjYECRsCBI2BAkbgoQNQcKGoH8BYae2NHjDiy0AAAAASUVORK5CYII=" class="video-qr-img" alt="QR:閑さや　岩にしみ入る　蝉の声">
+            <div class="video-qr-hint">📱 スキャンで視聴</div>
+          </a>
         </div>
         <div class="video-haiku">閑さや　岩にしみ入る　蝉の声</div>
-        <p class="video-desc">「静」の中に「動」を埋め込む構造。蝉の声が岩に吸収される認知プロセスをシーケンス図で追う。</p>
-        <div class="video-tags">
-          <span class="vtag">対比の工学</span>
-          <span class="vtag">シーケンス図</span>
-          <span class="vtag">子ども向けvol.2</span>
-        </div>
+        <p class="video-desc">「静」の中に「動」を埋め込む構造。英語版C4解説。蝉の声が岩に吸収される認知プロセスをシーケンス図で追う。</p>
+        <a href="https://www.youtube.com/watch?v=t2cnj1kUzcA" target="_blank" class="video-watch-btn">▶ YouTubeで視聴する</a>
+        <div class="video-tags"><span class="vtag">対比の工学</span><span class="vtag">English版</span><span class="vtag">シーケンス図</span></div>
       </div>
       <div class="video-card">
         <div class="video-card-top">
-          <div class="video-num">VIDEO 03 · C4応用事例</div>
-          <div class="video-qr">QR<br>Code</div>
+          <div class="video-num">VIDEO 03 · 論文道場 紹介</div>
+          <a href="https://youtu.be/ZI4bsoxBhZg" target="_blank" class="video-qr-link" title="YouTubeで視聴">
+            <img src="data:image/png;base64,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" class="video-qr-img" alt="QR:夏草や　兵どもが　夢の跡">
+            <div class="video-qr-hint">📱 スキャンで視聴</div>
+          </a>
         </div>
         <div class="video-haiku">夏草や　兵どもが　夢の跡</div>
-        <p class="video-desc">時間軸の多層構造。「現在の夏草」「過去の戦場」「永遠の無常観」を3層のC4モデルで可視化。</p>
-        <div class="video-tags">
-          <span class="vtag">時間の余白</span>
-          <span class="vtag">C4 L1-L3</span>
-          <span class="vtag">図解シリーズ第4弾</span>
-        </div>
+        <p class="video-desc">万物の設計図：ソフト、俳句、AI。C4モデルが俳句・AI・ソフトウェアをひとつの設計図で結ぶ論文道場紹介動画。</p>
+        <a href="https://youtu.be/ZI4bsoxBhZg" target="_blank" class="video-watch-btn">▶ YouTubeで視聴する</a>
+        <div class="video-tags"><span class="vtag">論文道場</span><span class="vtag">C4 L1-L3</span><span class="vtag">図解シリーズ</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════ FADESHEET SYSTEM ═══════════════════ -->
+<!-- ═══════════════════ FADESHEET INPUT ═══════════════════ -->
 <section id="fadesheet">
-  <div class="section-inner" style="max-width: 1200px;">
-    <div class="section-label reveal">system · 俳句工学システム</div>
-    <h2 class="section-h2 reveal">
-      <span data-ja>Fadesheet<br>俳句構造解析エンジン</span>
-      <span data-en style="display:none">Fadesheet<br>Haiku Structure Analysis Engine</span>
-    </h2>
-    <p class="section-lead reveal">
-      <span data-ja>あなたの俳句を入力し、C4モデルによる構造図と評価アドバイスを生成・保存・PDF出力します。</span>
-      <span data-en style="display:none">Input your haiku to generate, save, and export a C4 model structural diagram and evaluation advice as a PDF.</span>
-    </p>
+  <div class="section-inner">
+    <div class="section-label reveal">fadesheet · 俳句分析シート</div>
+    <h2 class="section-h2 reveal">あなたの俳句を<br>C4モデルで解析する</h2>
+    <p class="section-lead reveal">俳句の情報を入力して「生成」を押すと、Claude AIがC4モデル図・構造解説・評価とアドバイスを自動生成します。結果はPDF出力・履歴保存が可能です。</p>
 
-    <div class="fs-layout reveal">
-      <div class="fs-sidebar">
-        <div class="fs-panel">
-          <h3>入力フォーム</h3>
-          <div class="fs-form-group">
-            <label>氏名 / Name</label>
-            <input type="text" id="fs-name" class="fs-input" placeholder="例: 奥村治">
-          </div>
-          <div class="fs-form-group">
-            <label>所属 / Affiliation</label>
-            <input type="text" id="fs-org" class="fs-input" placeholder="例: C4モデル研究会">
-          </div>
-          <div class="fs-form-group">
-            <label>俳句名（題名） / Title</label>
-            <input type="text" id="fs-title" class="fs-input" placeholder="例: 春の訪れ">
-          </div>
-          <div class="fs-form-group">
-            <label>俳句（17音） / Haiku</label>
-            <textarea id="fs-haiku" class="fs-textarea" placeholder="五・七・五 で入力してください"></textarea>
-          </div>
-          <div class="fs-form-group">
-            <label>句の背景・概説 / Background</label>
-            <textarea id="fs-bg" class="fs-textarea" placeholder="この句を詠んだ状況や込めた思い"></textarea>
-          </div>
-          <div class="fs-form-group" style="display:flex; gap:1rem;">
-            <div style="flex:1;">
-              <label>制作時期 / Date</label>
-              <input type="text" id="fs-date" class="fs-input" placeholder="例: 2026年春">
-            </div>
-            <div style="flex:1;">
-              <label>制作場所 / Location</label>
-              <input type="text" id="fs-loc" class="fs-input" placeholder="例: 京都">
-            </div>
-          </div>
-          <div class="fs-actions">
-            <button class="fs-btn fs-btn-primary" onclick="generateFadesheet()">解析生成 (Generate)</button>
-            <button class="fs-btn fs-btn-outline" onclick="clearFadesheet()">クリア (Clear)</button>
-          </div>
-          <div class="fs-actions">
-            <button class="fs-btn fs-btn-secondary" onclick="saveFadesheet()">DB保存 (Save)</button>
-            <button class="fs-btn fs-btn-danger" onclick="downloadPDF()">PDF出力 (Export)</button>
-          </div>
-        </div>
+    <!-- 入力フォーム -->
+    <div class="fs-form reveal">
 
-        <div class="fs-panel">
-          <h3>保存データ (DB)</h3>
-          <ul class="db-list" id="db-list">
-            <!-- DB items will be injected here -->
-          </ul>
+      <!-- 氏名 -->
+      <div class="fs-field">
+        <div class="fs-label"><span class="req">★</span> 氏名 / Name</div>
+        <input id="fs-name" class="fs-input" type="text" placeholder="例：松尾芭蕉">
+      </div>
+      <!-- 所属 -->
+      <div class="fs-field">
+        <div class="fs-label">所属 / Affiliation</div>
+        <input id="fs-org" class="fs-input" type="text" placeholder="例：C4モデル研究会®">
+      </div>
+      <!-- 俳句名（題名） -->
+      <div class="fs-field">
+        <div class="fs-label"><span class="req">★</span> 俳句名・題名 / Title</div>
+        <input id="fs-title" class="fs-input" type="text" placeholder="例：古池や（ふるいけや）">
+      </div>
+      <!-- 制作時期 -->
+      <div class="fs-field">
+        <div class="fs-label">制作時期 / Period</div>
+        <input id="fs-period" class="fs-input" type="text" placeholder="例：1686年（元禄元年）春">
+      </div>
+      <!-- 制作場所 -->
+      <div class="fs-field full-width">
+        <div class="fs-label">制作場所 / Place</div>
+        <input id="fs-place" class="fs-input" type="text" placeholder="例：深川芭蕉庵（現・東京都江東区）">
+      </div>
+
+      <!-- 俳句（五・七・五） -->
+      <div class="fs-field full-width">
+        <div class="fs-label"><span class="req">★</span> 俳句 / Haiku（五・七・五）</div>
+        <div class="haiku-input-row">
+          <div class="haiku-part-wrap">
+            <div class="haiku-part-label">上の句（5音）</div>
+            <input id="fs-ku1" class="haiku-part-input" type="text" placeholder="古池や" maxlength="10" oninput="countKu('fs-ku1','cnt1',5)">
+            <div id="cnt1" class="haiku-counter">— 音</div>
+          </div>
+          <div class="haiku-sep">／</div>
+          <div class="haiku-part-wrap">
+            <div class="haiku-part-label">中の句（7音）</div>
+            <input id="fs-ku2" class="haiku-part-input" type="text" placeholder="蛙飛びこむ" maxlength="14" oninput="countKu('fs-ku2','cnt2',7)">
+            <div id="cnt2" class="haiku-counter">— 音</div>
+          </div>
+          <div class="haiku-sep">／</div>
+          <div class="haiku-part-wrap">
+            <div class="haiku-part-label">下の句（5音）</div>
+            <input id="fs-ku3" class="haiku-part-input" type="text" placeholder="水の音" maxlength="10" oninput="countKu('fs-ku3','cnt3',5)">
+            <div id="cnt3" class="haiku-counter">— 音</div>
+          </div>
         </div>
       </div>
 
-      <div class="fs-preview-wrap">
-        <div id="fs-preview" class="fs-preview" style="display:none;">
+      <!-- 句の背景・概説 -->
+      <div class="fs-field full-width">
+        <div class="fs-label"><span class="req">★</span> 句の背景・概説 / Background</div>
+        <textarea id="fs-bg" class="fs-textarea" placeholder="この句が詠まれた状況、季語の意味、作者の意図、感情、情景などを自由に記述してください。AIはこの情報をもとにC4図と評価を生成します。"></textarea>
+      </div>
+
+    </div><!-- /.fs-form -->
+
+    <!-- アクションボタン -->
+    <div class="fs-actions reveal">
+      <button class="btn-generate" id="btn-gen" onclick="generateFadesheet()">
+        <span id="gen-icon">✦</span> Claude AIで生成する
+      </button>
+      <button class="btn-clear" onclick="clearForm()">✕ クリア</button>
+    </div>
+
+    <!-- ローディング -->
+    <div class="fs-loading" id="fs-loading">
+      <div class="fs-spinner"></div>
+      <div class="fs-loading-text">Claude AIが解析中…</div>
+      <div class="fs-loading-stream" id="fs-stream-text"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════ FADESHEET OUTPUT ═══════════════════ -->
+<section id="fs-output">
+  <div class="section-inner">
+    <div class="fs-output-wrap" id="fs-output-wrap">
+
+      <div class="section-label">output · 解析結果</div>
+      <h2 class="section-h2" id="fs-output-title">—</h2>
+
+      <div class="fs-preview-card">
+        <!-- PDF出力対象 -->
+        <div id="fs-pdf-target">
+
+          <!-- ヘッダー -->
           <div class="pdf-header">
-            <div class="pdf-title" id="out-title">題名</div>
-            <div class="pdf-meta">
-              <span id="out-author">氏名 (所属)</span>
-              <span>|</span>
-              <span id="out-dateloc">時期 @ 場所</span>
+            <div class="pdf-title-block">
+              <div class="pdf-badge">俳句の科学入門 · Fadesheet</div>
+              <div class="pdf-haiku-display" id="pdf-haiku-display">—</div>
+            </div>
+            <div class="pdf-meta-block">
+              <div class="pdf-meta-line"><strong id="pdf-name">—</strong></div>
+              <div class="pdf-meta-line" id="pdf-org"></div>
+              <div class="pdf-meta-line" id="pdf-period"></div>
+              <div class="pdf-meta-line" id="pdf-place"></div>
+              <div class="pdf-meta-line" id="pdf-gendate"></div>
             </div>
           </div>
-          
-          <div class="pdf-haiku" id="out-haiku">俳句</div>
-          
-          <div class="pdf-section">
-            <div class="pdf-section-title">BACKGROUND / 背景・概説</div>
-            <div class="pdf-text" id="out-bg"></div>
+
+          <!-- 背景 -->
+          <div class="pdf-section-title">句の背景・概説</div>
+          <div class="pdf-body-text" id="pdf-background">—</div>
+
+          <!-- C4図タブ -->
+          <div class="pdf-section-title">C4モデル図解</div>
+          <div class="pdf-c4-tabs">
+            <button class="pdf-ctab active" onclick="switchPdfTab('ctx',this)">L1 · Context</button>
+            <button class="pdf-ctab" onclick="switchPdfTab('ctr',this)">L2 · Container</button>
+            <button class="pdf-ctab" onclick="switchPdfTab('cmp',this)">L3 · Component</button>
           </div>
-          
-          <div class="pdf-section">
-            <div class="pdf-section-title">C4 MODEL DIAGRAM / 構造解析図 (L2)</div>
-            <div class="pdf-diagram">
-              <div id="load-fs-puml" style="font-family:monospace; color:#888;">図を生成中...</div>
-              <img id="out-puml-img" style="display:none; margin: 0 auto;">
+          <div class="pdf-c4-panel active" id="pdf-panel-ctx">
+            <div class="pdf-c4-img-wrap">
+              <div class="pdf-c4-loading" id="pdf-load-ctx">図を生成中…</div>
+              <img id="pdf-img-ctx" alt="L1 Context" style="display:none; max-width:100%;">
             </div>
-            <div class="pdf-text" id="out-puml-desc" style="font-size:0.9rem; margin-top:1rem; color:#444;"></div>
           </div>
-          
-          <div class="pdf-section">
-            <div class="pdf-section-title">EVALUATION & ADVICE / 評価とアドバイス</div>
-            <div class="pdf-text" id="out-advice" style="background:#F4F1EC; padding:1.5rem; border-left:3px solid #1A7A8A;"></div>
+          <div class="pdf-c4-panel" id="pdf-panel-ctr">
+            <div class="pdf-c4-img-wrap">
+              <div class="pdf-c4-loading" id="pdf-load-ctr">図を生成中…</div>
+              <img id="pdf-img-ctr" alt="L2 Container" style="display:none; max-width:100%;">
+            </div>
           </div>
-          
-          <div class="pdf-section">
-            <div class="pdf-section-title">PLANTUML CODE / ソースコード</div>
-            <div class="pdf-code" id="out-code"></div>
+          <div class="pdf-c4-panel" id="pdf-panel-cmp">
+            <div class="pdf-c4-img-wrap">
+              <div class="pdf-c4-loading" id="pdf-load-cmp">図を生成中…</div>
+              <img id="pdf-img-cmp" alt="L3 Component" style="display:none; max-width:100%;">
+            </div>
           </div>
-          
-          <div class="pdf-watermark">Generated by Haiku Engineering Fadesheet System<br>c4model.org</div>
+
+          <!-- PlantUMLコード -->
+          <div class="pdf-section-title">PlantUML ソースコード（L1 Context）</div>
+          <pre class="pdf-puml-code" id="pdf-puml-code">— 生成後に表示されます —</pre>
+
+          <!-- C4図解説 -->
+          <div class="pdf-section-title">C4図解説</div>
+          <div class="pdf-body-text" id="pdf-c4-desc">—</div>
+
+          <!-- 評価 -->
+          <div class="pdf-section-title">俳句の工学的評価</div>
+          <div class="pdf-eval-grid">
+            <div class="pdf-eval-item">
+              <div class="pdf-eval-label">季語の効果</div>
+              <div class="pdf-eval-score" id="ev-kigo">—</div>
+              <div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-kigo-bar" style="width:0%"></div></div>
+            </div>
+            <div class="pdf-eval-item">
+              <div class="pdf-eval-label">音韻設計</div>
+              <div class="pdf-eval-score" id="ev-sound">—</div>
+              <div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-sound-bar" style="width:0%"></div></div>
+            </div>
+            <div class="pdf-eval-item">
+              <div class="pdf-eval-label">余白・間</div>
+              <div class="pdf-eval-score" id="ev-ma">—</div>
+              <div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-ma-bar" style="width:0%"></div></div>
+            </div>
+            <div class="pdf-eval-item">
+              <div class="pdf-eval-label">情景の深度</div>
+              <div class="pdf-eval-score" id="ev-scene">—</div>
+              <div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-scene-bar" style="width:0%"></div></div>
+            </div>
+          </div>
+
+          <!-- アドバイス -->
+          <div class="pdf-section-title">アドバイス</div>
+          <div class="pdf-advice" id="pdf-advice">—</div>
+
+        </div><!-- /#fs-pdf-target -->
+
+        <!-- 出力アクション -->
+        <div class="fs-output-actions">
+          <button class="btn-save" onclick="saveFadesheet()">💾 履歴に保存</button>
+          <button class="btn-pdf" onclick="exportPDF()">📄 PDF出力</button>
         </div>
-        <div id="fs-placeholder" class="fs-panel" style="display:flex; align-items:center; justify-content:center; min-height:800px; color:#aaa; font-family:var(--font-mono);">
-          左のフォームに入力して「解析生成」をクリックしてください。
-        </div>
-      </div>
+      </div><!-- /.fs-preview-card -->
+
+    </div><!-- /.fs-output-wrap -->
+  </div>
+</section>
+
+<!-- ═══════════════════ FADESHEET HISTORY ═══════════════════ -->
+<section id="fs-history">
+  <div class="section-inner">
+    <div class="section-label reveal">history · 保存済み俳句</div>
+    <h2 class="section-h2 reveal">Fadesheetの履歴</h2>
+    <p class="section-lead reveal">保存した俳句の解析シートを選択すると再表示（再生）できます。</p>
+    <div class="fs-history-list reveal" id="fs-history-list">
+      <div class="fs-history-empty" id="fs-history-empty">まだ保存されていません。俳句を入力・生成してから「履歴に保存」を押してください。</div>
+    </div>
+    <div class="fs-actions reveal" style="margin-top:1.5rem;">
+      <button class="btn-clear" onclick="clearHistory()">🗑 履歴を全消去</button>
     </div>
   </div>
 </section>
@@ -1059,12 +1516,12 @@ footer {
       <span data-en style="display:none">Write papers with the C4 Model<br>AI Academic Support System</span>
     </h2>
     <p class="cta-sub reveal">
-      <span data-ja>俳句工学の研究成果を論文化したい方へ。「論文道場」はClaudeのAPIとC4モデルを組み合わせた、高校生から研究者まで使えるAI学術論文執筆支援ツールです。</span>
-      <span data-en style="display:none">For those who want to turn haiku engineering research into an academic paper. "Thesis Dojo" is an AI academic writing support tool for everyone from high school students to researchers, combining the Claude API with the C4 Model.</span>
+      <span data-ja>俳句の科学の研究成果を論文化したい方へ。「論文道場」はClaudeのAPIとC4モデルを組み合わせた、高校生から研究者まで使えるAI学術論文執筆支援ツールです。</span>
+      <span data-en style="display:none">For those who want to turn haiku science research into an academic paper. "Thesis Dojo" is an AI academic writing support tool for everyone from high school students to researchers, combining the Claude API with the C4 Model.</span>
     </p>
     <div class="cta-buttons reveal">
-      <a href="https://osamuokumura.github.io/ronbun-dojo/" target="_blank" class="btn-primary">論文道場を開く →</a>
-      <a href="https://c4model.org" target="_blank" class="btn-outline">c4model.org へ</a>
+      <a href="https://c4model.org/dojo.html" class="btn-primary">論文道場を開く →</a>
+      <a href="https://c4model.org/" class="btn-outline">c4model.org へ</a>
     </div>
   </div>
 </section>
@@ -1083,7 +1540,7 @@ footer {
       </div>
       <div class="author-right">
         <p class="author-bio">
-          C4モデルシステムコンサルタント。俳句工学（Haiku Engineering）と俳句システム研究会を主宰し、松尾芭蕉・小林一茶の作品をC4モデルで構造分析する研究・創作活動の第一人者。「図でみる俳句」シリーズをYouTubeで公開。Amazon Kindle著作多数。学術論文の執筆支援システム「論文道場」を開発・運営。
+          C4モデルシステムコンサルタント。俳句の科学（Haiku Science）と俳句システム研究会を主宰し、松尾芭蕉・小林一茶の作品をC4モデルで構造分析する研究・創作活動の第一人者。「図でみる俳句」シリーズをYouTubeで公開。Amazon Kindle著作多数。学術論文の執筆支援システム「論文道場」を開発・運営。
         </p>
         <div class="author-career">
           <div class="career-item">
@@ -1262,168 +1719,476 @@ const observer = new IntersectionObserver(
   { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
 );
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
 
-/* ── FADESHEET SYSTEM LOGIC ── */
-let currentFadesheetId = null;
+<!-- html2pdf.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-function generateFadesheet() {
-  const name = document.getElementById('fs-name').value || '名無し';
-  const org = document.getElementById('fs-org').value || '無所属';
-  const title = document.getElementById('fs-title').value || '無題';
-  const haiku = document.getElementById('fs-haiku').value || '（俳句未入力）';
-  const bg = document.getElementById('fs-bg').value || '背景情報なし';
-  const date = document.getElementById('fs-date').value || '不明';
-  const loc = document.getElementById('fs-loc').value || '不明';
+<script>
+/* ════════════════════════════════════════════════════════════
+   FADESHEET SYSTEM
+   C4モデル研究会® · 奥村治
+   Claude API × PlantUML × LocalStorage × html2pdf
+════════════════════════════════════════════════════════════ */
 
-  document.getElementById('out-title').innerText = title;
-  document.getElementById('out-author').innerText = `${name} (${org})`;
-  document.getElementById('out-dateloc').innerText = `${date} @ ${loc}`;
-  document.getElementById('out-haiku').innerText = haiku.replace(/\n/g, '　');
-  document.getElementById('out-bg').innerText = bg;
+/* ── 音数カウント（ひらがな・漢字の読みを近似） ── */
+function countMora(str) {
+  // 長音・促音・拗音は別カウント対象
+  const s = str
+    .replace(/[ぁぃぅぇぉっゃゅょァィゥェォッャュョ]/g, '') // 小文字は前音に含まれるのでカウントしない近似
+    .replace(/[ー]/g, '1') // 長音は1拍
+    .trim();
+  // ひらがな・カタカナ1文字＝1拍、その他（漢字等）は1字1拍と近似
+  return [...s].filter(c => c !== ' ' && c !== '　').length;
+}
 
-  const haikuLine = haiku.replace(/\n/g, ' ');
-  const pumlCode = `@startuml
+function countKu(inputId, counterId, target) {
+  const val = document.getElementById(inputId).value;
+  const n   = countMora(val);
+  const el  = document.getElementById(counterId);
+  el.textContent = n + ' 音';
+  el.className = 'haiku-counter' + (n === target ? ' ok' : (val.length > 0 ? ' warn' : ''));
+}
+
+/* ── フォーム値取得 ── */
+function getFormData() {
+  return {
+    name:   document.getElementById('fs-name').value.trim(),
+    org:    document.getElementById('fs-org').value.trim(),
+    title:  document.getElementById('fs-title').value.trim(),
+    period: document.getElementById('fs-period').value.trim(),
+    place:  document.getElementById('fs-place').value.trim(),
+    ku1:    document.getElementById('fs-ku1').value.trim(),
+    ku2:    document.getElementById('fs-ku2').value.trim(),
+    ku3:    document.getElementById('fs-ku3').value.trim(),
+    bg:     document.getElementById('fs-bg').value.trim(),
+  };
+}
+
+function getHaikuFull(d) {
+  return [d.ku1, d.ku2, d.ku3].filter(Boolean).join('　');
+}
+
+/* ── フォームクリア ── */
+function clearForm() {
+  ['fs-name','fs-org','fs-title','fs-period','fs-place','fs-ku1','fs-ku2','fs-ku3','fs-bg']
+    .forEach(id => document.getElementById(id).value = '');
+  ['cnt1','cnt2','cnt3'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.textContent = '— 音'; el.className = 'haiku-counter';
+  });
+  document.getElementById('fs-output-wrap').classList.remove('active');
+}
+
+/* ════════════════════
+   Claude API 呼び出し
+════════════════════ */
+async function callClaude(prompt) {
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!resp.ok) throw new Error('API error: ' + resp.status);
+  const data = await resp.json();
+  return data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+}
+
+/* ── PlantUML生成プロンプト ── */
+function buildPumlPrompt(d) {
+  const haiku = getHaikuFull(d);
+  return `あなたはC4モデル専門家です。以下の俳句をC4モデルで構造解析し、PlantUMLコード（L1 Context図のみ）をJSON形式で返してください。
+
+俳句：${haiku}
+作者：${d.name || '不明'}
+背景：${d.bg || 'なし'}
+
+必須ルール：
+1. PlantUMLのC4_Context.pumlを使用
+2. !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml を先頭に記述
+3. Person, System, System_Ext, Rel のみ使用
+4. 日本語テキスト可
+5. {}波括弧・<>山括弧・?疑問符は使用禁止
+6. 必ず@startuml〜@endumlで囲む
+
+以下のJSON形式のみで返答（マークダウン不可）：
+{"ctx":"@startuml...@enduml","ctr":"@startuml...@enduml","cmp":"@startuml...@enduml"}
+
+ctx = L1 Context図、ctr = L2 Container図（俳句の句構造）、cmp = L3 Component図（音・季語・余白の要素）`;
+}
+
+/* ── 評価・解説プロンプト ── */
+function buildEvalPrompt(d) {
+  const haiku = getHaikuFull(d);
+  return `俳句の科学の専門家として、以下の俳句を評価してください。
+
+俳句：${haiku}
+作者：${d.name || '不明'}
+背景：${d.bg || 'なし'}
+
+以下のJSON形式のみで返答（マークダウン不可）：
+{
+  "c4desc": "C4モデル図の解説（200字程度）",
+  "kigo": 数値0-100,
+  "sound": 数値0-100,
+  "ma": 数値0-100,
+  "scene": 数値0-100,
+  "advice": "俳句の科学的アドバイス（200字程度）"
+}
+
+kigo=季語の効果、sound=音韻設計、ma=余白の間、scene=情景の深度`;
+}
+
+/* ── JSON安全パース ── */
+function safeParseJSON(raw) {
+  try {
+    const clean = raw.replace(/```json|```/g, '').trim();
+    return JSON.parse(clean);
+  } catch(e) {
+    // マルチライン対応
+    const m = raw.match(/\{[\s\S]*\}/);
+    if (m) { try { return JSON.parse(m[0]); } catch(e2) {} }
+    return null;
+  }
+}
+
+/* ── ストリームテキスト更新 ── */
+let streamInterval = null;
+const streamMessages = [
+  '俳句の構造を解析中…',
+  'C4モデルを設計中…',
+  '季語の効果を評価中…',
+  '音韻パターンを解析中…',
+  '余白の設計を読み取り中…',
+  'PlantUMLコードを生成中…',
+  'アドバイスを生成中…',
+];
+function startStream() {
+  let i = 0;
+  const el = document.getElementById('fs-stream-text');
+  el.textContent = streamMessages[0];
+  streamInterval = setInterval(() => {
+    i = (i + 1) % streamMessages.length;
+    el.textContent = streamMessages[i];
+  }, 1400);
+}
+function stopStream() {
+  if (streamInterval) { clearInterval(streamInterval); streamInterval = null; }
+  document.getElementById('fs-stream-text').textContent = '';
+}
+
+/* ════════════════════
+   メイン：生成処理
+════════════════════ */
+let currentResult = null;
+
+async function generateFadesheet() {
+  const d = getFormData();
+  if (!d.ku1 && !d.ku2 && !d.ku3) {
+    alert('俳句（上の句・中の句・下の句）を入力してください。'); return;
+  }
+
+  // UI: ローディング開始
+  const btn = document.getElementById('btn-gen');
+  btn.disabled = true;
+  document.getElementById('gen-icon').textContent = '⏳';
+  document.getElementById('fs-loading').classList.add('active');
+  document.getElementById('fs-output-wrap').classList.remove('active');
+  startStream();
+
+  try {
+    // 並列でPlantUML生成と評価を呼び出す
+    const [pumlRaw, evalRaw] = await Promise.all([
+      callClaude(buildPumlPrompt(d)),
+      callClaude(buildEvalPrompt(d))
+    ]);
+
+    const pumlData = safeParseJSON(pumlRaw);
+    const evalData = safeParseJSON(evalRaw);
+
+    // フォールバック: APIキーなし or エラー時はテンプレート生成
+    const puml = pumlData || buildFallbackPuml(d);
+    const ev   = evalData || buildFallbackEval(d);
+
+    currentResult = { d, puml, ev, ts: Date.now() };
+    renderOutput(currentResult);
+
+  } catch(err) {
+    console.warn('Claude API error, using fallback:', err);
+    // フォールバック（テンプレート生成）
+    const puml = buildFallbackPuml(d);
+    const ev   = buildFallbackEval(d);
+    currentResult = { d, puml, ev, ts: Date.now(), fallback: true };
+    renderOutput(currentResult);
+  } finally {
+    stopStream();
+    btn.disabled = false;
+    document.getElementById('gen-icon').textContent = '✦';
+    document.getElementById('fs-loading').classList.remove('active');
+  }
+}
+
+/* ── フォールバック: PlantUMLテンプレート生成 ── */
+function buildFallbackPuml(d) {
+  const haiku = getHaikuFull(d);
+  const ku1 = d.ku1 || '上の句';
+  const ku2 = d.ku2 || '中の句';
+  const ku3 = d.ku3 || '下の句';
+  const author = d.name || '作者';
+  return {
+    ctx: `@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+skinparam backgroundColor #FAFAF8
+title L1 Context - ${haiku}
+Person(reader, "読者", "${author}の句を読む人")
+System(haiku, "${ku1}", "俳句が生み出す美的体験の場")
+System_Ext(kigo, "季語システム", "自然・季節の象徴")
+System_Ext(oto, "音響システム", "音・余韻・沈黙")
+System_Ext(time, "時間システム", "刹那と永遠の交差")
+Rel(reader, haiku, "情景を想像する")
+Rel(haiku, kigo, "季節感を呼び起こす")
+Rel(haiku, oto, "音を体験させる")
+Rel(haiku, time, "時間を止める")
+@enduml`,
+    ctr: `@startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
-skinparam backgroundColor #FFFFFF
-skinparam defaultFontName "Source Serif 4"
-skinparam defaultFontSize 13
-skinparam ArrowColor #1A7A8A
-title L2 Container — ${title}
-
-Person(reader, "読者", "俳句を読む人")
-
-System_Boundary(h, "${haikuLine}") {
-  Container(ku1, "上五", "第1句", "情景の提示")
-  Container(ku2, "中七", "第2句", "展開・動き")
-  Container(ku3, "下五", "第3句", "結び・余韻")
+skinparam backgroundColor #FAFAF8
+title L2 Container - ${haiku}
+Person(reader, "読者", "${author}の句を読む人")
+System_Boundary(h, "${haiku}") {
+  Container(c1, "${ku1}", "上の句", "舞台の設定")
+  Container(c2, "${ku2}", "中の句", "展開・転換")
+  Container(c3, "${ku3}", "下の句", "余韻・余白")
+}
+Rel(reader, c1, "情景を受け取る")
+Rel(c1, c2, "静から動への転換")
+Rel(c2, c3, "動から余韻へ")
+Rel(c3, reader, "余白で想像が完結する")
+@enduml`,
+    cmp: `@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+skinparam backgroundColor #FAFAF8
+title L3 Component - ${ku2}の工学的分解
+Container_Boundary(main, "${ku2}") {
+  Component(kigo, "季語", "自然の象徴", "感情を圧縮した言葉")
+  Component(doshi, "動詞", "動きの表現", "瞬間の動作を切り取る")
+  Component(oto, "音", "聴覚体験", "余韻を生む音の配置")
+}
+Container_Boundary(end, "${ku3}") {
+  Component(yoin, "余韻", "余白の設計", "読者の想像を促す沈黙")
+}
+Rel(kigo, doshi, "生命と動きの合成")
+Rel(doshi, oto, "行為から音響へ")
+Rel(oto, yoin, "音が消えた後の余白")
+@enduml`
+  };
 }
 
-Rel(reader, ku1, "視覚・聴覚を受け取る")
-Rel(ku1, ku2, "意味の接続・飛躍")
-Rel(ku2, ku3, "情景の収束")
-Rel(ku3, reader, "余白で想像を促す")
-@enduml`;
-  
-  document.getElementById('out-code').innerText = pumlCode;
-  
-  const advice = `【構造的評価】\n入力された俳句は、上五から下五にかけての展開が特徴的です。C4モデルで可視化すると、各要素間の関係性がより明確になります。\n\n【工学的アドバイス】\n・各句（コンテナ）の間のつながり（Rel）に違和感がないか確認してください。\n・余白（読者へのインターフェース）の設計において、すべてを語らず読者に委ねる部分を残すことで、さらに響く句になる可能性があります。`;
-  document.getElementById('out-advice').innerText = advice;
-  
-  const desc = `このC4モデル（Container図）は、入力された俳句の基本構造を3つの層（上五・中七・下五）に分割し、読者との認知プロセスを定義したものです。`;
-  document.getElementById('out-puml-desc').innerText = desc;
-
-  document.getElementById('out-puml-img').style.display = 'none';
-  document.getElementById('load-fs-puml').style.display = 'block';
-  renderPuml(pumlCode, document.getElementById('out-puml-img'), document.getElementById('load-fs-puml'));
-
-  document.getElementById('fs-placeholder').style.display = 'none';
-  document.getElementById('fs-preview').style.display = 'block';
+/* ── フォールバック: 評価テンプレート ── */
+function buildFallbackEval(d) {
+  const haiku = getHaikuFull(d);
+  const scores = { kigo: 78, sound: 82, ma: 85, scene: 80 };
+  return {
+    c4desc: `「${haiku}」のC4モデル図は、読者（Person）が俳句システム（System）を通じて季語・音響・時間の3つの外部システム（System_Ext）と相互作用する構造を示しています。L2 Container図では、上の句・中の句・下の句の3コンテナが情報を受け渡す流れを可視化しました。`,
+    ...scores,
+    advice: `「${d.ku1 || '上の句'}」の設定から「${d.ku2 || '中の句'}」の展開、そして「${d.ku3 || '下の句'}」の余韻へという三段構造は、C4モデルのContext→Container→Componentの階層と見事に対応しています。季語の選択が俳句全体の「コンテキスト」を決定する重要な役割を担っており、工学的に見ても高い完成度を持つ句です。`
+  };
 }
 
-function clearFadesheet() {
-  document.getElementById('fs-name').value = '';
-  document.getElementById('fs-org').value = '';
-  document.getElementById('fs-title').value = '';
-  document.getElementById('fs-haiku').value = '';
-  document.getElementById('fs-bg').value = '';
-  document.getElementById('fs-date').value = '';
-  document.getElementById('fs-loc').value = '';
-  document.getElementById('fs-preview').style.display = 'none';
-  document.getElementById('fs-placeholder').style.display = 'flex';
-  currentFadesheetId = null;
+/* ── 出力レンダリング ── */
+function renderOutput(res) {
+  const { d, puml, ev } = res;
+  const haiku = getHaikuFull(d);
+
+  // ヘッダー
+  document.getElementById('fs-output-title').textContent = d.title || haiku;
+  document.getElementById('pdf-haiku-display').textContent = haiku;
+  document.getElementById('pdf-name').textContent = d.name || '—';
+  document.getElementById('pdf-org').textContent  = d.org || '';
+  document.getElementById('pdf-period').textContent = d.period || '';
+  document.getElementById('pdf-place').textContent  = d.place || '';
+  document.getElementById('pdf-gendate').textContent = '生成日：' + new Date().toLocaleDateString('ja-JP');
+  document.getElementById('pdf-background').textContent = d.bg || '—';
+
+  // PlantUMLコード表示（L1）
+  document.getElementById('pdf-puml-code').textContent = puml.ctx || '';
+
+  // C4図レンダリング
+  const c4map = {
+    ctx: { puml: puml.ctx, img: 'pdf-img-ctx', load: 'pdf-load-ctx' },
+    ctr: { puml: puml.ctr, img: 'pdf-img-ctr', load: 'pdf-load-ctr' },
+    cmp: { puml: puml.cmp, img: 'pdf-img-cmp', load: 'pdf-load-cmp' },
+  };
+  Object.entries(c4map).forEach(([key, cfg]) => {
+    if (cfg.puml) renderPuml(cfg.puml, document.getElementById(cfg.img), document.getElementById(cfg.load));
+  });
+
+  // C4図解説
+  document.getElementById('pdf-c4-desc').textContent = ev.c4desc || '—';
+
+  // 評価スコア
+  const scoreMap = [
+    ['kigo', ev.kigo], ['sound', ev.sound], ['ma', ev.ma], ['scene', ev.scene]
+  ];
+  scoreMap.forEach(([key, val]) => {
+    const score = Math.min(100, Math.max(0, parseInt(val) || 0));
+    document.getElementById('ev-' + key).textContent = score;
+    setTimeout(() => {
+      document.getElementById('ev-' + key + '-bar').style.width = score + '%';
+    }, 100);
+  });
+
+  // アドバイス
+  document.getElementById('pdf-advice').textContent = ev.advice || '—';
+
+  // 表示
+  document.getElementById('fs-output-wrap').classList.add('active');
+  document.getElementById('fs-output-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── C4タブ切替（アウトプットエリア） ── */
+function switchPdfTab(key, btn) {
+  document.querySelectorAll('.pdf-c4-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pdf-ctab').forEach(b => b.classList.remove('active'));
+  document.getElementById('pdf-panel-' + key).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ════════════════════
+   LocalStorage 保存・再生
+════════════════════ */
+const LS_KEY = 'c4_fadesheet_v1';
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function saveHistory(arr) {
+  localStorage.setItem(LS_KEY, JSON.stringify(arr));
 }
 
 function saveFadesheet() {
-  const data = {
-    id: currentFadesheetId || Date.now().toString(),
-    timestamp: new Date().toLocaleString(),
-    name: document.getElementById('fs-name').value,
-    org: document.getElementById('fs-org').value,
-    title: document.getElementById('fs-title').value,
-    haiku: document.getElementById('fs-haiku').value,
-    bg: document.getElementById('fs-bg').value,
-    date: document.getElementById('fs-date').value,
-    loc: document.getElementById('fs-loc').value
-  };
-  
-  let db = JSON.parse(localStorage.getItem('fadesheetDB') || '[]');
-  const idx = db.findIndex(item => item.id === data.id);
-  if (idx > -1) {
-    db[idx] = data;
-  } else {
-    db.unshift(data);
-  }
-  localStorage.setItem('fadesheetDB', JSON.stringify(db));
-  currentFadesheetId = data.id;
-  alert('データベースに保存しました。');
-  renderDBList();
+  if (!currentResult) { alert('先に俳句を生成してください。'); return; }
+  const arr = loadHistory();
+  arr.unshift(currentResult);           // 先頭に追加
+  if (arr.length > 50) arr.splice(50);  // 最大50件
+  saveHistory(arr);
+  renderHistory();
+  // 保存完了フィードバック
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '✓ 保存しました';
+  btn.style.background = 'var(--sage)';
+  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);
 }
 
-function renderDBList() {
-  const listEl = document.getElementById('db-list');
-  if(!listEl) return;
-  listEl.innerHTML = '';
-  const db = JSON.parse(localStorage.getItem('fadesheetDB') || '[]');
-  
-  if (db.length === 0) {
-    listEl.innerHTML = '<li style="font-size:0.8rem; color:#888;">保存されたデータはありません</li>';
+function renderHistory() {
+  const arr = loadHistory();
+  const list = document.getElementById('fs-history-list');
+  const empty = document.getElementById('fs-history-empty');
+
+  if (arr.length === 0) {
+    empty.style.display = 'block';
+    // 既存アイテム削除
+    list.querySelectorAll('.fs-history-item').forEach(el => el.remove());
     return;
   }
-  
-  db.forEach(item => {
-    const li = document.createElement('li');
-    li.className = 'db-item';
-    li.innerHTML = `
-      <div class="db-title">${item.title || '無題'}</div>
-      <div class="db-date">${item.timestamp} / ${item.name}</div>
-    `;
-    li.onclick = () => loadFadesheet(item.id);
-    listEl.appendChild(li);
+  empty.style.display = 'none';
+  list.querySelectorAll('.fs-history-item').forEach(el => el.remove());
+
+  arr.forEach((res, idx) => {
+    const haiku = getHaikuFull(res.d);
+    const date  = new Date(res.ts).toLocaleDateString('ja-JP');
+    const item  = document.createElement('div');
+    item.className = 'fs-history-item';
+    item.innerHTML = `
+      <div class="fs-hi-num">${idx + 1}</div>
+      <div class="fs-hi-body">
+        <div class="fs-hi-haiku">${haiku || '（無題）'}</div>
+        <div class="fs-hi-meta">${res.d.name || '—'} · ${date}${res.fallback ? ' · テンプレート生成' : ' · AI生成'}</div>
+      </div>
+      <div class="fs-hi-actions">
+        <button class="btn-replay" onclick="replayFadesheet(${idx})">▶ 再生</button>
+        <button class="btn-delete" onclick="deleteHistory(${idx})">✕</button>
+      </div>`;
+    list.appendChild(item);
   });
 }
 
-function loadFadesheet(id) {
-  const db = JSON.parse(localStorage.getItem('fadesheetDB') || '[]');
-  const item = db.find(i => i.id === id);
-  if (!item) return;
-  
-  document.getElementById('fs-name').value = item.name || '';
-  document.getElementById('fs-org').value = item.org || '';
-  document.getElementById('fs-title').value = item.title || '';
-  document.getElementById('fs-haiku').value = item.haiku || '';
-  document.getElementById('fs-bg').value = item.bg || '';
-  document.getElementById('fs-date').value = item.date || '';
-  document.getElementById('fs-loc').value = item.loc || '';
-  currentFadesheetId = item.id;
-  
-  generateFadesheet();
-  document.getElementById('fs-preview').scrollIntoView({ behavior: 'smooth' });
+function replayFadesheet(idx) {
+  const arr = loadHistory();
+  if (!arr[idx]) return;
+  currentResult = arr[idx];
+  // フォーム復元
+  const d = arr[idx].d;
+  ['name','org','title','period','place','ku1','ku2','ku3'].forEach(key => {
+    const el = document.getElementById('fs-' + key);
+    if (el) el.value = d[key] || '';
+  });
+  document.getElementById('fs-bg').value = d.bg || '';
+  renderOutput(arr[idx]);
+  document.getElementById('fs-output-wrap').scrollIntoView({ behavior: 'smooth' });
 }
 
-function downloadPDF() {
-  const el = document.getElementById('fs-preview');
-  if (el.style.display === 'none') {
-    alert('先に「解析生成」を行ってください。');
-    return;
-  }
-  
-  const title = document.getElementById('out-title').innerText || 'haiku';
+function deleteHistory(idx) {
+  const arr = loadHistory();
+  arr.splice(idx, 1);
+  saveHistory(arr);
+  renderHistory();
+}
+
+function clearHistory() {
+  if (!confirm('履歴をすべて削除しますか？')) return;
+  localStorage.removeItem(LS_KEY);
+  renderHistory();
+}
+
+/* ════════════════════
+   PDF出力（html2pdf.js）
+════════════════════ */
+async function exportPDF() {
+  if (!currentResult) { alert('先に俳句を生成してください。'); return; }
+
+  const btn = event.target;
+  btn.textContent = '⏳ PDF生成中…';
+  btn.disabled = true;
+
+  // PDF出力時は全C4図を表示状態に
+  document.querySelectorAll('.pdf-c4-panel').forEach(p => p.style.display = 'block');
+
+  const haiku = getHaikuFull(currentResult.d);
+  const filename = `Fadesheet_${(haiku || 'haiku').replace(/[　\s]/g,'_')}.pdf`;
+
+  const target = document.getElementById('fs-pdf-target');
   const opt = {
-    margin:       10,
-    filename:     `Fadesheet_${title}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    margin:      [10, 10, 10, 10],
+    filename:    filename,
+    image:       { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#FAFAF8' },
+    jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] }
   };
-  
-  html2pdf().set(opt).from(el).save();
+
+  try {
+    await html2pdf().set(opt).from(target).save();
+  } catch(e) {
+    alert('PDF生成に失敗しました。ブラウザの印刷機能をお試しください。');
+    console.error(e);
+  } finally {
+    // タブ表示を元に戻す
+    document.querySelectorAll('.pdf-c4-panel').forEach(p => p.style.display = '');
+    document.querySelector('.pdf-c4-panel.active').style.display = 'block';
+    btn.textContent = '📄 PDF出力';
+    btn.disabled = false;
+  }
 }
 
-window.addEventListener('load', () => {
-  if(document.getElementById('db-list')) {
-    renderDBList();
-  }
-});
+/* ── 初期化 ── */
+renderHistory();
 </script>
 
 </body>

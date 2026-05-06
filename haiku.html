@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>俳句工学入門 — Haiku Engineering | c4model.org</title>
-  <meta name="description" content="あなたの俳句をAIがC4モデルで可視化・添削・評価。子供からお年寄りまで、初心者歓迎。Haiku Engineering — AI analysis for everyone." />
+  <title>俳句の科学入門 — Haiku Science | c4model.org</title>
+  <meta name="description" content="俳句の科学入門 — あなたの俳句をAIがC4モデルで可視化・添削・評価。100点満点スコアリング・PDF保存・QRコード付き。子供から俳句愛好家まで初心者歓迎。Haiku Science — AI-powered C4 Model analysis for everyone worldwide." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
   <style>
@@ -349,83 +349,6 @@
     .ja-only, .en-only { transition: opacity 0.3s; }
     body.lang-en .ja-only { display: none; }
     body.lang-ja .en-only { display: none; }
-    /* ===== TRANSPLANTED FROM HAIKU-ENGINEERING ===== */
-    .section-inner { max-width: 960px; margin: 0 auto; }
-    .section-label {
-      font-size: 0.82rem; letter-spacing: 0.14em;
-      color: var(--muted); text-transform: lowercase;
-      padding-left: 1.2rem; border-left: 2px solid var(--gold);
-      margin-bottom: 1.5rem;
-    }
-    .section-h2 {
-      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-      font-weight: 700; color: var(--ink);
-      margin-bottom: 1rem; line-height: 1.2;
-    }
-    .section-lead { color: var(--muted); max-width: 620px; margin-bottom: 3rem; line-height: 1.8; }
-    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── THREE PILLARS ── */
-    #pillars { background: var(--paper2); padding: 5rem 1.5rem; }
-    .pillars-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0;
-      border: 1px solid var(--border); margin-top: 2rem; background: var(--paper);
-    }
-    .pillar { padding: 2.5rem 2rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .pillar-num { font-size: 0.72rem; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1rem; }
-    .pillar-icon { font-size: 2.5rem; margin-bottom: 1rem; }
-    .pillar-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--ink); }
-    .pillar-title em { font-style: italic; color: var(--gold); }
-    .pillar-body { font-size: 0.95rem; color: var(--muted); line-height: 1.7; }
-
-    /* ── BOOK STRUCTURE (SPIRAL) ── */
-    #structure { background: var(--paper); padding: 5rem 1.5rem; }
-    .spiral-stack { display: flex; flex-direction: column; gap: 0; }
-    .spiral-item {
-      background: var(--paper); border: 1px solid var(--border);
-      border-left: 4px solid var(--layer-color); padding: 1.5rem 1.75rem;
-      margin-left: var(--indent, 0px); width: calc(100% - var(--indent, 0px));
-      transition: transform 0.25s, box-shadow 0.25s; cursor: default; margin-bottom: 2px;
-    }
-    .spiral-item:hover { transform: translateX(5px) translateY(-2px); box-shadow: -5px 4px 0 var(--layer-color), 0 8px 24px rgba(26,16,8,0.1); position: relative; z-index: 1; }
-    .spiral-item[data-layer="1"] { --indent: 0px;   --layer-color: var(--gold);  }
-    .spiral-item[data-layer="2"] { --indent: 2rem;  --layer-color: var(--teal);  }
-    .spiral-item[data-layer="3"] { --indent: 4rem;  --layer-color: #4A7A5A;  }
-    .spiral-item[data-layer="4"] { --indent: 6rem;  --layer-color: #8B4A8B;      }
-    @media (max-width: 640px) {
-      .spiral-item[data-layer="2"] { --indent: 1rem; }
-      .spiral-item[data-layer="3"] { --indent: 2rem; }
-      .spiral-item[data-layer="4"] { --indent: 3rem; }
-    }
-    .spiral-tag { font-size: 0.7rem; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 0.35rem; }
-    .spiral-title { font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; }
-    .spiral-body { font-size: 0.95rem; color: var(--muted); }
-
-    /* ── VIDEO / QR SECTION ── */
-    #videos { background: var(--paper2); padding: 5rem 1.5rem; }
-    .video-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0;
-      border: 1px solid var(--border); background: var(--paper);
-    }
-    .video-card { padding: 2rem 1.75rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .video-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
-    .video-num { font-size: 0.65rem; letter-spacing: 0.1em; color: var(--muted); }
-    .video-qr { width: 64px; height: 64px; background: var(--paper2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: var(--muted); text-align: center; }
-    .video-haiku { font-size: 1.15rem; font-style: italic; color: var(--ink); margin-bottom: 0.5rem; }
-    .video-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
-
-    /* ── AUTHOR ── */
-    #author { background: var(--paper); padding: 5rem 1.5rem; }
-    .author-card { display: grid; grid-template-columns: 1fr 2fr; gap: 0; border: 1px solid var(--border); background: var(--paper); }
-    @media (max-width: 640px) { .author-card { grid-template-columns: 1fr; } }
-    .author-left { padding: 3rem 2.5rem; border-right: 1px solid var(--border); background: var(--ink); color: var(--paper); }
-    .author-mark { font-size: 0.82rem; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 1rem; }
-    .author-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.25rem; }
-    .author-name-en { font-size: 0.8rem; color: rgba(250,250,248,0.5); margin-bottom: 2rem; }
-    .author-org { font-size: 0.75rem; letter-spacing: 0.08em; color: var(--gold); padding: 0.4rem 0.9rem; border: 1px solid rgba(184,134,11,0.4); display: inline-block; margin-bottom: 1.5rem; }
-    .author-right { padding: 3rem 2.5rem; }
-    .author-bio { color: var(--muted); line-height: 1.85; margin-bottom: 1.5rem; }
   </style>
 </head>
 <body class="lang-ja">
@@ -434,7 +357,7 @@
 <div class="topnav">
   <div class="topnav-left">
     <a href="https://c4model.org/">← c4model.org</a>
-    <span class="topnav-title">俳句工学入門 / Haiku Engineering</span>
+    <span class="topnav-title">俳句の科学入門 / Haiku Science</span>
   </div>
   <div style="display:flex; gap:0.5rem; align-items:center;">
     <button class="lang-btn active" id="btnJa" onclick="setLang('ja')">日本語</button>
@@ -444,8 +367,8 @@
 
 <!-- HERO -->
 <div class="hero">
-  <p class="hero-kigo ja-only">俳句工学入門 — C4モデル×AI添削サービス</p>
-  <p class="hero-kigo en-only">Haiku Engineering — AI Analysis & Critique with the C4 Model</p>
+  <p class="hero-kigo ja-only">俳句の科学入門 — C4モデル×AI添削サービス</p>
+  <p class="hero-kigo en-only">Haiku Science — AI Analysis & Critique with the C4 Model</p>
 
   <div class="hero-haiku ja-only">
     古池や<br>蛙飛び込む<br>水の音
@@ -789,6 +712,7 @@
       </div>
 
       <div style="text-align:center; margin-top:1.25rem; display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
+        <!-- [修正④] PDF・DB・履歴閲覧ボタン群 -->
         <button class="btn-teal" onclick="savePDF()" id="btnPdf">
           <span class="ja-only">📄 PDFで保存する</span>
           <span class="en-only">📄 Save as PDF</span>
@@ -796,6 +720,10 @@
         <button class="btn-secondary" onclick="saveToDb()" id="btnDb">
           <span class="ja-only">💾 DBに記録する</span>
           <span class="en-only">💾 Save to Database</span>
+        </button>
+        <button class="btn-secondary" onclick="showHistory()">
+          <span class="ja-only">📚 履歴を見る</span>
+          <span class="en-only">📚 View History</span>
         </button>
         <button class="btn-secondary" onclick="resetAll()">
           <span class="ja-only">🔄 新しい俳句を入力</span>
@@ -807,331 +735,27 @@
   </div><!-- /result-panel -->
 </div><!-- /main-card -->
 
-<!-- ═══════════════════ THREE PILLARS ═══════════════════ -->
-<section id="pillars">
-  <div class="section-inner">
-    <div class="section-label reveal">concept · 三位一体構造</div>
-    <h2 class="section-h2 reveal">
-      <span class="ja-only">普通の俳句入門書には<br>絶対にできない構成</span>
-      <span class="en-only">A structure no ordinary<br>haiku primer can match</span>
+<!-- ══════════════════════════════════
+     [追加④] 履歴モーダル (LocalStorage)
+     要件④: 保存・読み込み・管理機能
+     ══════════════════════════════════ -->
+<div id="historyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; overflow-y:auto; padding:2rem 1rem;">
+  <div style="max-width:700px; margin:0 auto; background:var(--paper); border-radius:12px; padding:2rem; position:relative;">
+    <button onclick="document.getElementById('historyModal').style.display='none'"
+            style="position:absolute; top:1rem; right:1rem; background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--muted);">✕</button>
+    <h2 style="margin-bottom:1.25rem; font-size:1.2rem;">
+      <span class="ja-only">📚 あなたの俳句履歴</span>
+      <span class="en-only">📚 Your Haiku History</span>
     </h2>
-    <p class="section-lead reveal">
-      <span class="ja-only">既公開の「解説」動画と「C4モデル応用事例研究」動画を軸に、書籍・図解・工学分析を有機的に統合。読者は俳句をまず体験し、次に構造で理解できる。</span>
-      <span class="en-only">The already-published "Commentary" and "C4 Model Case Study" videos anchor the book, organically integrating diagrams and engineering analysis. Readers first experience haiku, then understand it structurally.</span>
-    </p>
-    <div class="pillars-grid reveal">
-      <div class="pillar">
-        <div class="pillar-num">01 / Video</div>
-        <div class="pillar-icon">🎥</div>
-        <h3 class="pillar-title"><em>動画</em>で体験</h3>
-        <p class="pillar-body">QRコードからYouTube動画へ直結。視覚・聴覚で俳句の音・動き・余韻を体感してから書籍へ戻る。初心者・高齢者に最適な「入口」。</p>
-      </div>
-      <div class="pillar">
-        <div class="pillar-num">02 / Diagram</div>
-        <div class="pillar-icon">📐</div>
-        <h3 class="pillar-title"><em>図解</em>で理解</h3>
-        <p class="pillar-body">C4モデルL1〜L3、シーケンス図、アクティビティ図で俳句の構造を可視化。「なんとなく好き」を「なぜ好きか」へ昇華する。</p>
-      </div>
-      <div class="pillar">
-        <div class="pillar-num">03 / Engineering</div>
-        <div class="pillar-icon">⚙️</div>
-        <h3 class="pillar-title"><em>工学</em>で再現</h3>
-        <p class="pillar-body">季語・音韻・余白の設計法則を工学的に抽出。「偶然生まれた名句」を「再現可能な創作プロセス」へ変換する。</p>
-      </div>
+    <div id="historyList" style="display:flex; flex-direction:column; gap:0.75rem; max-height:60vh; overflow-y:auto;"></div>
+    <div style="margin-top:1.25rem; text-align:center;">
+      <button class="btn-secondary" onclick="clearHistory()" style="font-size:0.85rem; color:#c0392b; border-color:#c0392b;">
+        <span class="ja-only">🗑 履歴をすべて削除</span>
+        <span class="en-only">🗑 Clear All History</span>
+      </button>
     </div>
   </div>
-</section>
-
-<!-- ═══════════════════ BOOK STRUCTURE ═══════════════════ -->
-<section id="structure">
-  <div class="section-inner">
-    <div class="section-label reveal">book structure · 書籍構成</div>
-    <h2 class="section-h2 reveal">
-      <span class="ja-only">C4モデルで読む<br>書籍のアーキテクチャ</span>
-      <span class="en-only">The book's architecture<br>read through the C4 Model</span>
-    </h2>
-    <p class="section-lead reveal">
-      <span class="ja-only">書籍そのものをC4モデルの4層構造で設計。第1部（コンテキスト）→第2部（コンテナ）→第3部（コンポーネント）→第4部（実践）へと階層的に深化する。</span>
-      <span class="en-only">The book itself is designed in the C4 Model's 4-layer structure, deepening hierarchically from Part 1 (Context) → Part 2 (Container) → Part 3 (Component) → Part 4 (Practice).</span>
-    </p>
-    <div class="spiral-stack reveal">
-      <div class="spiral-item" data-layer="1">
-        <div class="spiral-tag">L1 · CONTEXT — 第1部</div>
-        <div class="spiral-title">俳句の世界へようこそ</div>
-        <div class="spiral-body">俳句とは何か・C4モデルとは何か・この本の使い方。動画を入口に、初心者・高齢者が安心して入れる序章。</div>
-      </div>
-      <div class="spiral-item" data-layer="2">
-        <div class="spiral-tag">L2 · CONTAINER — 第2部</div>
-        <div class="spiral-title">芭蕉の名句を工学的に分解する</div>
-        <div class="spiral-body">古池や・夏草や・閑さや の3句をC4モデルL1〜L3で完全分解。各句ごとに統一フォーマット（動画QR→C4図→認知プロセス→実践ワーク）で解説。</div>
-      </div>
-      <div class="spiral-item" data-layer="3">
-        <div class="spiral-tag">L3 · COMPONENT — 第3部</div>
-        <div class="spiral-title">C4モデル応用事例研究</div>
-        <div class="spiral-body">芭蕉の旅路のC4モデル化・一茶と子規の比較モデル・季語辞書のコンポーネント化・読者感情のシーケンス図化。専門的なのに分かりやすい「研究成果の翻訳」章。</div>
-      </div>
-      <div class="spiral-item" data-layer="4">
-        <div class="spiral-tag">L4 · CODE — 第4部</div>
-        <div class="spiral-title">あなたも作れる "工学的俳句"</div>
-        <div class="spiral-body">散歩しながら音を探す・季語を変えてみる・C4テンプレートで俳句を設計する。健康×俳句×工学が自然に融合する実践ワーク集。</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════ C4 DEMO ═══════════════════ -->
-<section id="c4demo" style="padding: 5rem 1.5rem; background: var(--paper2);">
-  <div class="section-inner">
-    <div class="section-label reveal">live c4 diagram · C4図解デモ</div>
-    <h2 class="section-h2 reveal">
-      <span class="ja-only">「古池や」をC4モデルで読む</span>
-      <span class="en-only">Reading "Old Pond" through the C4 Model</span>
-    </h2>
-    <p class="section-lead reveal">
-      <span class="ja-only">書籍に掲載するC4図のライブプレビュー。L1・L2・L3の3層で俳句の構造を完全可視化する。</span>
-      <span class="en-only">Live preview of the C4 diagrams in the book. Three layers — L1, L2, L3 — completely visualize the structure of the haiku.</span>
-    </p>
-
-    <div class="haiku-highlight reveal" style="text-align:center; margin-bottom:2rem; font-size:1.5rem; font-style:italic;">
-      <div class="haiku-text" style="color:var(--ink);">古池や　蛙飛びこむ　水の音</div>
-      <div class="haiku-credit" style="font-size:0.9rem; color:var(--muted); margin-top:0.5rem;">— 松尾芭蕉　Matsuo Bashō, c. 1686</div>
-    </div>
-
-    <div class="diagram-tabs reveal" style="display:flex; justify-content:center; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap;">
-      <button class="dtab active" onclick="switchTab('ctx')" style="padding:0.5rem 1rem; cursor:pointer; background:var(--bg); border:1px solid var(--border);">L1 · Context</button>
-      <button class="dtab" onclick="switchTab('ctr')" style="padding:0.5rem 1rem; cursor:pointer; background:var(--bg); border:1px solid var(--border);">L2 · Container</button>
-      <button class="dtab" onclick="switchTab('cmp')" style="padding:0.5rem 1rem; cursor:pointer; background:var(--bg); border:1px solid var(--border);">L3 · Component</button>
-    </div>
-
-    <!-- L1 Context -->
-    <div class="diagram-panel active" id="panel-ctx" style="background:#fff; padding:1.5rem; border:1px solid var(--border);">
-      <div class="puml-wrap" style="text-align:center; min-height:300px; display:flex; align-items:center; justify-content:center;">
-        <div class="puml-loading" id="load-ctx">📐 図を読み込み中…</div>
-        <img id="puml-ctx" class="puml-svg" alt="L1 Context — 古池や" style="display:none; max-width:100%; margin:0 auto;">
-      </div>
-    </div>
-
-    <!-- L2 Container -->
-    <div class="diagram-panel" id="panel-ctr" style="display:none; background:#fff; padding:1.5rem; border:1px solid var(--border);">
-      <div class="puml-wrap" style="text-align:center; min-height:300px; display:flex; align-items:center; justify-content:center;">
-        <div class="puml-loading" id="load-ctr">📐 図を読み込み中…</div>
-        <img id="puml-ctr" class="puml-svg" alt="L2 Container — 古池や" style="display:none; max-width:100%; margin:0 auto;">
-      </div>
-    </div>
-
-    <!-- L3 Component -->
-    <div class="diagram-panel" id="panel-cmp" style="display:none; background:#fff; padding:1.5rem; border:1px solid var(--border);">
-      <div class="puml-wrap" style="text-align:center; min-height:300px; display:flex; align-items:center; justify-content:center;">
-        <div class="puml-loading" id="load-cmp">📐 図を読み込み中…</div>
-        <img id="puml-cmp" class="puml-svg" alt="L3 Component — 古池や" style="display:none; max-width:100%; margin:0 auto;">
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════ VIDEOS ═══════════════════ -->
-<section id="videos">
-  <div class="section-inner">
-    <div class="section-label reveal">published videos · 公開済み動画</div>
-    <h2 class="section-h2 reveal">
-      <span class="ja-only">すでに公開中の<br>「図でみる俳句」シリーズ</span>
-      <span class="en-only">The already-published<br>"Haiku in Diagrams" series</span>
-    </h2>
-    <p class="section-lead reveal">
-      <span class="ja-only">書籍のQRコードで読み取れる動画は、すでにYouTubeで公開中。動画が「入口」となり、書籍が「深化」の場となる。</span>
-      <span class="en-only">The videos accessible via QR codes in the book are already on YouTube. The video is the "entry point"; the book is the place of "deepening."</span>
-    </p>
-    <div class="video-grid reveal">
-      <div class="video-card">
-        <div class="video-card-top">
-          <div class="video-num">VIDEO 01 · 解説編</div>
-          <div class="video-qr">QR<br>Code</div>
-        </div>
-        <div class="video-haiku">古池や　蛙飛びこむ　水の音</div>
-        <p class="video-desc">芭蕉の代表句をC4モデルで初めて解説した動画。静けさと音の対比、時間の構造を視覚化。</p>
-      </div>
-      <div class="video-card">
-        <div class="video-card-top">
-          <div class="video-num">VIDEO 02 · C4応用事例</div>
-          <div class="video-qr">QR<br>Code</div>
-        </div>
-        <div class="video-haiku">閑さや　岩にしみ入る　蝉の声</div>
-        <p class="video-desc">「静」の中に「動」を埋め込む構造。蝉の声が岩に吸収される認知プロセスをシーケンス図で追う。</p>
-      </div>
-      <div class="video-card">
-        <div class="video-card-top">
-          <div class="video-num">VIDEO 03 · C4応用事例</div>
-          <div class="video-qr">QR<br>Code</div>
-        </div>
-        <div class="video-haiku">夏草や　兵どもが　夢の跡</div>
-        <p class="video-desc">時間軸の多層構造。「現在の夏草」「過去の戦場」「永遠の無常観」を3層のC4モデルで可視化。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════ AUTHOR ═══════════════════ -->
-<section id="author">
-  <div class="section-inner">
-    <div class="section-label reveal">author · 著者</div>
-    <div class="author-card reveal">
-      <div class="author-left">
-        <div class="author-mark">C4モデル研究会®</div>
-        <div class="author-name">奥村治</div>
-        <div class="author-name-en">Osamu Okumura</div>
-        <div class="author-org">C4 Model Study Group®</div>
-      </div>
-      <div class="author-right">
-        <p class="author-bio">
-          C4モデルシステムコンサルタント。俳句工学（Haiku Engineering）と俳句システム研究会を主宰し、松尾芭蕉・小林一茶の作品をC4モデルで構造分析する研究・創作活動の第一人者。「図でみる俳句」シリーズをYouTubeで公開。Amazon Kindle著作多数。学術論文の執筆支援システム「論文道場」を開発・運営。
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<script>
-/* ── PlantUML Encoder ── */
-const PUML_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
-function encode64(data) {
-  let r = '';
-  for (let i = 0; i < data.length; i += 3) {
-    const b = [data[i]||0, data[i+1]||0, data[i+2]||0];
-    r += PUML_CHARS[(b[0]>>2)&0x3F];
-    r += PUML_CHARS[((b[0]&3)<<4)|((b[1]>>4)&0xF)];
-    r += PUML_CHARS[((b[1]&0xF)<<2)|((b[2]>>6)&3)];
-    r += PUML_CHARS[b[2]&0x3F];
-  }
-  return r;
-}
-function deflateRaw(str) {
-  const data = new TextEncoder().encode(str);
-  const chunks = [];
-  const BSIZE = 32768;
-  for (let i = 0; i < data.length; i += BSIZE) {
-    const chunk = data.slice(i, i + BSIZE);
-    const last = (i + BSIZE >= data.length) ? 1 : 0;
-    const len = chunk.length;
-    const nlen = (~len) & 0xFFFF;
-    chunks.push(last, len&0xFF, (len>>8)&0xFF, nlen&0xFF, (nlen>>8)&0xFF);
-    chunk.forEach(b => chunks.push(b));
-  }
-  let s1 = 1, s2 = 0;
-  data.forEach(b => { s1=(s1+b)%65521; s2=(s2+s1)%65521; });
-  const adler = (s2<<16)|s1;
-  return new Uint8Array([0x78,0x01,...chunks,(adler>>24)&0xFF,(adler>>16)&0xFF,(adler>>8)&0xFF,adler&0xFF]);
-}
-function encodePuml(puml) { return '~1' + encode64(deflateRaw(puml)); }
-function renderPuml(puml, imgEl, loadEl) {
-  const enc = encodePuml(puml);
-  imgEl.onload = () => { loadEl.style.display='none'; imgEl.style.display='block'; };
-  imgEl.onerror = () => {
-    imgEl.src = \`https://kroki.io/plantuml/svg/\${btoa(unescape(encodeURIComponent(puml)))}\`;
-    imgEl.onerror = () => { loadEl.textContent = '⚠ 図の読み込みに失敗しました'; };
-  };
-  imgEl.src = \`https://www.plantuml.com/plantuml/svg/\${enc}\`;
-}
-
-/* ── PlantUML Definitions ── */
-const PUML_CTX = \`@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
-skinparam backgroundColor #FAFAF8
-skinparam defaultFontName "Source Serif 4"
-skinparam defaultFontSize 13
-skinparam ArrowColor #1A7A8A
-title L1 Context — 古池や（ふるいけや）
-
-Person(reader, "読者 / Reader", "俳句を読む人\\nA person reading haiku")
-System(haiku, "古池や\\n（俳句システム）", "芭蕉の句が生み出す\\n美的体験の場")
-System_Ext(season, "季語システム", "蛙（春）\\nKigo: Frog = Spring")
-System_Ext(sound, "音響システム", "水の音・静寂\\nSound of water / Silence")
-System_Ext(time, "時間システム", "刹那と永遠\\nMoment and Eternity")
-
-Rel(reader, haiku, "情景を想像する", "認知プロセス")
-Rel(haiku, season, "季節感を呼び起こす")
-Rel(haiku, sound, "音を体験させる")
-Rel(haiku, time, "時間を止める")
-@enduml\`;
-
-const PUML_CTR = \`@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
-skinparam backgroundColor #FAFAF8
-skinparam defaultFontName "Source Serif 4"
-skinparam defaultFontSize 13
-skinparam ArrowColor #1A7A8A
-title L2 Container — 古池や の構造
-
-Person(reader, "読者", "俳句を読む人")
-
-System_Boundary(h, "古池や　蛙飛びこむ　水の音") {
-  Container(ku1, "古池や", "第1句", "静けさの舞台設定\\n古い池 = 永遠・歴史")
-  Container(ku2, "蛙飛びこむ", "第2句", "突発的な動き\\n蛙 = 生命・春")
-  Container(ku3, "水の音", "第3句", "音の余韻\\n聴覚 = 余白の設計")
-}
-
-Rel(reader, ku1, "視覚的情景を受け取る")
-Rel(ku1, ku2, "静 → 動 の転換")
-Rel(ku2, ku3, "動 → 音 → 余韻")
-Rel(ku3, reader, "余白で想像を促す", "認知の完結")
-@enduml\`;
-
-const PUML_CMP = \`@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
-skinparam backgroundColor #FAFAF8
-skinparam defaultFontName "Source Serif 4"
-skinparam defaultFontSize 13
-skinparam ArrowColor #1A7A8A
-title L3 Component — 古池や の工学的分解
-
-Container_Boundary(ku2, "蛙飛びこむ（第2句コンテナ）") {
-  Component(kigo, "季語コンポーネント", "蛙（春）", "春の訪れ・生命感\\nKigo: 5音の感情圧縮")
-  Component(verb, "動詞コンポーネント", "飛びこむ", "瞬間の動き\\n過去形で完了を示す")
-  Component(agent, "主体コンポーネント", "蛙（主語）", "自然の意志ある存在\\n人間不在の構造")
-}
-
-Container_Boundary(ku3, "水の音（第3句コンテナ）") {
-  Component(sound2, "音響コンポーネント", "水の音", "聴覚刺激\\n想像を完結させる")
-  Component(blank, "余白コンポーネント", "省略された情景", "読者の脳が補完\\n17音の外にある世界")
-}
-
-Rel(kigo, verb, "生命 × 動き の合成")
-Rel(verb, sound2, "行為 → 結果 の因果")
-Rel(sound2, blank, "音が消えた後の沈黙")
-@enduml\`;
-
-/* ── Tab Switcher ── */
-const loaded = {};
-function switchTab(key) {
-  document.querySelectorAll('.diagram-panel').forEach(p => p.style.display = 'none');
-  document.querySelectorAll('.dtab').forEach(b => {
-    b.classList.remove('active');
-    b.style.fontWeight = 'normal';
-    b.style.background = 'var(--bg)';
-  });
-  document.getElementById('panel-' + key).style.display = 'block';
-  event.target.classList.add('active');
-  event.target.style.fontWeight = 'bold';
-  event.target.style.background = '#eee';
-  if (!loaded[key]) { loadDiagram(key); loaded[key] = true; }
-}
-function loadDiagram(key) {
-  const map = {
-    ctx: { puml: PUML_CTX, img: 'puml-ctx', load: 'load-ctx' },
-    ctr: { puml: PUML_CTR, img: 'puml-ctr', load: 'load-ctr' },
-    cmp: { puml: PUML_CMP, img: 'puml-cmp', load: 'load-cmp' }
-  };
-  const m = map[key];
-  renderPuml(m.puml, document.getElementById(m.img), document.getElementById(m.load));
-}
-window.addEventListener('load', () => { loadDiagram('ctx'); loaded.ctx = true; });
-
-/* ── Scroll Reveal ── */
-const observer = new IntersectionObserver(
-  entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
-  { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
-);
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
+</div>
 
 <!-- FOOTER -->
 <footer>
@@ -1279,8 +903,7 @@ async function requestCritique() {
     <div class="loading-haiku">採点・添削中<span class="loading-dots"></span></div>`;
   document.getElementById('critiqueResult').before(loadDiv);
 
-  const prompt = `あなたは、高齢者の初心者（アマチュア）にも優しく丁寧に教える、ベテランの俳句指導者（選者）です。
-以下の俳句を100点満点で評価・添削し、初心者が感動し、かつ具体的に学べるアドバイスを提供してください。
+  const prompt = `あなたはベテランの俳句選者・俳句指導者です。以下の俳句を100点満点で評価・添削してください。
 
 【俳句】：「${haiku}」
 【C4分析（参考）】
@@ -1290,25 +913,21 @@ L3: ${d.l3_ja||''}
 L4: ${d.l4_ja||''}
 
 【評価基準（各20点）】
-① 季語の適切さ（無季や季重なりがないか、季節感が情景と合っているか）
-② 五七五のリズム（字余り・字足らずのチェックと、その効果の是非）
-③ 映像・情景・感情の喚起力（具体的な情景が目に浮かぶか）
-④ 文法と切れ（助詞「てにをは」の正確さ、切れ字の効果的な使用）
-⑤ 独創性・新鮮さ（ありきたりな表現になっていないか）
-
-【出力の条件】
-- 高齢者の初心者が読んで「なるほど！」と腑に落ちるよう、専門用語は控えめにするか、わかりやすく解説してください。
-- 良い点はしっかりと褒め（感動を与え）、改善点は「字余り」「季語の検討」「文法・助詞の微調整」など具体的な理由を添えて優しく提案してください。
+① 季語の適切さと文化的豊かさ
+② 五七五のリズムと音の美しさ
+③ 映像・情景・感情の喚起力
+④ 切れ字・切れの効果
+⑤ 独創性・新鮮さ・表現の工夫
 
 JSONのみで回答（マークダウン不可）：
 {
   "score": <0〜100の整数>,
   "breakdown": {"kigo":0〜20, "rhythm":0〜20, "imagery":0〜20, "kireji":0〜20, "originality":0〜20},
-  "critique_ja": "添削コメント（良い点を褒める。具体的に・やさしく・励ます口調で・4〜5文）",
-  "advice_ja": "改善アドバイス（字余り・文法・季語に関する具体的な指摘と、より良くなる言葉の提案・2〜3文）",
-  "revised_ja": "改善案の俳句（1句。文法やリズムを整えたもの。直す必要がなければ元の句）",
-  "critique_en": "English critique (4-5 sentences, encouraging, tailored for beginners)",
-  "advice_en": "English improvement advice (2-3 sentences with specific suggestions on syllables, grammar, and kigo)",
+  "critique_ja": "添削コメント（具体的に・やさしく・励ます口調で・4〜5文）",
+  "advice_ja": "改善アドバイス（具体的な言葉の提案・類語の提示も含めて・2〜3文）",
+  "revised_ja": "改善案の俳句（1句、なければ元の句をそのまま）",
+  "critique_en": "English critique (4-5 sentences, encouraging)",
+  "advice_en": "English improvement advice (2-3 sentences with specific suggestions)",
   "revised_en": "English translation of revised haiku (1 line)"
 }`;
 
@@ -1522,30 +1141,137 @@ ${scoreSection}
   };
 }
 
-/* ===== DB SAVE ===== */
-async function saveToDb() {
+/* ===== DB SAVE（LocalStorage 実装版）[修正④] ===== */
+function saveToDb() {
   const record = {
+    id:         Date.now(),
     haiku:      window._haiku || '',
     score:      window._score ?? null,
-    name:       document.getElementById('userName').value,
-    age:        document.getElementById('userAge').value,
-    occupation: document.getElementById('userOccupation').value,
-    email:      document.getElementById('userEmail').value,
-    experience: document.getElementById('experience').value,
+    stars:      window._score !== null ? (window._score>=90?'⭐⭐⭐⭐':window._score>=75?'⭐⭐⭐':window._score>=60?'⭐⭐':'⭐') : '',
+    name:       document.getElementById('userName').value || '',
+    age:        document.getElementById('userAge').value  || '',
+    occupation: document.getElementById('userOccupation').selectedOptions[0]?.text || '',
+    email:      document.getElementById('userEmail').value || '',
+    experience: document.getElementById('experience').value || '',
     title:      window._title || '',
     kigo:       window._kigo  || '',
     timestamp:  new Date().toISOString(),
+    date_ja:    new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'}),
     l1: document.getElementById('l1content').textContent,
     l2: document.getElementById('l2content').textContent,
     l3: document.getElementById('l3content').textContent,
     l4: document.getElementById('l4content').textContent,
+    explanation: document.getElementById('c4Explanation').textContent,
+    critique:   document.getElementById('critiqueText').textContent,
+    advice:     document.getElementById('adviceText').textContent,
   };
   try {
-    await window.storage.set('haiku:' + Date.now(), JSON.stringify(record));
-    alert('✅ データベースに保存しました！\nSaved to database!');
+    // LocalStorageに保存
+    const existing = JSON.parse(localStorage.getItem('haikuScience_records') || '[]');
+    existing.unshift(record); // 新しい順に追加
+    // 最大50件保持
+    if (existing.length > 50) existing.splice(50);
+    localStorage.setItem('haikuScience_records', JSON.stringify(existing));
+    alert('✅ データベースに保存しました！（ブラウザ内LocalStorage）\nSaved to local database!');
   } catch(e) {
     alert('保存に失敗しました / Save failed: ' + e.message);
   }
+}
+
+/* ===== 履歴表示 [追加④] ===== */
+function showHistory() {
+  const records = JSON.parse(localStorage.getItem('haikuScience_records') || '[]');
+  const list = document.getElementById('historyList');
+  const isEn = document.body.classList.contains('lang-en');
+
+  if (records.length === 0) {
+    list.innerHTML = `<p style="color:var(--muted);text-align:center;padding:2rem;">
+      ${isEn ? 'No records yet. Analyze a haiku and save it!' : 'まだ記録がありません。俳句を分析して保存してください。'}
+    </p>`;
+  } else {
+    list.innerHTML = records.map((r, i) => `
+      <div style="background:var(--paper2);border:1px solid var(--border);border-radius:8px;padding:1rem;cursor:pointer;"
+           onclick="loadFromHistory(${i})">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:0.5rem;">
+          <div style="font-size:1.1rem;font-family:serif;letter-spacing:0.15em;color:var(--ink);flex:1;">${r.haiku||'—'}</div>
+          <div style="text-align:right;flex-shrink:0;">
+            ${r.score !== null ? `<span style="font-size:1.2rem;font-weight:bold;color:var(--brush);">${r.score}</span><span style="font-size:0.75rem;color:var(--muted);">/100</span>` : ''}
+            ${r.stars ? `<div style="font-size:0.9rem;">${r.stars}</div>` : ''}
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-top:0.5rem;display:flex;gap:1rem;flex-wrap:wrap;">
+          <span>📅 ${r.date_ja||r.timestamp?.slice(0,10)||'—'}</span>
+          ${r.name ? `<span>👤 ${r.name}</span>` : ''}
+          ${r.kigo ? `<span>🌸 ${r.kigo}</span>` : ''}
+        </div>
+        <div style="font-size:0.78rem;color:var(--accent);margin-top:0.3rem;">
+          ${isEn ? 'Click to reload this analysis →' : 'クリックしてこの分析を再表示 →'}
+        </div>
+      </div>
+    `).join('');
+  }
+  document.getElementById('historyModal').style.display = 'block';
+}
+
+/* ===== 履歴から読み込み [追加④] ===== */
+function loadFromHistory(index) {
+  const records = JSON.parse(localStorage.getItem('haikuScience_records') || '[]');
+  const r = records[index];
+  if (!r) return;
+
+  // フォームに値を復元
+  document.getElementById('haikuInput').value = r.haiku || '';
+  document.getElementById('haikuTitle').value = r.title || '';
+  document.getElementById('kigo').value = r.kigo || '';
+  if (r.name) document.getElementById('userName').value = r.name;
+  if (r.age)  document.getElementById('userAge').value  = r.age;
+  if (r.email) document.getElementById('userEmail').value = r.email;
+
+  // 分析結果を復元
+  window._haiku = r.haiku;
+  window._title = r.title;
+  window._kigo  = r.kigo;
+  window._score = r.score;
+  window._analysisData = { l1_ja:r.l1, l2_ja:r.l2, l3_ja:r.l3, l4_ja:r.l4, explanation_ja:r.explanation };
+  window._critiqueData = { critique_ja:r.critique, advice_ja:r.advice };
+
+  document.getElementById('displayHaiku').textContent  = r.haiku || '—';
+  document.getElementById('l1content').textContent     = r.l1 || '—';
+  document.getElementById('l2content').textContent     = r.l2 || '—';
+  document.getElementById('l3content').textContent     = r.l3 || '—';
+  document.getElementById('l4content').textContent     = r.l4 || '—';
+  document.getElementById('c4Explanation').textContent = r.explanation || '—';
+
+  if (r.critique) {
+    document.getElementById('critiqueText').textContent = r.critique;
+    document.getElementById('adviceText').textContent   = r.advice || '';
+    document.getElementById('critiqueResult').style.display = 'block';
+    document.getElementById('adviceBox').classList.add('show');
+    if (r.score !== null) {
+      document.getElementById('scoreNum').textContent    = r.score;
+      document.getElementById('starsDisplay').textContent= r.stars || '';
+      const lbl = r.score>=90?'優秀作品賞！':r.score>=75?'大変よくできました':r.score>=60?'なかなかの出来です':'もう少し練習しましょう';
+      document.getElementById('scoreLabel').textContent = lbl;
+      if (r.score >= 90) document.getElementById('awardBadge').classList.add('show');
+    }
+  }
+
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('profileSection').classList.add('show');
+  document.getElementById('historyModal').style.display = 'none';
+  document.getElementById('critiqueOptIn').style.display = 'none';
+  setActiveTab(4);
+  window.scrollTo({top: document.getElementById('mainCard').offsetTop - 60, behavior:'smooth'});
+}
+
+/* ===== 履歴全削除 [追加④] ===== */
+function clearHistory() {
+  const isEn = document.body.classList.contains('lang-en');
+  const msg = isEn ? 'Delete all history? This cannot be undone.' : '履歴をすべて削除しますか？この操作は取り消せません。';
+  if (!confirm(msg)) return;
+  localStorage.removeItem('haikuScience_records');
+  showHistory();
 }
 
 /* ===== RESET ===== */

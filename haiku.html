@@ -330,8 +330,8 @@ footer a { color: var(--gold); text-decoration: none; }
   <span class="nav-title">俳句の科学入門 / Haiku Science</span>
   <div class="nav-right">
     <div class="lang-toggle">
-      <button class="lang-btn active" data-lang="ja" onclick="setLang('ja')">日本語</button>
-      <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+      <button class="lang-btn active" data-lang="ja">日本語</button>
+      <button class="lang-btn" data-lang="en">English</button>
     </div>
     <a href="https://c4model.org/dojo.html" class="nav-cta">論文道場 →</a>
   </div>
@@ -372,8 +372,6 @@ footer a { color: var(--gold); text-decoration: none; }
 
       <textarea id="haiku-input" class="haiku-textarea" rows="2"
         placeholder="例：古池や　蛙飛びこむ　水の音"
-        oninput="onHaikuInput()"
-        onpaste="setTimeout(onHaikuInput,10)"
       ></textarea>
 
       <!-- 音数カウンター -->
@@ -398,7 +396,7 @@ footer a { color: var(--gold); text-decoration: none; }
       <!-- 漢字警告 -->
       <div class="kanji-warn" id="kanji-warn">
         ⚠ 漢字を含む句は読み方を自動推定しています。推定が合わない場合は
-        「<a href="#" onclick="insertFurigana();return false;" style="color:var(--teal)">ひらがな表記に変換</a>」
+        「<a href="#" id="link-furigana" style="color:var(--teal)">ひらがな表記に変換</a>」
         するか、ひらがな交じりで入力してください。
       </div>
     </div>
@@ -435,7 +433,7 @@ footer a { color: var(--gold); text-decoration: none; }
     </div>
 
     <div class="submit-wrap">
-      <button id="btn-analyze" class="btn-analyze" onclick="startAnalysis()">
+      <button id="btn-analyze" class="btn-analyze">
         <span class="btn-dot"></span>
         C4モデルで分析する
       </button>
@@ -470,9 +468,9 @@ footer a { color: var(--gold); text-decoration: none; }
 
       <!-- C4タブ -->
       <div class="out-tabs">
-        <button class="out-tab active" onclick="switchTab('ctx')">L1 · Context</button>
-        <button class="out-tab" onclick="switchTab('ctr')">L2 · Container</button>
-        <button class="out-tab" onclick="switchTab('cmp')">L3 · Component</button>
+        <button class="out-tab active">L1 · Context</button>
+        <button class="out-tab">L2 · Container</button>
+        <button class="out-tab">L3 · Component</button>
       </div>
       <div class="out-panel active" id="p-ctx">
         <div class="puml-wrap">
@@ -511,9 +509,9 @@ footer a { color: var(--gold); text-decoration: none; }
     </div><!-- /#pdf-target -->
 
     <div class="out-actions">
-      <button class="out-btn primary" onclick="exportPDF()">📄 PDFで出力する</button>
-      <button class="out-btn" onclick="saveHistory()">💾 履歴に保存する</button>
-      <button class="out-btn" onclick="scrollToForm()">← 別の俳句を入力する</button>
+      <button class="out-btn primary" id="btn-pdf">📄 PDFで出力する</button>
+      <button class="out-btn" id="btn-save">💾 履歴に保存する</button>
+      <button class="out-btn" id="btn-back">← 別の俳句を入力する</button>
     </div>
   </div>
 </section>
@@ -524,7 +522,7 @@ footer a { color: var(--gold); text-decoration: none; }
     <h2 class="history-title">俳句アーカイブ</h2>
     <div id="history-list" class="history-list"></div>
     <div style="margin-top:1rem;">
-      <button class="out-btn" onclick="clearAllHistory()">🗑 すべて削除する</button>
+      <button class="out-btn" id="btn-clear-history">🗑 すべて削除する</button>
     </div>
   </div>
 </section>
@@ -1052,10 +1050,19 @@ function renderHistory() {
         <div class="history-meta">${r.mora}音 · ${new Date(r.ts).toLocaleDateString('ja-JP')}</div>
       </div>
       <div class="history-actions">
-        <button class="h-btn" onclick="replayHistory(${i})">再生</button>
-        <button class="h-btn del" onclick="deleteHistory(${i})">削除</button>
+        <button class="h-btn" data-action="replay" data-idx="${i}">再生</button>
+        <button class="h-btn del" data-action="delete" data-idx="${i}">削除</button>
       </div>
     </div>`).join('');
+
+  // イベント委任
+  list.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.idx, 10);
+      if (btn.dataset.action === 'replay') replayHistory(idx);
+      else deleteHistory(idx);
+    });
+  });
 }
 
 /* ─ ユーティリティ ─ */
@@ -1066,11 +1073,40 @@ function setLang(lang) {
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
   localStorage.setItem('c4-lang',lang);
 }
-
 /* ─ 初期化 ─ */
 document.addEventListener('DOMContentLoaded', () => {
   setLang(localStorage.getItem('c4-lang')||'ja');
   renderHistory();
+
+  // ── イベント登録（インライン属性を使わない） ──
+  const textarea = document.getElementById('haiku-input');
+  textarea.addEventListener('input',  onHaikuInput);
+  textarea.addEventListener('change', onHaikuInput);
+  textarea.addEventListener('paste',  () => setTimeout(onHaikuInput, 30));
+  textarea.addEventListener('keyup',  onHaikuInput);
+
+  document.getElementById('btn-analyze').addEventListener('click', startAnalysis);
+
+  // 言語ボタン
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.addEventListener('click', () => setLang(b.dataset.lang)));
+
+  // タブボタン
+  document.querySelectorAll('.out-tab').forEach((b, i) =>
+    b.addEventListener('click', () => switchTab(['ctx','ctr','cmp'][i])));
+
+  // アクションボタン
+  document.getElementById('btn-pdf') .addEventListener('click', exportPDF);
+  document.getElementById('btn-save').addEventListener('click', saveHistory);
+  document.getElementById('btn-back').addEventListener('click', scrollToForm);
+
+  // 履歴削除
+  const clrBtn = document.getElementById('btn-clear-history');
+  if (clrBtn) clrBtn.addEventListener('click', clearAllHistory);
+
+  // ふりがなリンク
+  const fLink = document.getElementById('link-furigana');
+  if (fLink) fLink.addEventListener('click', e => { e.preventDefault(); insertFurigana(); });
 });
 </script>
 </body>

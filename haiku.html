@@ -161,8 +161,21 @@
       font-family: 'Noto Serif JP', serif;
       background: #FFFDF5;
       border: 2px solid var(--border);
+      /* [修正] 俳句が途中で改行されないよう */
+      word-break: keep-all;
+      overflow-wrap: normal;
     }
     #haikuInput:focus { border-color: var(--brush); }
+
+    /* [修正] 結果表示の俳句テキストも折り返し防止 */
+    #displayHaiku {
+      word-break: keep-all;
+      white-space: nowrap;
+      overflow-x: auto;
+      font-size: clamp(1rem, 4vw, 1.3rem);
+      letter-spacing: 0.2em;
+      font-family: 'Noto Serif JP', serif;
+    }
     .char-display {
       text-align: right; font-size: 0.82rem; margin-top: 0.3rem;
       color: var(--muted);
@@ -343,6 +356,24 @@
     @media (max-width: 640px) {
       .main-card { padding: 1.25rem; }
       .hero { padding: 2.5rem 1rem 2rem; }
+      /* [修正] モバイルで俳句テキストが途中改行されないよう */
+      #displayHaiku {
+        font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+        white-space: nowrap;
+        overflow-x: auto;
+        padding: 0 0.5rem;
+      }
+      .hero-haiku {
+        font-size: clamp(1.4rem, 6vw, 2rem);
+        word-break: keep-all;
+      }
+      /* 5-7-5インジケーターをモバイルで縦に */
+      #haikuBreakdown {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+        margin-top: 6px;
+      }
     }
 
     /* ===== HIDDEN BY LANG ===== */
@@ -394,20 +425,6 @@
   <p class="hero-desc-en en-only" style="font-size:0.88rem; color:var(--muted);">
     俳句を入力 → C4構造図 → AI添削&スコア → PDF保存
   </p>
-</div>
-
-<!-- VIDEO SECTION -->
-<div class="video-section" style="text-align:center; max-width:760px; margin: 0 auto 3rem; padding: 0 1.5rem; position:relative; z-index:1;">
-  <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; box-shadow:0 4px 24px var(--shadow); margin-bottom:1.5rem; border:1px solid var(--border); background:var(--paper2);">
-    <iframe style="position:absolute; top:0; left:0; width:100%; height:100%;" src="https://www.youtube.com/embed/t2cnj1kUzcA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-  </div>
-  <p style="font-size:1.1rem; font-weight:bold; color:var(--ink); margin-bottom:0.5rem;" class="ja-only">松尾芭蕉「古池や蛙飛び込む水の音」のひみつ</p>
-  <p style="font-size:0.95rem; color:var(--muted); margin-bottom:0.5rem;" class="ja-only">芭蕉の句に秘められた謎を解いていきましょう。「俳句工学」のすすめ。</p>
-  <p style="font-size:0.8rem; color:var(--muted);" class="ja-only">このビデオは Clipchamp で作成されました<br>C4モデル研究会編　2026年</p>
-  
-  <p style="font-size:1.1rem; font-weight:bold; color:var(--ink); margin-bottom:0.5rem;" class="en-only">The Secret of Matsuo Basho's "Old Pond"</p>
-  <p style="font-size:0.95rem; color:var(--muted); margin-bottom:0.5rem;" class="en-only">Let's solve the mystery hidden in Basho's haiku. Introduction to "Haiku Engineering".</p>
-  <p style="font-size:0.8rem; color:var(--muted);" class="en-only">Created with Clipchamp<br>C4 Model Study Group, 2026</p>
 </div>
 
 <!-- FEATURE CARDS -->
@@ -489,13 +506,27 @@
       <textarea id="haikuInput" rows="3"
         placeholder="古池や 蛙飛び込む 水の音"
         oninput="countChars(this)"></textarea>
-      <div class="char-display">
-        <span class="ja-only">文字数（空白除く）：</span>
-        <span class="en-only">Characters (excl. spaces): </span>
-        <span class="count" id="charCount">0</span>
-        <span class="ja-only"> 音（17音で✓）</span>
-        <span class="en-only"> (17 = ✓)</span>
+
+      <!-- [修正] リアルタイム音数フィードバックUI強化 -->
+      <div class="char-display" style="display:flex; align-items:center; justify-content:space-between; margin-top:0.5rem;">
+        <div>
+          <span class="ja-only" style="font-size:0.82rem; color:var(--muted);">音数カウント：</span>
+          <span class="en-only" style="font-size:0.82rem; color:var(--muted);">Syllable count: </span>
+          <span class="count" id="charCount" style="font-size:1.4rem; font-weight:bold; transition:color 0.2s;">0</span>
+          <span style="font-size:0.9rem; color:var(--muted);"> / 17</span>
+          <span id="charFeedback" style="margin-left:0.5rem; font-size:1rem;"></span>
+        </div>
+        <!-- 5-7-5 区切りインジケーター -->
+        <div id="haikuBreakdown" style="display:flex; gap:4px; font-size:0.75rem; color:var(--muted);">
+          <span id="ku1" style="padding:2px 8px; background:var(--paper2); border:1px solid var(--border); border-radius:4px;">上五 —</span>
+          <span style="color:var(--muted);">·</span>
+          <span id="ku2" style="padding:2px 8px; background:var(--paper2); border:1px solid var(--border); border-radius:4px;">中七 —</span>
+          <span style="color:var(--muted);">·</span>
+          <span id="ku3" style="padding:2px 8px; background:var(--paper2); border:1px solid var(--border); border-radius:4px;">下五 —</span>
+        </div>
       </div>
+      <!-- 小学生向けヒント -->
+      <div id="countHint" style="font-size:0.8rem; margin-top:0.4rem; color:var(--muted); min-height:1.2em;"></div>
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
@@ -792,18 +823,100 @@ function setLang(lang) {
   }
 }
 
-/* ===== CHAR COUNT（俳句の音数を正確に計測）===== */
+/* ===== CHAR COUNT 強化版（リアルタイム5-7-5フィードバック）[修正] ===== */
 function countChars(el) {
-  // 空白・句読点・記号を除いた文字数をカウント
-  // 拗音（ゃゅょ）小文字は独立した音としてカウントしない
-  const txt = el.value.replace(/[\s　、。・「」『』（）\(\)\-ー]/g, '');
-  // 拗音の小文字は前の音と合体するので-1
-  const small = (txt.match(/[ぁぃぅぇぉっゃゅょァィゥェォッャュョ]/g)||[]).length;
-  const count = [...txt].length - small;
+  const raw = el.value;
+  const isEn = document.body.classList.contains('lang-en');
+
+  // 音数カウント（拗音・促音を1音として数えない）
+  function countMora(str) {
+    const cleaned = str.replace(/[\s　、。・「」『』（）\(\)\-]/g, '');
+    // 小文字（拗音・促音）は前の音に合体
+    const small = (cleaned.match(/[ぁぃぅぇぉっゃゅょァィゥェォッャュョ]/g)||[]).length;
+    return Math.max(0, [...cleaned].length - small);
+  }
+
+  // 空白で区切って上五・中七・下五を試みる
+  const parts = raw.trim().split(/[\s　]+/);
+  let k1mora = 0, k2mora = 0, k3mora = 0;
+  if (parts.length >= 3) {
+    k1mora = countMora(parts[0]);
+    k2mora = countMora(parts[1]);
+    k3mora = countMora(parts.slice(2).join(''));
+  } else if (parts.length === 2) {
+    k1mora = countMora(parts[0]);
+    k2mora = countMora(parts[1]);
+  } else if (parts.length === 1) {
+    k1mora = countMora(parts[0]);
+  }
+
+  // 全体の音数（空白除く）
+  const total = countMora(raw);
+
+  // カウント表示
   const span = document.getElementById('charCount');
-  span.textContent = count;
-  span.className = 'count ' + (count === 17 ? 'valid' : 'invalid');
-  document.getElementById('btnAnalyze').disabled = count !== 17;
+  span.textContent = total;
+  if (total === 0) {
+    span.style.color = 'var(--muted)';
+  } else if (total === 17) {
+    span.style.color = 'var(--teal)';
+  } else if (total < 17) {
+    span.style.color = 'var(--gold)';
+  } else {
+    span.style.color = 'var(--brush)';
+  }
+
+  // 絵文字フィードバック
+  const feedback = document.getElementById('charFeedback');
+  if (total === 0) {
+    feedback.textContent = '';
+  } else if (total === 17) {
+    feedback.textContent = '✅';
+    feedback.title = isEn ? 'Perfect! 17 syllables.' : '17音ぴったり！';
+  } else if (total < 17) {
+    feedback.textContent = `あと${17 - total}音`;
+    feedback.style.color = 'var(--gold)';
+  } else {
+    feedback.textContent = `${total - 17}音多い`;
+    feedback.style.color = 'var(--brush)';
+  }
+
+  // 5-7-5 区切りインジケーター
+  function kuStyle(mora, target) {
+    if (mora === 0) return 'background:var(--paper2); border:1px solid var(--border); color:var(--muted);';
+    if (mora === target) return 'background:#E8F8F0; border:1px solid var(--teal); color:var(--teal); font-weight:bold;';
+    if (mora < target)  return 'background:#FFF8E0; border:1px solid var(--gold); color:var(--gold);';
+    return 'background:#FFF0F0; border:1px solid var(--brush); color:var(--brush);';
+  }
+
+  if (parts.length >= 2) {
+    const ku1el = document.getElementById('ku1');
+    const ku2el = document.getElementById('ku2');
+    const ku3el = document.getElementById('ku3');
+    if (ku1el) { ku1el.textContent = `上五 ${k1mora||'—'}`; ku1el.style.cssText = `padding:2px 8px; border-radius:4px; font-size:0.75rem; ${kuStyle(k1mora,5)}`; }
+    if (ku2el) { ku2el.textContent = `中七 ${k2mora||'—'}`; ku2el.style.cssText = `padding:2px 8px; border-radius:4px; font-size:0.75rem; ${kuStyle(k2mora,7)}`; }
+    if (ku3el) { ku3el.textContent = `下五 ${k3mora||'—'}`; ku3el.style.cssText = `padding:2px 8px; border-radius:4px; font-size:0.75rem; ${kuStyle(k3mora,5)}`; }
+  }
+
+  // 小学生向けヒント
+  const hint = document.getElementById('countHint');
+  if (hint) {
+    if (total === 0) {
+      hint.textContent = isEn ? 'Type your haiku above. Spaces separate the 5-7-5 phrases.' : '上の欄に俳句を入力してください。空白で「上五・中七・下五」を区切ると数えやすいです。';
+    } else if (total < 17) {
+      hint.textContent = isEn ? `${17-total} more syllable(s) needed.` : `あと${17-total}音あります。ヒント：空白で句切りを入れると上五・中七・下五がわかりやすいです。`;
+    } else if (total === 17) {
+      hint.textContent = isEn ? '🎉 17 syllables — perfect haiku rhythm!' : '🎉 17音そろいました！ずっしりとした俳句の完成です。';
+      hint.style.color = 'var(--teal)';
+    } else {
+      hint.textContent = isEn ? `Too many by ${total-17}. Try removing a word.` : `${total-17}音多いです。言葉を1つ減らしてみましょう。`;
+      hint.style.color = 'var(--brush)';
+    }
+  }
+
+  // 分析ボタンの有効/無効
+  const btn = document.getElementById('btnAnalyze');
+  if (btn) btn.disabled = (total !== 17);
 }
 
 /* ===== STEP TABS ===== */

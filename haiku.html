@@ -177,8 +177,46 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(250,250,248,
 
 footer{background:var(--ink);color:rgba(250,250,248,.4);padding:2rem 1.5rem;text-align:center;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;}
 footer a{color:var(--gold);text-decoration:none;}
+/* ── 新出力フォーマット（Copilot形式） ── */
+.out-overall{font-size:.95rem;color:var(--ink-mid);margin-top:.6rem;line-height:1.7;font-style:italic;}
+.eval-section{background:var(--white);border:1px solid var(--border);border-left:4px solid var(--gold);padding:1.5rem 1.5rem 1.5rem 1.4rem;margin-bottom:1.2rem;}
+.eval-sec-title{font-family:var(--font-display);font-size:1.15rem;color:var(--ink);margin-bottom:.8rem;font-weight:700;}
+.eval-sec-body{font-size:.95rem;color:var(--ink-mid);line-height:1.8;white-space:pre-wrap;}
+.out-haiku-disp{font-family:var(--font-display);font-size:clamp(1.2rem,3vw,1.8rem);color:var(--ink);padding:.6rem 0;margin-bottom:.8rem;border-left:3px solid var(--gold-lt);padding-left:.8rem;}
+/* 評価テーブル */
+.eval-table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem;font-size:.9rem;}
+.eval-table th{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.08em;background:var(--ink);color:var(--bg);padding:.5rem .75rem;text-align:left;}
+.eval-table td{padding:.5rem .75rem;border-bottom:1px solid var(--border-lt);color:var(--ink-mid);vertical-align:top;}
+.eval-table tr:last-child td{border-bottom:none;}
+.eval-table tr:hover td{background:var(--bg-alt);}
+.eval-table td:nth-child(2){font-family:var(--font-mono);font-size:.8rem;color:var(--teal);white-space:nowrap;}
+/* ミニスコアカード */
+.eval-mini-card{background:var(--bg-alt);border:1px solid var(--border-lt);padding:1rem;text-align:center;}
+.eval-mini-label{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;color:var(--ink-lite);margin-bottom:.4rem;}
+.eval-mini-score{font-family:var(--font-display);font-size:1.8rem;color:var(--gold);line-height:1;}
+.eval-summary{background:var(--bg-alt);border-left:3px solid var(--teal);padding:1rem 1.2rem;margin-top:1rem;font-size:.92rem;color:var(--ink-mid);line-height:1.7;}
 .pdf-all .out-panel{display:block!important;}
-@media(max-width:480px){.ku-sep{display:none;}.ku-row{flex-direction:column;}.ku-wrap{min-width:100%;}}
+
+/* OUTPUT */
+#output-section{display:none;padding:4rem 1.5rem;background:var(--bg);}
+.output-inner{max-width:780px;margin:0 auto;}
+.out-header{border-left:4px solid var(--gold);padding:1.5rem;background:var(--white);border:1px solid var(--border);margin-bottom:1.2rem;}
+.out-haiku{font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2.4rem);color:var(--ink);line-height:1.4;}
+.out-yomi{font-family:var(--font-mono);font-size:.8rem;color:var(--teal);margin-top:.3rem;}
+.out-meta{font-family:var(--font-mono);font-size:.72rem;color:var(--ink-lite);margin-top:.3rem;}
+.out-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.2rem;flex-wrap:wrap;}
+.out-tab{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;padding:.55rem .9rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--ink-lite);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.out-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.out-panel{display:none;}
+.out-panel.active{display:block;}
+.puml-wrap{background:var(--bg-alt);border:1px solid var(--border-lt);padding:1rem;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.puml-svg{max-width:100%;height:auto;display:none;}
+.puml-loading{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-lite);text-align:center;padding:1.5rem;}
+.puml-note{font-size:.88rem;color:var(--ink-mid);margin-top:.8rem;line-height:1.65;padding:.8rem;background:var(--bg-alt);border-left:3px solid var(--border);}
+.out-actions{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;}
+.out-btn{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;padding:.65rem 1.3rem;border:1px solid var(--border);cursor:pointer;background:var(--white);color:var(--ink);transition:all .2s;}
+.out-btn:hover{background:var(--ink);color:var(--bg);}
+.out-btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);}
 </style>
 </head>
 <body>
@@ -341,35 +379,81 @@ footer a{color:var(--gold);text-decoration:none;}
   <div class="output-inner">
     <div style="font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;color:var(--gold);margin-bottom:1rem;">Fadesheet 出力 · C4 Analysis</div>
     <div id="pdf-target">
+
+      <!-- ── ヘッダー ── -->
       <div class="out-header">
         <div class="out-haiku" id="out-haiku">—</div>
-        <div class="out-yomi"  id="out-yomi"  style="display:none">—</div>
-        <div class="out-meta"  id="out-meta">—</div>
+        <div class="out-yomi" id="out-yomi" style="display:none">—</div>
+        <div class="out-meta" id="out-meta">—</div>
+        <div id="out-overall" class="out-overall"></div>
       </div>
-      <div style="background:var(--white);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;">
-        <div style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;color:var(--gold);margin-bottom:.6rem;">句の背景・概説</div>
-        <div id="out-bg" style="font-size:.92rem;color:var(--ink-mid);line-height:1.7;">—</div>
-      </div>
-      <div class="out-tabs">
-        <button class="out-tab active" data-tab="ctx">L1 · Context</button>
-        <button class="out-tab" data-tab="ctr">L2 · Container</button>
-        <button class="out-tab" data-tab="cmp">L3 · Component</button>
-      </div>
-      <div class="out-panel active" id="p-ctx"><div class="puml-wrap"><div class="puml-loading" id="ld-ctx">図を生成中…</div><img id="img-ctx" class="puml-svg" alt="L1 Context"></div><p class="puml-note" id="note-ctx"></p></div>
-      <div class="out-panel" id="p-ctr"><div class="puml-wrap"><div class="puml-loading" id="ld-ctr">図を生成中…</div><img id="img-ctr" class="puml-svg" alt="L2 Container"></div><p class="puml-note" id="note-ctr"></p></div>
-      <div class="out-panel" id="p-cmp"><div class="puml-wrap"><div class="puml-loading" id="ld-cmp">図を生成中…</div><img id="img-cmp" class="puml-svg" alt="L3 Component"></div><p class="puml-note" id="note-cmp"></p></div>
-      <div style="margin-top:2rem;">
-        <div style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;color:var(--gold);margin-bottom:1rem;">工学的評価スコア</div>
-        <div class="eval-grid">
-          <div class="eval-card"><div class="eval-label">季語の効果 · Kigo</div><div class="eval-score" id="ev-kigo">—</div><div class="eval-bar-wrap"><div class="eval-bar" id="bar-kigo"></div></div></div>
-          <div class="eval-card"><div class="eval-label">音韻設計 · Sound</div><div class="eval-score" id="ev-sound">—</div><div class="eval-bar-wrap"><div class="eval-bar" id="bar-sound"></div></div></div>
-          <div class="eval-card"><div class="eval-label">余白の間 · Ma</div><div class="eval-score" id="ev-ma">—</div><div class="eval-bar-wrap"><div class="eval-bar" id="bar-ma"></div></div></div>
-          <div class="eval-card"><div class="eval-label">情景の深度 · Scene</div><div class="eval-score" id="ev-scene">—</div><div class="eval-bar-wrap"><div class="eval-bar" id="bar-scene"></div></div></div>
+
+      <!-- ── 🌿 季語の判定 ── -->
+      <div class="eval-section">
+        <div class="eval-sec-title">🌿 季語の判定</div>
+        <div class="eval-sec-body" id="ev-kigo-body">—</div>
+        <div class="eval-row-grid">
+          <div class="eval-mini-card">
+            <div class="eval-mini-label">季語の効果 · Kigo</div>
+            <div class="eval-mini-score" id="ev-kigo">—</div>
+            <div class="eval-bar-wrap"><div class="eval-bar" id="bar-kigo"></div></div>
+          </div>
         </div>
-        <div class="eval-desc" id="ev-desc"></div>
-        <div class="eval-advice" id="ev-advice"></div>
       </div>
-    </div>
+
+      <!-- ── 🍶 句の読みと鑑賞 ── -->
+      <div class="eval-section">
+        <div class="eval-sec-title">🍶 句の読みと鑑賞</div>
+        <div class="out-haiku-disp" id="out-haiku-disp">—</div>
+        <div class="eval-sec-body" id="ev-kansha">—</div>
+      </div>
+
+      <!-- ── 📊 評価ポイント（俳句的観点） ── -->
+      <div class="eval-section">
+        <div class="eval-sec-title">📊 評価ポイント（俳句的観点）</div>
+        <table class="eval-table" id="eval-table">
+          <thead>
+            <tr><th>観点</th><th>評価</th><th>コメント</th></tr>
+          </thead>
+          <tbody id="eval-table-body">
+            <tr><td>季語の働き</td><td id="ev-t-kigo">—</td><td id="ev-t-kigo-c">—</td></tr>
+            <tr><td>写生性</td><td id="ev-t-photo">—</td><td id="ev-t-photo-c">—</td></tr>
+            <tr><td>余情</td><td id="ev-t-ma">—</td><td id="ev-t-ma-c">—</td></tr>
+            <tr><td>リズム</td><td id="ev-t-rhythm">—</td><td id="ev-t-rhythm-c">—</td></tr>
+          </tbody>
+        </table>
+        <div class="eval-grid" style="margin-top:1.2rem;">
+          <div class="eval-mini-card"><div class="eval-mini-label">音韻設計 · Sound</div><div class="eval-mini-score" id="ev-sound">—</div><div class="eval-bar-wrap"><div class="eval-bar" id="bar-sound"></div></div></div>
+          <div class="eval-mini-card"><div class="eval-mini-label">余白の間 · Ma</div><div class="eval-mini-score" id="ev-ma">—</div><div class="eval-bar-wrap"><div class="eval-bar" id="bar-ma"></div></div></div>
+          <div class="eval-mini-card"><div class="eval-mini-label">情景の深度 · Scene</div><div class="eval-mini-score" id="ev-scene">—</div><div class="eval-bar-wrap"><div class="eval-bar" id="bar-scene"></div></div></div>
+        </div>
+        <div class="eval-summary" id="ev-summary">—</div>
+      </div>
+
+      <!-- ── 🔍 アドバイス ── -->
+      <div class="eval-section">
+        <div class="eval-sec-title">🔍 アドバイス：さらに深めるなら</div>
+        <div class="eval-sec-body" id="ev-advice">—</div>
+      </div>
+
+      <!-- ── C4モデル図 ── -->
+      <div class="eval-section">
+        <div class="eval-sec-title">📐 C4モデル構造図</div>
+        <div class="out-tabs">
+          <button class="out-tab active" data-tab="ctx">L1 · Context</button>
+          <button class="out-tab" data-tab="ctr">L2 · Container</button>
+          <button class="out-tab" data-tab="cmp">L3 · Component</button>
+          <button class="out-tab" data-tab="seq">シーケンス図</button>
+          <button class="out-tab" data-tab="sta">状態遷移図</button>
+        </div>
+        <div class="out-panel active" id="p-ctx"><div class="puml-wrap"><div class="puml-loading" id="ld-ctx">図を生成中…</div><img id="img-ctx" class="puml-svg" alt="L1 Context"></div><p class="puml-note" id="note-ctx"></p></div>
+        <div class="out-panel" id="p-ctr"><div class="puml-wrap"><div class="puml-loading" id="ld-ctr">図を生成中…</div><img id="img-ctr" class="puml-svg" alt="L2 Container"></div><p class="puml-note" id="note-ctr"></p></div>
+        <div class="out-panel" id="p-cmp"><div class="puml-wrap"><div class="puml-loading" id="ld-cmp">図を生成中…</div><img id="img-cmp" class="puml-svg" alt="L3 Component"></div><p class="puml-note" id="note-cmp"></p></div>
+        <div class="out-panel" id="p-seq"><div class="puml-wrap"><div class="puml-loading" id="ld-seq">図を生成中…</div><img id="img-seq" class="puml-svg" alt="Sequence Diagram"></div><p class="puml-note" id="note-seq"></p></div>
+        <div class="out-panel" id="p-sta"><div class="puml-wrap"><div class="puml-loading" id="ld-sta">図を生成中…</div><img id="img-sta" class="puml-svg" alt="State Diagram"></div><p class="puml-note" id="note-sta"></p></div>
+      </div>
+
+    </div><!-- /#pdf-target -->
     <div class="out-actions">
       <button class="out-btn primary" id="btn-pdf">📄 PDFで出力する</button>
       <button class="out-btn" id="btn-save">💾 履歴に保存する</button>
@@ -560,14 +644,52 @@ function renderPuml(code,imgId,ldId){const img=document.getElementById(imgId);co
 /* ══ Claude API ══ */
 async function callClaude(prompt){const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});if(!r.ok)throw new Error('API '+r.status);const d=await r.json();return d.content.filter(b=>b.type==='text').map(b=>b.text).join('');}
 
-function buildPumlPrompt(inp){return `あなたはC4モデル専門家です。以下の俳句をC4モデルで構造解析し、PlantUMLコード（L1 Context / L2 Container / L3 Component）をJSON形式で返してください。\n\n俳句（原文）：${inp.haiku}\n${inp.yomi!==inp.haiku?`読み：${inp.yomi}`:''}${inp.bg?`\n背景：${inp.bg}`:''}\n\n必須ルール：\n1. !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml を使用\n2. skinparam backgroundColor #FAFAF8 を含める\n3. 波括弧{}・疑問符?は使用禁止\n4. @startuml〜@endumlで囲む\n5. JSON形式のみ（マークダウン不可）\n\n形式：{"ctx":"@startuml...@enduml","ctr":"@startuml...@enduml","cmp":"@startuml...@enduml","note_ctx":"L1解説","note_ctr":"L2解説","note_cmp":"L3解説"}`;}
+function buildPumlPrompt(inp){return `あなたはC4モデル専門家です。以下の俳句をC4モデルで構造解析し、5種類のPlantUMLコードをJSON形式で返してください。
 
-function buildEvalPrompt(inp){return `俳句の科学の専門家として、以下の俳句を工学的に評価してください。\n\n俳句：${inp.haiku}\n${inp.yomi!==inp.haiku?`読み：${inp.yomi}`:''}${inp.bg?`\n背景：${inp.bg}`:''}${inp.exp?`\n経験：${inp.exp}`:''}\n\nJSON形式のみで返答：{"c4desc":"C4図の解説200字","kigo":数値0-100,"sound":数値0-100,"ma":数値0-100,"scene":数値0-100,"advice":"アドバイス200字"}`;}
+俳句（原文）：${inp.haiku}
+${inp.yomi!==inp.haiku?`読み：${inp.yomi}`:''}${inp.bg?`\n背景：${inp.bg}`:''}
+
+必須ルール：
+1. C4図は !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml 等を使用
+2. skinparam backgroundColor #FAFAF8 を全図に含める
+3. 波括弧{}・疑問符?は使用禁止（日本語で代替）
+4. 必ず@startuml〜@endumlで囲む
+5. シーケンス図：俳句の「読者が句を読む体験の流れ」を時系列で表現（participant/->）
+6. 状態遷移図：句を読む前→読む中→読んだ後の「心理状態変化」を表現（state/-->）
+7. JSON形式のみ（マークダウン不可）
+
+形式：{"ctx":"@startuml...@enduml","ctr":"@startuml...@enduml","cmp":"@startuml...@enduml","seq":"@startuml...@enduml","sta":"@startuml...@enduml","note_ctx":"L1解説","note_ctr":"L2解説","note_cmp":"L3解説","note_seq":"シーケンス図解説","note_sta":"状態遷移図解説"}`;}
+
+function buildEvalPrompt(inp){return `俳句の科学の専門家として、以下の俳句を詳細に評価してください。
+
+俳句：${inp.haiku}
+${inp.yomi!==inp.haiku?`読み：${inp.yomi}`:''}${inp.bg?`\n背景：${inp.bg}`:''}${inp.exp?`\n経験：${inp.exp}`:''}
+
+以下のJSON形式のみで返答してください（マークダウン不可）：
+{
+  "overall": "句の総評（1〜2文）",
+  "kigo_body": "🌿季語の判定：季語の名前・季節・歳時記分類・句中での働きを詳しく説明（3〜5文）",
+  "kigo": 数値0-100,
+  "kansha": "🍶句の読みと鑑賞：語句ごとの解説と全体評価（上五・中七・下五の構造分析を含む、5〜8文）",
+  "t_kigo": "良／高い／やや弱い／普通",
+  "t_kigo_c": "季語の働きについての短評",
+  "t_photo": "良／高い／やや弱い／普通",
+  "t_photo_c": "写生性についての短評",
+  "t_ma": "良／高い／やや弱い／普通",
+  "t_ma_c": "余情についての短評",
+  "t_rhythm": "良／高い／やや弱い／普通",
+  "t_rhythm_c": "リズムについての短評",
+  "summary": "全体評価：句の構造と表現の総括（2〜3文）",
+  "sound": 数値0-100,
+  "ma": 数値0-100,
+  "scene": 数値0-100,
+  "advice": "🔍アドバイス：さらに深めるための具体的な提案（2〜3項目、箇条書き風に）"
+}`;}
 
 function safeJSON(raw){try{return JSON.parse(raw.replace(/```json|```/g,'').trim());}catch{const m=raw.match(/\{[\s\S]*\}/);if(m){try{return JSON.parse(m[0]);}catch{}}return null;}}
 
-function fallbackPuml(inp){const h=inp.haiku;const k1=inp.ku1||'上の句',k2=inp.ku2||'中の句',k3=inp.ku3||'下の句';return{ctx:`@startuml\n!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml\nskinparam backgroundColor #FAFAF8\ntitle L1 Context\nPerson(r,"読者","俳句を読む人")\nSystem(s,"${h}","俳句システム")\nRel(r,s,"情景を想像する")\n@enduml`,ctr:`@startuml\n!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\nskinparam backgroundColor #FAFAF8\ntitle L2 Container\nContainer(c1,"${k1}","上の句","設定")\nContainer(c2,"${k2}","中の句","展開")\nContainer(c3,"${k3}","下の句","余韻")\nRel(c1,c2,"転換")\nRel(c2,c3,"収束")\n@enduml`,cmp:`@startuml\n!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml\nskinparam backgroundColor #FAFAF8\ntitle L3 Component\nContainer_Boundary(b,"${h}") {\n  Component(w1,"${k1}","上の句","5音")\n  Component(w2,"${k2}","中の句","7音")\n  Component(w3,"${k3}","下の句","5音")\n}\n@enduml`,note_ctx:'俳句システムと読者の関係',note_ctr:'三層の句構造',note_cmp:'言語コンポーネント'};}
-function fallbackEval(inp){return{c4desc:`「${inp.haiku}」のC4構造を生成しました。`,kigo:75,sound:78,ma:80,scene:76,advice:'AI分析は一時的に利用できませんでした。'};}
+function fallbackPuml(inp){const h=inp.haiku;const k1=inp.ku1||'上の句',k2=inp.ku2||'中の句',k3=inp.ku3||'下の句';return{ctx:`@startuml\n!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml\nskinparam backgroundColor #FAFAF8\ntitle L1 Context\nPerson(r,"読者","俳句を読む人")\nSystem(s,"${h}","俳句システム")\nRel(r,s,"情景を想像する")\n@enduml`,ctr:`@startuml\n!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\nskinparam backgroundColor #FAFAF8\ntitle L2 Container\nContainer(c1,"${k1}","上の句","設定")\nContainer(c2,"${k2}","中の句","展開")\nContainer(c3,"${k3}","下の句","余韻")\nRel(c1,c2,"転換")\nRel(c2,c3,"収束")\n@enduml`,cmp:`@startuml\n!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml\nskinparam backgroundColor #FAFAF8\ntitle L3 Component\nContainer_Boundary(b,"${h}") {\n  Component(w1,"${k1}","上の句","5音")\n  Component(w2,"${k2}","中の句","7音")\n  Component(w3,"${k3}","下の句","5音")\n}\n@enduml`,seq:`@startuml\nskinparam backgroundColor #FAFAF8\ntitle シーケンス図 — 句を読む体験の流れ\nparticipant 読者\nparticipant 上五 as "${k1}"\nparticipant 中七 as "${k2}"\nparticipant 下五 as "${k3}"\n読者 -> 上五 : 読む\n上五 -> 中七 : 場面転換\n中七 -> 下五 : 展開\n下五 -> 読者 : 余韻\n@enduml`,sta:`@startuml\nskinparam backgroundColor #FAFAF8\ntitle 状態遷移図 — 読者の心理変化\n[*] --> 日常\n日常 --> 想起 : 俳句を読む\n想起 --> 没入 : 情景を想像\n没入 --> 余韻 : 句が終わる\n余韻 --> [*] : 沈黙\n@enduml`,note_ctx:'俳句システムと読者の関係',note_ctr:'三層の句構造',note_cmp:'言語コンポーネント',note_seq:'読者が句を受け取る時系列の流れを示します。',note_sta:'句を読む前後の読者の心理状態変化を示します。'};}
+function fallbackEval(inp){return{overall:`「${inp.haiku}」の評価を生成しました。`,kigo_body:'季語の詳細解析を生成中です。',kigo:75,kansha:'句の鑑賞を生成中です。',t_kigo:'良',t_kigo_c:'季節感を表現しています。',t_photo:'良',t_photo_c:'具体的な描写があります。',t_ma:'良',t_ma_c:'余情が感じられます。',t_rhythm:'良',t_rhythm_c:'五七五のリズムが整っています。',summary:'安定した句です。',sound:78,ma:80,scene:76,advice:'AI分析は一時的に利用できませんでした。別の句で試すか、背景情報を追加してください。'};}
 
 const MSGS=['俳句の構造を解析中…','C4モデルを設計中…','季語の効果を評価中…','音韻パターンを解析中…','余白の設計を読み取り中…','PlantUMLコードを生成中…','アドバイスを生成中…'];
 let si=null;
@@ -595,6 +717,8 @@ async function startAnalysis(){
 
 function renderOutput(res){
   const{inp,puml,ev}=res;
+
+  // ── ヘッダー ──
   document.getElementById('out-haiku').textContent=inp.haiku;
   const yEl=document.getElementById('out-yomi');
   if(inp.yomi&&inp.yomi!==inp.haiku){yEl.textContent='読み：'+inp.yomi;yEl.style.display='block';}else{yEl.style.display='none';}
@@ -602,15 +726,37 @@ function renderOutput(res){
   if(inp.title)meta=inp.title+(meta?'　'+meta:'');
   if(inp.kigo)meta+=(meta?'　':'')+'【季語】'+inp.kigo;
   document.getElementById('out-meta').textContent=meta;
-  document.getElementById('out-bg').textContent=inp.bg||'（背景情報なし）';
-  ['ctx','ctr','cmp'].forEach(k=>{if(puml[k])renderPuml(puml[k],'img-'+k,'ld-'+k);document.getElementById('note-'+k).textContent=puml['note_'+k]||'';});
-  ['kigo','sound','ma','scene'].forEach(k=>{const v=ev[k]||0;document.getElementById('ev-'+k).textContent=v;setTimeout(()=>{document.getElementById('bar-'+k).style.width=v+'%';},100);});
-  document.getElementById('ev-desc').textContent=ev.c4desc||'';
+  document.getElementById('out-overall').textContent=ev.overall||'';
+
+  // ── 🌿 季語の判定 ──
+  document.getElementById('ev-kigo-body').textContent=ev.kigo_body||'';
+  const kigoV=ev.kigo||0;
+  document.getElementById('ev-kigo').textContent=kigoV;
+  setTimeout(()=>{document.getElementById('bar-kigo').style.width=kigoV+'%';},100);
+
+  // ── 🍶 読みと鑑賞 ──
+  document.getElementById('out-haiku-disp').textContent=inp.haiku;
+  document.getElementById('ev-kansha').textContent=ev.kansha||'';
+
+  // ── 📊 評価テーブル ──
+  const td=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val||'—';};
+  td('ev-t-kigo',ev.t_kigo);td('ev-t-kigo-c',ev.t_kigo_c);
+  td('ev-t-photo',ev.t_photo);td('ev-t-photo-c',ev.t_photo_c);
+  td('ev-t-ma',ev.t_ma);td('ev-t-ma-c',ev.t_ma_c);
+  td('ev-t-rhythm',ev.t_rhythm);td('ev-t-rhythm-c',ev.t_rhythm_c);
+  document.getElementById('ev-summary').textContent=ev.summary||'';
+  ['sound','ma','scene'].forEach(k=>{const v=ev[k]||0;document.getElementById('ev-'+k).textContent=v;setTimeout(()=>{document.getElementById('bar-'+k).style.width=v+'%';},100);});
+
+  // ── 🔍 アドバイス ──
   document.getElementById('ev-advice').textContent=ev.advice||'';
+
+  // ── C4図（5種） ──
+  ['ctx','ctr','cmp','seq','sta'].forEach(k=>{if(puml[k])renderPuml(puml[k],'img-'+k,'ld-'+k);const noteEl=document.getElementById('note-'+k);if(noteEl)noteEl.textContent=puml['note_'+k]||'';});
+
   const sec=document.getElementById('output-section');sec.style.display='block';sec.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function switchTab(id){document.querySelectorAll('.out-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));document.querySelectorAll('.out-panel').forEach(p=>p.classList.remove('active'));document.getElementById('p-'+id).classList.add('active');}
+function switchTab(id){document.querySelectorAll('.out-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));document.querySelectorAll('.out-panel').forEach(p=>p.classList.remove('active'));const panel=document.getElementById('p-'+id);if(panel)panel.classList.add('active');}
 
 async function exportPDF(){if(!currentResult)return;document.getElementById('output-section').classList.add('pdf-all');const fn=`Fadesheet_${currentResult.inp.haiku.replace(/[\s　]/g,'_')}.pdf`;const opt={margin:[10,10,10,10],filename:fn,image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,backgroundColor:'#FAFAF8'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['avoid-all','css','legacy']}};await html2pdf().set(opt).from(document.getElementById('pdf-target')).save();document.getElementById('output-section').classList.remove('pdf-all');}
 

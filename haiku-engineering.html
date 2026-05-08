@@ -614,7 +614,7 @@ footer {
 /* ════════════════════════════════════════════════
    FADESHEET SYSTEM — 俳句入力・生成・保存・PDF
 ════════════════════════════════════════════════ */
-#fadesheet { background: var(--bg-alt); }
+#facesheet { background: var(--bg-alt); }
 #fs-output  { background: var(--bg); }
 #fs-history { background: var(--bg-alt); }
 
@@ -1017,7 +1017,7 @@ footer {
     <li><a href="#structure">書籍構成</a></li>
     <li><a href="#c4demo">C4図解</a></li>
     <li><a href="#videos">動画</a></li>
-    <li><a href="#fadesheet">Fadesheet</a></li>
+    <li><a href="#facesheet">Facesheet</a></li>
     <li><a href="#dojo-cta">論文道場</a></li>
   </ul>
   <div class="nav-right">
@@ -1320,9 +1320,9 @@ footer {
 </section>
 
 <!-- ═══════════════════ FADESHEET INPUT ═══════════════════ -->
-<section id="fadesheet">
+<section id="facesheet">
   <div class="section-inner">
-    <div class="section-label reveal">fadesheet · 俳句分析シート</div>
+    <div class="section-label reveal">facesheet · 俳句分析シート</div>
     <h2 class="section-h2 reveal">あなたの俳句を<br>C4モデルで解析する</h2>
     <p class="section-lead reveal">俳句の情報を入力して「生成」を押すと、Claude AIがC4モデル図・構造解説・評価とアドバイスを自動生成します。結果はPDF出力・履歴保存が可能です。</p>
 
@@ -1395,7 +1395,7 @@ footer {
 
     <!-- アクションボタン -->
     <div class="fs-actions reveal">
-      <button class="btn-generate" id="btn-gen" onclick="generateFadesheet()">
+      <button class="btn-generate" id="btn-gen" onclick="generateFacesheet()">
         <span id="gen-icon">✦</span> Claude AIで生成する
       </button>
       <button class="btn-clear" onclick="clearForm()">✕ クリア</button>
@@ -1426,7 +1426,7 @@ footer {
           <!-- ヘッダー -->
           <div class="pdf-header">
             <div class="pdf-title-block">
-              <div class="pdf-badge">俳句の科学入門 · Fadesheet</div>
+              <div class="pdf-badge">俳句の科学入門 · Facesheet</div>
               <div class="pdf-haiku-display" id="pdf-haiku-display">—</div>
             </div>
             <div class="pdf-meta-block">
@@ -1509,7 +1509,7 @@ footer {
 
         <!-- 出力アクション -->
         <div class="fs-output-actions">
-          <button class="btn-save" onclick="saveFadesheet()">💾 履歴に保存</button>
+          <button class="btn-save" onclick="saveFacesheet()">💾 履歴に保存</button>
           <button class="btn-pdf" onclick="exportPDF()">📄 PDF出力</button>
         </div>
       </div><!-- /.fs-preview-card -->
@@ -1522,7 +1522,7 @@ footer {
 <section id="fs-history">
   <div class="section-inner">
     <div class="section-label reveal">history · 保存済み俳句</div>
-    <h2 class="section-h2 reveal">Fadesheetの履歴</h2>
+    <h2 class="section-h2 reveal">Facesheetの履歴</h2>
     <p class="section-lead reveal">保存した俳句の解析シートを選択すると再表示（再生）できます。</p>
     <div class="fs-history-list reveal" id="fs-history-list">
       <div class="fs-history-empty" id="fs-history-empty">まだ保存されていません。俳句を入力・生成してから「履歴に保存」を押してください。</div>
@@ -1917,7 +1917,7 @@ function stopStream() {
 ════════════════════ */
 let currentResult = null;
 
-async function generateFadesheet() {
+async function generateFacesheet() {
   const d = getFormData();
   if (!d.ku1 && !d.ku2 && !d.ku3) {
     alert('俳句（上の句・中の句・下の句）を入力してください。'); return;
@@ -2100,7 +2100,7 @@ function switchPdfTab(key, btn) {
 /* ════════════════════
    LocalStorage 保存・再生
 ════════════════════ */
-const LS_KEY = 'c4_fadesheet_v1';
+const LS_KEY = 'c4_facesheet_v1';
 
 function loadHistory() {
   try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
@@ -2110,7 +2110,7 @@ function saveHistory(arr) {
   localStorage.setItem(LS_KEY, JSON.stringify(arr));
 }
 
-function saveFadesheet() {
+function saveFacesheet() {
   if (!currentResult) { alert('先に俳句を生成してください。'); return; }
   const arr = loadHistory();
   arr.unshift(currentResult);           // 先頭に追加
@@ -2151,14 +2151,14 @@ function renderHistory() {
         <div class="fs-hi-meta">${res.d.name || '—'} · ${date}${res.fallback ? ' · テンプレート生成' : ' · AI生成'}</div>
       </div>
       <div class="fs-hi-actions">
-        <button class="btn-replay" onclick="replayFadesheet(${idx})">▶ 再生</button>
+        <button class="btn-replay" onclick="replayFacesheet(${idx})">▶ 再生</button>
         <button class="btn-delete" onclick="deleteHistory(${idx})">✕</button>
       </div>`;
     list.appendChild(item);
   });
 }
 
-function replayFadesheet(idx) {
+function replayFacesheet(idx) {
   const arr = loadHistory();
   if (!arr[idx]) return;
   currentResult = arr[idx];
@@ -2200,7 +2200,7 @@ async function exportPDF() {
   document.querySelectorAll('.pdf-c4-panel').forEach(p => p.style.display = 'block');
 
   const haiku = getHaikuFull(currentResult.d);
-  const filename = `Fadesheet_${(haiku || 'haiku').replace(/[　\s]/g,'_')}.pdf`;
+  const filename = `Facesheet_${(haiku || 'haiku').replace(/[　\s]/g,'_')}.pdf`;
 
   const target = document.getElementById('fs-pdf-target');
   const opt = {

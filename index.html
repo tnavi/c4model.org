@@ -1,196 +1,1335 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>論文道場｜C4モデルで論文構造を可視化する思考支援プラットフォーム</title>
-  <meta name="description" content="論文道場は、C4モデルと7Rフレームワークに基づき、論文・レポート・企画書の構造を自動生成する思考支援プラットフォームである。">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C4 Model Study Project — c4model.org</title>
+  <meta name="description" content="The universal architecture framework for academic papers, software systems, and beyond. Home of Thesis Dojo.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
   <style>
-    /* 全体のフォント・レイアウト設定 */
-    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.8; margin: 0; color: #1f2937; background-color: #f9fafb; }
-    header, footer { background: #111827; color: #f9fafb; padding: 24px 32px; }
-    main { display: flex; min-height: calc(100vh - 140px); max-width: 1200px; margin: 0 auto; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    
-    /* 左側ナビゲーション（目次） */
-    nav { width: 280px; background: #f3f4f6; padding: 32px 24px; box-sizing: border-box; border-right: 1px solid #e5e7eb; }
-    nav h2 { font-size: 16px; margin-top: 0; color: #374151; letter-spacing: 0.05em; }
-    nav ul { list-style: none; padding-left: 0; margin: 0; position: sticky; top: 32px; }
-    nav li { margin-bottom: 4px; }
-    nav a { color: #111827; text-decoration: none; font-size: 14px; display: block; padding: 8px 12px; border-radius: 4px; transition: background 0.2s, color 0.2s; }
-    nav a:hover { background: #e5e7eb; color: #1d4ed8; text-decoration: none; }
-    
-    /* 右側メインコンテンツ */
-    .content-area { flex: 1; padding: 40px 56px; box-sizing: border-box; }
-    h1, h2, h3 { font-weight: 700; color: #111827; }
-    h2 { border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; margin-top: 0; font-size: 24px; }
-    h3 { font-size: 18px; margin-top: 24px; color: #1f2937; }
-    .section-block { margin-bottom: 64px; }
-    .tagline { font-size: 16px; color: #9ca3af; margin: 8px 0 0; }
-    
-    /* リストの装飾 */
-    ul:not(nav ul), ol { padding-left: 24px; color: #374151; }
-    li { margin-bottom: 8px; }
-    
-    /* ボタンとリンク */
-    a { color: #1d4ed8; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .btn {
-      display: inline-block;
-      background: #111827;
-      color: #ffffff;
-      padding: 10px 24px;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-    .btn:hover { background: #374151; text-decoration: none; color: #ffffff; }
-    
-    /* FAQリストの装飾（QとAを自動付与） */
-    .faq-list dt { font-weight: bold; margin-top: 24px; color: #111827; }
-    .faq-list dt::before { content: "Q. "; color: #1d4ed8; font-weight: 900; }
-    .faq-list dd { margin-left: 0; margin-top: 8px; padding-left: 24px; color: #4b5563; border-left: 3px solid #e5e7eb; }
-    .faq-list dd::before { content: "A. "; font-weight: 900; color: #10b981; margin-left: -24px; margin-right: 8px; }
+  /* ══════════════════════════════════════════════════════
+     ROOT & RESET
+  ══════════════════════════════════════════════════════ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* スマートフォン向けレスポンシブ対応 */
-    @media (max-width: 768px) {
-      main { flex-direction: column; box-shadow: none; }
-      nav { width: 100%; border-right: none; border-bottom: 1px solid #e5e7eb; padding: 24px; }
-      nav ul { position: static; }
-      .content-area { padding: 32px 24px; }
-    }
+  :root {
+    --white:     #FFFFFF;
+    --bg:        #FAFAF8;
+    --bg-alt:    #F4F1EC;
+    --bg-dark:   #1A1A2E;
+    --ink:       #1A1A2E;
+    --ink-mid:   #3D3D5C;
+    --ink-lite:  #7A7A9A;
+    --gold:      #B8860B;
+    --gold-lt:   #D4A01A;
+    --teal:      #1A7A8A;
+    --teal-lt:   #2A9BAD;
+    --sage:      #4A7A5A;
+    --purple:    #7A4A9A;
+    --border:    #D8D4CA;
+    --border-lt: #ECEAE4;
+    --shadow:    rgba(26,26,46,0.08);
+    --shadow-md: rgba(26,26,46,0.14);
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-mono:    'DM Mono', 'Courier New', monospace;
+    --font-body:    'Source Serif 4', Georgia, serif;
+
+    --fs-hero: clamp(3.4rem, 7vw, 6.2rem);
+    --fs-h2:   clamp(2rem, 4vw, 3.2rem);
+    --fs-h3:   clamp(1.4rem, 2.5vw, 1.9rem);
+    --fs-body: 1.1rem;
+    --fs-mono: 0.82rem;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--gold); color: #fff; }
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--gold); }
+
+  /* ══════════════════════════════════════════════════════
+     LANGUAGE TOGGLE LOGIC
+  ══════════════════════════════════════════════════════ */
+  /* 初期状態：日本語表示・英語非表示（JSで上書き） */
+  [data-en] { display: none; }
+  [data-ja] { display: inline; }
+
+  /* ══════════════════════════════════════════════════════
+     NAV
+  ══════════════════════════════════════════════════════ */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    background: rgba(250,250,248,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3rem;
+    height: 60px;
+    transition: height 0.3s var(--ease);
+  }
+
+  .nav-logo {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  .nav-logo-pip {
+    width: 7px; height: 7px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: pip 2.5s ease-in-out infinite;
+  }
+  @keyframes pip { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.5)} }
+
+  .nav-center {
+    display: flex; gap: 2.5rem; list-style: none;
+  }
+  .nav-center a {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-lite);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-center a:hover { color: var(--gold); }
+
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+
+  /* Lang toggle */
+  .lang-toggle {
+    display: flex;
+    border: 1px solid var(--border);
+  }
+  .lang-btn {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    padding: 0.3rem 0.75rem;
+    background: var(--bg);
+    color: var(--ink-lite);
+    border: none;
+    border-right: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .lang-btn:last-child { border-right: none; }
+  .lang-btn.active {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .nav-cta {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--ink);
+    padding: 0.45rem 1.2rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--teal); }
+
+  /* ══════════════════════════════════════════════════════
+     HERO
+  ══════════════════════════════════════════════════════ */
+  #hero {
+    min-height: 100vh;
+    padding: 100px 3rem 5rem;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 5rem;
+    align-items: center;
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* Subtle grid texture */
+  #hero::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border-lt) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-lt) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+    mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 50%, transparent 100%);
+  }
+
+  .hero-left { position: relative; z-index: 1; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--teal);
+    border: 1px solid var(--teal);
+    padding: 0.3rem 0.85rem;
+    margin-bottom: 1.75rem;
+    opacity: 0;
+    animation: fade-up 0.7s var(--ease) 0.15s forwards;
+  }
+  .hero-badge::before {
+    content:''; width:5px; height:5px; background:var(--teal); border-radius:50%;
+  }
+
+  .hero-h1 {
+    font-family: var(--font-display);
+    font-size: var(--fs-hero);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+    opacity: 0;
+    animation: fade-up 0.8s var(--ease) 0.3s forwards;
+  }
+  .hero-h1 em { font-style: italic; color: var(--gold); }
+  .hero-h1 .accent-teal { color: var(--teal); }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--ink-mid);
+    max-width: 500px;
+    font-weight: 300;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fade-up 0.8s var(--ease) 0.45s forwards;
+  }
+
+  .hero-actions {
+    display: flex; gap: 1rem; align-items: center;
+    opacity: 0;
+    animation: fade-up 0.8s var(--ease) 0.6s forwards;
+  }
+
+  .btn-primary {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--ink);
+    padding: 0.85rem 2rem;
+    border: none; cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover {
+    background: var(--teal);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26,122,138,0.25);
+  }
+
+  .btn-ghost {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-mid);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 0.85rem 2rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ── Hero Right: Haiku Card ── */
+  .hero-right {
+    position: relative; z-index: 1;
+    opacity: 0;
+    animation: fade-in 1s var(--ease) 0.8s forwards;
+  }
+
+  .haiku-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 0 var(--border), 0 20px 60px var(--shadow);
+    overflow: hidden;
+  }
+
+  .haiku-card-header {
+    background: var(--ink);
+    padding: 0.65rem 1.25rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .haiku-card-header span {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    color: rgba(250,250,248,0.6);
+  }
+  .haiku-card-dot {
+    width: 5px; height: 5px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  .haiku-poem {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border-lt);
+  }
+  .haiku-poem p {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .haiku-poem cite {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-lite);
+    margin-top: 0.6rem;
+    font-style: normal;
+  }
+
+  /* ── Spiral steps inside hero card ── */
+  .spiral-stack { display: flex; flex-direction: column; }
+
+  .spiral-item {
+    border-left: 3px solid var(--layer-color);
+    border-bottom: 1px solid var(--border-lt);
+    padding: 0.8rem 1.1rem;
+    margin-left: var(--indent);
+    background: var(--white);
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), background 0.2s;
+    cursor: default;
+  }
+  .spiral-item:last-child { border-bottom: none; }
+  .spiral-item:hover {
+    background: var(--bg);
+    transform: translateX(3px) translateY(-1px);
+    box-shadow: -3px 3px 0 var(--layer-color), 0 4px 16px var(--shadow);
+    position: relative; z-index: 1;
+  }
+
+  .spiral-item[data-layer="1"] { --indent:0;    --layer-color:var(--gold);  }
+  .spiral-item[data-layer="2"] { --indent:1rem; --layer-color:var(--teal);  }
+  .spiral-item[data-layer="3"] { --indent:2rem; --layer-color:var(--sage);  }
+  .spiral-item[data-layer="4"] { --indent:3rem; --layer-color:var(--purple);}
+
+  .spiral-tag {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: var(--layer-color);
+    white-space: nowrap;
+    margin-top: 0.1rem;
+    min-width: 88px;
+  }
+  .spiral-body { font-size: 0.82rem; color: var(--ink-mid); line-height: 1.5; }
+
+  @keyframes fade-up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fade-in { from{opacity:0} to{opacity:1} }
+
+  /* ══════════════════════════════════════════════════════
+     SHARED SECTION
+  ══════════════════════════════════════════════════════ */
+  .section-wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 6rem 3rem;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex; align-items: center; gap: 0.7rem;
+    margin-bottom: 0.85rem;
+  }
+  .section-label::before {
+    content: ''; width: 24px; height: 1px; background: var(--gold);
+  }
+
+  .section-h2 {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1.1rem;
+  }
+  .section-h2 em { font-style: italic; color: var(--gold); }
+
+  .section-body {
+    font-size: 1.05rem;
+    color: var(--ink-mid);
+    max-width: 540px;
+    font-weight: 300;
+    line-height: 1.85;
+  }
+
+  .divider {
+    width: 100%; height: 1px;
+    background: var(--border);
+  }
+
+  /* ══════════════════════════════════════════════════════
+     §1 CONCEPT
+  ══════════════════════════════════════════════════════ */
+  #concept { background: var(--bg-alt); }
+
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  /* Domain cards */
+  .domain-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .domain-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    padding: 1.25rem;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  }
+  .domain-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px var(--shadow-md);
+  }
+  .domain-card.sw { --accent: var(--teal); }
+  .domain-card.ac { --accent: var(--gold); }
+  .domain-card.ha { --accent: var(--sage); }
+  .domain-card.gr { --accent: var(--purple); }
+
+  .domain-icon { font-size: 1.3rem; margin-bottom: 0.5rem; }
+  .domain-title {
+    font-family: var(--font-mono); font-size: 0.72rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 0.3rem;
+  }
+  .domain-desc { font-size: 0.84rem; color: var(--ink-mid); line-height: 1.5; }
+
+  /* Big haiku spiral */
+  .haiku-big {
+    font-family: var(--font-display);
+    font-size: 2.2rem; font-style: italic; font-weight: 300;
+    color: var(--ink); line-height: 1.35;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.25rem; margin-bottom: 0.75rem;
+  }
+  .haiku-credit {
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.12em; color: var(--ink-lite);
+    margin-bottom: 1.75rem;
+  }
+
+  /* Full spiral (concept page) */
+  .spiral-stack-lg .spiral-item {
+    padding: 1rem 1.25rem;
+  }
+  .spiral-stack-lg .spiral-item[data-layer="1"] { --indent:0;     }
+  .spiral-stack-lg .spiral-item[data-layer="2"] { --indent:2rem;  }
+  .spiral-stack-lg .spiral-item[data-layer="3"] { --indent:4rem;  }
+  .spiral-stack-lg .spiral-item[data-layer="4"] { --indent:6rem;  }
+
+  .spiral-title {
+    font-family: var(--font-display);
+    font-size: 1rem; font-weight: 700; color: var(--ink);
+    margin-bottom: 0.2rem;
+  }
+  .spiral-desc { font-size: 0.84rem; color: var(--ink-mid); line-height: 1.5; }
+
+  /* ══════════════════════════════════════════════════════
+     §2 THESIS DOJO
+  ══════════════════════════════════════════════════════ */
+  #dojo { background: var(--bg); }
+
+  .dojo-header {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 3rem; align-items: end;
+    margin-bottom: 3.5rem;
+  }
+
+  .badge-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  .badge {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.2rem 0.65rem; border-radius: 999px; border: 1px solid;
+  }
+  .badge.saas  { color:var(--teal);   border-color:var(--teal);   background:rgba(26,122,138,.06); }
+  .badge.ai    { color:var(--gold);   border-color:var(--gold);   background:rgba(184,134,11,.06); }
+  .badge.open  { color:var(--sage);   border-color:var(--sage);   background:rgba(74,122,90,.06);  }
+
+  /* Score box */
+  .score-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    min-width: 180px;
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+  .score-n {
+    font-family: var(--font-display);
+    font-size: 3.5rem; font-weight: 900; line-height: 1;
+    color: var(--gold);
+  }
+  .score-den {
+    font-family: var(--font-display);
+    font-size: 1.6rem; color: var(--ink-lite);
+  }
+  .score-lbl {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-lite); margin-top: 0.3rem;
+  }
+
+  /* ── Pipeline ── */
+  .pipeline {
+    display: grid;
+    grid-template-columns: 1fr 40px 1.5fr 40px 1fr;
+    gap: 0; align-items: stretch;
+    border: 1px solid var(--border);
+    background: var(--border);
+    box-shadow: 0 4px 24px var(--shadow);
+    margin-bottom: 2.5rem;
+  }
+
+  .pipe-block {
+    background: var(--white);
+    padding: 1.75rem 1.5rem;
+    border-top: 3px solid var(--pipe-color);
+  }
+  .pipe-block.inp  { --pipe-color: var(--ink-lite); }
+  .pipe-block.proc { --pipe-color: var(--teal); }
+  .pipe-block.out  { --pipe-color: var(--gold); }
+
+  .pipe-label {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--pipe-color); margin-bottom: 0.85rem;
+  }
+  .pipe-icon { font-size: 1.6rem; display:block; margin-bottom:0.75rem; }
+  .pipe-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem; font-weight: 700; color: var(--ink);
+    margin-bottom: 0.65rem;
+  }
+  .pipe-items { list-style:none; display:flex; flex-direction:column; gap:0.3rem; }
+  .pipe-items li {
+    font-family: var(--font-mono); font-size: 0.72rem;
+    color: var(--ink-mid); display:flex; align-items:center; gap:0.4rem;
+  }
+  .pipe-items li::before { content:'·'; color:var(--pipe-color); font-size:1.2em; }
+
+  .pipe-arrow {
+    background: var(--bg-alt);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--ink-lite); font-size: 1rem;
+  }
+
+  /* ── Stage grid ── */
+  .stages {
+    display: grid; grid-template-columns: repeat(4,1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .stage-cell {
+    background: var(--white);
+    padding: 1.4rem 1.25rem;
+    position: relative; overflow: hidden;
+    transition: background 0.2s;
+  }
+  .stage-cell::before {
+    content: attr(data-n);
+    font-family: var(--font-display);
+    font-size: 4rem; font-weight: 900;
+    color: var(--border-lt);
+    position: absolute; top: -0.3rem; right: 0.5rem;
+    line-height: 1; transition: color 0.2s;
+    pointer-events: none;
+  }
+  .stage-cell:hover { background: var(--bg-alt); }
+  .stage-cell:hover::before { color: rgba(184,134,11,0.12); }
+
+  .stage-tag {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.4rem;
+  }
+  .stage-name {
+    font-family: var(--font-display); font-size: 0.98rem;
+    font-weight: 700; color: var(--ink); margin-bottom: 0.35rem;
+  }
+  .stage-desc { font-size: 0.8rem; color: var(--ink-mid); line-height: 1.5; }
+
+  /* ══════════════════════════════════════════════════════
+     §3 METRICS (dark band)
+  ══════════════════════════════════════════════════════ */
+  #metrics {
+    background: var(--bg-dark);
+    padding: 0;
+  }
+  .metrics-row {
+    max-width: 1280px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4,1fr);
+    gap: 1px; background: rgba(255,255,255,0.05);
+  }
+  .metric-cell {
+    padding: 2.75rem 2rem; text-align: center;
+    background: var(--bg-dark);
+    transition: background 0.2s;
+  }
+  .metric-cell:hover { background: rgba(255,255,255,0.04); }
+  .metric-val {
+    font-family: var(--font-display);
+    font-size: 3.6rem; font-weight: 900; line-height: 1;
+    color: var(--gold); margin-bottom: 0.4rem;
+  }
+  .metric-val sup { font-size: 1.6rem; vertical-align: super; }
+  .metric-key {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(250,250,248,0.5); margin-bottom: 0.2rem;
+  }
+  .metric-sub { font-size: 0.78rem; color: rgba(250,250,248,0.3); }
+
+  /* ══════════════════════════════════════════════════════
+     §4 ORGANIZATION
+  ══════════════════════════════════════════════════════ */
+  #org { background: var(--bg-alt); }
+
+  .org-grid {
+    display: grid; grid-template-columns: 1.1fr 0.9fr;
+    gap: 5rem; align-items: start;
+  }
+
+  /* Pillars */
+  .pillars { display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); margin-top:2rem; }
+  .pillar {
+    background: var(--white);
+    padding: 1.1rem 1.4rem;
+    display: flex; gap: 1rem; align-items: flex-start;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .pillar:hover { background: var(--bg); transform: translateX(3px); }
+  .pillar-icon { font-size: 1.1rem; flex-shrink:0; margin-top:0.1rem; }
+  .pillar-title {
+    font-family: var(--font-mono); font-size: 0.72rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.25rem;
+  }
+  .pillar-desc { font-size: 0.84rem; color: var(--ink-mid); line-height: 1.55; }
+
+  /* Contact card */
+  .contact-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 24px var(--shadow);
+    overflow: hidden;
+    position: sticky; top: 76px;
+  }
+  .contact-card-top {
+    background: var(--ink);
+    padding: 1.5rem;
+  }
+  .contact-card-top-label {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--teal-lt); margin-bottom: 0.3rem;
+  }
+  .contact-card-top-title {
+    font-family: var(--font-display);
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--bg);
+  }
+  .contact-body { padding: 1.5rem; }
+
+  .contact-row { display:flex; flex-direction:column; gap:0.9rem; margin-bottom:1.5rem; }
+  .contact-item { display:flex; gap:0.75rem; align-items:flex-start; }
+  .ci-icon { font-size: 0.9rem; flex-shrink:0; margin-top:0.15rem; }
+  .ci-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-lite); margin-bottom: 0.1rem;
+  }
+  .ci-val { font-size: 0.88rem; color: var(--ink-mid); }
+  .ci-val a { color: var(--teal); text-decoration:none; }
+  .ci-val a:hover { color: var(--gold); text-decoration: underline; }
+
+  .contact-cta {
+    display: block; text-align: center;
+    font-family: var(--font-mono); font-size: var(--fs-mono);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--white); background: var(--ink);
+    padding: 0.9rem 1rem; text-decoration: none;
+    transition: background 0.2s;
+  }
+  .contact-cta:hover { background: var(--teal); }
+
+  .funding-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-lt); }
+  .ftag {
+    font-family:var(--font-mono); font-size:0.62rem;
+    padding:0.18rem 0.55rem; border:1px solid;
+  }
+  .ftag.jst    { color:var(--gold);   border-color:var(--gold);   }
+  .ftag.jsps   { color:var(--teal);   border-color:var(--teal);   }
+  .ftag.ind    { color:var(--sage);   border-color:var(--sage);   }
+
+  /* ══════════════════════════════════════════════════════
+     STAGE 2 LINK BANNER
+  ══════════════════════════════════════════════════════ */
+  .stage2-banner {
+    background: var(--ink);
+    padding: 2rem 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 2rem;
+  }
+  .stage2-banner-text {
+    display: flex; flex-direction: column; gap: 0.25rem;
+  }
+  .stage2-banner-label {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--teal-lt);
+  }
+  .stage2-banner-title {
+    font-family: var(--font-display); font-size: 1.3rem;
+    font-weight: 700; color: var(--bg);
+  }
+  .stage2-banner-sub { font-size: 0.9rem; color: rgba(250,250,248,0.55); font-weight:300; }
+  .stage2-cta {
+    font-family: var(--font-mono); font-size: var(--fs-mono);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink); background: var(--gold);
+    padding: 0.75rem 1.75rem; text-decoration: none;
+    white-space: nowrap; flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .stage2-cta:hover { background: var(--gold-lt); }
+
+  /* ══════════════════════════════════════════════════════
+     FOOTER
+  ══════════════════════════════════════════════════════ */
+  footer {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: var(--font-mono); font-size: 0.82rem;
+    letter-spacing: 0.12em; color: var(--ink);
+  }
+  .footer-links { display:flex; gap:2rem; list-style:none; }
+  .footer-links a {
+    font-family:var(--font-mono); font-size:0.68rem;
+    letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--ink-lite); text-decoration:none; transition:color 0.2s;
+  }
+  .footer-links a:hover { color:var(--gold); }
+  .footer-copy {
+    font-family:var(--font-mono); font-size:0.65rem;
+    letter-spacing:0.08em; color:var(--ink-lite);
+  }
+
+  /* ══════════════════════════════════════════════════════
+     SCROLL REVEAL
+  ══════════════════════════════════════════════════════ */
+  .reveal {
+    opacity:0; transform:translateY(22px);
+    transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
+  }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+  .reveal-d1 { transition-delay:.1s; }
+  .reveal-d2 { transition-delay:.2s; }
+  .reveal-d3 { transition-delay:.3s; }
+  .reveal-d4 { transition-delay:.4s; }
+
+  /* ══════════════════════════════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════════════════════════════ */
+  @media(max-width:960px){
+    nav { padding:0 1.5rem; }
+    .nav-center { display:none; }
+    #hero { grid-template-columns:1fr; padding:80px 1.5rem 3rem; gap:3rem; }
+    .section-wrap { padding:4rem 1.5rem; }
+    .concept-grid,.dojo-header,.org-grid { grid-template-columns:1fr; gap:2.5rem; }
+    .contact-card { position:static; }
+    .domain-grid { grid-template-columns:1fr; }
+    .pipeline { grid-template-columns:1fr; }
+    .pipe-arrow { transform:rotate(90deg); height:2.5rem; }
+    .stages { grid-template-columns:1fr 1fr; }
+    .metrics-row { grid-template-columns:1fr 1fr; }
+    footer { flex-direction:column; gap:1.25rem; text-align:center; }
+    .stage2-banner { flex-direction:column; text-align:center; }
+    .spiral-stack-lg .spiral-item[data-layer="2"] { --indent:1rem; }
+    .spiral-stack-lg .spiral-item[data-layer="3"] { --indent:2rem; }
+    .spiral-stack-lg .spiral-item[data-layer="4"] { --indent:3rem; }
+  }
   </style>
 </head>
 <body>
 
-<header>
-  <div style="max-width: 1200px; margin: 0 auto;">
-    <h1 style="margin: 0; font-size: 28px;">論文道場｜Academic Paper Dojo</h1>
-    <p class="tagline">C4モデルで論文構造を可視化する思考支援プラットフォームである。</p>
+<!-- ══════════════════════════════════════════════════════
+     NAV
+══════════════════════════════════════════════════════ -->
+<nav id="main-nav">
+  <a href="#" class="nav-logo">
+    <span class="nav-logo-pip"></span>
+    c4model.org
+  </a>
+  <ul class="nav-center">
+    <li><a href="#concept"><span data-en>Concept</span><span data-ja>概念</span></a></li>
+    <li><a href="#dojo"><span data-en>Thesis Dojo</span><span data-ja>論文道場</span></a></li>
+    <li><a href="#org"><span data-en>Organization</span><span data-ja>組織</span></a></li>
+    <li><a href="haiku-engineering.html"><span data-en>Haiku Science</span><span data-ja>俳句の科学</span></a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" data-lang="ja" onclick="setLang('ja')">日本語</button>
+    </div>
+    <a href="#org" class="nav-cta">
+      <span data-en>Contact</span>
+      <span data-ja>お問い合わせ</span>
+    </a>
   </div>
-</header>
+</nav>
 
-<main>
-  <nav>
-    <h2>目次</h2>
-    <ul>
-      <li><a href="#about">論文道場とは</a></li>
-      <li><a href="#value">提供する価値</a></li>
-      <li><a href="#howto">使い方（3ステップ）</a></li>
-      <li><a href="#c4">C4モデルによる構造化</a></li>
-      <li><a href="#7r">7Rフレームワーク</a></li>
-      <li><a href="#features">主な機能</a></li>
-      <li><a href="#samples">サンプルとデモ</a></li>
-      <li><a href="#faq">よくある質問</a></li>
-      <li><a href="#contact">お問い合わせ</a></li>
-    </ul>
-  </nav>
+<!-- ══════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-badge">C4 Model Study Project</div>
 
-  <div class="content-area">
-    <section id="about" class="section-block">
-      <h2>論文道場とは</h2>
-      <p>論文道場は、研究・論文・レポート・企画書の構造を自動生成し、思考の可視化と論理構築を支援する教育工学プラットフォームである。C4モデルと7Rフレームワークを統合し、研究の背景から結論までを一貫して整理することができる。</p>
-    </section>
+    <h1 class="hero-h1">
+      <span data-en>Structure<br><em>everything.</em><br><span class="accent-teal">Think deeper.</span></span>
+      <span data-ja>すべてを<br><em>構造化する。</em><br><span class="accent-teal">より深く思考する。</span></span>
+    </h1>
 
-    <section id="value" class="section-block">
-      <h2>論文道場が提供する価値</h2>
-      <ul>
-        <li>論理構造の自動生成による研究プロセスの高速化</li>
-        <li>C4モデルによる研究全体像の可視化と抜け漏れ防止</li>
-        <li>文章改善・査読模擬による品質向上</li>
-        <li>初心者でも扱えるシンプルな操作性</li>
-      </ul>
-    </section>
+    <p class="hero-sub">
+      <span data-en>The C4 Model is not just for software. It is a universal language for structural thinking — from microservices to haiku, from code to academic papers.</span>
+      <span data-ja>C4モデルはソフトウェアだけのものではありません。マイクロサービスから俳句へ、コードから学術論文へ——構造的思考の普遍的言語です。</span>
+    </p>
 
-    <section id="howto" class="section-block">
-      <h2>使い方（3ステップ）</h2>
-      <ol>
-        <li>研究テーマと背景情報を入力する。</li>
-        <li>C4モデルで構造化し、章立てと論点を確認する。</li>
-        <li>論文ドラフトと査読結果を生成し、7Rで改善する。</li>
-      </ol>
-    </section>
-
-    <section id="c4" class="section-block">
-      <h2>C4モデルによる構造化</h2>
-      <p>C4モデルは、複雑な情報を4つの階層で整理する構造化フレームワークである。論文道場では、これを論文構造に最適化している。</p>
-      <h3>L1：Context（研究の背景）</h3>
-      <p>研究の背景・社会的意義・既存研究の課題を整理する階層である。</p>
-      <h3>L2：Container（章構成）</h3>
-      <p>序論・関連研究・方法・結果・考察・結論など、論文全体の章立てを示す階層である。</p>
-      <h3>L3：Component（論点・データ）</h3>
-      <p>各章を構成する論点・データ・引用・図表を分解する階層である。</p>
-      <h3>L4：Code（文章・接続詞）</h3>
-      <p>文章レベルの構造、接続詞、引用番号の整合性を扱う階層である。</p>
-    </section>
-
-    <section id="7r" class="section-block">
-      <h2>7Rフレームワーク</h2>
-      <p>研究の発想から完成稿までを7段階で改善する体系である。</p>
-      <ul>
-        <li>R1 文献調査</li>
-        <li>R2 論理構築</li>
-        <li>R3 再構成</li>
-        <li>R4 文章改善</li>
-        <li>R5 査読模擬</li>
-        <li>R6 査読回答</li>
-        <li>R7 最終確認</li>
-      </ul>
-    </section>
-
-    <section id="features" class="section-block">
-      <h2>主な機能</h2>
-      <ul>
-        <li>C4モデルに基づく論文構造の自動生成</li>
-        <li>Markdown形式の論文ドラフト生成</li>
-        <li>PlantUMLによる構造図生成</li>
-        <li>査読コメントと回答案の自動生成</li>
-      </ul>
-    </section>
-
-    <section id="samples" class="section-block">
-      <h2>サンプルとデモ</h2>
-      <p>以下のデモ環境にてサンプルデータを読み込むことで、3分程度で論文道場の全体像を体験することが可能である。</p>
-      <div style="margin-top: 24px;">
-        <a href="demo.html" class="btn">デモ画面を開く</a>
-      </div>
-    </section>
-
-    <section id="faq" class="section-block">
-      <h2>よくある質問</h2>
-      <dl class="faq-list">
-        <dt>利用に料金はかかるか。</dt>
-        <dd>現在は研究および教育目的のため、無償で提供している。</dd>
-        
-        <dt>入力したデータの扱いはどうなるか。</dt>
-        <dd>入力データはブラウザ上で処理され、明示的に保存操作を行わない限り外部のサーバーへ公開・流出することはない。</dd>
-        
-        <dt>どのような分野の論文に対応しているか。</dt>
-        <dd>情報工学や感性工学をはじめ、人文社会科学系など、論理構造の整理を必要とするあらゆる分野に適用可能である。</dd>
-      </dl>
-    </section>
-
-    <section id="contact" class="section-block">
-      <h2>お問い合わせ</h2>
-      <p>ご意見・ご要望や共同研究の提案等がある場合は、以下の連絡先へ問い合わせされたい。</p>
-      <div style="margin-top: 24px; padding: 24px; background: #f3f4f6; border-radius: 8px; border-left: 4px solid #1A7A8A;">
-        <p style="margin: 0; font-weight: bold; font-size: 18px;">
-          <a href="mailto:info@c4model.org" style="color: #1d4ed8;">info@c4model.org</a>
-        </p>
-        <p style="margin: 8px 0 0 0; font-size: 14px; color: #4b5563;">
-          C4モデル研究会 論文道場チーム
-        </p>
-      </div>
-    </section>
+    <div class="hero-actions">
+      <a href="#dojo" class="btn-primary">
+        <span data-en>Explore Thesis Dojo</span>
+        <span data-ja>論文道場を見る</span>
+      </a>
+      <a href="#concept" class="btn-ghost">
+        <span data-en>See the Framework</span>
+        <span data-ja>フレームワークを見る</span>
+      </a>
+    </div>
   </div>
-</main>
 
+  <!-- Live Haiku Card -->
+  <div class="hero-right">
+    <div class="haiku-card">
+      <div class="haiku-card-header">
+        <span class="haiku-card-dot"></span>
+        <span>C4 Model Applied — Live Structural Analysis</span>
+      </div>
+      <div class="haiku-poem">
+        <p>Furu ike ya —<br>kawazu tobikomu,<br>mizu no oto.</p>
+        <cite>— Matsuo Bashō, c. 1686 &nbsp;·&nbsp; 17 syllables</cite>
+      </div>
+      <div class="spiral-stack">
+        <div class="spiral-item" data-layer="1">
+          <span class="spiral-tag">L1 · CONTEXT</span>
+          <span class="spiral-body">Edo Japan · Zen tradition · Bashō's spiritual exile in Fukagawa</span>
+        </div>
+        <div class="spiral-item" data-layer="2">
+          <span class="spiral-tag">L2 · CONTAINER</span>
+          <span class="spiral-body">5·7·5 — Setting / Action / Echo: three logical vessels</span>
+        </div>
+        <div class="spiral-item" data-layer="3">
+          <span class="spiral-tag">L3 · COMPONENT</span>
+          <span class="spiral-body">Kigo (frog=spring) · Kireji "ya" · Silence vs. sudden sound</span>
+        </div>
+        <div class="spiral-item" data-layer="4">
+          <span class="spiral-tag">L4 · CODE</span>
+          <span class="spiral-body">FU-RU-I-KE · abrupt MU · resonant long-O — phonemic architecture</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     §1 CONCEPT
+══════════════════════════════════════════════════════ -->
+<section id="concept">
+  <div class="section-wrap">
+    <div class="concept-grid">
+      <div>
+        <div class="section-label reveal">
+          <span data-en>Universal Architecture</span>
+          <span data-ja>普遍的アーキテクチャ</span>
+        </div>
+        <h2 class="section-h2 reveal reveal-d1">
+          <span data-en>One framework.<br><em>Infinite</em> domains.</span>
+          <span data-ja>ひとつのフレームワーク。<br><em>無限</em>のドメイン。</span>
+        </h2>
+        <p class="section-body reveal reveal-d2">
+          <span data-en>Simon Brown's C4 Model was born in software engineering. We extended it to every domain where structure creates clarity — academic papers, literary analysis, and grant proposals.</span>
+          <span data-ja>Simon BrownのC4モデルはソフトウェア工学から生まれました。私たちはこれを、構造が明確さを生み出すすべてのドメインへと拡張しました——学術論文、文学分析、グラント提案書まで。</span>
+        </p>
+        <div class="domain-grid reveal reveal-d3">
+          <div class="domain-card sw">
+            <div class="domain-icon">⚙️</div>
+            <div class="domain-title"><span data-en>Software Systems</span><span data-ja>ソフトウェア</span></div>
+            <div class="domain-desc"><span data-en>Microservices, APIs, cloud — the original domain.</span><span data-ja>マイクロサービス・API・クラウド——原点のドメイン。</span></div>
+          </div>
+          <div class="domain-card ac">
+            <div class="domain-icon">📄</div>
+            <div class="domain-title"><span data-en>Academic Papers</span><span data-ja>学術論文</span></div>
+            <div class="domain-desc"><span data-en>RQ → Chapters → Arguments → Sentences.</span><span data-ja>RQ → 章立て → 論点 → 文章。</span></div>
+          </div>
+          <div class="domain-card ha">
+            <div class="domain-icon">🌸</div>
+            <div class="domain-title"><span data-en>Literary Works</span><span data-ja>文学作品</span></div>
+            <div class="domain-desc"><span data-en>17 syllables. 4 layers. A universe visible.</span><span data-ja>17音。4層。宇宙が見える。</span></div>
+          </div>
+          <div class="domain-card gr">
+            <div class="domain-icon">🏛️</div>
+            <div class="domain-title"><span data-en>Grant Proposals</span><span data-ja>グラント提案</span></div>
+            <div class="domain-desc"><span data-en>JST A-STEP · JSPS · NSF — structured to win.</span><span data-ja>JST A-STEP · JSPS · NSF——採択のために構造化。</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Haiku full breakdown with large spiral -->
+      <div class="reveal reveal-d2">
+        <p class="haiku-big">"Furu ike ya —<br>kawazu tobikomu,<br>mizu no oto."</p>
+        <p class="haiku-credit">Matsuo Bashō · Japan's greatest haiku poet · c. 1686</p>
+
+        <div class="spiral-stack spiral-stack-lg">
+          <div class="spiral-item" data-layer="1">
+            <div>
+              <div class="spiral-title"><span data-en>L1 · Context — World & Era</span><span data-ja>L1 · Context — 世界・時代</span></div>
+              <div class="spiral-desc"><span data-en>Edo-period Japan. Zen tradition of finding eternity in a single moment. Bashō's self-imposed exile in Fukagawa creates the contemplative silence.</span><span data-ja>江戸時代の日本。一瞬に永遠を見出す禅の伝統。深川での隠棲が、静寂の中の詩情を生み出す。</span></div>
+            </div>
+          </div>
+          <div class="spiral-item" data-layer="2">
+            <div>
+              <div class="spiral-title"><span data-en>L2 · Container — 5·7·5 Structure</span><span data-ja>L2 · Container — 5·7·5の構造</span></div>
+              <div class="spiral-desc"><span data-en>Three logical containers: <strong>5 syllables</strong> (setting: ancient pond), <strong>7 syllables</strong> (action: frog leaps), <strong>5 syllables</strong> (resonance: sound of water).</span><span data-ja>3つの論理的器：<strong>5音</strong>（情景：古池）、<strong>7音</strong>（動作：蛙が飛び込む）、<strong>5音</strong>（余韻：水の音）。</span></div>
+            </div>
+          </div>
+          <div class="spiral-item" data-layer="3">
+            <div>
+              <div class="spiral-title"><span data-en>L3 · Component — Poetic Devices</span><span data-ja>L3 · Component — 表現技法</span></div>
+              <div class="spiral-desc"><span data-en><em>Kigo</em> (frog = spring). <em>Kireji</em> "ya" creates emotional pause. Contrast: absolute silence vs. sudden splash. Deliberate omission invites imagination.</span><span data-ja>季語（蛙＝春）。切れ字「や」が感情の間を作る。静寂 vs 音の対比。意図的な余白が読者の想像力を招く。</span></div>
+            </div>
+          </div>
+          <div class="spiral-item" data-layer="4">
+            <div>
+              <div class="spiral-title"><span data-en>L4 · Code — Phonemic Architecture</span><span data-ja>L4 · Code — 音素アーキテクチャ</span></div>
+              <div class="spiral-desc"><span data-en>FU-RU-I-KE: clear consonants = transparency. Abrupt <strong>MU</strong> = single instant of impact. Long vowel <strong>O</strong> in "oto" = resonance. As precisely engineered as beautiful.</span><span data-ja>FU-RU-I-KE：清音＝透明感。促音<strong>ム</strong>＝一瞬の閉塞。長母音<strong>オ</strong>＝余韻。美しさと同じくらい精密に設計されている。</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     §2 THESIS DOJO
+══════════════════════════════════════════════════════ -->
+<section id="dojo">
+  <div class="section-wrap">
+    <div class="dojo-header">
+      <div>
+        <div class="section-label reveal">
+          <span data-en>Core Product</span><span data-ja>主要プロダクト</span>
+        </div>
+        <div class="badge-row reveal reveal-d1">
+          <span class="badge saas">SaaS</span>
+          <span class="badge ai">Claude API</span>
+          <span class="badge open">Open Research</span>
+        </div>
+        <h2 class="section-h2 reveal reveal-d1">
+          <span data-en>Thesis Dojo —<br><em>Academic Paper</em><br>Writing System</span>
+          <span data-ja>論文道場 —<br><em>学術論文</em><br>執筆支援システム</span>
+        </h2>
+        <p class="section-body reveal reveal-d2">
+          <span data-en>A 7-stage AI writing system built on the C4 Model. Transforms scattered ideas into publication-ready academic papers while protecting writer wellbeing through the PERMA framework.</span>
+          <span data-ja>C4モデルを基盤とした7段階AI執筆支援システム。散在するアイデアを出版可能な学術論文へと変換しながら、PERMAフレームワークで執筆者のウェルビーイングを守ります。</span>
+        </p>
+      </div>
+      <div class="score-box reveal reveal-d3">
+        <div style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem;">C4 Quality Score</div>
+        <div class="score-n">32<span class="score-den">/35</span></div>
+        <div class="score-lbl">Pass: 28pts · Preprint Published</div>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-lt);display:grid;grid-template-columns:1fr 1fr;gap:.5rem;text-align:left;">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;color:var(--ink-lite);">WHO-5</div>
+            <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--teal);">↑ Sig.</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;color:var(--ink-lite);">Cog. Load</div>
+            <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--sage);">−40%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="pipeline reveal">
+      <div class="pipe-block inp">
+        <div class="pipe-label">📥 <span data-en>Input</span><span data-ja>入力</span></div>
+        <span class="pipe-icon">💭</span>
+        <div class="pipe-title"><span data-en>Raw Ideas</span><span data-ja>散在するアイデア</span></div>
+        <ul class="pipe-items">
+          <li><span data-en>Research question</span><span data-ja>研究課題（RQ）</span></li>
+          <li><span data-en>Scattered notes</span><span data-ja>断片的なメモ</span></li>
+          <li><span data-en>Prior literature</span><span data-ja>先行研究</span></li>
+          <li><span data-en>Grant requirements</span><span data-ja>グラント要件</span></li>
+        </ul>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-block proc">
+        <div class="pipe-label">⚙️ <span data-en>C4 Structuring Engine</span><span data-ja>C4構造化エンジン</span></div>
+        <span class="pipe-icon">🏗️</span>
+        <div class="pipe-title"><span data-en>7-Stage AI Process</span><span data-ja>7段階AIプロセス</span></div>
+        <ul class="pipe-items">
+          <li>Stage 0 — <span data-en>Paper Input & C4 Score</span><span data-ja>論文入力・C4スコア</span></li>
+          <li>Stage I — <span data-en>CREATE Prompt Ideation</span><span data-ja>CREATEプロンプト発想</span></li>
+          <li>Stage II — <span data-en>C4 Blueprint Design</span><span data-ja>C4設計図</span></li>
+          <li>Stage III — <span data-en>7R Writing Support</span><span data-ja>7R執筆支援</span></li>
+          <li>Stage IV — <span data-en>Quality Evaluation</span><span data-ja>品質評価</span></li>
+          <li>Stage V–VII — <span data-en>Presentation & Submission</span><span data-ja>発表・投稿</span></li>
+        </ul>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-block out">
+        <div class="pipe-label">📤 <span data-en>Output</span><span data-ja>出力</span></div>
+        <span class="pipe-icon">🌍</span>
+        <div class="pipe-title"><span data-en>World-Ready Paper</span><span data-ja>世界公開の論文</span></div>
+        <ul class="pipe-items">
+          <li><span data-en>DOI-citable preprint</span><span data-ja>DOI取得・引用可能</span></li>
+          <li><span data-en>PlantUML C4 diagrams</span><span data-ja>C4モデル図4枚</span></li>
+          <li><span data-en>Conference presentation</span><span data-ja>学会発表資料</span></li>
+          <li><span data-en>Grant proposal draft</span><span data-ja>グラント提案書</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Stages -->
+    <div class="stages reveal">
+      <div class="stage-cell" data-n="0">
+        <div class="stage-tag">Input</div>
+        <div class="stage-name"><span data-en>Paper Info & C4 Score</span><span data-ja>論文情報・C4スコア</span></div>
+        <div class="stage-desc"><span data-en>Author, RQ, structure, refs. Real-time 35-pt score preview.</span><span data-ja>著者・RQ・構成・文献。35点リアルタイムプレビュー。</span></div>
+      </div>
+      <div class="stage-cell" data-n="I">
+        <div class="stage-tag">Ideation</div>
+        <div class="stage-name">CREATE Prompt</div>
+        <div class="stage-desc"><span data-en>Context→Role→Explore→Assert→Test→Evaluate. Structured ideation.</span><span data-ja>文脈→役割→探索→主張→検証→評価。体系的発想法。</span></div>
+      </div>
+      <div class="stage-cell" data-n="II">
+        <div class="stage-tag">Design</div>
+        <div class="stage-name"><span data-en>C4 Blueprint</span><span data-ja>C4設計図</span></div>
+        <div class="stage-desc"><span data-en>L1 Context · L2 Chapters · L3 Arguments · L4 Sentences.</span><span data-ja>L1 Context · L2 章立て · L3 論点 · L4 文章。</span></div>
+      </div>
+      <div class="stage-cell" data-n="III">
+        <div class="stage-tag">Writing</div>
+        <div class="stage-name">7R Prompt</div>
+        <div class="stage-desc"><span data-en>Reframe · Relate · Reason · Reveal · Refine · Respond · Recap.</span><span data-ja>再定義・接続・論拠・発見・精緻・応答・要約。</span></div>
+      </div>
+      <div class="stage-cell" data-n="IV">
+        <div class="stage-tag">Evaluation</div>
+        <div class="stage-name"><span data-en>C4 Tiered Score</span><span data-ja>C4段階評価</span></div>
+        <div class="stage-desc"><span data-en>6-axis quality assessment, 35-pt max. Actionable feedback.</span><span data-ja>6軸品質評価、35点満点。具体的フィードバック。</span></div>
+      </div>
+      <div class="stage-cell" data-n="V">
+        <div class="stage-tag">Presentation</div>
+        <div class="stage-name"><span data-en>Conference Prep</span><span data-ja>学会発表</span></div>
+        <div class="stage-desc"><span data-en>Auto-generate 10-slide deck, script skeleton.</span><span data-ja>10枚スライド・スクリプト自動生成。</span></div>
+      </div>
+      <div class="stage-cell" data-n="VI">
+        <div class="stage-tag">Training</div>
+        <div class="stage-name">AI Peer Review</div>
+        <div class="stage-desc"><span data-en>Simulated reviewer questions on methodology & novelty.</span><span data-ja>AI査読者シミュレーション。方法論・新規性を問う。</span></div>
+      </div>
+      <div class="stage-cell" data-n="VII">
+        <div class="stage-tag">Submission</div>
+        <div class="stage-name"><span data-en>Publication</span><span data-ja>投稿・公開</span></div>
+        <div class="stage-desc"><span data-en>Cover letter, checklist, reviewer response. ResearchGate-ready.</span><span data-ja>カバーレター・チェックリスト・査読対応。ResearchGate対応。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     STAGE 2 BANNER
+══════════════════════════════════════════════════════ -->
+<div class="stage2-banner">
+  <div class="stage2-banner-text">
+    <div class="stage2-banner-label">
+      <span data-en>Featured — Haiku Science</span>
+      <span data-ja>注目 — 俳句の科学入門</span>
+    </div>
+    <div class="stage2-banner-title">
+      <span data-en>C4 Model Applied to Haiku — Interactive Analysis</span>
+      <span data-ja>俳句にC4モデルを適用 — インタラクティブ解析</span>
+    </div>
+    <div class="stage2-banner-sub">
+      <span data-en>Enter a haiku, get a full C4 structural analysis with PlantUML diagrams, sequence and state charts, and AI-powered scientific commentary.</span>
+      <span data-ja>俳句を入力すると、C4構造図・シーケンス図・状態遷移図と俳句の科学的AIアドバイスを自動生成。</span>
+    </div>
+  </div>
+  <a href="haiku-engineering.html" class="stage2-cta">
+    <span data-en>View Technical Docs →</span>
+    <span data-ja>技術資料を見る →</span>
+  </a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     METRICS
+══════════════════════════════════════════════════════ -->
+<div id="metrics">
+  <div class="metrics-row">
+    <div class="metric-cell reveal">
+      <div class="metric-val">32<sup>/35</sup></div>
+      <div class="metric-key">C4 Quality Score</div>
+      <div class="metric-sub"><span data-en>Publication-ready threshold</span><span data-ja>発表・投稿レベル</span></div>
+    </div>
+    <div class="metric-cell reveal reveal-d1">
+      <div class="metric-val" style="color:var(--teal-lt)">−40<sup>%</sup></div>
+      <div class="metric-key"><span data-en>Cognitive Load</span><span data-ja>認知的負荷</span></div>
+      <div class="metric-sub"><span data-en>Extraneous load reduction</span><span data-ja>外発的負荷の削減</span></div>
+    </div>
+    <div class="metric-cell reveal reveal-d2">
+      <div class="metric-val" style="color:var(--sage)">+17<sup>%</sup></div>
+      <div class="metric-key">C4 Score Growth</div>
+      <div class="metric-sub">28.3 → 33.1 pts (N=8 pilot)</div>
+    </div>
+    <div class="metric-cell reveal reveal-d3">
+      <div class="metric-val" style="color:#8B7ACC">7</div>
+      <div class="metric-key"><span data-en>Pipeline Stages</span><span data-ja>パイプライン段階</span></div>
+      <div class="metric-sub">Stage 0 → VII</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     §4 ORGANIZATION
+══════════════════════════════════════════════════════ -->
+<section id="org">
+  <div class="section-wrap">
+    <div class="org-grid">
+      <div>
+        <div class="section-label reveal">
+          <span data-en>Organization</span><span data-ja>組織</span>
+        </div>
+        <h2 class="section-h2 reveal reveal-d1">
+          <span data-en>C4 Model<br><em>Study Project</em></span>
+          <span data-ja>C4モデル<br><em>研究会®</em></span>
+        </h2>
+        <p class="section-body reveal reveal-d2">
+          <span data-en>An independent research consortium advancing the application of structural architecture methodology beyond software — into education, scholarship, and the humanities.</span>
+          <span data-ja>ソフトウェアを超えて、教育・学術・人文科学への構造的アーキテクチャ手法の応用を推進する独立型研究コンソーシアム。</span>
+        </p>
+
+        <div class="pillars reveal reveal-d3">
+          <div class="pillar">
+            <span class="pillar-icon">🔬</span>
+            <div>
+              <div class="pillar-title"><span data-en>Research</span><span data-ja>研究活動</span></div>
+              <div class="pillar-desc"><span data-en>Empirical study targeting JST A-STEP, JSPS Grants-in-Aid, and international research partnerships. N=30 trial scheduled June–August 2026.</span><span data-ja>JST A-STEP・JSPS科研費・国際共同研究を対象とした実証研究。2026年6〜8月にN=30の実証実験を予定。</span></div>
+            </div>
+          </div>
+          <div class="pillar">
+            <span class="pillar-icon">🤝</span>
+            <div>
+              <div class="pillar-title"><span data-en>Industry Partnership</span><span data-ja>産業連携</span></div>
+              <div class="pillar-desc"><span data-en>Seeking SaaS integration — IcePanel, Structurizr, enterprise knowledge management platforms. API and white-label licensing available.</span><span data-ja>IcePanel・Structurizr・ナレッジマネジメントプラットフォームとのSaaS連携を検討。API・OEM提供可能。</span></div>
+            </div>
+          </div>
+          <div class="pillar">
+            <span class="pillar-icon">🌐</span>
+            <div>
+              <div class="pillar-title"><span data-en>Global Expansion</span><span data-ja>グローバル展開</span></div>
+              <div class="pillar-desc"><span data-en>Academic Paper Dojo public release March 2027. Kindle: <em>Writing Without Giving Up</em>. Multilingual support roadmap.</span><span data-ja>論文道場を2027年3月に一般公開。Kindle「挫折しない論文術」同時刊行。多言語ロードマップ。</span></div>
+            </div>
+          </div>
+          <div class="pillar">
+            <span class="pillar-icon">📊</span>
+            <div>
+              <div class="pillar-title"><span data-en>Evidence Base</span><span data-ja>実証基盤</span></div>
+              <div class="pillar-desc"><span data-en>Preprint published on ResearchGate.net. Pilot study N=8 completed. C4 Score +17%, Cognitive Load −40%, WHO-5 significant improvement.</span><span data-ja>ResearchGate.netにプレプリント公開済み。N=8パイロット完了。C4スコア+17%・認知負荷−40%・WHO-5有意改善。</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Card -->
+      <div class="reveal reveal-d2">
+        <div class="contact-card">
+          <div class="contact-card-top">
+            <div class="contact-card-top-label">
+              <span data-en>Research & Partnership</span><span data-ja>研究・連携のお問い合わせ</span>
+            </div>
+            <div class="contact-card-top-title">
+              <span data-en>Get in touch</span><span data-ja>お問い合わせ</span>
+            </div>
+          </div>
+          <div class="contact-body">
+            <div class="contact-row">
+              <div class="contact-item">
+                <span class="ci-icon">👤</span>
+                <div>
+                  <div class="ci-label"><span data-en>Principal Investigator</span><span data-ja>主宰</span></div>
+                  <div class="ci-val">Osamu Okumura（奥村 治）</div>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="ci-icon">🏛️</span>
+                <div>
+                  <div class="ci-label"><span data-en>Affiliation</span><span data-ja>所属</span></div>
+                  <div class="ci-val">C4 Model Study Project（C4モデル研究会®）<br>Tokyo Metropolitan Univ. of Technology M.S.</div>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="ci-icon">📧</span>
+                <div>
+                  <div class="ci-label">Email</div>
+                  <div class="ci-val"><a href="mailto:info@c4model.org">info@c4model.org</a></div>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="ci-icon">🔗</span>
+                <div>
+                  <div class="ci-label">Preprint</div>
+                  <div class="ci-val"><a href="https://www.researchgate.net/profile/Osamu-Okumura-2" target="_blank" rel="noopener">ResearchGate → 奥村治</a></div>
+                </div>
+              </div>
+            </div>
+            <a href="mailto:info@c4model.org" class="contact-cta">
+              <span data-en>Send Research Inquiry →</span>
+              <span data-ja>研究・連携について問い合わせる →</span>
+            </a>
+            <div class="funding-tags">
+              <span class="ftag jst">JST A-STEP</span>
+              <span class="ftag jsps">JSPS 科研費</span>
+              <span class="ftag ind">Industry Partners</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════ -->
 <footer>
-  <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-    <p style="margin: 0; font-size: 14px;">© 論文道場 / Academic Paper Dojo</p>
-    <p style="margin: 0; font-size: 14px; color: #9ca3af;">運営: <a href="https://c4model.org" style="color: #9ca3af; text-decoration: underline;">C4モデル研究会</a></p>
-  </div>
+  <div class="footer-logo">c4model.org</div>
+  <ul class="footer-links">
+    <li><a href="#concept"><span data-en>Concept</span><span data-ja>概念</span></a></li>
+    <li><a href="#dojo"><span data-en>Thesis Dojo</span><span data-ja>論文道場</span></a></li>
+    <li><a href="#org"><span data-en>Organization</span><span data-ja>組織</span></a></li>
+    <li><a href="haiku-engineering.html"><span data-en>Haiku Science</span><span data-ja>俳句の科学</span></a></li>
+    <li><a href="mailto:info@c4model.org"><span data-en>Contact</span><span data-ja>連絡先</span></a></li>
+  </ul>
+  <div class="footer-copy">© 2026 C4 Model Study Project · c4model.org</div>
 </footer>
+
+<!-- ══════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════ -->
+<script>
+/* ── Language toggle ── */
+function setLang(lang) {
+  document.querySelectorAll('[data-en]').forEach(el =>
+    el.style.display = lang === 'en' ? 'inline' : 'none');
+  document.querySelectorAll('[data-ja]').forEach(el =>
+    el.style.display = lang === 'ja' ? 'inline' : 'none');
+  document.querySelectorAll('.lang-btn').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.lang === lang));
+  document.documentElement.lang = lang;
+  try { localStorage.setItem('c4-lang', lang); } catch(e){}
+}
+// Init: 日本語デフォルト（保存済み設定があれば優先）
+// localStorage の古い 'en' 設定を無視し、日本語をデフォルトに
+const savedLang = (() => {
+  try { return localStorage.getItem('c4-lang'); } catch(e){ return null; }
+})();
+setLang(savedLang || 'ja');
+
+/* ── Scroll reveal ── */
+const observer = new IntersectionObserver(
+  entries => entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  }),
+  { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+);
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── Nav shrink ── */
+const nav = document.getElementById('main-nav');
+window.addEventListener('scroll', () => {
+  nav.style.height = window.scrollY > 50 ? '52px' : '60px';
+}, { passive: true });
+</script>
 
 </body>
 </html>

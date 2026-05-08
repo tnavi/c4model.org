@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>事例研究：俳句の科学 | Haiku Science Case Studies</title>
+<meta name="description" content="俳句の科学システムを用いて、実際の俳句がどのようにC4モデル・シーケンス図として解析され、ResearchGate等で学術論文として公開されるのかのプロセス事例を紹介します。">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+<style>
+/* ════════════════════════════════════════════════
+   DESIGN TOKENS (haiku-engineering.html 互換)
+════════════════════════════════════════════════ */
+:root {
+  --white:      #FFFFFF;
+  --bg:         #FAFAF8;
+  --bg-alt:     #F4F1EC;
+  --ink:        #1A1A2E;
+  --ink-mid:    #3D3D5C;
+  --ink-lite:   #7A7A9A;
+  --gold:       #B8860B;
+  --gold-lt:    #D4A01A;
+  --teal:       #1A7A8A;
+  --teal-lt:    #2A9BAD;
+  --sage:       #4A7A5A;
+  --border:     #D8D4CA;
+  --border-lt:  #ECEAE4;
+  --shadow:     rgba(26,26,46,0.08);
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+  --font-body:    'Source Serif 4', Georgia, serif;
+  --fs-hero:    clamp(2.5rem, 5vw, 4rem);
+  --fs-h2:      clamp(1.6rem, 3.5vw, 2.4rem);
+  --fs-h3:      clamp(1.2rem, 2vw, 1.6rem);
+  --fs-body:    1.1rem;
+  --fs-mono:    0.82rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.75;
+}
+
+/* ── NAVIGATION ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250,250,248,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 2.5rem;
+}
+.nav-logo {
+  font-family: var(--font-mono);
+  font-size: 0.9rem; font-weight: 500;
+  letter-spacing: 0.08em; color: var(--ink); text-decoration: none;
+}
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  font-family: var(--font-mono); font-size: var(--fs-mono);
+  letter-spacing: 0.06em; color: var(--ink-mid);
+  text-decoration: none; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--gold); }
+.nav-right { display: flex; align-items: center; gap: 1rem; }
+
+.nav-cta {
+  font-family: var(--font-mono); font-size: var(--fs-mono);
+  letter-spacing: 0.08em; padding: 0.5rem 1.2rem;
+  background: var(--ink); color: var(--bg);
+  text-decoration: none; transition: background 0.2s;
+}
+.nav-cta:hover { background: var(--gold); }
+
+/* ── HERO ── */
+.hero {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 5rem 2.5rem 4rem;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(184,134,11,0.12) 0%, transparent 60%);
+}
+.hero-inner { max-width: 800px; margin: 0 auto; position: relative; }
+.hero-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: var(--fs-mono);
+  letter-spacing: 0.12em; color: var(--gold);
+  border: 1px solid rgba(184,134,11,0.4); padding: 0.3rem 0.9rem; margin-bottom: 1.5rem;
+}
+.hero-h1 {
+  font-family: var(--font-display); font-size: var(--fs-hero);
+  font-weight: 900; line-height: 1.2; margin-bottom: 1.5rem;
+}
+.hero-sub {
+  color: rgba(250,250,248,0.7); font-size: 1.15rem; line-height: 1.7;
+}
+
+/* ── LAYOUT & TYPOGRAPHY ── */
+section { padding: 5rem 2.5rem; }
+.container { max-width: 960px; margin: 0 auto; }
+.section-title {
+  font-family: var(--font-display); font-size: var(--fs-h2);
+  margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;
+}
+.lead-text { font-size: 1.2rem; color: var(--ink-mid); margin-bottom: 3rem; }
+
+/* ── CASE STUDY WORKFLOW ── */
+.case-workflow {
+  display: flex; flex-direction: column; gap: 4rem;
+}
+
+.step-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 24px var(--shadow);
+  padding: 3rem;
+  position: relative;
+}
+.step-number {
+  position: absolute; top: -1.2rem; left: 2rem;
+  background: var(--teal); color: var(--white);
+  font-family: var(--font-mono); font-size: 0.9rem; letter-spacing: 0.1em;
+  padding: 0.5rem 1.2rem; font-weight: bold;
+}
+.step-card[data-step="3"] .step-number { background: var(--gold); }
+
+.step-header { margin-bottom: 2rem; }
+.step-header h3 { font-family: var(--font-display); font-size: var(--fs-h3); margin-bottom: 0.5rem; }
+.step-header p { color: var(--ink-mid); font-size: 1rem; }
+
+/* ── STEP 1: INPUT ── */
+.haiku-box {
+  background: var(--bg-alt);
+  border-left: 4px solid var(--teal);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+.haiku-text {
+  font-family: 'Yu Mincho', 'Noto Serif JP', serif;
+  font-size: 2rem;
+  color: var(--ink);
+  margin-bottom: 1rem;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+}
+.haiku-author { font-size: 1rem; color: var(--ink-mid); text-align: right; }
+
+/* ── STEP 2: OUTPUT DIAGRAMS ── */
+.diagram-grid {
+  display: grid; grid-template-columns: 1fr; gap: 2rem;
+}
+@media (min-width: 768px) {
+  .diagram-grid { grid-template-columns: 1fr 1fr; }
+}
+.diagram-placeholder {
+  background: var(--bg-alt);
+  border: 1px dashed var(--ink-lite);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  min-height: 250px;
+}
+.diagram-placeholder.full { grid-column: 1 / -1; }
+.dp-icon { font-size: 2rem; color: var(--teal); margin-bottom: 1rem; }
+.dp-title { font-family: var(--font-mono); font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; }
+.dp-note { font-size: 0.85rem; color: var(--ink-lite); }
+
+/* ── STEP 3: PUBLICATION ── */
+.pub-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 2rem;
+}
+.pub-title {
+  font-size: 1.3rem; font-weight: bold; margin-bottom: 1.5rem; color: var(--ink);
+  line-height: 1.4;
+}
+.pub-meta-grid {
+  display: grid; grid-template-columns: auto 1fr; gap: 0.8rem 1.5rem;
+  margin-bottom: 2rem;
+}
+.meta-label {
+  font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-lite);
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.meta-value { font-size: 1rem; color: var(--ink-mid); }
+.meta-value.doi { font-family: var(--font-mono); color: var(--teal); }
+
+.btn-rg {
+  display: inline-block;
+  background: #00CCBB; /* ResearchGate brand-like color */
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 0.8rem 1.5rem;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: opacity 0.2s;
+}
+.btn-rg:hover { opacity: 0.9; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 0.85rem 1.25rem; }
+  .nav-links { display: none; }
+  section { padding: 3rem 1.25rem; }
+  .step-card { padding: 2rem 1.5rem; }
+  .step-number { top: -1rem; left: 1rem; padding: 0.4rem 1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <a href="/" class="nav-logo">c4model.org</a>
+  <ul class="nav-links">
+    <li><a href="haiku-engineering.html">Haiku Science</a></li>
+    <li><a href="haiku-casestudy.html">Case Studies</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="haiku-engineering.html" class="nav-cta">← システムに戻る</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">CASE STUDY WORKFLOW</div>
+    <h1 class="hero-h1">俳句の科学 事例研究</h1>
+    <p class="hero-sub">入力された俳句が、どのようにAIによって構造解析（C4モデル・シーケンス図等）され、最終的に学術論文として公開されるのか。その具体的なプロセスをご紹介します。</p>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="container">
+      <h2 class="section-title">Case 1: 「名月をとってくれよと泣く子かな」の構造解析</h2>
+      <p class="lead-text">「俳句の科学」システムを用いて、小林一茶の有名な一句「名月をとってくれよと泣く子かな」を解析した事例です。「C4モデル」や「シーケンス図」といった専門的な用語が出てきますが、難しく考える必要はありません。これらは**「誰もが知る名句の奥深い景色を、目に見える形にする魔法の虫眼鏡」**です。この図解の力により、言葉の壁を越えて海外の学術プラットフォーム（ResearchGate）でも高い評価を受けました。</p>
+
+      <div class="case-workflow">
+        
+        <!-- STEP 1 -->
+        <div class="step-card" data-step="1">
+          <div class="step-number">STEP 1: 入力（Input）</div>
+          <div class="step-header">
+            <h3>俳句と情景の入力</h3>
+            <p>システムに俳句と、その時の簡単な情景（コンテキスト）を入力します。</p>
+          </div>
+          <div class="haiku-box">
+            <div class="haiku-text">名月をとってくれよと泣く子かな</div>
+            <div class="haiku-author">小林 一茶</div>
+          </div>
+          
+          <div style="background: #ffffff; border: 1px solid var(--border-lt); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 6px;">
+            <h4 style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--teal); margin-bottom: 0.5rem; letter-spacing: 0.05em;">【作品情報】</h4>
+            <ul style="list-style: none; padding: 0; margin: 0 0 1rem 0; font-size: 0.95rem; color: var(--ink-mid);">
+              <li><strong>作者:</strong> 小林一茶（1763-1828）</li>
+              <li><strong>季語:</strong> 名月（秋）</li>
+              <li><strong>出典:</strong> 『おらが春』所収</li>
+            </ul>
+            
+            <h4 style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--teal); margin-bottom: 0.5rem; letter-spacing: 0.05em;">【文学的背景】</h4>
+            <p style="font-size: 0.95rem; color: var(--ink-mid); line-height: 1.6; margin: 0;">
+              この句は、一茶の温かい人間観察が表現された代表作の一つです。幼児の無邪気な願いと、それに対する大人の複雑な感情が込められています。月に対する幼児の素朴な欲求は、人間の根源的な欲望と理想への憧れを象徴しています。
+            </p>
+          </div>
+
+          <p style="color: var(--ink-mid); font-size: 0.95rem;">
+            ※システムは、この人間的な「距離感」や「感情の動き」を見えない要件として読み取り、アーキテクチャ図へと変換します。
+          </p>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="step-card" data-step="2">
+          <div class="step-number">STEP 2: AI構造解析（Analysis）</div>
+          <div class="step-header">
+            <h3>AIが描く「俳句の設計図」</h3>
+            <p>AIが俳句の言葉を読み解き、目に見えない景色を図表（ダイアグラム）にしてくれます。一見すると専門的な図表ですが、実はとても直感的に俳句のストーリーを味わうことができます。</p>
+          </div>
+          
+          <div class="diagram-grid">
+            <!-- Placeholder: C4 Model -->
+            <div class="diagram-placeholder full">
+              <div class="dp-icon">⬡</div>
+              <div class="dp-title">「全体像と構造」の地図（C4モデル図）</div>
+              <div class="dp-note">※ここに実際のC4図の画像を配置します<br>（俳句の世界観全体を俯瞰する地図の役割を果たします）</div>
+            </div>
+            
+            <!-- Placeholder: Sequence Diagram -->
+            <div class="diagram-placeholder">
+              <div class="dp-icon">⇶</div>
+              <div class="dp-title">「やり取りや時間の流れ」のストーリー（シーケンス図）</div>
+              <div class="dp-note">※ここにシーケンス図の画像を配置します<br>（子が月を欲しがって泣き、親がそれを見守るという時間の流れを表現）</div>
+            </div>
+
+            <!-- Placeholder: Class Diagram -->
+            <div class="diagram-placeholder">
+              <div class="dp-icon">▦</div>
+              <div class="dp-title">「存在の関係性」の相関図（クラス図）</div>
+              <div class="dp-note">※ここにクラス図の画像を配置します<br>（「親」「子」「月」の物理的な距離や、愛情という結びつきを表現）</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="step-card" data-step="3">
+          <div class="step-number">STEP 3: 学術論文として公開（Publication）</div>
+          <div class="step-header">
+            <h3>そして世界への発信（論文化）</h3>
+            <p>図解によって見えてきた「俳句の深さ」は、誰にでも分かる論理的な構造を持っています。そのため、言葉の壁を越えて、世界中の研究者が集まるプラットフォーム（ResearchGate）でも、正式な学術論文として公開されました。</p>
+          </div>
+          
+          <div class="pub-card">
+            <div class="pub-title">小林一茶句「名月をとってくれよと泣く子かな」C4 モデルによる構造分析</div>
+            
+            <div class="pub-meta-grid">
+              <div class="meta-label">Date</div>
+              <div class="meta-value">2025</div>
+              
+              <div class="meta-label">Author</div>
+              <div class="meta-value">Osamu Okumura（奥村 治）</div>
+
+              <div class="meta-label">DOI</div>
+              <div class="meta-value doi">※要確認・入力</div>
+            </div>
+
+            <a href="https://www.researchgate.net/publication/395810142_C4_model_tujiehua_xiaolinyichajumingyuewotottekureyotoqikuzikana_C4_moderuniyorupaijunogouzaojiexi" target="_blank" rel="noopener noreferrer" class="btn-rg">
+              ResearchGateで実際の論文を読む ↗
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer style="background: var(--ink); color: rgba(250,250,248,0.5); padding: 2rem; text-align: center; font-family: var(--font-mono); font-size: 0.8rem;">
+  <p>© C4 Model Study Group® / Haiku Science</p>
+</footer>
+
+</body>
+</html>

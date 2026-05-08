@@ -235,19 +235,25 @@ footer a{color:var(--gold);text-decoration:none;}
 
 <section id="hero">
   <div class="hero-inner">
-    <div class="hero-badge">Haiku Science · C4モデル分析</div>
+    <div class="hero-badge">Haiku Science · C4モデル分析 AIツール</div>
     <div class="hero-haiku">
       <span class="ku">古池や</span><span class="ku">蛙飛びこむ</span><span class="ku">水の音</span>
     </div>
     <h1 class="hero-h1">俳句の科学<em>入門</em></h1>
-    <p class="hero-sub">ひらがな3分割入力で正確に音数カウント。<br>AIがC4モデル図と工学的評価を即時生成します。</p>
+    <p class="hero-sub">ひらがな3分割入力により、音数を正確にカウントします。<br>AIがC4モデル構造図と工学的・文学的評価を即座に生成します。</p>
   </div>
 </section>
 
 <section id="form-section">
   <div class="form-inner">
     <h2 class="form-title"><em>俳句</em>を入力して分析する</h2>
-    <p class="form-subtitle">俳句の入力だけが必須です。それ以外はすべて任意です。どうぞ気軽にお試しください。</p>
+    <p class="form-subtitle">俳句の入力（上五・中七・下五）は必須です。その他の項目はすべて任意です。どうぞ気軽にお試しください。</p>
+
+    <div class="fs-notice reveal" style="background: #eef7f8; border-left: 4px solid var(--teal); padding: 1rem 1.5rem; margin-bottom: 2rem; color: var(--ink-mid); font-weight: bold; border-radius: 4px;">
+      💡 【ご入力時の注意】<br>
+      各入力欄にはあらかじめ「古池や」などの記入例がうすい文字で表示されています。<br>
+      枠内をクリックし、そのまま上書きしてご自身の俳句情報を入力してください。
+    </div>
 
     <div class="haiku-card">
       <!-- ── 入力モード切替 ── -->
@@ -364,7 +370,7 @@ footer a{color:var(--gold);text-decoration:none;}
 
     <div class="submit-wrap">
       <button id="btn-analyze" class="btn-analyze" disabled>
-        <span class="btn-dot"></span>C4モデルで分析する
+        <span class="btn-dot"></span>C4モデル図を生成して分析する
       </button>
       <div class="btn-guide" id="btn-guide">俳句を入力するとボタンが有効になります</div>
     </div>
@@ -432,7 +438,7 @@ footer a{color:var(--gold);text-decoration:none;}
 
       <!-- ── 🔍 アドバイス ── -->
       <div class="eval-section">
-        <div class="eval-sec-title">🔍 アドバイス：さらに深めるなら</div>
+        <div class="eval-sec-title">🔍 俳句の科学からのアドバイス</div>
         <div class="eval-sec-body" id="ev-advice">—</div>
       </div>
 
@@ -471,7 +477,7 @@ footer a{color:var(--gold);text-decoration:none;}
 </section>
 
 <footer>
-  <p>© 2025 C4モデル研究会® · <a href="https://c4model.org/">c4model.org</a> · <a href="mailto:info@c4model.org">info@c4model.org</a></p>
+  <p>© 2025 C4モデル研究会® · <a href="https://c4model.org/">c4model.org</a> · <a href="mailto:info@c4model.org">info@c4model.org</a> · <a href="https://c4model.org/haiku-engineering.html">俳句の科学入門</a></p>
 </footer>
 
 <script>

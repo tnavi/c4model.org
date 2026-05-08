@@ -1448,6 +1448,8 @@ footer {
             <button class="pdf-ctab active" onclick="switchPdfTab('ctx',this)">L1 · Context</button>
             <button class="pdf-ctab" onclick="switchPdfTab('ctr',this)">L2 · Container</button>
             <button class="pdf-ctab" onclick="switchPdfTab('cmp',this)">L3 · Component</button>
+            <button class="pdf-ctab" onclick="switchPdfTab('seq',this)">シーケンス図</button>
+            <button class="pdf-ctab" onclick="switchPdfTab('sta',this)">状態遷移図</button>
           </div>
           <div class="pdf-c4-panel active" id="pdf-panel-ctx">
             <div class="pdf-c4-img-wrap">
@@ -1465,6 +1467,18 @@ footer {
             <div class="pdf-c4-img-wrap">
               <div class="pdf-c4-loading" id="pdf-load-cmp">図を生成中…</div>
               <img id="pdf-img-cmp" alt="L3 Component" style="display:none; max-width:100%;">
+            </div>
+          </div>
+          <div class="pdf-c4-panel" id="pdf-panel-seq">
+            <div class="pdf-c4-img-wrap">
+              <div class="pdf-c4-loading" id="pdf-load-seq">図を生成中…</div>
+              <img id="pdf-img-seq" alt="シーケンス図" style="display:none; max-width:100%;">
+            </div>
+          </div>
+          <div class="pdf-c4-panel" id="pdf-panel-sta">
+            <div class="pdf-c4-img-wrap">
+              <div class="pdf-c4-loading" id="pdf-load-sta">図を生成中…</div>
+              <img id="pdf-img-sta" alt="状態遷移図" style="display:none; max-width:100%;">
             </div>
           </div>
 
@@ -1832,24 +1846,31 @@ async function callClaude(prompt) {
 /* ── PlantUML生成プロンプト ── */
 function buildPumlPrompt(d) {
   const haiku = getHaikuFull(d);
-  return `あなたはC4モデル専門家です。以下の俳句をC4モデルで構造解析し、PlantUMLコード（L1 Context図のみ）をJSON形式で返してください。
+  return `あなたはC4モデル・UML専門家です。以下の俳句を構造解析し、5種類のPlantUMLコードをJSON形式で返してください。
 
 俳句：${haiku}
 作者：${d.name || '不明'}
 背景：${d.bg || 'なし'}
 
-必須ルール：
-1. PlantUMLのC4_Context.pumlを使用
-2. !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml を先頭に記述
-3. Person, System, System_Ext, Rel のみ使用
-4. 日本語テキスト可
-5. {}波括弧・<>山括弧・?疑問符は使用禁止
-6. 必ず@startuml〜@endumlで囲む
+必須ルール（全図共通）：
+1. {}波括弧・<>山括弧・?疑問符は使用禁止
+2. 必ず@startuml〜@endumlで囲む
+3. 日本語テキスト可
+4. skinparam state<<tag>>は禁止、代わりにstate "名前" as S1 #色を使用
 
-以下のJSON形式のみで返答（マークダウン不可）：
-{"ctx":"@startuml...@enduml","ctr":"@startuml...@enduml","cmp":"@startuml...@enduml"}
+C4図ルール（ctx/ctr/cmp）：
+- ctx: !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml を使用、Person/System/System_Ext/Relのみ
+- ctr: !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml を使用
+- cmp: !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml を使用
 
-ctx = L1 Context図、ctr = L2 Container図（俳句の句構造）、cmp = L3 Component図（音・季語・余白の要素）`;
+シーケンス図（seq）：俳句を読む読者の認知プロセスを時系列で表現（participant/actor/->/-->を使用）
+状態遷移図（sta）：句を読む前後の読者の心理状態変化を表現（@startuml
+state "状態名" as S1
+S1 --> S2 : トリガー
+@enduml の形式）
+
+以下のJSON形式のみで返答（マークダウン不可、改行は\nでエスケープ）：
+{"ctx":"@startuml...@enduml","ctr":"@startuml...@enduml","cmp":"@startuml...@enduml","seq":"@startuml...@enduml","sta":"@startuml...@enduml"}`;
 }
 
 /* ── 評価・解説プロンプト ── */
@@ -2061,6 +2082,8 @@ function renderOutput(res) {
     ctx: { puml: puml.ctx, img: 'pdf-img-ctx', load: 'pdf-load-ctx' },
     ctr: { puml: puml.ctr, img: 'pdf-img-ctr', load: 'pdf-load-ctr' },
     cmp: { puml: puml.cmp, img: 'pdf-img-cmp', load: 'pdf-load-cmp' },
+    seq: { puml: puml.seq, img: 'pdf-img-seq', load: 'pdf-load-seq' },
+    sta: { puml: puml.sta, img: 'pdf-img-sta', load: 'pdf-load-sta' },
   };
   Object.entries(c4map).forEach(([key, cfg]) => {
     if (cfg.puml) renderPuml(cfg.puml, document.getElementById(cfg.img), document.getElementById(cfg.load));

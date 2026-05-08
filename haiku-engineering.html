@@ -787,6 +787,8 @@ footer {
 /* PDF出力対象エリア */
 #fs-pdf-target {
   padding: 2.5rem;
+  max-width: 100%;
+  overflow: hidden;
 }
 .pdf-header {
   display: flex; justify-content: space-between; align-items: flex-start;
@@ -829,6 +831,9 @@ footer {
 .pdf-body-text {
   color: var(--ink-mid);
   line-height: 1.85; font-size: 0.95rem;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 
 /* C4図エリア */
@@ -2038,7 +2043,15 @@ function renderOutput(res) {
   document.getElementById('pdf-period').textContent = d.period || '';
   document.getElementById('pdf-place').textContent  = d.place || '';
   document.getElementById('pdf-gendate').textContent = '生成日：' + new Date().toLocaleDateString('ja-JP');
-  document.getElementById('pdf-background').textContent = d.bg || '—';
+  // 背景テキスト：URLを短縮リンクに変換して表示（はみ出し防止）
+  const bgEl = document.getElementById('pdf-background');
+  const bgText = d.bg || '—';
+  bgEl.innerHTML = bgText.replace(/(https?:\/\/[^\s]+)/g, (url) => {
+    const display = url.length > 50 ? url.substring(0, 47) + '…' : url;
+    return `<a href="${url}" target="_blank" rel="noopener"
+      style="color:var(--teal);word-break:break-all;overflow-wrap:anywhere;font-size:0.88em;"
+      title="${url}">${display}</a>`;
+  });
 
   // PlantUMLコード表示（L1）
   document.getElementById('pdf-puml-code').textContent = puml.ctx || '';

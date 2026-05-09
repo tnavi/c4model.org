@@ -1654,11 +1654,29 @@ function deflateRaw(str) {
 function encodePuml(puml) { return '~1' + encode64(deflateRaw(puml)); }
 function renderPuml(puml, imgEl, loadEl) {
   const enc = encodePuml(puml);
-  imgEl.onload = () => { loadEl.style.display='none'; imgEl.style.display='block'; };
-  imgEl.onerror = () => {
-    imgEl.src = `https://kroki.io/plantuml/svg/${btoa(unescape(encodeURIComponent(puml)))}`;
-    imgEl.onerror = () => { loadEl.textContent = '⚠ 図の読み込みに失敗しました'; };
+  loadEl.style.display = 'block';
+  imgEl.style.display = 'none';
+
+  // plantuml.com（~1プレフィックス付き）で試行
+  const tryKroki = () => {
+    // kroki.io POSTエンドポイント（マルチバイト対応・確実）
+    fetch('https://kroki.io/plantuml/svg', {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Accept': 'image/svg+xml' },
+      body: puml
+    })
+    .then(r => { if (!r.ok) throw new Error('kroki error'); return r.blob(); })
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      imgEl.onload = () => { loadEl.style.display='none'; imgEl.style.display='block'; };
+      imgEl.onerror = () => { loadEl.textContent = '⚠ 図の読み込みに失敗しました'; };
+      imgEl.src = url;
+    })
+    .catch(() => { loadEl.textContent = '⚠ 図の読み込みに失敗しました'; });
   };
+
+  imgEl.onload = () => { loadEl.style.display='none'; imgEl.style.display='block'; };
+  imgEl.onerror = () => { tryKroki(); };
   imgEl.src = `https://www.plantuml.com/plantuml/svg/${enc}`;
 }
 
@@ -1957,17 +1975,24 @@ async function generateFacesheet() {
 
   try {
     // 並列でPlantUML生成と評価を呼び出す
-    const [pumlRaw, evalRaw] = await Promise.all([
+    const [pumlResult, evalResult] = await Promise.allSettled([
       callClaude(buildPumlPrompt(d)),
       callClaude(buildEvalPrompt(d))
     ]);
 
-    const pumlData = safeParseJSON(pumlRaw);
-    const evalData = safeParseJSON(evalRaw);
+    const pumlRaw = pumlResult.status === 'fulfilled' ? pumlResult.value : null;
+    const evalRaw = evalResult.status === 'fulfilled' ? evalResult.value : null;
+
+    const pumlData = pumlRaw ? safeParseJSON(pumlRaw) : null;
+    const evalData = evalRaw ? safeParseJSON(evalRaw) : null;
 
     // フォールバック: APIキーなし or エラー時はテンプレート生成
     const puml = pumlData || buildFallbackPuml(d);
     const ev   = evalData || buildFallbackEval(d);
+
+    // seq・staが欠落していた場合もフォールバックで補完
+    if (!puml.seq) puml.seq = buildFallbackPuml(d).seq;
+    if (!puml.sta) puml.sta = buildFallbackPuml(d).sta;
 
     currentResult = { d, puml, ev, ts: Date.now() };
     renderOutput(currentResult);
@@ -1977,6 +2002,9 @@ async function generateFacesheet() {
     // フォールバック（テンプレート生成）
     const puml = buildFallbackPuml(d);
     const ev   = buildFallbackEval(d);
+    // seq・staを明示的に確認（安全策）
+    if (!puml.seq) puml.seq = buildFallbackPuml(d).seq;
+    if (!puml.sta) puml.sta = buildFallbackPuml(d).sta;
     currentResult = { d, puml, ev, ts: Date.now(), fallback: true };
     renderOutput(currentResult);
   } finally {
@@ -2039,6 +2067,42 @@ Container_Boundary(end, "${ku3}") {
 Rel(kigo, doshi, "生命と動きの合成")
 Rel(doshi, oto, "行為から音響へ")
 Rel(oto, yoin, "音が消えた後の余白")
+@enduml`,
+    seq: `@startuml
+skinparam backgroundColor #FAFAF8
+skinparam sequenceArrowThickness 2
+skinparam defaultFontName "Source Serif 4"
+title シーケンス図 - ${haiku}
+participant "読者" as R
+participant "${ku1}" as K1
+participant "${ku2}" as K2
+participant "${ku3}" as K3
+participant "余韻・余白" as Y
+R -> K1 : 句を目にする
+K1 -> R : 情景（舞台）が浮かぶ
+R -> K2 : 動きを感じ取る
+K2 -> R : 驚き・感動が生まれる
+R -> K3 : 音・感触を受け取る
+K3 -> Y : 余韻が広がる
+Y -> R : 想像の中で世界が完結する
+@enduml`,
+    sta: `@startuml
+skinparam backgroundColor #FAFAF8
+skinparam defaultFontName "Source Serif 4"
+title 状態遷移図 - 読者の心理変化 ${haiku}
+[*] --> S1
+state "日常の意識" as S1
+state "句と出会う" as S2
+state "情景が浮かぶ" as S3
+state "感動・共鳴" as S4
+state "余韻の中にいる" as S5
+state "俳句の世界に生きる" as S6
+S1 --> S2 : 俳句を目にする
+S2 --> S3 : ${ku1}を受け取る
+S3 --> S4 : ${ku2}で動きを感じる
+S4 --> S5 : ${ku3}で余白に入る
+S5 --> S6 : 想像が完結する
+S6 --> [*]
 @enduml`
   };
 }

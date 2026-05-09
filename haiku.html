@@ -229,49 +229,52 @@ footer a{color:var(--gold);text-decoration:none;}
       <button class="lang-btn active" data-lang="ja">日本語</button>
       <button class="lang-btn" data-lang="en">English</button>
     </div>
-    <a href="https://c4model.org/dojo.html" class="nav-cta">論文道場 →</a>
+    <a href="https://c4model.org/dojo.html" class="nav-cta"><span data-ja>論文道場 →</span><span data-en style="display:none">Thesis Dojo →</span></a>
   </div>
 </nav>
 
 <section id="hero">
   <div class="hero-inner">
-    <div class="hero-badge">Haiku Science · C4モデル分析 AIツール</div>
+    <div class="hero-badge"><span data-ja>Haiku Science · C4モデル分析 AIツール</span><span data-en style="display:none">Haiku Science · C4 Model AI Analyzer</span></div>
     <div class="hero-haiku">
       <span class="ku">古池や</span><span class="ku">蛙飛びこむ</span><span class="ku">水の音</span>
     </div>
-    <h1 class="hero-h1">俳句の科学<em>入門</em></h1>
-    <p class="hero-sub">ひらがな3分割入力により、音数を正確にカウントします。<br>AIがC4モデル構造図と工学的・文学的評価を即座に生成します。</p>
+    <h1 class="hero-h1"><span data-ja>俳句の科学<em>入門</em></span><span data-en style="display:none">Haiku <em>Science</em></span></h1>
+    <p class="hero-sub"><span data-ja>ひらがな3分割入力により、音数を正確にカウントします。<br>AIがC4モデル構造図と工学的・文学的評価を即座に生成します。</span><span data-en style="display:none">Enter haiku in 3 parts (5-7-5) for accurate mora counting.<br>AI instantly generates C4 structural diagrams and engineering/literary analysis.</span></p>
   </div>
 </section>
 
 <section id="form-section">
   <div class="form-inner">
-    <h2 class="form-title"><em>俳句</em>を入力して分析する</h2>
-    <p class="form-subtitle">俳句の入力（上五・中七・下五）は必須です。その他の項目はすべて任意です。どうぞ気軽にお試しください。</p>
+    <h2 class="form-title"><span data-ja><em>俳句</em>を入力して分析する</span><span data-en style="display:none">Enter a <em>Haiku</em> for Analysis</span></h2>
+    <p class="form-subtitle"><span data-ja>俳句の入力（上五・中七・下五）は必須です。その他の項目はすべて任意です。どうぞ気軽にお試しください。</span><span data-en style="display:none">The haiku fields (5-7-5) are required. All other fields are optional. Feel free to try it.</span></p>
 
     <div class="fs-notice reveal" style="background: #eef7f8; border-left: 4px solid var(--teal); padding: 1rem 1.5rem; margin-bottom: 2rem; color: var(--ink-mid); font-weight: bold; border-radius: 4px;">
-      💡 【ご入力時の注意】<br>
+      <span data-ja>💡 【ご入力時の注意】<br>
       各入力欄にはあらかじめ「古池や」などの記入例がうすい文字で表示されています。<br>
-      枠内をクリックし、そのまま上書きしてご自身の俳句情報を入力してください。
+      枠内をクリックし、そのまま上書きしてご自身の俳句情報を入力してください。</span><span data-en style="display:none">💡 【How to enter】<br>
+      Each field shows a sample (e.g. "furuike ya") as placeholder text.<br>
+      Click inside the field and type over it to enter your own haiku.</span>
     </div>
 
     <div class="haiku-card">
       <!-- ── 入力モード切替 ── -->
       <div class="mode-tabs">
-        <button class="mode-tab active" id="tab-kana">★ ひらがな入力（推奨・正確）</button>
-        <button class="mode-tab" id="tab-kanji">漢字・旧仮名・自由入力</button>
+        <button class="mode-tab active" id="tab-kana"><span data-ja>★ ひらがな入力（推奨・正確）</span><span data-en style="display:none">★ Hiragana Input (Recommended)</span></button>
+        <button class="mode-tab" id="tab-kanji"><span data-ja>漢字・旧仮名・自由入力</span><span data-en style="display:none">Kanji / Free Input</span></button>
       </div>
 
       <!-- ── モードA：ひらがな3分割（推奨） ── -->
       <div id="mode-kana">
         <div class="mode-hint">
-          ひらがな・カタカナで入力すると音数を正確にカウントします。<br>
-          漢字の句は右のタブから入力し、読み仮名欄に読みをひらがなで入力してください。
+          <span data-ja>ひらがな・カタカナで入力すると音数を正確にカウントします。<br>
+          漢字の句は右のタブから入力し、読み仮名欄に読みをひらがなで入力してください。</span><span data-en style="display:none">Enter in hiragana or katakana for accurate mora counting.<br>
+          For kanji, use the right tab and enter the reading in hiragana.</span>
         </div>
         <div class="ku-row">
           <div class="ku-wrap">
             <div class="ku-meta">
-              <span>上五（5音）</span>
+              <span><span data-ja>上五（5音）</span><span data-en style="display:none">First (5)</span></span>
               <span class="mora-badge" id="badge-k1">0音</span>
             </div>
             <input id="ku1" class="ku-input" type="text" placeholder="ふるいけや" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -279,7 +282,7 @@ footer a{color:var(--gold);text-decoration:none;}
           <div class="ku-sep">／</div>
           <div class="ku-wrap">
             <div class="ku-meta">
-              <span>中七（7音）</span>
+              <span><span data-ja>中七（7音）</span><span data-en style="display:none">Middle (7)</span></span>
               <span class="mora-badge" id="badge-k2">0音</span>
             </div>
             <input id="ku2" class="ku-input" type="text" placeholder="かわずとびこむ" maxlength="16" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -287,7 +290,7 @@ footer a{color:var(--gold);text-decoration:none;}
           <div class="ku-sep">／</div>
           <div class="ku-wrap">
             <div class="ku-meta">
-              <span>下五（5音）</span>
+              <span><span data-ja>下五（5音）</span><span data-en style="display:none">Last (5)</span></span>
               <span class="mora-badge" id="badge-k3">0音</span>
             </div>
             <input id="ku3" class="ku-input" type="text" placeholder="みずのおと" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -343,20 +346,20 @@ footer a{color:var(--gold);text-decoration:none;}
 
     <div class="field-row">
       <div class="field">
-        <label class="field-label">句の題名・テーマ <span style="color:var(--ink-lite)">任意</span></label>
+        <label class="field-label"><span data-ja>句の題名・テーマ <span style="color:var(--ink-lite)">任意</span></span><span data-en style="display:none">Title / Theme <span style="color:var(--ink-lite)">Optional</span></span></label>
         <input id="f-title" class="field-input" type="text" placeholder="例：蛍">
       </div>
       <div class="field">
-        <label class="field-label">季語（わかれば） <span style="color:var(--ink-lite)">任意</span></label>
+        <label class="field-label"><span data-ja>季語（わかれば） <span style="color:var(--ink-lite)">任意</span></span><span data-en style="display:none">Kigo / Season Word <span style="color:var(--ink-lite)">Optional</span></span></label>
         <input id="f-kigo" class="field-input" type="text" placeholder="例：蛍（夏）">
       </div>
     </div>
     <div class="field">
-      <label class="field-label">作句の背景・気持ち <span style="color:var(--ink-lite)">任意</span></label>
+      <label class="field-label"><span data-ja>作句の背景・気持ち <span style="color:var(--ink-lite)">任意</span></span><span data-en style="display:none">Background / Feelings <span style="color:var(--ink-lite)">Optional</span></span></label>
       <textarea id="f-bg" class="field-textarea" rows="3" placeholder="詠んだ状況、気持ち、季語の意味など。AIはこの情報も参考にC4図を生成します。"></textarea>
     </div>
     <div class="field">
-      <label class="field-label">俳句の経験 <span style="color:var(--ink-lite)">任意</span></label>
+      <label class="field-label"><span data-ja>俳句の経験 <span style="color:var(--ink-lite)">任意</span></span><span data-en style="display:none">Experience Level <span style="color:var(--ink-lite)">Optional</span></span></label>
       <select id="f-exp" class="field-select">
         <option value="">選択してください</option>
         <option>初めて作った / First haiku</option>
@@ -370,9 +373,9 @@ footer a{color:var(--gold);text-decoration:none;}
 
     <div class="submit-wrap">
       <button id="btn-analyze" class="btn-analyze" disabled>
-        <span class="btn-dot"></span>C4モデル図を生成して分析する
+        <span class="btn-dot"></span><span data-ja>C4モデル図を生成して分析する</span><span data-en style="display:none">Generate C4 Diagram &amp; Analyze</span>
       </button>
-      <div class="btn-guide" id="btn-guide">俳句を入力するとボタンが有効になります</div>
+      <div class="btn-guide" id="btn-guide"><span data-ja>俳句を入力するとボタンが有効になります</span><span data-en style="display:none">Enter a haiku to enable the button</span></div>
     </div>
     <div class="stream-wrap" id="stream-wrap">
       <div class="stream-text" id="stream-text">俳句の構造を解析中…</div>
@@ -461,18 +464,18 @@ footer a{color:var(--gold);text-decoration:none;}
 
     </div><!-- /#pdf-target -->
     <div class="out-actions">
-      <button class="out-btn primary" id="btn-pdf">📄 PDFで出力する</button>
-      <button class="out-btn" id="btn-save">💾 履歴に保存する</button>
-      <button class="out-btn" id="btn-back">← 別の俳句を入力する</button>
+      <button class="out-btn primary" id="btn-pdf"><span data-ja>📄 PDFで出力する</span><span data-en style="display:none">📄 Export PDF</span></button>
+      <button class="out-btn" id="btn-save"><span data-ja>💾 履歴に保存する</span><span data-en style="display:none">💾 Save to History</span></button>
+      <button class="out-btn" id="btn-back"><span data-ja>← 別の俳句を入力する</span><span data-en style="display:none">← Enter Another Haiku</span></button>
     </div>
   </div>
 </section>
 
 <section id="history-section">
   <div class="history-inner">
-    <h2 class="history-title">俳句アーカイブ</h2>
+    <h2 class="history-title"><span data-ja>俳句アーカイブ</span><span data-en style="display:none">Haiku Archive</span></h2>
     <div id="history-list" class="history-list"></div>
-    <div style="margin-top:1rem;"><button class="out-btn" id="btn-clear">🗑 すべて削除する</button></div>
+    <div style="margin-top:1rem;"><button class="out-btn" id="btn-clear"><span data-ja>🗑 すべて削除する</span><span data-en style="display:none">🗑 Clear All</span></button></div>
   </div>
 </section>
 
@@ -774,7 +777,13 @@ function deleteHistory(idx){if(!confirm('削除しますか？'))return;const ar
 function clearAllHistory(){if(!confirm('すべて削除しますか？'))return;localStorage.removeItem(LS);renderHistory();}
 function renderHistory(){const arr=loadHistory();const sec=document.getElementById('history-section');const list=document.getElementById('history-list');if(!arr.length){sec.style.display='none';return;}sec.style.display='block';list.innerHTML=arr.map((r,i)=>`<div class="history-item"><div style="flex:1"><div class="history-haiku">${r.inp.haiku}</div><div class="history-meta">${r.inp.mora||0}音 · ${new Date(r.ts).toLocaleDateString('ja-JP')}</div></div><div class="history-actions"><button class="h-btn" data-action="replay" data-idx="${i}">再生</button><button class="h-btn del" data-action="delete" data-idx="${i}">削除</button></div></div>`).join('');list.querySelectorAll('[data-action]').forEach(btn=>btn.addEventListener('click',()=>{const idx=parseInt(btn.dataset.idx,10);btn.dataset.action==='replay'?replayHistory(idx):deleteHistory(idx);}));}
 
-function setLang(lang){document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));localStorage.setItem('c4-lang',lang);}
+function setLang(lang){
+  document.querySelectorAll('[data-en]').forEach(el=>el.style.display=lang==='en'?'inline':'none');
+  document.querySelectorAll('[data-ja]').forEach(el=>el.style.display=lang==='ja'?'inline':'none');
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  document.documentElement.lang=lang==='en'?'en':'ja';
+  localStorage.setItem('c4-lang',lang);
+}
 
 /* ══ 初期化 ══ */
 function initApp(){

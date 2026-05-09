@@ -1046,14 +1046,14 @@ footer {
       <span data-en style="display:none">Structural analysis of Bashō's haiku using the C4 Model.<br>A completely new introduction — video × diagram × engineering,<br>reading the deep structure of haiku.</span>
     </p>
     <div class="hero-badges">
-      <span class="hero-badge accent">🎥 動画連動</span>
-      <span class="hero-badge accent">📐 C4モデル図解</span>
-      <span class="hero-badge">松尾芭蕉 · 小林一茶</span>
-      <span class="hero-badge">健康 × 俳句 × 工学</span>
-      <span class="hero-badge">高齢者対応設計</span>
+      <span class="hero-badge accent"><span data-ja>🎥 動画連動</span><span data-en style="display:none">🎥 Video-Linked</span></span>
+      <span class="hero-badge accent"><span data-ja>📐 C4モデル図解</span><span data-en style="display:none">📐 C4 Diagrams</span></span>
+      <span class="hero-badge"><span data-ja>松尾芭蕉 · 小林一茶</span><span data-en style="display:none">Bashō · Issa</span></span>
+      <span class="hero-badge"><span data-ja>健康 × 俳句 × 工学</span><span data-en style="display:none">Health × Haiku × Engineering</span></span>
+      <span class="hero-badge"><span data-ja>高齢者対応設計</span><span data-en style="display:none">Senior-Friendly Design</span></span>
     </div>
     <div style="margin-top: 2rem;">
-      <a href="haiku-casestudy.html" style="display: inline-block; padding: 0.8rem 2rem; background: var(--gold); color: var(--ink); text-decoration: none; font-family: var(--font-mono); font-weight: bold; letter-spacing: 0.1em; transition: background 0.2s;">▶ 実際の事例研究を見る（ResearchGate）</a>
+      <a href="haiku-casestudy.html" style="display: inline-block; padding: 0.8rem 2rem; background: var(--gold); color: var(--ink); text-decoration: none; font-family: var(--font-mono); font-weight: bold; letter-spacing: 0.1em; transition: background 0.2s;"><span data-ja>▶ 実際の事例研究を見る（ResearchGate）</span><span data-en style="display:none">▶ View Case Study (ResearchGate)</span></a>
     </div>
   </div>
 </section>
@@ -1074,22 +1074,22 @@ footer {
       <div class="pillar">
         <div class="pillar-num">01 / Video</div>
         <div class="pillar-icon">🎥</div>
-        <h3 class="pillar-title"><em>動画</em>で体験</h3>
-        <p class="pillar-body">QRコードからYouTube動画へ直結。視覚・聴覚で俳句の音・動き・余韻を体感してから書籍へ戻る。初心者・高齢者に最適な「入口」。</p>
+        <h3 class="pillar-title"><span data-ja><em>動画</em>で体験</span><span data-en style="display:none">Experience via <em>Video</em></span></h3>
+        <p class="pillar-body"><span data-ja>QRコードからYouTube動画へ直結。視覚・聴覚で俳句の音・動き・余韻を体感してから書籍へ戻る。初心者・高齢者に最適な「入口」。</span><span data-en style="display:none">QR codes link directly to YouTube. Experience the sound, movement, and resonance of haiku visually and aurally before returning to the book — the perfect "entry point" for beginners and seniors.</span></p>
         <span class="pillar-tag">QR → YouTube</span>
       </div>
       <div class="pillar">
         <div class="pillar-num">02 / Diagram</div>
         <div class="pillar-icon">📐</div>
-        <h3 class="pillar-title"><em>図解</em>で理解</h3>
-        <p class="pillar-body">C4モデルL1〜L3、シーケンス図、アクティビティ図で俳句の構造を可視化。「なんとなく好き」を「なぜ好きか」へ昇華する。</p>
+        <h3 class="pillar-title"><span data-ja><em>図解</em>で理解</span><span data-en style="display:none">Understand via <em>Diagrams</em></span></h3>
+        <p class="pillar-body"><span data-ja>C4モデルL1〜L3、シーケンス図、アクティビティ図で俳句の構造を可視化。「なんとなく好き」を「なぜ好きか」へ昇華する。</span><span data-en style="display:none">Visualize haiku structure with C4 Model L1–L3, sequence diagrams, and activity diagrams. Elevate "I just like it" into "Here is why I like it."</span></p>
         <span class="pillar-tag">PlantUML C4</span>
       </div>
       <div class="pillar">
         <div class="pillar-num">03 / Engineering</div>
         <div class="pillar-icon">⚙️</div>
-        <h3 class="pillar-title"><em>工学</em>で再現</h3>
-        <p class="pillar-body">季語・音韻・余白の設計法則を工学的に抽出。「偶然生まれた名句」を「再現可能な創作プロセス」へ変換する。</p>
+        <h3 class="pillar-title"><span data-ja><em>工学</em>で再現</span><span data-en style="display:none">Reproduce via <em>Engineering</em></span></h3>
+        <p class="pillar-body"><span data-ja>季語・音韻・余白の設計法則を工学的に抽出。「偶然生まれた名句」を「再現可能な創作プロセス」へ変換する。</span><span data-en style="display:none">Extract the design principles of kigo, phonetics, and ma (negative space) through engineering analysis. Transform "accidentally great haiku" into a "reproducible creative process."</span></p>
         <span class="pillar-tag">Haiku Science</span>
       </div>
     </div>
@@ -1753,8 +1753,8 @@ window.addEventListener('load', () => { loadDiagram('ctx'); loaded.ctx = true; }
 
 /* ── Lang Toggle ── */
 function setLang(lang) {
-  document.querySelectorAll('[data-en]').forEach(el => el.style.display = lang==='en' ? '' : 'none');
-  document.querySelectorAll('[data-ja]').forEach(el => el.style.display = lang==='ja' ? '' : 'none');
+  document.querySelectorAll('[data-en]').forEach(el => el.style.display = lang==='en' ? 'inline' : 'none');
+  document.querySelectorAll('[data-ja]').forEach(el => el.style.display = lang==='ja' ? 'inline' : 'none');
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang===lang));
   document.documentElement.lang = lang;
   localStorage.setItem('c4-lang', lang);

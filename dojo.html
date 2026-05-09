@@ -330,16 +330,31 @@
       aside { display: none; }
       main { padding: 1.5rem 1rem; max-width: 100%; }
     }
+
+    /* ── 言語切替ボタン ── */
+    .lang-switcher { margin-left: auto; display: flex; gap: 0; }
+    .lang-btn {
+      font-family: monospace; font-size: 0.72rem; letter-spacing: 0.08em;
+      padding: 0.3rem 0.75rem; background: transparent; color: var(--main-muted);
+      border: 1px solid var(--border); border-right: none; cursor: pointer; transition: all 0.15s;
+    }
+    .lang-btn:last-child { border-right: 1px solid var(--border); }
+    .lang-btn.active { background: var(--main-text, #1A1A2E); color: #fff; }
+    [data-en] { display: none; }
+    [data-ja] { display: inline; }
   </style>
 </head>
 <body>
 
 <!-- TOP NAV -->
 <div class="topnav">
-  <!-- [校正] リンクをc4model.orgトップページへ正しく設定 -->
   <a href="https://c4model.org/">c4model.org</a>
   <span>—</span>
-  <strong>論文道場</strong>
+  <strong><span data-ja>論文道場</span><span data-en style="display:none">Academic Paper Dojo</span></strong>
+  <div class="lang-switcher">
+    <button class="lang-btn active" data-lang="ja" onclick="setLang('ja')">日本語</button>
+    <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  </div>
 </div>
 
 <div class="layout">
@@ -348,25 +363,25 @@
 <!-- [変更] 背景を薄い青(#D6E8F5)に変更、文字サイズを拡大 -->
 <aside>
   <div class="sidebar-group">START HERE</div>
-  <a href="#stage0" class="active"><span class="dot"></span>Stage 0 — 入力</a>
+  <a href="#stage0" class="active"><span class="dot"></span><span data-ja>Stage 0 — 入力</span><span data-en style="display:none">Stage 0 — Input</span></a>
 
   <div class="sidebar-group">WRITING STAGES</div>
   <!-- [校正] すべてのアンカーリンクを対応するid属性と一致させた -->
-  <a href="#stage1">● Stage I — 発想</a>
-  <a href="#stage2">● Stage II — 構造化</a>
-  <a href="#stage3">● Stage III — 執筆</a>
-  <a href="#stage4">● Stage IV — 評価</a>
-  <a href="#stage5">● Stage V — 発表準備</a>
-  <a href="#stage6">● Stage VI — 質疑応答</a>
-  <a href="#stage7">● Stage VII — 投稿</a>
+  <a href="#stage1"><span data-ja>● Stage I — 発想</span><span data-en style="display:none">● Stage I — Ideation</span></a>
+  <a href="#stage2"><span data-ja>● Stage II — 構造化</span><span data-en style="display:none">● Stage II — Structure</span></a>
+  <a href="#stage3"><span data-ja>● Stage III — Writing</span><span data-en style="display:none">● Stage III — Writing</span></a>
+  <a href="#stage4"><span data-ja>● Stage IV — 評価</span><span data-en style="display:none">● Stage IV — Evaluation</span></a>
+  <a href="#stage5"><span data-ja>● Stage V — 発表準備</span><span data-en style="display:none">● Stage V — Presentation</span></a>
+  <a href="#stage6"><span data-ja>● Stage VI — 質疑応答</span><span data-en style="display:none">● Stage VI — Q&amp;A</span></a>
+  <a href="#stage7"><span data-ja>● Stage VII — 投稿</span><span data-en style="display:none">● Stage VII — Submission</span></a>
   <!-- [校正] アンケートリンクを正しいidに修正 -->
-  <a href="#feedback">📊 本アプリの評価アンケート</a>
+  <a href="#feedback"><span data-ja>📊 本アプリの評価アンケート</span><span data-en style="display:none">📊 Feedback Survey</span></a>
 
   <div class="sidebar-group">TOOLS</div>
   <!-- [校正] ツールリンクを正しいidに修正 -->
-  <a href="#tools-c4">C4モデル図集</a>
-  <a href="#tools-format">学会フォーマット</a>
-  <a href="#settings">設定</a>
+  <a href="#tools-c4"><span data-ja>C4モデル図集</span><span data-en style="display:none">C4 Diagram Gallery</span></a>
+  <a href="#tools-format"><span data-ja>学会フォーマット</span><span data-en style="display:none">Journal Formats</span></a>
+  <a href="#settings"><span data-ja>設定</span><span data-en style="display:none">Settings</span></a>
 </aside>
 
 <!-- ===== MAIN ===== -->
@@ -374,35 +389,35 @@
 
   <!-- STAGE 0 -->
   <section id="stage0">
-    <div class="stage-tag">STAGE 0 · 論文情報入力</div>
+    <div class="stage-tag"><span data-ja>STAGE 0 · 論文情報入力</span><span data-en style="display:none">STAGE 0 · Paper Input</span></div>
     <!-- [変更] 右側文字拡大（h1は1.9rem、本文は1rem以上） -->
-    <h1>200の実証例をワンクリックで再現する<br>『思考の自動化ツール』</h1>
-    <p class="stage-note">必須項目（*）を入力してください。スコアが28点以上になると「分析開始」ボタンが有効になります。</p>
+    <h1><span data-ja>200の実証例をワンクリックで再現する<br>『思考の自動化ツール』</span><span data-en style="display:none">Reproduce 200 Validated Cases in One Click<br>"Automated Thinking Tool"</span></h1>
+    <p class="stage-note"><span data-ja>必須項目（*）を入力してください。スコアが28点以上になると「分析開始」ボタンが有効になります。</span><span data-en style="display:none">Fill in required fields (*). The "Start Analysis" button activates when the score reaches 28 or above.</span></p>
 
     <!-- HOW-TO -->
     <div class="howto-box">
-      <div class="howto-title">🔰 3分でわかる！論文道場の使い方</div>
+      <div class="howto-title"><span data-ja>🔰 3分でわかる！論文道場の使い方</span><span data-en style="display:none">🔰 3-Minute Guide to Academic Paper Dojo</span></div>
       <div class="howto-grid">
         <div class="howto-card">
           <span class="howto-num">1</span>
-          <h4>何ができるの？</h4>
+          <h4><span data-ja>何ができるの？</span><span data-en style="display:none">What can it do?</span></h4>
           <p>頭の中のモヤモヤを整理し、論理的な「レポート・企画書・論文」を挫折せずに書き上げるための思考自動化ツールです。</p>
         </div>
         <div class="howto-card">
           <span class="howto-num">2</span>
-          <h4>どう入力するの？</h4>
+          <h4><span data-ja>どう入力するの？</span><span data-en style="display:none">How do I enter data?</span></h4>
           <p>左のメニューに沿って、分かる項目から穴埋めしていくだけ。まずは下の【💡 サンプルを入力】ボタンを押して体験してみてください。</p>
         </div>
         <div class="howto-card" style="grid-column: 1 / -1;">
           <span class="howto-num">3</span>
-          <h4>何が出てくるの？</h4>
+          <h4><span data-ja>何が出てくるの？</span><span data-en style="display:none">What does it generate?</span></h4>
           <p>審査をパスするレベルの「緻密な論文構成（Markdown）」と、最大の売りである<strong>「論文の構造を可視化できる図解（PlantUML）」</strong>が完成します。</p>
         </div>
       </div>
     </div>
 
     <div class="action-row">
-      <button class="btn-sample" onclick="loadSample()">💡 迷ったらここをクリック！（サンプルデータを入力して体験する）</button>
+      <button class="btn-sample" onclick="loadSample()"><span data-ja>💡 迷ったらここをクリック！（サンプルデータを入力して体験する）</span><span data-en style="display:none">💡 Click Here to Try Sample Data</span></button>
     </div>
     <!-- [校正] basho-case.html へのリンク（相対パスで正しく設定） -->
     <p style="margin-bottom:1.5rem; font-size:0.95rem;">
@@ -410,10 +425,10 @@
     </p>
 
     <div class="action-row">
-      <button class="btn-ghost" onclick="exportMarkdown()">⬇️ Markdown出力</button>
-      <button class="btn-ghost" onclick="saveDraft()">💾 下書き保存</button>
-      <button class="btn-ghost" onclick="loadDraft()">📂 下書き読込</button>
-      <button class="btn-ghost" onclick="clearAll()">🗑 クリア</button>
+      <button class="btn-ghost" onclick="exportMarkdown()"><span data-ja>⬇️ Markdown出力</span><span data-en style="display:none">⬇️ Export Markdown</span></button>
+      <button class="btn-ghost" onclick="saveDraft()"><span data-ja>💾 下書き保存</span><span data-en style="display:none">💾 Save Draft</span></button>
+      <button class="btn-ghost" onclick="loadDraft()"><span data-ja>📂 下書き読込</span><span data-en style="display:none">📂 Load Draft</span></button>
+      <button class="btn-ghost" onclick="clearAll()"><span data-ja>🗑 クリア</span><span data-en style="display:none">🗑 Clear</span></button>
     </div>
 
     <div style="background:#EAF4EC; border:1px solid #A8D5B5; border-radius:8px; padding:1.25rem; margin-bottom:2rem; font-size:0.95rem; color:#1A4A2E; line-height:1.7;">
@@ -558,13 +573,13 @@
       </div>
       <button class="btn-analyze" id="btnAnalyze" onclick="startAnalysis()" disabled>→ 分析開始</button>
     </div>
-    <div class="score-hint" id="scoreHint">必須項目を入力してスコアを28点以上にしてください</div>
+    <div class="score-hint" id="scoreHint"><span data-ja>必須項目を入力してスコアを28点以上にしてください</span><span data-en style="display:none">Fill in required fields to reach a score of 28 or above</span></div>
   </div>
 
   <!-- STAGE I -->
   <section class="stage-block" id="stage1">
-    <div class="stage-tag">STAGE I · 発想</div>
-    <h1>研究アイデアを育てる</h1>
+    <div class="stage-tag"><span data-ja>STAGE I · 発想</span><span data-en style="display:none">STAGE I · Ideation</span></div>
+    <h1><span data-ja>研究アイデアを育てる</span><span data-en style="display:none">Develop Your Research Idea</span></h1>
 
     <div class="c4-card">
       <h3>🧠 CREATEプロンプト</h3>
@@ -587,8 +602,8 @@
 
   <!-- STAGE II -->
   <section class="stage-block" id="stage2">
-    <div class="stage-tag">STAGE II · C4モデル構造化</div>
-    <h1>論文の設計図を描く</h1>
+    <div class="stage-tag"><span data-ja>STAGE II · C4モデル構造化</span><span data-en style="display:none">STAGE II · C4 Structuring</span></div>
+    <h1><span data-ja>論文の設計図を描く</span><span data-en style="display:none">Draw Your Paper Blueprint</span></h1>
     <p style="margin-bottom:1.5rem; color:var(--main-muted); font-size:0.95rem;">C4モデルの4層（Context→Container→Component→Code）で論文構造を可視化します。Stage 0のデータが自動反映されます。</p>
 
     <div class="c4-card">
@@ -625,8 +640,8 @@
 
   <!-- STAGE III — 7R -->
   <section class="stage-block" id="stage3">
-    <div class="stage-tag">STAGE III · 7Rプロンプト執筆支援</div>
-    <h1>7ステップで論文を書く</h1>
+    <div class="stage-tag"><span data-ja>STAGE III · 7Rプロンプト執筆支援</span><span data-en style="display:none">STAGE III · 7R Writing Support</span></div>
+    <h1><span data-ja>7ステップで論文を書く</span><span data-en style="display:none">Write Your Paper in 7 Steps</span></h1>
     <p style="margin-bottom:1.5rem; color:var(--main-muted); font-size:0.95rem;">7Rフレームワークで草稿から完成稿まで反復的に改良します。各ステップの「Claudeプロンプト」をコピーしてAIに貼り付けてください。</p>
 
     <!-- [変更] 7Rブロック背景を薄い青(#D6E8F5)に変更 -->
@@ -689,8 +704,8 @@
 
   <!-- STAGE IV -->
   <section class="stage-block" id="stage4">
-    <div class="stage-tag">STAGE IV · C4段階評価</div>
-    <h1>論文ドラフトを評価する</h1>
+    <div class="stage-tag"><span data-ja>STAGE IV · C4段階評価</span><span data-en style="display:none">STAGE IV · C4 Evaluation</span></div>
+    <h1><span data-ja>論文ドラフトを評価する</span><span data-en style="display:none">Evaluate Your Draft</span></h1>
 
     <div class="c4-card">
       <h3>📄 論文ドラフトを貼り付け</h3>
@@ -754,7 +769,7 @@
 
   <!-- STAGE VII -->
   <section class="stage-block" id="stage7">
-    <div class="stage-tag">STAGE VII · 投稿</div>
+    <div class="stage-tag"><span data-ja>STAGE VII · 投稿</span><span data-en style="display:none">STAGE VII · Submission</span></div>
     <h1>投稿・査読対応</h1>
 
     <div class="c4-card">
@@ -901,7 +916,7 @@ Rel(d, p, "図コード送信")
   <!-- SETTINGS -->
   <section class="stage-block" id="settings">
     <div class="stage-tag">SETTINGS</div>
-    <h1>設定</h1>
+    <h1><span data-ja>設定</span><span data-en style="display:none">Settings</span></h1>
 
     <div class="settings-card">
       <h3>💾 データ管理</h3>
@@ -920,11 +935,7 @@ Rel(d, p, "図コード送信")
         開発：奥村 治 / C4モデル研究会®<br>
         バックエンド：Cloudflare Workers + D1<br>
         AI：Claude API (Anthropic)<br>
-        図解：PlantUML Server<br>
-        © 2025–2026 C4モデル研究会® / Osamu Okumura. All rights reserved.
-      </p>
-      <p style="font-size:0.85rem; margin-top:0.75rem;">
-        <a href="https://c4model.org/">← c4model.org トップへ戻る</a>
+        図解：PlantUML Server
       </p>
     </div>
   </section>
@@ -933,6 +944,18 @@ Rel(d, p, "図コード送信")
 </div><!-- /.layout -->
 
 <script>
+  function setLang(lang) {
+    document.querySelectorAll('[data-en]').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
+    document.querySelectorAll('[data-ja]').forEach(el => el.style.display = lang === 'ja' ? 'inline' : 'none');
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    document.documentElement.lang = lang;
+    try { localStorage.setItem('dojo-lang', lang); } catch(e) {}
+  }
+  (function() {
+    const saved = (() => { try { return localStorage.getItem('dojo-lang'); } catch(e) { return null; } })();
+    setLang(saved || 'ja');
+  })();
+
   /* ===== SCORE CALCULATION ===== */
   function calcScore() {
     let score = 0;

@@ -2278,6 +2278,17 @@ function clearHistory() {
 
 /* ════════════════════
    PDF出力（html2pdf.js）
+   
+   【修正履歴 2025-05-10】
+   バグ①: fs-output-wrap が display:none のまま html2pdf に渡すと白紙になる
+           → PDF生成前に一時的に visibility:visible / display:block を強制付与し、
+             生成後に元に戻す
+   バグ②: finally で全 pdf-c4-panel を display:'' にリセットした後、
+           active パネルを再表示する順序が不正確で表示状態が壊れる
+           → activeパネルのみ先に保存し、finally で確実に復元する
+   バグ③: PlantUML 画像が非同期読み込み中に html2canvas がキャプチャすると
+           図が欠けることがある
+           → 全 img 要素の complete 確認 + 500ms の安定待機を追加
 ════════════════════ */
 async function exportPDF() {
   if (!currentResult) { alert('先に俳句を生成してください。'); return; }
@@ -2286,8 +2297,35 @@ async function exportPDF() {
   btn.textContent = '⏳ PDF生成中…';
   btn.disabled = true;
 
-  // PDF出力時は全C4図を表示状態に
-  document.querySelectorAll('.pdf-c4-panel').forEach(p => p.style.display = 'block');
+  // ── 現在アクティブなパネルを記録（後で復元）
+  const activePanel = document.querySelector('.pdf-c4-panel.active');
+
+  // ── バグ①修正: fs-output-wrap の表示を強制（display:none だと白紙になる）
+  const outputWrap = document.getElementById('fs-output-wrap');
+  const wrapWasHidden = !outputWrap.classList.contains('active');
+  if (wrapWasHidden) {
+    outputWrap.style.display = 'block';
+    outputWrap.style.visibility = 'visible';
+  }
+
+  // ── バグ②修正: 全 C4 パネルを表示（PDF では全図を出力）
+  document.querySelectorAll('.pdf-c4-panel').forEach(p => {
+    p.style.display = 'block';
+    p.style.visibility = 'visible';
+  });
+
+  // ── バグ③修正: 全 img が読み込み完了するまで待機
+  const imgs = document.querySelectorAll('#fs-pdf-target img');
+  await Promise.all([...imgs].map(img => {
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+    return new Promise(resolve => {
+      img.onload  = resolve;
+      img.onerror = resolve; // 読み込み失敗でも続行
+      setTimeout(resolve, 5000); // 最大5秒タイムアウト
+    });
+  }));
+  // 画像読み込み後、レイアウト安定のため追加待機
+  await new Promise(r => setTimeout(r, 500));
 
   const haiku = getHaikuFull(currentResult.d);
   const filename = `Facesheet_${(haiku || 'haiku').replace(/[　\s]/g,'_')}.pdf`;
@@ -2297,7 +2335,17 @@ async function exportPDF() {
     margin:      [10, 10, 10, 10],
     filename:    filename,
     image:       { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#FAFAF8' },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#FAFAF8',
+      // バグ①修正: スクロール位置をリセットして全体を確実にキャプチャ
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: document.documentElement.scrollWidth,
+      logging: false
+    },
     jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] }
   };
@@ -2305,12 +2353,25 @@ async function exportPDF() {
   try {
     await html2pdf().set(opt).from(target).save();
   } catch(e) {
-    alert('PDF生成に失敗しました。ブラウザの印刷機能をお試しください。');
-    console.error(e);
+    alert('PDF生成に失敗しました。ブラウザの印刷機能（Ctrl+P）をお試しください。');
+    console.error('[exportPDF] error:', e);
   } finally {
-    // タブ表示を元に戻す
-    document.querySelectorAll('.pdf-c4-panel').forEach(p => p.style.display = '');
-    document.querySelector('.pdf-c4-panel.active').style.display = 'block';
+    // ── バグ②修正: パネル表示を正確に復元
+    document.querySelectorAll('.pdf-c4-panel').forEach(p => {
+      p.style.display = '';
+      p.style.visibility = '';
+    });
+    // activeパネルだけ明示的に block に戻す
+    if (activePanel) {
+      activePanel.style.display = 'block';
+    }
+
+    // ── バグ①修正: output-wrap を元の非表示状態に戻す
+    if (wrapWasHidden) {
+      outputWrap.style.display = '';
+      outputWrap.style.visibility = '';
+    }
+
     btn.textContent = '📄 PDF出力';
     btn.disabled = false;
   }

@@ -1,1344 +1,2352 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>C4 Model Study Project — c4model.org</title>
-  <meta name="description" content="The universal architecture framework for academic papers, software systems, and beyond. Home of Thesis Dojo.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C4 Model Study Group® | c4model.org</title>
+  <meta name="description" content="C4 Model Study Group® — AI-powered academic writing, structural thinking, and Thesis Dojo. From daily reports to peer-reviewed papers." />
   <style>
-  /* ══════════════════════════════════════════════════════
-     ROOT & RESET
-  ══════════════════════════════════════════════════════ */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --white:     #FFFFFF;
-    --bg:        #FAFAF8;
-    --bg-alt:    #F4F1EC;
-    --bg-dark:   #1A1A2E;
-    --ink:       #1A1A2E;
-    --ink-mid:   #3D3D5C;
-    --ink-lite:  #7A7A9A;
-    --gold:      #B8860B;
-    --gold-lt:   #D4A01A;
-    --teal:      #1A7A8A;
-    --teal-lt:   #2A9BAD;
-    --sage:      #4A7A5A;
-    --purple:    #7A4A9A;
-    --border:    #D8D4CA;
-    --border-lt: #ECEAE4;
-    --shadow:    rgba(26,26,46,0.08);
-    --shadow-md: rgba(26,26,46,0.14);
-
-    --font-display: 'Fraunces', Georgia, serif;
-    --font-mono:    'DM Mono', 'Courier New', monospace;
-    --font-body:    'Source Serif 4', Georgia, serif;
-
-    --fs-hero: clamp(3.4rem, 7vw, 6.2rem);
-    --fs-h2:   clamp(2rem, 4vw, 3.2rem);
-    --fs-h3:   clamp(1.4rem, 2.5vw, 1.9rem);
-    --fs-body: 1.1rem;
-    --fs-mono: 0.82rem;
-
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--font-body);
-    font-size: var(--fs-body);
-    line-height: 1.75;
-    overflow-x: hidden;
-  }
-
-  ::selection { background: var(--gold); color: #fff; }
-  ::-webkit-scrollbar { width: 3px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--gold); }
-
-  /* ══════════════════════════════════════════════════════
-     LANGUAGE TOGGLE LOGIC
-  ══════════════════════════════════════════════════════ */
-  /* 初期状態：日本語表示・英語非表示（JSで上書き） */
-  [data-en] { display: none; }
-  [data-ja] { display: inline; }
-
-  /* ══════════════════════════════════════════════════════
-     NAV
-  ══════════════════════════════════════════════════════ */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 200;
-    background: rgba(250,250,248,0.92);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 3rem;
-    height: 60px;
-    transition: height 0.3s var(--ease);
-  }
-
-  .nav-logo {
-    font-family: var(--font-mono);
-    font-size: 0.9rem;
-    letter-spacing: 0.12em;
-    font-weight: 500;
-    color: var(--ink);
-    text-decoration: none;
-    display: flex; align-items: center; gap: 0.5rem;
-  }
-
-  .nav-logo-pip {
-    width: 7px; height: 7px;
-    background: var(--teal);
-    border-radius: 50%;
-    animation: pip 2.5s ease-in-out infinite;
-  }
-  @keyframes pip { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.5)} }
-
-  .nav-center {
-    display: flex; gap: 2.5rem; list-style: none;
-  }
-  .nav-center a {
-    font-family: var(--font-mono);
-    font-size: var(--fs-mono);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-lite);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .nav-center a:hover { color: var(--gold); }
-
-  .nav-right { display: flex; align-items: center; gap: 1rem; }
-
-  /* Lang toggle */
-  .lang-toggle {
-    display: flex;
-    border: 1px solid var(--border);
-  }
-  .lang-btn {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    padding: 0.3rem 0.75rem;
-    background: var(--bg);
-    color: var(--ink-lite);
-    border: none;
-    border-right: 1px solid var(--border);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .lang-btn:last-child { border-right: none; }
-  .lang-btn.active {
-    background: var(--ink);
-    color: var(--bg);
-  }
-
-  .nav-cta {
-    font-family: var(--font-mono);
-    font-size: var(--fs-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--white);
-    background: var(--ink);
-    padding: 0.45rem 1.2rem;
-    text-decoration: none;
-    transition: background 0.2s;
-  }
-  .nav-cta:hover { background: var(--teal); }
-
-  /* ══════════════════════════════════════════════════════
-     HERO
-  ══════════════════════════════════════════════════════ */
-  #hero {
-    min-height: 100vh;
-    padding: 100px 3rem 5rem;
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 5rem;
-    align-items: center;
-    max-width: 1280px;
-    margin: 0 auto;
-    position: relative;
-  }
-
-  /* Subtle grid texture */
-  #hero::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--border-lt) 1px, transparent 1px),
-      linear-gradient(90deg, var(--border-lt) 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.6;
-    mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 50%, transparent 100%);
-  }
-
-  .hero-left { position: relative; z-index: 1; }
-
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--teal);
-    border: 1px solid var(--teal);
-    padding: 0.3rem 0.85rem;
-    margin-bottom: 1.75rem;
-    opacity: 0;
-    animation: fade-up 0.7s var(--ease) 0.15s forwards;
-  }
-  .hero-badge::before {
-    content:''; width:5px; height:5px; background:var(--teal); border-radius:50%;
-  }
-
-  .hero-h1 {
-    font-family: var(--font-display);
-    font-size: var(--fs-hero);
-    font-weight: 900;
-    line-height: 1.0;
-    letter-spacing: -0.025em;
-    color: var(--ink);
-    margin-bottom: 1.25rem;
-    opacity: 0;
-    animation: fade-up 0.8s var(--ease) 0.3s forwards;
-  }
-  .hero-h1 em { font-style: italic; color: var(--gold); }
-  .hero-h1 .accent-teal { color: var(--teal); }
-
-  .hero-sub {
-    font-size: 1.15rem;
-    color: var(--ink-mid);
-    max-width: 500px;
-    font-weight: 300;
-    line-height: 1.8;
-    margin-bottom: 2.5rem;
-    opacity: 0;
-    animation: fade-up 0.8s var(--ease) 0.45s forwards;
-  }
-
-  .hero-actions {
-    display: flex; gap: 1rem; align-items: center;
-    opacity: 0;
-    animation: fade-up 0.8s var(--ease) 0.6s forwards;
-  }
-
-  .btn-primary {
-    font-family: var(--font-mono);
-    font-size: var(--fs-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--white);
-    background: var(--ink);
-    padding: 0.85rem 2rem;
-    border: none; cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.2s;
-  }
-  .btn-primary:hover {
-    background: var(--teal);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(26,122,138,0.25);
-  }
-
-  .btn-ghost {
-    font-family: var(--font-mono);
-    font-size: var(--fs-mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-mid);
-    background: none;
-    border: 1px solid var(--border);
-    padding: 0.85rem 2rem;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.2s;
-  }
-  .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
-
-  /* ── Hero Right: Haiku Card ── */
-  .hero-right {
-    position: relative; z-index: 1;
-    opacity: 0;
-    animation: fade-in 1s var(--ease) 0.8s forwards;
-  }
-
-  .haiku-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 0 var(--border), 0 20px 60px var(--shadow);
-    overflow: hidden;
-  }
-
-  .haiku-card-header {
-    background: var(--ink);
-    padding: 0.65rem 1.25rem;
-    display: flex; align-items: center; gap: 0.5rem;
-  }
-  .haiku-card-header span {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.15em;
-    color: rgba(250,250,248,0.6);
-  }
-  .haiku-card-dot {
-    width: 5px; height: 5px;
-    background: var(--gold);
-    border-radius: 50%;
-  }
-
-  .haiku-poem {
-    padding: 1.5rem 1.5rem 1rem;
-    border-bottom: 1px solid var(--border-lt);
-  }
-  .haiku-poem p {
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    font-style: italic;
-    font-weight: 300;
-    color: var(--ink);
-    line-height: 1.4;
-  }
-  .haiku-poem cite {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    color: var(--ink-lite);
-    margin-top: 0.6rem;
-    font-style: normal;
-  }
-
-  /* ── Spiral steps inside hero card ── */
-  .spiral-stack { display: flex; flex-direction: column; }
-
-  .spiral-item {
-    border-left: 3px solid var(--layer-color);
-    border-bottom: 1px solid var(--border-lt);
-    padding: 0.8rem 1.1rem;
-    margin-left: var(--indent);
-    background: var(--white);
-    display: flex; gap: 0.75rem; align-items: flex-start;
-    transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), background 0.2s;
-    cursor: default;
-  }
-  .spiral-item:last-child { border-bottom: none; }
-  .spiral-item:hover {
-    background: var(--bg);
-    transform: translateX(3px) translateY(-1px);
-    box-shadow: -3px 3px 0 var(--layer-color), 0 4px 16px var(--shadow);
-    position: relative; z-index: 1;
-  }
-
-  .spiral-item[data-layer="1"] { --indent:0;    --layer-color:var(--gold);  }
-  .spiral-item[data-layer="2"] { --indent:1rem; --layer-color:var(--teal);  }
-  .spiral-item[data-layer="3"] { --indent:2rem; --layer-color:var(--sage);  }
-  .spiral-item[data-layer="4"] { --indent:3rem; --layer-color:var(--purple);}
-
-  .spiral-tag {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.14em;
-    color: var(--layer-color);
-    white-space: nowrap;
-    margin-top: 0.1rem;
-    min-width: 88px;
-  }
-  .spiral-body { font-size: 0.82rem; color: var(--ink-mid); line-height: 1.5; }
-
-  @keyframes fade-up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fade-in { from{opacity:0} to{opacity:1} }
-
-  /* ══════════════════════════════════════════════════════
-     SHARED SECTION
-  ══════════════════════════════════════════════════════ */
-  .section-wrap {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 6rem 3rem;
-  }
-
-  .section-label {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--gold);
-    display: flex; align-items: center; gap: 0.7rem;
-    margin-bottom: 0.85rem;
-  }
-  .section-label::before {
-    content: ''; width: 24px; height: 1px; background: var(--gold);
-  }
-
-  .section-h2 {
-    font-family: var(--font-display);
-    font-size: var(--fs-h2);
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-    margin-bottom: 1.1rem;
-  }
-  .section-h2 em { font-style: italic; color: var(--gold); }
-
-  .section-body {
-    font-size: 1.05rem;
-    color: var(--ink-mid);
-    max-width: 540px;
-    font-weight: 300;
-    line-height: 1.85;
-  }
-
-  .divider {
-    width: 100%; height: 1px;
-    background: var(--border);
-  }
-
-  /* ══════════════════════════════════════════════════════
-     §1 CONCEPT
-  ══════════════════════════════════════════════════════ */
-  #concept { background: var(--bg-alt); }
-
-  .concept-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.1fr;
-    gap: 5rem;
-    align-items: start;
-  }
-
-  /* Domain cards */
-  .domain-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-    margin-top: 2.5rem;
-  }
-
-  .domain-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-top: 3px solid var(--accent);
-    padding: 1.25rem;
-    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
-  }
-  .domain-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 28px var(--shadow-md);
-  }
-  .domain-card.sw { --accent: var(--teal); }
-  .domain-card.ac { --accent: var(--gold); }
-  .domain-card.ha { --accent: var(--sage); }
-  .domain-card.gr { --accent: var(--purple); }
-
-  .domain-icon { font-size: 1.3rem; margin-bottom: 0.5rem; }
-  .domain-title {
-    font-family: var(--font-mono); font-size: 0.72rem;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 0.3rem;
-  }
-  .domain-desc { font-size: 0.84rem; color: var(--ink-mid); line-height: 1.5; }
-
-  /* Big haiku spiral */
-  .haiku-big {
-    font-family: var(--font-display);
-    font-size: 2.2rem; font-style: italic; font-weight: 300;
-    color: var(--ink); line-height: 1.35;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 1.25rem; margin-bottom: 0.75rem;
-  }
-  .haiku-credit {
-    font-family: var(--font-mono); font-size: 0.68rem;
-    letter-spacing: 0.12em; color: var(--ink-lite);
-    margin-bottom: 1.75rem;
-  }
-
-  /* Full spiral (concept page) */
-  .spiral-stack-lg .spiral-item {
-    padding: 1rem 1.25rem;
-  }
-  .spiral-stack-lg .spiral-item[data-layer="1"] { --indent:0;     }
-  .spiral-stack-lg .spiral-item[data-layer="2"] { --indent:2rem;  }
-  .spiral-stack-lg .spiral-item[data-layer="3"] { --indent:4rem;  }
-  .spiral-stack-lg .spiral-item[data-layer="4"] { --indent:6rem;  }
-
-  .spiral-title {
-    font-family: var(--font-display);
-    font-size: 1rem; font-weight: 700; color: var(--ink);
-    margin-bottom: 0.2rem;
-  }
-  .spiral-desc { font-size: 0.84rem; color: var(--ink-mid); line-height: 1.5; }
-
-  /* ══════════════════════════════════════════════════════
-     §2 THESIS DOJO
-  ══════════════════════════════════════════════════════ */
-  #dojo { background: var(--bg); }
-
-  .dojo-header {
-    display: grid; grid-template-columns: 1fr auto;
-    gap: 3rem; align-items: end;
-    margin-bottom: 3.5rem;
-  }
-
-  .badge-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
-  .badge {
-    font-family: var(--font-mono); font-size: 0.62rem;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 0.2rem 0.65rem; border-radius: 999px; border: 1px solid;
-  }
-  .badge.saas  { color:var(--teal);   border-color:var(--teal);   background:rgba(26,122,138,.06); }
-  .badge.ai    { color:var(--gold);   border-color:var(--gold);   background:rgba(184,134,11,.06); }
-  .badge.open  { color:var(--sage);   border-color:var(--sage);   background:rgba(74,122,90,.06);  }
-
-  /* Score box */
-  .score-box {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-top: 3px solid var(--gold);
-    padding: 1.5rem 2rem;
-    text-align: center;
-    min-width: 180px;
-    box-shadow: 0 4px 20px var(--shadow);
-  }
-  .score-n {
-    font-family: var(--font-display);
-    font-size: 3.5rem; font-weight: 900; line-height: 1;
-    color: var(--gold);
-  }
-  .score-den {
-    font-family: var(--font-display);
-    font-size: 1.6rem; color: var(--ink-lite);
-  }
-  .score-lbl {
-    font-family: var(--font-mono); font-size: 0.62rem;
-    letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--ink-lite); margin-top: 0.3rem;
-  }
-
-  /* ── Pipeline ── */
-  .pipeline {
-    display: grid;
-    grid-template-columns: 1fr 40px 1.5fr 40px 1fr;
-    gap: 0; align-items: stretch;
-    border: 1px solid var(--border);
-    background: var(--border);
-    box-shadow: 0 4px 24px var(--shadow);
-    margin-bottom: 2.5rem;
-  }
-
-  .pipe-block {
-    background: var(--white);
-    padding: 1.75rem 1.5rem;
-    border-top: 3px solid var(--pipe-color);
-  }
-  .pipe-block.inp  { --pipe-color: var(--ink-lite); }
-  .pipe-block.proc { --pipe-color: var(--teal); }
-  .pipe-block.out  { --pipe-color: var(--gold); }
-
-  .pipe-label {
-    font-family: var(--font-mono); font-size: 0.65rem;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--pipe-color); margin-bottom: 0.85rem;
-  }
-  .pipe-icon { font-size: 1.6rem; display:block; margin-bottom:0.75rem; }
-  .pipe-title {
-    font-family: var(--font-display);
-    font-size: 1.2rem; font-weight: 700; color: var(--ink);
-    margin-bottom: 0.65rem;
-  }
-  .pipe-items { list-style:none; display:flex; flex-direction:column; gap:0.3rem; }
-  .pipe-items li {
-    font-family: var(--font-mono); font-size: 0.72rem;
-    color: var(--ink-mid); display:flex; align-items:center; gap:0.4rem;
-  }
-  .pipe-items li::before { content:'·'; color:var(--pipe-color); font-size:1.2em; }
-
-  .pipe-arrow {
-    background: var(--bg-alt);
-    display:flex; align-items:center; justify-content:center;
-    color: var(--ink-lite); font-size: 1rem;
-  }
-
-  /* ── Stage grid ── */
-  .stages {
-    display: grid; grid-template-columns: repeat(4,1fr);
-    gap: 1px; background: var(--border);
-    border: 1px solid var(--border);
-  }
-
-  .stage-cell {
-    background: var(--white);
-    padding: 1.4rem 1.25rem;
-    position: relative; overflow: hidden;
-    transition: background 0.2s;
-  }
-  .stage-cell::before {
-    content: attr(data-n);
-    font-family: var(--font-display);
-    font-size: 4rem; font-weight: 900;
-    color: var(--border-lt);
-    position: absolute; top: -0.3rem; right: 0.5rem;
-    line-height: 1; transition: color 0.2s;
-    pointer-events: none;
-  }
-  .stage-cell:hover { background: var(--bg-alt); }
-  .stage-cell:hover::before { color: rgba(184,134,11,0.12); }
-
-  .stage-tag {
-    font-family: var(--font-mono); font-size: 0.62rem;
-    letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 0.4rem;
-  }
-  .stage-name {
-    font-family: var(--font-display); font-size: 0.98rem;
-    font-weight: 700; color: var(--ink); margin-bottom: 0.35rem;
-  }
-  .stage-desc { font-size: 0.8rem; color: var(--ink-mid); line-height: 1.5; }
-
-  /* ══════════════════════════════════════════════════════
-     §3 METRICS (dark band)
-  ══════════════════════════════════════════════════════ */
-  #metrics {
-    background: var(--bg-dark);
-    padding: 0;
-  }
-  .metrics-row {
-    max-width: 1280px; margin: 0 auto;
-    display: grid; grid-template-columns: repeat(4,1fr);
-    gap: 1px; background: rgba(255,255,255,0.05);
-  }
-  .metric-cell {
-    padding: 2.75rem 2rem; text-align: center;
-    background: var(--bg-dark);
-    transition: background 0.2s;
-  }
-  .metric-cell:hover { background: rgba(255,255,255,0.04); }
-  .metric-val {
-    font-family: var(--font-display);
-    font-size: 3.6rem; font-weight: 900; line-height: 1;
-    color: var(--gold); margin-bottom: 0.4rem;
-  }
-  .metric-val sup { font-size: 1.6rem; vertical-align: super; }
-  .metric-key {
-    font-family: var(--font-mono); font-size: 0.65rem;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: rgba(250,250,248,0.5); margin-bottom: 0.2rem;
-  }
-  .metric-sub { font-size: 0.78rem; color: rgba(250,250,248,0.3); }
-
-  /* ══════════════════════════════════════════════════════
-     §4 ORGANIZATION
-  ══════════════════════════════════════════════════════ */
-  #org { background: var(--bg-alt); }
-
-  .org-grid {
-    display: grid; grid-template-columns: 1.1fr 0.9fr;
-    gap: 5rem; align-items: start;
-  }
-
-  /* Pillars */
-  .pillars { display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); margin-top:2rem; }
-  .pillar {
-    background: var(--white);
-    padding: 1.1rem 1.4rem;
-    display: flex; gap: 1rem; align-items: flex-start;
-    transition: background 0.2s, transform 0.2s;
-  }
-  .pillar:hover { background: var(--bg); transform: translateX(3px); }
-  .pillar-icon { font-size: 1.1rem; flex-shrink:0; margin-top:0.1rem; }
-  .pillar-title {
-    font-family: var(--font-mono); font-size: 0.72rem;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 0.25rem;
-  }
-  .pillar-desc { font-size: 0.84rem; color: var(--ink-mid); line-height: 1.55; }
-
-  /* Contact card */
-  .contact-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 24px var(--shadow);
-    overflow: hidden;
-    position: sticky; top: 76px;
-  }
-  .contact-card-top {
-    background: var(--ink);
-    padding: 1.5rem;
-  }
-  .contact-card-top-label {
-    font-family: var(--font-mono); font-size: 0.65rem;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--teal-lt); margin-bottom: 0.3rem;
-  }
-  .contact-card-top-title {
-    font-family: var(--font-display);
-    font-size: 1.4rem; font-weight: 700;
-    color: var(--bg);
-  }
-  .contact-body { padding: 1.5rem; }
-
-  .contact-row { display:flex; flex-direction:column; gap:0.9rem; margin-bottom:1.5rem; }
-  .contact-item { display:flex; gap:0.75rem; align-items:flex-start; }
-  .ci-icon { font-size: 0.9rem; flex-shrink:0; margin-top:0.15rem; }
-  .ci-label {
-    font-family: var(--font-mono); font-size: 0.62rem;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--ink-lite); margin-bottom: 0.1rem;
-  }
-  .ci-val { font-size: 0.88rem; color: var(--ink-mid); }
-  .ci-val a { color: var(--teal); text-decoration:none; }
-  .ci-val a:hover { color: var(--gold); text-decoration: underline; }
-
-  .contact-cta {
-    display: block; text-align: center;
-    font-family: var(--font-mono); font-size: var(--fs-mono);
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--white); background: var(--ink);
-    padding: 0.9rem 1rem; text-decoration: none;
-    transition: background 0.2s;
-  }
-  .contact-cta:hover { background: var(--teal); }
-
-  .funding-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-lt); }
-  .ftag {
-    font-family:var(--font-mono); font-size:0.62rem;
-    padding:0.18rem 0.55rem; border:1px solid;
-  }
-  .ftag.jst    { color:var(--gold);   border-color:var(--gold);   }
-  .ftag.jsps   { color:var(--teal);   border-color:var(--teal);   }
-  .ftag.ind    { color:var(--sage);   border-color:var(--sage);   }
-
-  /* ══════════════════════════════════════════════════════
-     STAGE 2 LINK BANNER
-  ══════════════════════════════════════════════════════ */
-  .stage2-banner {
-    background: var(--ink);
-    padding: 2rem 3rem;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 2rem;
-  }
-  .stage2-banner-text {
-    display: flex; flex-direction: column; gap: 0.25rem;
-  }
-  .stage2-banner-label {
-    font-family: var(--font-mono); font-size: 0.65rem;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--teal-lt);
-  }
-  .stage2-banner-title {
-    font-family: var(--font-display); font-size: 1.3rem;
-    font-weight: 700; color: var(--bg);
-  }
-  .stage2-banner-sub { font-size: 0.9rem; color: rgba(250,250,248,0.55); font-weight:300; }
-  .stage2-cta {
-    font-family: var(--font-mono); font-size: var(--fs-mono);
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--ink); background: var(--gold);
-    padding: 0.75rem 1.75rem; text-decoration: none;
-    white-space: nowrap; flex-shrink: 0;
-    transition: background 0.2s;
-  }
-  .stage2-cta:hover { background: var(--gold-lt); }
-
-  /* ══════════════════════════════════════════════════════
-     FOOTER
-  ══════════════════════════════════════════════════════ */
-  footer {
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    padding: 2rem 3rem;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .footer-logo {
-    font-family: var(--font-mono); font-size: 0.82rem;
-    letter-spacing: 0.12em; color: var(--ink);
-  }
-  .footer-links { display:flex; gap:2rem; list-style:none; }
-  .footer-links a {
-    font-family:var(--font-mono); font-size:0.68rem;
-    letter-spacing:0.1em; text-transform:uppercase;
-    color:var(--ink-lite); text-decoration:none; transition:color 0.2s;
-  }
-  .footer-links a:hover { color:var(--gold); }
-  .footer-copy {
-    font-family:var(--font-mono); font-size:0.65rem;
-    letter-spacing:0.08em; color:var(--ink-lite);
-  }
-
-  /* ══════════════════════════════════════════════════════
-     SCROLL REVEAL
-  ══════════════════════════════════════════════════════ */
-  .reveal {
-    opacity:0; transform:translateY(22px);
-    transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
-  }
-  .reveal.visible { opacity:1; transform:translateY(0); }
-  .reveal-d1 { transition-delay:.1s; }
-  .reveal-d2 { transition-delay:.2s; }
-  .reveal-d3 { transition-delay:.3s; }
-  .reveal-d4 { transition-delay:.4s; }
-
-  /* ══════════════════════════════════════════════════════
-     RESPONSIVE
-  ══════════════════════════════════════════════════════ */
-  @media(max-width:960px){
-    nav { padding:0 1.5rem; }
-    .nav-center { display:none; }
-    #hero { grid-template-columns:1fr; padding:80px 1.5rem 3rem; gap:3rem; }
-    .section-wrap { padding:4rem 1.5rem; }
-    .concept-grid,.dojo-header,.org-grid { grid-template-columns:1fr; gap:2.5rem; }
-    .contact-card { position:static; }
-    .domain-grid { grid-template-columns:1fr; }
-    .pipeline { grid-template-columns:1fr; }
-    .pipe-arrow { transform:rotate(90deg); height:2.5rem; }
-    .stages { grid-template-columns:1fr 1fr; }
-    .metrics-row { grid-template-columns:1fr 1fr; }
-    footer { flex-direction:column; gap:1.25rem; text-align:center; }
-    .stage2-banner { flex-direction:column; text-align:center; }
-    .spiral-stack-lg .spiral-item[data-layer="2"] { --indent:1rem; }
-    .spiral-stack-lg .spiral-item[data-layer="3"] { --indent:2rem; }
-    .spiral-stack-lg .spiral-item[data-layer="4"] { --indent:3rem; }
-  }
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #F5F0E8;
+      --bg2:       #EDE7D9;
+      --bg3:       #E4DDD0;
+      --accent:    #7A5C2E;
+      --accent2:   #1A1A1A;
+      --gold:      #8B6914;
+      --text:      #1A1A1A;
+      --muted:     #5A5040;
+      --border:    rgba(90,70,40,0.2);
+      --teal:      #1A6B7A;
+      --white:     #FAFAF6;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Georgia', 'Noto Serif JP', serif;
+      font-size: 18px;
+      line-height: 1.8;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { max-width: 100%; display: block; }
+
+    /* ===== NAV ===== */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(245,240,232,0.97);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .nav-logo { font-size: 1rem; font-weight: bold; color: var(--text); letter-spacing: 0.05em; }
+    .nav-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .nav-links a { font-size: 0.85rem; color: var(--muted); letter-spacing: 0.04em; }
+    .nav-links a:hover { color: var(--accent); text-decoration: none; }
+    .nav-right { display: flex; gap: 1rem; align-items: center; }
+    .lang-switch { font-size: 0.75rem; color: var(--muted); }
+    .nav-cta {
+      font-size: 0.8rem; padding: 0.4rem 1rem;
+      border: 1px solid var(--border); border-radius: 4px;
+      color: var(--text); background: transparent;
+    }
+    .nav-cta:hover { background: var(--border); text-decoration: none; }
+
+    /* ===== ANNOUNCEMENT BANNER ===== */
+    .banner {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 2rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .banner strong { color: var(--accent); }
+    .banner a { color: var(--accent); }
+
+    /* ===== HERO ===== */
+    .hero {
+      text-align: center;
+      padding: 5rem 2rem 3rem;
+      max-width: 860px; margin: 0 auto;
+    }
+    .hero-tag {
+      font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.25;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .hero h1 em { color: var(--gold); font-style: italic; }
+    .hero-sub { font-size: 1rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.7; }
+    .hero p { font-size: 0.95rem; color: var(--text); max-width: 680px; margin: 0 auto 2rem; }
+    .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      padding: 0.65rem 1.6rem; border-radius: 4px;
+      font-size: 0.9rem; font-weight: bold;
+    }
+    .btn-primary:hover { background: var(--gold); text-decoration: none; }
+    .btn-secondary {
+      border: 1px solid var(--border); color: var(--text);
+      padding: 0.65rem 1.6rem; border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .btn-secondary:hover { background: var(--border); text-decoration: none; }
+
+    /* ===== STATS ===== */
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1.5rem;
+      max-width: 700px; margin: 3rem auto 0;
+      padding: 2rem;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: var(--bg2);
+      text-align: center;
+    }
+    .stat-num { font-size: 2rem; color: var(--gold); font-weight: bold; }
+    .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* ===== SECTION ===== */
+    section { padding: 5rem 2rem; }
+    .section-inner { max-width: 960px; margin: 0 auto; }
+    .section-tag {
+      font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.75rem;
+    }
+    h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); color: var(--text); margin-bottom: 1rem; line-height: 1.3; }
+    h2 em { color: var(--gold); font-style: italic; }
+    .section-sep { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+    /* ===== C4 LAYERS ===== */
+    .layers-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem; margin-top: 2.5rem;
+    }
+    .layer-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.5rem;
+    }
+    .layer-id { font-size: 0.7rem; letter-spacing: 0.15em; color: var(--gold); margin-bottom: 0.5rem; }
+    .layer-title { font-size: 1rem; font-weight: bold; color: var(--text); }
+    .layer-sub { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+    .layer-desc { font-size: 0.85rem; color: var(--text); margin-top: 0.75rem; }
+    .layer-desc-ja { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+
+    /* ===== PHILOSOPHY / VIDEO ===== */
+    .video-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 2rem;
+    }
+    .video-block { }
+    .video-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .video-thumb {
+      position: relative; display: block;
+      border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+    }
+    .video-thumb img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+    .play-btn {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 48px; height: 48px; background: rgba(122,92,46,0.85);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: #fff;
+    }
+    .video-thumb:hover .play-btn { background: var(--gold); }
+
+    /* ===== PUBLICATION ===== */
+    .pub-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 2rem; margin-top: 2rem;
+    }
+    .pub-box h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 1rem; }
+    .pub-box p { font-size: 0.9rem; color: var(--text); margin-bottom: 0.75rem; line-height: 1.75; }
+    .pub-links { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem; }
+    .pub-links a {
+      font-size: 0.85rem; padding: 0.45rem 1rem;
+      border: 1px solid var(--border); border-radius: 4px; color: var(--text);
+    }
+    .pub-links a:hover { background: var(--border); text-decoration: none; }
+
+    /* ===== DOJO STEPS ===== */
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem; margin-top: 2rem;
+    }
+    .step-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.25rem;
+      display: block; color: var(--text);
+    }
+    .step-card:hover { border-color: var(--accent); text-decoration: none; }
+    .step-num { font-size: 1.8rem; color: var(--gold); font-weight: bold; }
+    .step-title { font-size: 0.95rem; font-weight: bold; color: var(--text); margin-top: 0.5rem; }
+    .step-title-ja { font-size: 0.8rem; color: var(--muted); }
+    .step-desc { font-size: 0.82rem; color: var(--text); margin-top: 0.5rem; }
+    .step-desc-ja { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem; margin-top: 1.5rem;
+    }
+    .feature-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.25rem;
+      display: block; color: var(--text);
+    }
+    .feature-card:hover { border-color: var(--accent); text-decoration: none; }
+    .feat-icon { font-size: 1.4rem; }
+    .feat-title { font-size: 0.9rem; font-weight: bold; color: var(--text); margin-top: 0.5rem; }
+    .feat-title-ja { font-size: 0.78rem; color: var(--muted); }
+    .feat-desc { font-size: 0.82rem; color: var(--text); margin-top: 0.4rem; }
+    .feat-desc-ja { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+
+    .dojo-cta { margin-top: 2rem; text-align: center; }
+    .dojo-cta a {
+      display: inline-block; background: var(--accent); color: #fff;
+      padding: 0.8rem 2rem; border-radius: 4px; font-size: 0.95rem; font-weight: bold;
+    }
+    .dojo-cta a:hover { background: var(--gold); text-decoration: none; }
+    .dojo-note { font-size: 0.78rem; color: var(--muted); margin-top: 0.75rem; }
+
+    /* ===== VIDEO PORTFOLIO ===== */
+    .region-intro {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;
+    }
+    .region-intro ul { padding-left: 1.25rem; }
+    .region-intro li { font-size: 0.9rem; color: var(--text); margin-bottom: 0.4rem; }
+    .region-intro li strong { color: var(--text); }
+
+    .video-section-title {
+      font-size: 1rem; font-weight: bold; color: var(--accent);
+      margin: 2.5rem 0 1rem; border-left: 3px solid var(--accent); padding-left: 0.75rem;
+    }
+    .video-caption { font-size: 0.9rem; color: var(--text); margin-top: 0.6rem; }
+    .video-caption-sub { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* ===== BOOKS ===== */
+    .books-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1.25rem; margin-top: 2rem;
+    }
+    .book-card {
+      display: block; color: var(--text);
+      border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .book-card:hover { border-color: var(--accent); text-decoration: none; }
+    .book-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+    .book-info { padding: 0.6rem; font-size: 0.72rem; color: var(--muted); }
+    .book-cta { font-size: 0.72rem; color: var(--accent); }
+
+    /* ===== ORG ===== */
+    .org-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 2rem; margin-top: 2rem;
+    }
+    @media (max-width: 640px) { .org-grid { grid-template-columns: 1fr; } }
+    .org-profile {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.5rem;
+    }
+    .org-name { font-size: 1.1rem; font-weight: bold; color: var(--text); }
+    .org-role { font-size: 0.8rem; color: var(--gold); margin-bottom: 0.75rem; }
+    .org-bio { font-size: 0.85rem; color: var(--text); line-height: 1.7; }
+    .org-links { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+    .org-links a {
+      font-size: 0.8rem; padding: 0.35rem 0.85rem;
+      border: 1px solid var(--border); border-radius: 4px; color: var(--text);
+    }
+    .org-links a:hover { background: var(--border); text-decoration: none; }
+
+    .org-contact {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.5rem;
+    }
+    .org-contact h3 { font-size: 1rem; color: var(--text); margin-bottom: 1rem; }
+    .contact-item { margin-bottom: 0.75rem; }
+    .contact-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .contact-value { font-size: 0.9rem; color: var(--text); }
+    .contact-value a { color: var(--accent); }
+    .contact-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.25rem; }
+    .ctag {
+      font-size: 0.72rem; padding: 0.25rem 0.7rem;
+      border: 1px solid var(--border); border-radius: 99px; color: var(--muted);
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 2rem;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo { font-size: 0.9rem; color: var(--text); }
+    .footer-links { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+    .footer-links a { font-size: 0.8rem; color: var(--muted); }
+    .footer-links a:hover { color: var(--accent); text-decoration: none; }
+    .footer-copy { font-size: 0.75rem; color: var(--muted); width: 100%; margin-top: 0.5rem; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      nav { padding: 0.75rem 1rem; }
+      section { padding: 3.5rem 1rem; }
+    }
   </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════
-     NAV
-══════════════════════════════════════════════════════ -->
-<nav id="main-nav">
-  <a href="#" class="nav-logo">
-    <span class="nav-logo-pip"></span>
-    c4model.org
-  </a>
-  <ul class="nav-center">
-    <li><a href="#concept"><span data-en>Concept</span><span data-ja>概念</span></a></li>
-    <li><a href="#dojo"><span data-en>Thesis Dojo</span><span data-ja>論文道場</span></a></li>
-    <li><a href="#org"><span data-en>Organization</span><span data-ja>組織</span></a></li>
-    <li><a href="haiku-engineering.html"><span data-en>Haiku Science</span><span data-ja>俳句の科学</span></a></li>
-  </ul>
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="https://c4model.org/">c4model.org</a>
+  <div class="nav-links">
+    <a href="#concept">Concept</a>
+    <a href="#our-research">Philosophy</a>
+    <a href="#dojo">Thesis Dojo</a>
+    <!-- [修正①] 俳句工学 → 俳句の科学 リブランディング完了 (haiku-engineering.htmlをメインに昇格) -->
+    <a href="haiku-engineering.html" style="color:var(--gold); font-weight:bold;">俳句の科学 🎋</a>
+    <a href="#fukushima" style="color:var(--accent); font-weight:bold;">Fukushima</a>
+    <a href="#publications">Publications</a>
+    <a href="#advisory">Advisory</a>
+    <a href="#org">Contact</a>
+  </div>
   <div class="nav-right">
-    <div class="lang-toggle">
-      <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" data-lang="ja" onclick="setLang('ja')">日本語</button>
-    </div>
-    <a href="#org" class="nav-cta">
-      <span data-en>Contact</span>
-      <span data-ja>お問い合わせ</span>
-    </a>
+    <span class="lang-switch">EN / 日本語</span>
+    <a class="nav-cta" href="#org">Contact</a>
   </div>
 </nav>
 
-<!-- ══════════════════════════════════════════════════════
-     HERO
-══════════════════════════════════════════════════════ -->
-<section id="hero">
-  <div class="hero-left">
-    <div class="hero-badge">C4 Model Study Project</div>
+<!-- ANNOUNCEMENT BANNER -->
+<div class="banner">
+  <strong>NEW PUBLICATION</strong>
+  Latest: "Never Give Up on Academic Writing" — Constructing a Thinking Blueprint Using the C4 Model &amp; Wellbeing Writing
+  / 最新論文：挫折しない論文執筆 — C4モデルによる「思考の設計図」構築とウェルビーイング・ライティングの提唱
+  <a href="https://www.researchgate.net/publication/403672762_cuozheshinailunwenshuC4moderuniyorusikaonoshejitugouzhutouerubiinguraitingunotichang" target="_blank" rel="noopener">→</a>
+</div>
 
-    <h1 class="hero-h1">
-      <span data-en>Structure<br><em>everything.</em><br><span class="accent-teal">Think deeper.</span></span>
-      <span data-ja>すべてを<br><em>構造化する。</em><br><span class="accent-teal">より深く思考する。</span></span>
+<!-- FUKUSHIMA COMMITMENT BANNER -->
+<div style="background:linear-gradient(135deg, #1A3A2A 0%, #0D2A1A 100%); border-bottom:2px solid #4A9A6A; padding:1rem 2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+  <div style="font-size:0.75rem; font-weight:bold; letter-spacing:0.15em; text-transform:uppercase; color:#6ACA8A; white-space:nowrap;">🌿 Fukushima Tech Create</div>
+  <div style="font-size:0.88rem; color:#C8E8D0; flex:1; min-width:200px;">
+    「白河の関」の名句をC4モデルで解剖し、教育に活かす——<strong style="color:#8AEA9A;">福島の文化遺産×構造化思考教育</strong>、地域EdTechプロジェクト始動。
+    <span style="color:#6ACA8A; margin-left:0.5rem; font-size:0.8rem;">Fukushima Innovation · Regional EdTech · 先導技術事業化申請中</span>
+  </div>
+  <a href="#fukushima" style="font-size:0.82rem; color:#8AEA9A; font-weight:bold; white-space:nowrap; text-decoration:none;">詳しく見る →</a>
+</div>
+
+<!-- HERO -->
+<section id="hero" style="padding-top:4rem; padding-bottom:2rem;">
+  <div class="section-inner" style="text-align:center;">
+    <p class="hero-tag">Your Friendly AI Writing Partner — 文章が苦手でも大丈夫。AIがやさしく導く、あなたの執筆パートナー</p>
+    <h1 style="font-size:clamp(1.9rem,5vw,3rem); color:var(--text); line-height:1.25; margin-bottom:0.75rem;">
+      From Daily Reports to <em>Academic Papers.</em><br>
+      日常のレポートから <em>学会論文まで。</em>
     </h1>
+    <p style="font-size:0.95rem; color:var(--text); max-width:700px; margin:0 auto 1rem;">
+      Thesis Dojo is your AI-powered writing assistant. From initial ideas to the final paper, it naturally guides you through the process. Don't worry about where to start—by visualizing the structure of your paper, our AI provides solid support for everything from daily reports to peer-reviewed academic papers.
+    </p>
+    <p style="font-size:0.9rem; color:var(--muted); max-width:700px; margin:0 auto 2rem;">
+      「論文道場」は、最初のアイデア出しから論文の完成までを、AIが自然に導いてくれる執筆アシスタントです。「何から書けばいいか分からない…」と悩まなくても大丈夫。<strong>論文の構造を可視化できる</strong>独自のアプローチで、AIがあなたをしっかりとサポート。日々のレポート課題から卒業論文、学会発表まで、知的なアウトプットをすべてカバーします。
+    </p>
+    <div class="hero-btns">
+      <a class="btn-primary" href="#dojo">→ Explore Thesis Dojo / 論文道場を見る</a>
+      <a class="btn-secondary" href="#concept">What is C4? / C4モデルとは？</a>
+    </div>
 
-    <p class="hero-sub">
-      <span data-en>The C4 Model is not just for software. It is a universal language for structural thinking — from microservices to haiku, from code to academic papers.</span>
-      <span data-ja>C4モデルはソフトウェアだけのものではありません。マイクロサービスから俳句へ、コードから学術論文へ——構造的思考の普遍的言語です。</span>
+    <!-- STATS -->
+    <div class="stats">
+      <div>
+        <div class="stat-num">21</div>
+        <div class="stat-label">peer-reviewed papers</div>
+      </div>
+      <div>
+        <!-- [校正] 本文の「200冊」と統計の「20+」が矛盾していたため、
+             Kindleに限定した数として「20+」を維持し、
+             注記で「Kindle書籍」と明示した -->
+        <div class="stat-num">109+</div>
+        <div class="stat-label">Kindle publications</div>
+      </div>
+      <div>
+        <div class="stat-num">L1–L4</div>
+        <div class="stat-label">C4 model layers</div>
+      </div>
+      <div>
+        <!-- [校正] 「2026 Thesis Dojo launch」は現在が2026年のため過去の事実。
+             「launched」と過去形に修正 -->
+        <div class="stat-num">2026</div>
+        <div class="stat-label">Thesis Dojo launched</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPT -->
+<section id="concept" style="background:var(--bg2);">
+  <div class="section-inner">
+    <p class="section-tag">Universal Architecture / 普遍的アーキテクチャ</p>
+    <h2>The C4 model, applied to <em>everything.</em><br>全人類のための <em>思考の型（OS）</em></h2>
+
+    <!-- ★ フィーチャー動画：万物の設計図 -->
+    <div style="margin:1.5rem 0 2rem; background:var(--bg3); border:1px solid var(--border); border-radius:10px; overflow:hidden; max-width:680px;">
+      <a href="https://youtu.be/ZI4bsoxBhZg" target="_blank" rel="noopener" style="display:block; position:relative; text-decoration:none;">
+        <img src="https://img.youtube.com/vi/ZI4bsoxBhZg/hqdefault.jpg"
+             alt="万物の設計図：ソフト、俳句、AI。「論文道場」への誘い"
+             style="width:100%; aspect-ratio:16/9; object-fit:cover; display:block;" />
+        <span style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                     width:60px; height:60px; background:rgba(122,92,46,0.88); border-radius:50%;
+                     display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff;">▶</span>
+      </a>
+      <div style="padding:1rem 1.25rem;">
+        <div style="font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); font-weight:bold; margin-bottom:0.3rem;">
+          C4モデル研究会 · 2026 · 紹介動画
+        </div>
+        <div style="font-size:1.05rem; font-weight:bold; color:var(--text); margin-bottom:0.3rem;">
+          万物の設計図：ソフト、俳句、AI。「論文道場」への誘い
+        </div>
+        <div style="font-size:0.85rem; color:var(--muted);">
+          C4モデルが俳句・AI・ソフトウェアをひとつの「設計図」で結ぶ——論文道場誕生の背景と哲学を語ります。
+        </div>
+        <a href="https://youtu.be/ZI4bsoxBhZg" target="_blank" rel="noopener"
+           style="display:inline-block; margin-top:0.75rem; font-size:0.85rem; color:var(--accent); font-weight:bold;">
+          YouTube で見る →
+        </a>
+      </div>
+    </div>
+
+    <p style="color:var(--text); max-width:700px; margin-bottom:1rem;">
+      Originally a software architecture framework, the C4 model — Context, Container, Component, Code — provides a universal language for structural thinking.
+      At C4 Model Study Group®, we extend this lens to haiku poetry, literary analysis, music cognition, and AI-assisted academic writing.
+    </p>
+    <p style="color:var(--muted); font-size:0.9rem; max-width:700px; margin-bottom:1rem;">
+      私は、英国発のアーキテクチャ設計手法「C4モデル」を、全人類のための「思考の型（OS）」として再定義しました。AIがもっともらしい嘘をつく時代、人間に必要なのは文章力ではなく、論理を構造的に設計する力です。これは、子供たちの探究心からシニアの知恵の整理まで、あらゆる教育の基盤を刷新する『令和の学問のすゝめ』です。
+    </p>
+    <p style="color:var(--muted); font-size:0.9rem; max-width:700px;">
+      本ソリューションは、DX推進の武器であるC4モデルを、汎用的な意思決定支援ツールへと転換したものです。都内中小企業の技術承継や、若手社員の論理性向上を「図解の力」で標準化し、東京から世界へ発信する知的生産性の新基準を目指します。
     </p>
 
-    <div class="hero-actions">
-      <a href="#dojo" class="btn-primary">
-        <span data-en>Explore Thesis Dojo</span>
-        <span data-ja>論文道場を見る</span>
+    <div class="layers-grid" style="margin-top:2.5rem;">
+      <div class="layer-card">
+        <div class="layer-id">L1 · CONTEXT</div>
+        <div class="layer-title">World &amp; Background</div>
+        <div class="layer-sub">世界観・背景</div>
+        <div class="layer-desc">Society, era, external actors, and the "why"</div>
+        <div class="layer-desc-ja">社会・時代・外部アクター・「なぜ」の問い</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-id">L2 · CONTAINER</div>
+        <div class="layer-title">Structure &amp; Framework</div>
+        <div class="layer-sub">章立て・枠組み</div>
+        <div class="layer-desc">Logical containers: intro → theory → implementation → discussion</div>
+        <div class="layer-desc-ja">論理の器：序論→理論→実装→考察</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-id">L3 · COMPONENT</div>
+        <div class="layer-title">Arguments &amp; Evidence</div>
+        <div class="layer-sub">論点・データ</div>
+        <div class="layer-desc">Claims, evidence, experimental data, citations</div>
+        <div class="layer-desc-ja">主張・根拠・実験データ・引用</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-id">L4 · CODE</div>
+        <div class="layer-title">Sentences &amp; Connectives</div>
+        <div class="layer-sub">文・接続詞</div>
+        <div class="layer-desc">Connectives, tense consistency, citation numbers</div>
+        <div class="layer-desc-ja">接続詞・文末統一・引用番号</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY & RESEARCH -->
+<section id="our-research">
+  <div class="section-inner">
+    <p class="section-tag">Philosophy &amp; Research / 理念と研究</p>
+    <h2>"Transforming the Pain of Writing into the Joy of Structure."<br>12年の歳月が生んだ 思考構造の進化。</h2>
+    <p style="color:var(--text); max-width:720px; margin-bottom:0.75rem; font-size:0.9rem;">
+      Academic evidence of how the C4 Model prevents writing fatigue and ensures high-quality output.
+      本プロジェクトは、2014年の産業技術大学院大学（AIIT）におけるSysMLを用いたサービスシステム設計の研究を起点としています。12年の歳月をかけ、設計対象を「交通システム」から「人間の思考構造そのもの」へと進化させてきました。この一貫した研究姿勢と、米国学会での査読論文、そして多数の実証実績の融合こそが、本プロジェクトの核心です。
+    </p>
+    <!-- [校正] 「200冊」→「多数」に修正。統計バッジの「20+ Kindle publications」との矛盾を解消 -->
+
+    <div class="video-grid">
+      <div class="video-block">
+        <div class="video-label">▶ Haiku Science（俳句の科学）(Japanese)</div>
+        <!-- [校正] placeholder.com サムネイルをYouTube実サムネイルに修正 -->
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=ykbQoCvpVZs" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/ykbQoCvpVZs/hqdefault.jpg" alt="教育工学的アプローチによる古典俳句の構造解析" />
+          <span class="play-btn">▶</span>
+        </a>
+      </div>
+      <div class="video-block">
+        <div class="video-label">▶ Haiku Science (English)</div>
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=t2cnj1kUzcA" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg" alt="Haiku Science English" />
+          <span class="play-btn">▶</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- LATEST PUBLICATION -->
+    <div class="pub-box" style="margin-top:3rem;">
+      <p class="section-tag" style="margin-bottom:0.5rem;">LATEST PUBLICATION</p>
+      <!-- [校正] 見出しを LATEST PUBLICATION の内容（挫折しない論文執筆）に統一 -->
+      <h3>"Never Give Up on Academic Writing: Constructing a 'Thinking Blueprint' Using the C4 Model and Proposing Wellbeing Writing"<br>
+        「挫折しない論文執筆：C4モデルによる『思考の設計図』構築とウェルビーイング・ライティングの提唱」</h3>
+      <p>
+        This paper proposes a revolutionary methodology for academic writing designed to prevent "writing frustration" by integrating the C4 model—originally a software architecture visualization framework—with the principles of <strong>Wellbeing Writing</strong>.
+      </p>
+      <p style="color:var(--muted); font-size:0.88rem;">
+        本論文では、ソフトウェアアーキテクチャの可視化フレームワークであるC4モデルと<strong>Wellbeing Writing（幸福な執筆）</strong>の原則を統合し、「執筆の挫折」を防ぐための画期的な学術執筆方法論を提案します。
+      </p>
+      <p>
+        By applying the four hierarchical layers of the C4 model (Context, Container, Component, and Code), authors can externalize their internal logic into a visual "Thinking Blueprint." This process reduces cognitive load and ensures logical consistency throughout the manuscript.
+      </p>
+      <p style="color:var(--muted); font-size:0.88rem;">
+        C4モデルの4つの階層（Context、Container、Component、Code）を適用することで、執筆者は内的論理を視覚的な「思考の設計図」として外部化できます。このプロセスにより、認知負荷が軽減され、原稿全体での論理的整合性が確保されます。
+      </p>
+      <p>
+        Furthermore, the study explores how this structured approach fosters a state of "Wellbeing" for the writer, transforming the arduous task of thesis construction into a sustainable, creative process.
+      </p>
+      <p style="color:var(--muted); font-size:0.88rem;">
+        さらに本研究では、この構造化されたアプローチが執筆者の「ウェルビーイング」な状態をいかに促進し、過酷な論文構築作業を持続可能で創造的なプロセスへと変えるかを探求します。
+      </p>
+      <div class="pub-links">
+        <a href="https://www.researchgate.net/publication/403672762_cuozheshinailunwenshuC4moderuniyorusikaonoshejitugouzhutouerubiinguraitingunotichang" target="_blank" rel="noopener">Read Full Paper →</a>
+        <a href="https://www.researchgate.net/publication/403672762_cuozheshinailunwenshuC4moderuniyorusikaonoshejitugouzhutouerubiinguraitingunotichang" target="_blank" rel="noopener">日本語版論文を読む →</a>
+        <a href="#video-lectures">View Analysis Video ↓</a>
+        <a href="#video-lectures">動画解説を見る ↓</a>
+      </div>
+    </div>
+
+    <!-- PEER-REVIEWED PAPERS (SciencePC) -->
+    <div style="margin-top:2.5rem;">
+      <p class="section-tag" style="margin-bottom:0.75rem;">PEER-REVIEWED PAPERS / 査読論文 — SciencePC International</p>
+      <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1.25rem; max-width:680px;">
+        以下の論文はSciencePC（Science Publishing Corporation）の国際査読誌に掲載された英文論文です。<br>
+        The following papers have been published in SciencePC international peer-reviewed journals.
+      </p>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1rem;">
+
+        <!-- 論文1：映画「国宝」-->
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+          <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+            <div style="flex-shrink:0; width:36px; height:36px; background:var(--accent); border-radius:6px;
+                        display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.7rem; font-weight:bold; text-align:center; line-height:1.2;">LLC</div>
+            <div>
+              <div style="font-size:0.7rem; color:var(--gold); font-weight:bold; letter-spacing:0.08em; margin-bottom:0.3rem;">
+                Linguistics, Literature and Culture · DOI: 10.11648/j.llc.20250101.12
+              </div>
+              <div style="font-size:0.95rem; font-weight:bold; color:var(--text); line-height:1.4; margin-bottom:0.4rem;">
+                A Structural Analysis of the Film "National Treasure (Kokuho)" Using the PlantUML C4 Model
+              </div>
+              <div style="font-size:0.82rem; color:var(--muted); margin-bottom:0.6rem;">
+                映画「国宝」C4モデル構造解析 — Osamu Okumura
+              </div>
+              <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <a href="https://doi.org/10.11648/j.llc.20250101.12" target="_blank" rel="noopener"
+                   style="font-size:0.78rem; color:var(--accent); text-decoration:none;">SciencePC →</a>
+                <a href="https://www.researchgate.net/publication/399067019_A_Structural_Analysis_of_the_Film_National_Treasure_Kokuho_Using_the_PlantUML_C4_Model"
+                   target="_blank" rel="noopener" style="font-size:0.78rem; color:#2A7A5A; text-decoration:none;">ResearchGate →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 論文2：芭蕉俳句×ウェルビーイング×DEMATEL -->
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+          <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+            <div style="flex-shrink:0; width:36px; height:36px; background:#2A7A6A; border-radius:6px;
+                        display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.7rem; font-weight:bold; text-align:center; line-height:1.2;">ELLC</div>
+            <div>
+              <div style="font-size:0.7rem; color:var(--gold); font-weight:bold; letter-spacing:0.08em; margin-bottom:0.3rem;">
+                English Language, Literature and Culture · DOI: 10.11648/j.ellc.20251004.15
+              </div>
+              <div style="font-size:0.95rem; font-weight:bold; color:var(--text); line-height:1.4; margin-bottom:0.4rem;">
+                Structural Analysis of Well-being Concepts in Matsuo Bashō's Haiku: An Interdisciplinary Approach Using PlantUML C4 Model and DEMATEL Method
+              </div>
+              <div style="font-size:0.82rem; color:var(--muted); margin-bottom:0.6rem;">
+                芭蕉俳句×ウェルビーイング×C4モデル×DEMATEL — Osamu Okumura
+              </div>
+              <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <a href="https://doi.org/10.11648/j.ellc.20251004.15" target="_blank" rel="noopener"
+                   style="font-size:0.78rem; color:var(--accent); text-decoration:none;">SciencePC →</a>
+                <a href="https://www.researchgate.net/publication/399426526_Structural_Analysis_of_Well-being_Concepts_in_Matsuo_Basho's_Haiku_An_Interdisciplinary_Approach_Using_PlantUML_C4_Model_and_DEMATEL_Method"
+                   target="_blank" rel="noopener" style="font-size:0.78rem; color:#2A7A5A; text-decoration:none;">ResearchGate →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 論文3：シューベルト Ave Maria -->
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+          <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+            <div style="flex-shrink:0; width:36px; height:36px; background:#6A3A7A; border-radius:6px;
+                        display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.7rem; font-weight:bold; text-align:center; line-height:1.2;">HSS</div>
+            <div>
+              <div style="font-size:0.7rem; color:var(--gold); font-weight:bold; letter-spacing:0.08em; margin-bottom:0.3rem;">
+                Humanities and Social Sciences · DOI: 10.11648/j.hss.20251306.23
+              </div>
+              <div style="font-size:0.95rem; font-weight:bold; color:var(--text); line-height:1.4; margin-bottom:0.4rem;">
+                Schubert's "Ave Maria (Ellen's Song No. 3)": Poetic Structure Analysis Using the C4 Model
+              </div>
+              <div style="font-size:0.82rem; color:var(--muted); margin-bottom:0.6rem;">
+                シューベルト Ave Maria 詩構造×C4モデル — Osamu Okumura
+              </div>
+              <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <a href="https://doi.org/10.11648/j.hss.20251306.23" target="_blank" rel="noopener"
+                   style="font-size:0.78rem; color:var(--accent); text-decoration:none;">SciencePC →</a>
+                <a href="https://www.researchgate.net/publication/399426262_Schubert's_Ave_Maria_Ellen's_Song_No_3_Poetic_Structure_Analysis_Using_the_C4_Model"
+                   target="_blank" rel="noopener" style="font-size:0.78rem; color:#2A7A5A; text-decoration:none;">ResearchGate →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 論文4：デジタル遺産継承 -->
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+          <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+            <div style="flex-shrink:0; width:36px; height:36px; background:#2A5A8A; border-radius:6px;
+                        display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.7rem; font-weight:bold; text-align:center; line-height:1.2;">AE</div>
+            <div>
+              <div style="font-size:0.7rem; color:var(--gold); font-weight:bold; letter-spacing:0.08em; margin-bottom:0.3rem;">
+                Advances in Engineering · DOI: 10.11648/j.ae.20250902.13
+              </div>
+              <div style="font-size:0.95rem; font-weight:bold; color:var(--text); line-height:1.4; margin-bottom:0.4rem;">
+                Digital Legacy Inheritance System Architecture: A Systematic Analysis Using PlantUML C4 Model
+              </div>
+              <div style="font-size:0.82rem; color:var(--muted); margin-bottom:0.6rem;">
+                デジタル遺産継承システムアーキテクチャ — Osamu Okumura
+              </div>
+              <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <a href="https://doi.org/10.11648/j.ae.20250902.13" target="_blank" rel="noopener"
+                   style="font-size:0.78rem; color:var(--accent); text-decoration:none;">SciencePC →</a>
+                <a href="https://www.researchgate.net/publication/398938096_Digital_Legacy_Inheritance_System_Architecture_A_Systematic_Analysis_Using_PlantUML_C4_Model"
+                   target="_blank" rel="noopener" style="font-size:0.78rem; color:#2A7A5A; text-decoration:none;">ResearchGate →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 論文5：奥の細道×終活×ウェルビーイング -->
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+          <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+            <div style="flex-shrink:0; width:36px; height:36px; background:#2A7A5A; border-radius:6px;
+                        display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.65rem; font-weight:bold; text-align:center; line-height:1.2;">RG</div>
+            <div>
+              <div style="font-size:0.7rem; color:var(--gold); font-weight:bold; letter-spacing:0.08em; margin-bottom:0.3rem;">
+                ResearchGate · Peer-Reviewed Paper
+              </div>
+              <div style="font-size:0.95rem; font-weight:bold; color:var(--text); line-height:1.4; margin-bottom:0.4rem;">
+                End-of-life Planning and Well-being in Bashō's "Oku No Hosomichi": A Structural Analysis Using PlantUML C4 Models
+              </div>
+              <div style="font-size:0.82rem; color:var(--muted); margin-bottom:0.6rem;">
+                奥の細道×終活×ウェルビーイング×C4モデル — Osamu Okumura
+              </div>
+              <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <a href="https://www.researchgate.net/publication/399426382_End-of-life_Planning_and_Well-being_in_Basho's_Oku_No_Hosomichi_A_Structural_Analysis_Using_PlantUML_C4_Models"
+                   target="_blank" rel="noopener" style="font-size:0.78rem; color:#2A7A5A; text-decoration:none;">ResearchGate →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 論文6：映画「おーい、応為」ナラティブ構造 -->
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+          <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+            <div style="flex-shrink:0; width:36px; height:36px; background:#2A7A5A; border-radius:6px;
+                        display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.65rem; font-weight:bold; text-align:center; line-height:1.2;">RG</div>
+            <div>
+              <div style="font-size:0.7rem; color:var(--gold); font-weight:bold; letter-spacing:0.08em; margin-bottom:0.3rem;">
+                ResearchGate · Peer-Reviewed Paper
+              </div>
+              <div style="font-size:0.95rem; font-weight:bold; color:var(--text); line-height:1.4; margin-bottom:0.4rem;">
+                Visualizing Film Narrative: Applying the C4 Model to "Oi, Ohoi", a Systems Approach to Narrative Structure Analysis
+              </div>
+              <div style="font-size:0.82rem; color:var(--muted); margin-bottom:0.6rem;">
+                映画「おーい、応為」ナラティブ構造×C4モデル — Osamu Okumura
+              </div>
+              <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <a href="https://www.researchgate.net/publication/399426354_Visualizing_Film_Narrative_Applying_the_C4_Model_to_Oi_Ohoi_a_Systems_Approach_to_Narrative_Structure_Analysis"
+                   target="_blank" rel="noopener" style="font-size:0.78rem; color:#2A7A5A; text-decoration:none;">ResearchGate →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 論文7：芭蕉俳句×ナラティブ理論×C4モデル -->
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+          <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+            <div style="flex-shrink:0; width:36px; height:36px; background:#2A7A5A; border-radius:6px;
+                        display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.65rem; font-weight:bold; text-align:center; line-height:1.2;">RG</div>
+            <div>
+              <div style="font-size:0.7rem; color:var(--gold); font-weight:bold; letter-spacing:0.08em; margin-bottom:0.3rem;">
+                ResearchGate · Peer-Reviewed Paper
+              </div>
+              <div style="font-size:0.95rem; font-weight:bold; color:var(--text); line-height:1.4; margin-bottom:0.4rem;">
+                Matsuo Bashō Haiku Analysis: Narrative Theory × C4 Model Structure Analysis
+              </div>
+              <div style="font-size:0.82rem; color:var(--muted); margin-bottom:0.6rem;">
+                芭蕉俳句×ナラティブ理論×C4モデル構造解析 — Osamu Okumura
+              </div>
+              <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <a href="https://www.researchgate.net/publication/399426348_Matsuo_Basho_Haiku_Analysis_Narrative_Theory_C4_Model_Structure_Analysis"
+                   target="_blank" rel="noopener" style="font-size:0.78rem; color:#2A7A5A; text-decoration:none;">ResearchGate →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ORCID / ResearchGate リンク -->
+      <p style="font-size:0.85rem; color:var(--muted); margin-top:1.25rem;">
+        📎 全論文リスト：
+        <a href="https://orcid.org/0009-0006-0015-938X" target="_blank" rel="noopener">ORCID 0009-0006-0015-938X</a>
+        &nbsp;／&nbsp;
+        <a href="https://www.researchgate.net/profile/Osamu-Okumura" target="_blank" rel="noopener">ResearchGate プロフィール</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- THESIS DOJO -->
+<section id="dojo" style="background:var(--bg2);">
+  <div class="section-inner">
+    <p class="section-tag">Academic Paper Dojo / 論文道場</p>
+    <h2>Write smarter. Structure deeper.<br>賢く書く。 深く構造化する。</h2>
+    <p style="color:var(--text); max-width:680px; margin-bottom:0.5rem; font-size:0.95rem;">
+      Thesis Dojo combines Claude AI with C4 model methodology to guide researchers from raw ideas to publication-ready manuscripts.
+    </p>
+    <p style="color:var(--muted); font-size:0.88rem; max-width:680px; margin-bottom:1.5rem;">
+      論文道場は、Claude AIとC4モデル手法を組み合わせ、研究者をアイデアから投稿準備まで導くAI学術論文執筆支援システムです。
+    </p>
+
+    <!-- ★ フィーチャー動画：疑問から草稿へ -->
+    <div style="margin-bottom:2.5rem; background:var(--bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; max-width:680px;">
+      <a href="https://youtu.be/wtjgwbsiQHg" target="_blank" rel="noopener" style="display:block; position:relative; text-decoration:none;">
+        <img src="https://img.youtube.com/vi/wtjgwbsiQHg/hqdefault.jpg"
+             alt="疑問から草稿へ：AIで論文を攻略。「論文道場」アプリ"
+             style="width:100%; aspect-ratio:16/9; object-fit:cover; display:block;" />
+        <span style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                     width:60px; height:60px; background:rgba(26,107,122,0.88); border-radius:50%;
+                     display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff;">▶</span>
       </a>
-      <a href="#concept" class="btn-ghost">
-        <span data-en>See the Framework</span>
-        <span data-ja>フレームワークを見る</span>
+      <div style="padding:1rem 1.25rem;">
+        <div style="font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); font-weight:bold; margin-bottom:0.3rem;">
+          C4モデル研究会 · 2026 · 論文道場 使い方ガイド
+        </div>
+        <div style="font-size:1.05rem; font-weight:bold; color:var(--text); margin-bottom:0.3rem;">
+          疑問から草稿へ：AIで論文を攻略。「論文道場」アプリ
+        </div>
+        <div style="font-size:0.85rem; color:var(--muted);">
+          研究の疑問をStage 0に入力するだけで、C4モデルが論文の骨格を自動生成。AIと対話しながら草稿完成まで導くアプリの全ステップを解説します。
+        </div>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:0.75rem; align-items:center;">
+          <a href="https://youtu.be/wtjgwbsiQHg" target="_blank" rel="noopener"
+             style="font-size:0.85rem; color:var(--accent); font-weight:bold; text-decoration:none;">
+            YouTube で見る →
+          </a>
+          <a href="https://c4model.org/dojo.html" target="_blank" rel="noopener"
+             style="font-size:0.85rem; background:var(--accent); color:#fff; padding:0.35rem 1rem; border-radius:4px; text-decoration:none; font-weight:bold;">
+            論文道場を開く →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ★ 新動画：AI支援システムによる挫折しない論文執筆 -->
+    <div style="margin-bottom:2.5rem; background:var(--bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; max-width:680px;">
+      <a href="https://www.youtube.com/watch?v=ojFE143WmmU" target="_blank" rel="noopener" style="display:block; position:relative; text-decoration:none;">
+        <img src="https://img.youtube.com/vi/ojFE143WmmU/hqdefault.jpg"
+             alt="AI支援システムによる挫折しない論文執筆：C4モデルとウェルビーイング・ライティング"
+             style="width:100%; aspect-ratio:16/9; object-fit:cover; display:block;" />
+        <span style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                     width:60px; height:60px; background:rgba(26,107,122,0.88); border-radius:50%;
+                     display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff;">▶</span>
+      </a>
+      <div style="padding:1rem 1.25rem;">
+        <div style="font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); font-weight:bold; margin-bottom:0.3rem;">
+          C4モデル研究会 · 2026 · 論文道場 研究解説
+        </div>
+        <div style="font-size:1.05rem; font-weight:bold; color:var(--text); margin-bottom:0.3rem;">
+          AI支援システムによる挫折しない論文執筆：C4モデルとウェルビーイング・ライティング
+        </div>
+        <div style="font-size:0.85rem; color:var(--muted);">
+          C4モデルとウェルビーイング・ライティングを統合したAI支援システムが、論文執筆の挫折をいかに防ぐかを解説します。
+        </div>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:0.75rem; align-items:center;">
+          <a href="https://www.youtube.com/watch?v=ojFE143WmmU" target="_blank" rel="noopener"
+             style="font-size:0.85rem; color:var(--accent); font-weight:bold; text-decoration:none;">
+            YouTube で見る →
+          </a>
+          <a href="https://c4model.org/dojo.html" target="_blank" rel="noopener"
+             style="font-size:0.85rem; background:var(--accent); color:#fff; padding:0.35rem 1rem; border-radius:4px; text-decoration:none; font-weight:bold;">
+            論文道場を開く →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dojo videos — 重複排除: 日英各1本ずつのみ掲載 -->
+    <div class="video-grid">
+      <div class="video-block">
+        <div class="video-label">▶ Ronbun Dojo (Japanese)</div>
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=W8KAt7YeeUs" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/W8KAt7YeeUs/hqdefault.jpg" alt="論文道場 日本語" />
+          <span class="play-btn">▶</span>
+        </a>
+      </div>
+      <!-- [校正] Thesis Dojo(English)とHow-To(English)が同動画 t2cnj1kUzcA で重複していた。
+           How-To English (gyLLYIuv85U) のみ残し、t2cnj1kUzcA の重複を削除 -->
+      <div class="video-block">
+        <div class="video-label">▶ Thesis Dojo (English)</div>
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=t2cnj1kUzcA" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/t2cnj1kUzcA/hqdefault.jpg" alt="Thesis Dojo English" />
+          <span class="play-btn">▶</span>
+        </a>
+      </div>
+      <div class="video-block">
+        <div class="video-label">▶ How-To: 論文道場の使い方（日本語）</div>
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=Gtyrxt6e_I8" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/Gtyrxt6e_I8/hqdefault.jpg" alt="論文道場 アプリ操作解説（日本語版）" />
+          <span class="play-btn">▶</span>
+        </a>
+      </div>
+      <div class="video-block">
+        <div class="video-label">▶ How-To: Thesis Dojo App Tutorial (English)</div>
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=gyLLYIuv85U" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/gyLLYIuv85U/hqdefault.jpg" alt="Thesis Dojo App Tutorial (English)" />
+          <span class="play-btn">▶</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- STEPS -->
+    <div class="steps-grid">
+      <a class="step-card" href="https://c4model.org/dojo.html#stage0">
+        <div class="step-num">01</div>
+        <div class="step-title">Research Question</div>
+        <div class="step-title-ja">研究問いの入力</div>
+        <div class="step-desc">Input your topic and keywords at Stage 0</div>
+        <div class="step-desc-ja">Stage 0でテーマ・キーワードを入力</div>
+      </a>
+      <a class="step-card" href="https://c4model.org/dojo.html#stage2">
+        <div class="step-num">02</div>
+        <div class="step-title">C4 Structuring</div>
+        <div class="step-title-ja">C4構造化</div>
+        <div class="step-desc">AI generates L1–L4 PlantUML diagrams automatically</div>
+        <div class="step-desc-ja">AIがL1〜L4 PlantUML図を自動生成</div>
+      </a>
+      <a class="step-card" href="https://c4model.org/dojo.html#stage3">
+        <div class="step-num">03</div>
+        <div class="step-title">7R Prompting</div>
+        <div class="step-title-ja">7Rプロンプト</div>
+        <div class="step-desc">Iterative refinement through 7 structured prompts</div>
+        <div class="step-desc-ja">7つの構造化プロンプトで反復改良</div>
+      </a>
+      <a class="step-card" href="https://c4model.org/dojo.html#stage7">
+        <div class="step-num">04</div>
+        <div class="step-title">Manuscript Output</div>
+        <div class="step-title-ja">原稿出力</div>
+        <div class="step-desc">Word / PDF ready for journal submission</div>
+        <div class="step-desc-ja">学術誌投稿用Word / PDFで出力</div>
+      </a>
+    </div>
+
+    <div class="dojo-cta">
+      <a href="https://c4model.org/dojo.html">→ Open Thesis Dojo — Start Stage 0 / 論文道場を開く — Stage 0 入力スタート</a>
+      <p class="dojo-note">Free to use · No account required · Runs in your browser / 無料 · アカウント不要 · ブラウザで完結</p>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="features-grid" style="margin-top:2.5rem;">
+      <a class="feature-card" href="https://c4model.org/dojo.html#stage0">
+        <div class="feat-icon">⬡</div>
+        <div class="feat-title">Wellbeing Writing</div>
+        <div class="feat-title-ja">ウェルビーイング執筆</div>
+        <div class="feat-desc">Minimal input burden — designed for sustainable academic practice</div>
+        <div class="feat-desc-ja">入力負荷を最小化した、持続可能な論文執筆設計</div>
+      </a>
+      <a class="feature-card" href="https://c4model.org/dojo.html#tools-c4">
+        <div class="feat-icon">◈</div>
+        <div class="feat-title">PlantUML Diagrams</div>
+        <div class="feat-title-ja">PlantUML自動図解</div>
+        <div class="feat-desc">Auto-generated C4 architecture diagrams embedded in your manuscript</div>
+        <div class="feat-desc-ja">C4図を自動生成し論文に直接埋め込み</div>
+      </a>
+      <a class="feature-card" href="https://c4model.org/dojo.html#tools-format">
+        <div class="feat-icon">✦</div>
+        <div class="feat-title">Multi-format Export</div>
+        <div class="feat-title-ja">マルチ形式エクスポート</div>
+        <div class="feat-desc">Customizable export templates supporting various academic standards</div>
+        <div class="feat-desc-ja">各種学術基準に対応した柔軟なエクスポートテンプレート</div>
+      </a>
+      <div class="feature-card" style="cursor:default;">
+        <div class="feat-icon">⬟</div>
+        <div class="feat-title">Claude API Powered</div>
+        <div class="feat-title-ja">Claude API連携</div>
+        <div class="feat-desc">Cloudflare Workers backend with D1 usage logging</div>
+        <div class="feat-desc-ja">Cloudflare WorkersバックエンドとD1使用ログ</div>
+      </div>
+      <a class="feature-card" href="https://c4model.org/dojo.html#feedback">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">User Feedback System</div>
+        <div class="feat-title-ja">本アプリの評価アンケート（SD法）</div>
+        <div class="feat-desc">Built-in evaluation surveys to continuously improve UI/UX based on educational engineering.</div>
+        <div class="feat-desc-ja">教育工学に基づくアンケートを内蔵し、ユーザーの声でシステムをアジャイルに改善</div>
       </a>
     </div>
   </div>
-
-  <!-- Live Haiku Card -->
-  <div class="hero-right">
-    <div class="haiku-card">
-      <div class="haiku-card-header">
-        <span class="haiku-card-dot"></span>
-        <span data-en>C4 Model Applied — Live Structural Analysis</span>
-        <span data-ja>C4モデル適用 — ライブ構造解析</span>
-      </div>
-      <div class="haiku-poem">
-        <p data-en>Furu ike ya —<br>kawazu tobikomu,<br>mizu no oto.</p>
-        <p data-ja>古池や —<br>蛙飛び込む、<br>水の音。</p>
-        <cite data-en>— Matsuo Bashō, c. 1686 &nbsp;·&nbsp; 17 syllables</cite>
-        <cite data-ja>— 松尾芭蕉、1686年頃 &nbsp;·&nbsp; 17音</cite>
-      </div>
-      <div class="spiral-stack">
-        <div class="spiral-item" data-layer="1">
-          <span class="spiral-tag">L1 · CONTEXT</span>
-          <span class="spiral-body" data-en>Edo Japan · Zen tradition · Bashō's spiritual exile in Fukagawa</span>
-          <span class="spiral-body" data-ja>江戸日本 · 禅の伝統 · 深川での芭蕉の隠棲</span>
-        </div>
-        <div class="spiral-item" data-layer="2">
-          <span class="spiral-tag">L2 · CONTAINER</span>
-          <span class="spiral-body" data-en>5·7·5 — Setting / Action / Echo: three logical vessels</span>
-          <span class="spiral-body" data-ja>5·7·5 — 情景 / 動作 / 余韻：三つの論理的器</span>
-        </div>
-        <div class="spiral-item" data-layer="3">
-          <span class="spiral-tag">L3 · COMPONENT</span>
-          <span class="spiral-body" data-en>Kigo (frog=spring) · Kireji "ya" · Silence vs. sudden sound</span>
-          <span class="spiral-body" data-ja>季語（蛙＝春）· 切れ字「や」· 静寂 vs 突然の音</span>
-        </div>
-        <div class="spiral-item" data-layer="4">
-          <span class="spiral-tag">L4 · CODE</span>
-          <span class="spiral-body" data-en>FU-RU-I-KE · abrupt MU · resonant long-O — phonemic architecture</span>
-          <span class="spiral-body" data-ja>ふ・る・い・け · 促音「む」· 長母音「お」— 音素設計</span>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
-<div class="divider"></div>
+<!-- ══════════════════════════════════════════
+     俳句の科学 (HAIKU SCIENCE) — 導線セクション
+     [追加] index.html → haiku.html への導線
+     要件②: 魅力的なUIで haiku.html へ誘導
+     ══════════════════════════════════════════ -->
+<section id="haiku-science" style="background:linear-gradient(160deg, #1A0808 0%, #2A1010 50%, #1A1A08 100%); color:#F0E8D4; padding:5rem 2rem;">
+  <div class="section-inner">
 
-<!-- ══════════════════════════════════════════════════════
-     §1 CONCEPT
-══════════════════════════════════════════════════════ -->
-<section id="concept">
-  <div class="section-wrap">
-    <div class="concept-grid">
+    <!-- タグ -->
+    <p style="font-size:0.7rem; letter-spacing:0.25em; text-transform:uppercase; color:#C4944A; margin-bottom:1rem; font-weight:bold;">
+      🎋 New Feature · 新機能 · 俳句の科学 / Haiku Science
+    </p>
+
+    <!-- 見出し -->
+    <h2 style="font-size:clamp(1.8rem,4vw,3rem); color:#F0E8D4; line-height:1.2; margin-bottom:1rem;">
+      あなたの俳句を<br>
+      <em style="color:#C4944A; font-style:italic;">AIがC4モデルで解剖する</em>
+    </h2>
+    <h2 style="font-size:clamp(1rem,2.5vw,1.5rem); color:rgba(240,232,212,0.6); font-style:italic; font-weight:300; margin-bottom:2rem; line-height:1.4;">
+      Your haiku, decoded by AI through the C4 Model.<br>
+      <span style="font-size:0.85em;">For everyone — from children to haiku masters worldwide.</span>
+    </h2>
+
+    <!-- メインコンテンツグリッド -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2.5rem; align-items:start;">
+
+      <!-- 左: 機能紹介 -->
       <div>
-        <div class="section-label reveal">
-          <span data-en>Universal Architecture</span>
-          <span data-ja>普遍的アーキテクチャ</span>
+        <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(196,148,74,0.3); border-radius:10px; padding:1.5rem; margin-bottom:1rem;">
+          <div style="font-size:1.5rem; margin-bottom:0.5rem;">🖊 → 📐 → 🎯 → 📄</div>
+          <div style="font-size:0.95rem; color:#F0E8D4; font-weight:bold; margin-bottom:0.5rem;">4ステップで完結</div>
+          <ol style="font-size:0.88rem; color:rgba(240,232,212,0.8); line-height:1.9; padding-left:1.2rem;">
+            <li>俳句（17音）を入力するだけ</li>
+            <li>C4モデルL1〜L4で構造を可視化</li>
+            <li>AIが100点満点で添削・評価</li>
+            <li>結果をPDF保存（QRコード付き）</li>
+          </ol>
         </div>
-        <h2 class="section-h2 reveal reveal-d1">
-          <span data-en>One framework.<br><em>Infinite</em> domains.</span>
-          <span data-ja>ひとつのフレームワーク。<br><em>無限</em>のドメイン。</span>
-        </h2>
-        <p class="section-body reveal reveal-d2">
-          <span data-en>Simon Brown's C4 Model was born in software engineering. We extended it to every domain where structure creates clarity — academic papers, literary analysis, and grant proposals.</span>
-          <span data-ja>Simon BrownのC4モデルはソフトウェア工学から生まれました。私たちはこれを、構造が明確さを生み出すすべてのドメインへと拡張しました——学術論文、文学分析、グラント提案書まで。</span>
-        </p>
-        <div class="domain-grid reveal reveal-d3">
-          <div class="domain-card sw">
-            <div class="domain-icon">⚙️</div>
-            <div class="domain-title"><span data-en>Software Systems</span><span data-ja>ソフトウェア</span></div>
-            <div class="domain-desc"><span data-en>Microservices, APIs, cloud — the original domain.</span><span data-ja>マイクロサービス・API・クラウド——原点のドメイン。</span></div>
+
+        <!-- 対象者 -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:0.75rem; font-size:0.8rem; color:rgba(240,232,212,0.8);">
+            <div style="font-size:1rem; margin-bottom:0.3rem;">👶👧👦</div>小学生〜高校生
           </div>
-          <div class="domain-card ac">
-            <div class="domain-icon">📄</div>
-            <div class="domain-title"><span data-en>Academic Papers</span><span data-ja>学術論文</span></div>
-            <div class="domain-desc"><span data-en>RQ → Chapters → Arguments → Sentences.</span><span data-ja>RQ → 章立て → 論点 → 文章。</span></div>
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:0.75rem; font-size:0.8rem; color:rgba(240,232,212,0.8);">
+            <div style="font-size:1rem; margin-bottom:0.3rem;">📖</div>俳句サークル・俳句誌投稿者
           </div>
-          <div class="domain-card ha">
-            <div class="domain-icon">🌸</div>
-            <div class="domain-title"><span data-en>Literary Works</span><span data-ja>文学作品</span></div>
-            <div class="domain-desc"><span data-en>17 syllables. 4 layers. A universe visible.</span><span data-ja>17音。4層。宇宙が見える。</span></div>
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:0.75rem; font-size:0.8rem; color:rgba(240,232,212,0.8);">
+            <div style="font-size:1rem; margin-bottom:0.3rem;">👴👵</div>シニア・生涯学習
           </div>
-          <div class="domain-card gr">
-            <div class="domain-icon">🏛️</div>
-            <div class="domain-title"><span data-en>Grant Proposals</span><span data-ja>グラント提案</span></div>
-            <div class="domain-desc"><span data-en>JST A-STEP · JSPS · NSF — structured to win.</span><span data-ja>JST A-STEP · JSPS · NSF——採択のために構造化。</span></div>
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:0.75rem; font-size:0.8rem; color:rgba(240,232,212,0.8);">
+            <div style="font-size:1rem; margin-bottom:0.3rem;">🌏</div>International Haiku lovers
           </div>
         </div>
       </div>
 
-      <!-- Haiku full breakdown with large spiral -->
-      <div class="reveal reveal-d2">
-        <p class="haiku-big" data-en>"Furu ike ya —<br>kawazu tobikomu,<br>mizu no oto."</p>
-        <p class="haiku-big" data-ja>「古池や —<br>蛙飛び込む、<br>水の音。」</p>
-        <p class="haiku-credit" data-en>Matsuo Bashō · Japan's greatest haiku poet · c. 1686</p>
-        <p class="haiku-credit" data-ja>松尾芭蕉 · 日本最高の俳人 · 1686年頃</p>
-
-        <div class="spiral-stack spiral-stack-lg">
-          <div class="spiral-item" data-layer="1">
-            <div>
-              <div class="spiral-title"><span data-en>L1 · Context — World & Era</span><span data-ja>L1 · Context — 世界・時代</span></div>
-              <div class="spiral-desc"><span data-en>Edo-period Japan. Zen tradition of finding eternity in a single moment. Bashō's self-imposed exile in Fukagawa creates the contemplative silence.</span><span data-ja>江戸時代の日本。一瞬に永遠を見出す禅の伝統。深川での隠棲が、静寂の中の詩情を生み出す。</span></div>
-            </div>
-          </div>
-          <div class="spiral-item" data-layer="2">
-            <div>
-              <div class="spiral-title"><span data-en>L2 · Container — 5·7·5 Structure</span><span data-ja>L2 · Container — 5·7·5の構造</span></div>
-              <div class="spiral-desc"><span data-en>Three logical containers: <strong>5 syllables</strong> (setting: ancient pond), <strong>7 syllables</strong> (action: frog leaps), <strong>5 syllables</strong> (resonance: sound of water).</span><span data-ja>3つの論理的器：<strong>5音</strong>（情景：古池）、<strong>7音</strong>（動作：蛙が飛び込む）、<strong>5音</strong>（余韻：水の音）。</span></div>
-            </div>
-          </div>
-          <div class="spiral-item" data-layer="3">
-            <div>
-              <div class="spiral-title"><span data-en>L3 · Component — Poetic Devices</span><span data-ja>L3 · Component — 表現技法</span></div>
-              <div class="spiral-desc"><span data-en><em>Kigo</em> (frog = spring). <em>Kireji</em> "ya" creates emotional pause. Contrast: absolute silence vs. sudden splash. Deliberate omission invites imagination.</span><span data-ja>季語（蛙＝春）。切れ字「や」が感情の間を作る。静寂 vs 音の対比。意図的な余白が読者の想像力を招く。</span></div>
-            </div>
-          </div>
-          <div class="spiral-item" data-layer="4">
-            <div>
-              <div class="spiral-title"><span data-en>L4 · Code — Phonemic Architecture</span><span data-ja>L4 · Code — 音素アーキテクチャ</span></div>
-              <div class="spiral-desc"><span data-en>FU-RU-I-KE: clear consonants = transparency. Abrupt <strong>MU</strong> = single instant of impact. Long vowel <strong>O</strong> in "oto" = resonance. As precisely engineered as beautiful.</span><span data-ja>FU-RU-I-KE：清音＝透明感。促音<strong>ム</strong>＝一瞬の閉塞。長母音<strong>オ</strong>＝余韻。美しさと同じくらい精密に設計されている。</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ══════════════════════════════════════════════════════
-     §2 THESIS DOJO
-══════════════════════════════════════════════════════ -->
-<section id="dojo">
-  <div class="section-wrap">
-    <div class="dojo-header">
+      <!-- 右: C4図プレビュー -->
       <div>
-        <div class="section-label reveal">
-          <span data-en>Core Product</span><span data-ja>主要プロダクト</span>
-        </div>
-        <div class="badge-row reveal reveal-d1">
-          <span class="badge saas">SaaS</span>
-          <span class="badge ai">Claude API</span>
-          <span class="badge open">Open Research</span>
-        </div>
-        <h2 class="section-h2 reveal reveal-d1">
-          <span data-en>Thesis Dojo —<br><em>Academic Paper</em><br>Writing System</span>
-          <span data-ja>論文道場 —<br><em>学術論文</em><br>執筆支援システム</span>
-        </h2>
-        <p class="section-body reveal reveal-d2">
-          <span data-en>A 7-stage AI writing system built on the C4 Model. Transforms scattered ideas into publication-ready academic papers while protecting writer wellbeing through the PERMA framework.</span>
-          <span data-ja>C4モデルを基盤とした7段階AI執筆支援システム。散在するアイデアを出版可能な学術論文へと変換しながら、PERMAフレームワークで執筆者のウェルビーイングを守ります。</span>
-        </p>
-      </div>
-      <div class="score-box reveal reveal-d3">
-        <div style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem;">C4 Quality Score</div>
-        <div class="score-n">32<span class="score-den">/35</span></div>
-        <div class="score-lbl">Pass: 28pts · Preprint Published</div>
-        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-lt);display:grid;grid-template-columns:1fr 1fr;gap:.5rem;text-align:left;">
-          <div>
-            <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;color:var(--ink-lite);">WHO-5</div>
-            <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--teal);">↑ Sig.</div>
+        <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(196,148,74,0.25); border-radius:10px; padding:1.25rem;">
+          <div style="font-size:1.2rem; text-align:center; letter-spacing:0.2em; color:#F0E8D4; margin-bottom:1.25rem; font-family:serif;">
+            古池や　蛙飛び込む　水の音
           </div>
-          <div>
-            <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.14em;color:var(--ink-lite);">Cog. Load</div>
-            <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--sage);">−40%</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1rem;">
+            <div style="background:#FFF5F5; border:1px solid #F9AAAA; border-radius:6px; padding:0.75rem; color:#1A1008; font-size:0.75rem;">
+              <div style="color:#8B2020; font-weight:bold; margin-bottom:0.25rem;">L1 · Context</div>
+              <div style="color:#5A3030;">江戸時代の禅的美意識・春の池という普遍的情景</div>
+            </div>
+            <div style="background:#F5F0FF; border:1px solid #AAA0FF; border-radius:6px; padding:0.75rem; color:#1A1008; font-size:0.75rem;">
+              <div style="color:#6446B4; font-weight:bold; margin-bottom:0.25rem;">L2 · Container</div>
+              <div style="color:#3A2860;">上五「古池や」切れ字・中七「蛙飛び込む」動・下五「水の音」余韻</div>
+            </div>
+            <div style="background:#F0F8FF; border:1px solid #A0CCFF; border-radius:6px; padding:0.75rem; color:#1A1008; font-size:0.75rem;">
+              <div style="color:#1A5C6A; font-weight:bold; margin-bottom:0.25rem;">L3 · Component</div>
+              <div style="color:#0D3040;">静と動の対比・刹那の永遠化・聴覚的イメージ</div>
+            </div>
+            <div style="background:#F5FFF0; border:1px solid #A0F0A0; border-radius:6px; padding:0.75rem; color:#1A1008; font-size:0.75rem;">
+              <div style="color:#1E641E; font-weight:bold; margin-bottom:0.25rem;">L4 · Code</div>
+              <div style="color:#1A401A;">切れ字「や」・体言止め・5-7-5の音節設計</div>
+            </div>
+          </div>
+          <div style="font-size:0.75rem; color:rgba(240,232,212,0.5); text-align:center;">
+            ※ これはデモ表示です。実際の分析はAIがリアルタイムで生成します。
+          </div>
+        </div>
+
+        <!-- スコアプレビュー -->
+        <div style="display:flex; gap:0.75rem; margin-top:0.75rem;">
+          <div style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(196,148,74,0.3); border-radius:8px; padding:1rem; text-align:center;">
+            <div style="font-size:2.5rem; color:#C4944A; font-weight:bold; line-height:1;">87</div>
+            <div style="font-size:0.75rem; color:rgba(240,232,212,0.6);">/ 100点 · ⭐⭐⭐</div>
+            <div style="font-size:0.7rem; color:rgba(240,232,212,0.5); margin-top:0.25rem;">AI評価（サンプル）</div>
+          </div>
+          <div style="flex:2; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:1rem; font-size:0.78rem; color:rgba(240,232,212,0.75); line-height:1.6;">
+            「古池」の永遠性と「蛙」の一瞬が対比され、禅的な余白が美しい。切れ字「や」の使い方が効果的です。
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Pipeline -->
-    <div class="pipeline reveal">
-      <div class="pipe-block inp">
-        <div class="pipe-label">📥 <span data-en>Input</span><span data-ja>入力</span></div>
-        <span class="pipe-icon">💭</span>
-        <div class="pipe-title"><span data-en>Raw Ideas</span><span data-ja>散在するアイデア</span></div>
-        <ul class="pipe-items">
-          <li><span data-en>Research question</span><span data-ja>研究課題（RQ）</span></li>
-          <li><span data-en>Scattered notes</span><span data-ja>断片的なメモ</span></li>
-          <li><span data-en>Prior literature</span><span data-ja>先行研究</span></li>
-          <li><span data-en>Grant requirements</span><span data-ja>グラント要件</span></li>
-        </ul>
-      </div>
-      <div class="pipe-arrow">→</div>
-      <div class="pipe-block proc">
-        <div class="pipe-label">⚙️ <span data-en>C4 Structuring Engine</span><span data-ja>C4構造化エンジン</span></div>
-        <span class="pipe-icon">🏗️</span>
-        <div class="pipe-title"><span data-en>7-Stage AI Process</span><span data-ja>7段階AIプロセス</span></div>
-        <ul class="pipe-items">
-          <li>Stage 0 — <span data-en>Paper Input & C4 Score</span><span data-ja>論文入力・C4スコア</span></li>
-          <li>Stage I — <span data-en>CREATE Prompt Ideation</span><span data-ja>CREATEプロンプト発想</span></li>
-          <li>Stage II — <span data-en>C4 Blueprint Design</span><span data-ja>C4設計図</span></li>
-          <li>Stage III — <span data-en>7R Writing Support</span><span data-ja>7R執筆支援</span></li>
-          <li>Stage IV — <span data-en>Quality Evaluation</span><span data-ja>品質評価</span></li>
-          <li>Stage V–VII — <span data-en>Presentation & Submission</span><span data-ja>発表・投稿</span></li>
-        </ul>
-      </div>
-      <div class="pipe-arrow">→</div>
-      <div class="pipe-block out">
-        <div class="pipe-label">📤 <span data-en>Output</span><span data-ja>出力</span></div>
-        <span class="pipe-icon">🌍</span>
-        <div class="pipe-title"><span data-en>World-Ready Paper</span><span data-ja>世界公開の論文</span></div>
-        <ul class="pipe-items">
-          <li><span data-en>DOI-citable preprint</span><span data-ja>DOI取得・引用可能</span></li>
-          <li><span data-en>PlantUML C4 diagrams</span><span data-ja>C4モデル図4枚</span></li>
-          <li><span data-en>Conference presentation</span><span data-ja>学会発表資料</span></li>
-          <li><span data-en>Grant proposal draft</span><span data-ja>グラント提案書</span></li>
-        </ul>
-      </div>
+    <!-- CTA ボタン -->
+    <div style="text-align:center;">
+      <a href="haiku.html" style="display:inline-flex; align-items:center; gap:0.75rem; background:linear-gradient(135deg,#C4944A,#8B6914); color:#fff; padding:1rem 2.5rem; border-radius:8px; font-size:1.1rem; font-weight:bold; text-decoration:none; box-shadow:0 4px 20px rgba(196,148,74,0.4); transition:transform 0.2s;"
+         onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+        🎋 俳句の科学を試してみる — 無料・登録不要
+      </a>
+      <p style="font-size:0.82rem; color:rgba(240,232,212,0.5); margin-top:0.75rem;">
+        Try Haiku Science — Free · No registration · Works in your browser<br>
+        <a href="haiku.html" style="color:#C4944A; font-size:0.8rem;">→ haiku.html</a>
+      </p>
     </div>
 
-    <!-- Stages -->
-    <div class="stages reveal">
-      <div class="stage-cell" data-n="0">
-        <div class="stage-tag">Input</div>
-        <div class="stage-name"><span data-en>Paper Info & C4 Score</span><span data-ja>論文情報・C4スコア</span></div>
-        <div class="stage-desc"><span data-en>Author, RQ, structure, refs. Real-time 35-pt score preview.</span><span data-ja>著者・RQ・構成・文献。35点リアルタイムプレビュー。</span></div>
-      </div>
-      <div class="stage-cell" data-n="I">
-        <div class="stage-tag">Ideation</div>
-        <div class="stage-name">CREATE Prompt</div>
-        <div class="stage-desc"><span data-en>Context→Role→Explore→Assert→Test→Evaluate. Structured ideation.</span><span data-ja>文脈→役割→探索→主張→検証→評価。体系的発想法。</span></div>
-      </div>
-      <div class="stage-cell" data-n="II">
-        <div class="stage-tag">Design</div>
-        <div class="stage-name"><span data-en>C4 Blueprint</span><span data-ja>C4設計図</span></div>
-        <div class="stage-desc"><span data-en>L1 Context · L2 Chapters · L3 Arguments · L4 Sentences.</span><span data-ja>L1 Context · L2 章立て · L3 論点 · L4 文章。</span></div>
-      </div>
-      <div class="stage-cell" data-n="III">
-        <div class="stage-tag">Writing</div>
-        <div class="stage-name">7R Prompt</div>
-        <div class="stage-desc"><span data-en>Reframe · Relate · Reason · Reveal · Refine · Respond · Recap.</span><span data-ja>再定義・接続・論拠・発見・精緻・応答・要約。</span></div>
-      </div>
-      <div class="stage-cell" data-n="IV">
-        <div class="stage-tag">Evaluation</div>
-        <div class="stage-name"><span data-en>C4 Tiered Score</span><span data-ja>C4段階評価</span></div>
-        <div class="stage-desc"><span data-en>6-axis quality assessment, 35-pt max. Actionable feedback.</span><span data-ja>6軸品質評価、35点満点。具体的フィードバック。</span></div>
-      </div>
-      <div class="stage-cell" data-n="V">
-        <div class="stage-tag">Presentation</div>
-        <div class="stage-name"><span data-en>Conference Prep</span><span data-ja>学会発表</span></div>
-        <div class="stage-desc"><span data-en>Auto-generate 10-slide deck, script skeleton.</span><span data-ja>10枚スライド・スクリプト自動生成。</span></div>
-      </div>
-      <div class="stage-cell" data-n="VI">
-        <div class="stage-tag">Training</div>
-        <div class="stage-name">AI Peer Review</div>
-        <div class="stage-desc"><span data-en>Simulated reviewer questions on methodology & novelty.</span><span data-ja>AI査読者シミュレーション。方法論・新規性を問う。</span></div>
-      </div>
-      <div class="stage-cell" data-n="VII">
-        <div class="stage-tag">Submission</div>
-        <div class="stage-name"><span data-en>Publication</span><span data-ja>投稿・公開</span></div>
-        <div class="stage-desc"><span data-en>Cover letter, checklist, reviewer response. ResearchGate-ready.</span><span data-ja>カバーレター・チェックリスト・査読対応。ResearchGate対応。</span></div>
-      </div>
+    <!-- 学術的根拠 -->
+    <div style="border-top:1px solid rgba(255,255,255,0.1); margin-top:2.5rem; padding-top:1.25rem; font-size:0.8rem; color:rgba(240,232,212,0.5); text-align:center;">
+      📖 本サービスは奥村治の査読論文（DOI: 10.13140/RG.2.2.20249.89444）に基づくC4モデル俳句構造分析手法を実装しています。<br>
+      Based on peer-reviewed research by Osamu Okumura · C4 Model Study Group® · <a href="https://orcid.org/0009-0006-0015-938X" target="_blank" style="color:#C4944A;">ORCID 0009-0006-0015-938X</a>
     </div>
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════════════════
-     STAGE 2 BANNER
-══════════════════════════════════════════════════════ -->
-<div class="stage2-banner">
-  <div class="stage2-banner-text">
-    <div class="stage2-banner-label">
-      <span data-en>Featured — Haiku Science</span>
-      <span data-ja>注目 — 俳句の科学入門</span>
-    </div>
-    <div class="stage2-banner-title">
-      <span data-en>C4 Model Applied to Haiku — Interactive Analysis</span>
-      <span data-ja>俳句にC4モデルを適用 — インタラクティブ解析</span>
-    </div>
-    <div class="stage2-banner-sub">
-      <span data-en>Enter a haiku, get a full C4 structural analysis with PlantUML diagrams, sequence and state charts, and AI-powered scientific commentary.</span>
-      <span data-ja>俳句を入力すると、C4構造図・シーケンス図・状態遷移図と俳句の科学的AIアドバイスを自動生成。</span>
-    </div>
-  </div>
-  <a href="haiku-engineering.html" class="stage2-cta">
-    <span data-en>View Technical Docs →</span>
-    <span data-ja>技術資料を見る →</span>
-  </a>
-</div>
-
-<!-- ══════════════════════════════════════════════════════
-     METRICS
-══════════════════════════════════════════════════════ -->
-<div id="metrics">
-  <div class="metrics-row">
-    <div class="metric-cell reveal">
-      <div class="metric-val">32<sup>/35</sup></div>
-      <div class="metric-key">C4 Quality Score</div>
-      <div class="metric-sub"><span data-en>Publication-ready threshold</span><span data-ja>発表・投稿レベル</span></div>
-    </div>
-    <div class="metric-cell reveal reveal-d1">
-      <div class="metric-val" style="color:var(--teal-lt)">−40<sup>%</sup></div>
-      <div class="metric-key"><span data-en>Cognitive Load</span><span data-ja>認知的負荷</span></div>
-      <div class="metric-sub"><span data-en>Extraneous load reduction</span><span data-ja>外発的負荷の削減</span></div>
-    </div>
-    <div class="metric-cell reveal reveal-d2">
-      <div class="metric-val" style="color:var(--sage)">+17<sup>%</sup></div>
-      <div class="metric-key">C4 Score Growth</div>
-      <div class="metric-sub">28.3 → 33.1 pts (N=8 pilot)</div>
-    </div>
-    <div class="metric-cell reveal reveal-d3">
-      <div class="metric-val" style="color:#8B7ACC">7</div>
-      <div class="metric-key"><span data-en>Pipeline Stages</span><span data-ja>パイプライン段階</span></div>
-      <div class="metric-sub">Stage 0 → VII</div>
-    </div>
-  </div>
-</div>
-
-<div class="divider"></div>
-
-<!-- ══════════════════════════════════════════════════════
-     §4 ORGANIZATION
-══════════════════════════════════════════════════════ -->
-<section id="org">
-  <div class="section-wrap">
-    <div class="org-grid">
-      <div>
-        <div class="section-label reveal">
-          <span data-en>Organization</span><span data-ja>組織</span>
-        </div>
-        <h2 class="section-h2 reveal reveal-d1">
-          <span data-en>C4 Model<br><em>Study Project</em></span>
-          <span data-ja>C4モデル<br><em>研究会®</em></span>
-        </h2>
-        <p class="section-body reveal reveal-d2">
-          <span data-en>An independent research consortium advancing the application of structural architecture methodology beyond software — into education, scholarship, and the humanities.</span>
-          <span data-ja>ソフトウェアを超えて、教育・学術・人文科学への構造的アーキテクチャ手法の応用を推進する独立型研究コンソーシアム。</span>
-        </p>
-
-        <div class="pillars reveal reveal-d3">
-          <div class="pillar">
-            <span class="pillar-icon">🔬</span>
-            <div>
-              <div class="pillar-title"><span data-en>Research</span><span data-ja>研究活動</span></div>
-              <div class="pillar-desc"><span data-en>Empirical study targeting JST A-STEP, JSPS Grants-in-Aid, and international research partnerships. N=30 trial scheduled June–August 2026.</span><span data-ja>JST A-STEP・JSPS科研費・国際共同研究を対象とした実証研究。2026年6〜8月にN=30の実証実験を予定。</span></div>
-            </div>
-          </div>
-          <div class="pillar">
-            <span class="pillar-icon">🤝</span>
-            <div>
-              <div class="pillar-title"><span data-en>Industry Partnership</span><span data-ja>産業連携</span></div>
-              <div class="pillar-desc"><span data-en>Seeking SaaS integration — IcePanel, Structurizr, enterprise knowledge management platforms. API and white-label licensing available.</span><span data-ja>IcePanel・Structurizr・ナレッジマネジメントプラットフォームとのSaaS連携を検討。API・OEM提供可能。</span></div>
-            </div>
-          </div>
-          <div class="pillar">
-            <span class="pillar-icon">🌐</span>
-            <div>
-              <div class="pillar-title"><span data-en>Global Expansion</span><span data-ja>グローバル展開</span></div>
-              <div class="pillar-desc"><span data-en>Academic Paper Dojo public release March 2027. Kindle: <em>Writing Without Giving Up</em>. Multilingual support roadmap.</span><span data-ja>論文道場を2027年3月に一般公開。Kindle「挫折しない論文術」同時刊行。多言語ロードマップ。</span></div>
-            </div>
-          </div>
-          <div class="pillar">
-            <span class="pillar-icon">📊</span>
-            <div>
-              <div class="pillar-title"><span data-en>Evidence Base</span><span data-ja>実証基盤</span></div>
-              <div class="pillar-desc"><span data-en>Preprint published on ResearchGate.net. Pilot study N=8 completed. C4 Score +17%, Cognitive Load −40%, WHO-5 significant improvement.</span><span data-ja>ResearchGate.netにプレプリント公開済み。N=8パイロット完了。C4スコア+17%・認知負荷−40%・WHO-5有意改善。</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Contact Card -->
-      <div class="reveal reveal-d2">
-        <div class="contact-card">
-          <div class="contact-card-top">
-            <div class="contact-card-top-label">
-              <span data-en>Research & Partnership</span><span data-ja>研究・連携のお問い合わせ</span>
-            </div>
-            <div class="contact-card-top-title">
-              <span data-en>Get in touch</span><span data-ja>お問い合わせ</span>
-            </div>
-          </div>
-          <div class="contact-body">
-            <div class="contact-row">
-              <div class="contact-item">
-                <span class="ci-icon">👤</span>
-                <div>
-                  <div class="ci-label"><span data-en>Principal Investigator</span><span data-ja>主宰</span></div>
-                  <div class="ci-val">Osamu Okumura（奥村 治）</div>
-                </div>
-              </div>
-              <div class="contact-item">
-                <span class="ci-icon">🏛️</span>
-                <div>
-                  <div class="ci-label"><span data-en>Affiliation</span><span data-ja>所属</span></div>
-                  <div class="ci-val">C4 Model Study Project（C4モデル研究会®）<br><a href="https://aiit.ac.jp/" target="_blank" rel="noopener" style="color:var(--teal);">東京都立産業技術大学院大学（AIIT）</a> M.S.</div>
-                </div>
-              </div>
-              <div class="contact-item">
-                <span class="ci-icon">📧</span>
-                <div>
-                  <div class="ci-label">Email</div>
-                  <div class="ci-val"><a href="mailto:info@c4model.org">info@c4model.org</a></div>
-                </div>
-              </div>
-              <div class="contact-item">
-                <span class="ci-icon">🔗</span>
-                <div>
-                  <div class="ci-label">Preprint</div>
-                  <div class="ci-val"><a href="https://www.researchgate.net/profile/Osamu-Okumura-2" target="_blank" rel="noopener">ResearchGate → 奥村治</a></div>
-                </div>
-              </div>
-            </div>
-            <a href="mailto:info@c4model.org" class="contact-cta">
-              <span data-en>Send Research Inquiry →</span>
-              <span data-ja>研究・連携について問い合わせる →</span>
-            </a>
-            <div class="funding-tags">
-              <span class="ftag jst">JST A-STEP</span>
-              <span class="ftag jsps">JSPS 科研費</span>
-              <span class="ftag ind">Industry Partners</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════════════════════
-     FOOTER
-══════════════════════════════════════════════════════ -->
-<footer>
-  <div class="footer-logo">c4model.org</div>
-  <ul class="footer-links">
-    <li><a href="#concept"><span data-en>Concept</span><span data-ja>概念</span></a></li>
-    <li><a href="#dojo"><span data-en>Thesis Dojo</span><span data-ja>論文道場</span></a></li>
-    <li><a href="#org"><span data-en>Organization</span><span data-ja>組織</span></a></li>
-    <li><a href="haiku-engineering.html"><span data-en>Haiku Science</span><span data-ja>俳句の科学</span></a></li>
-    <li><a href="mailto:info@c4model.org"><span data-en>Contact</span><span data-ja>連絡先</span></a></li>
-  </ul>
-  <div class="footer-copy">© 2026 C4 Model Study Project · c4model.org</div>
-</footer>
-
-<!-- ══════════════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════════════ -->
-<script>
-/* ── Language toggle ── */
-function setLang(lang) {
-  document.querySelectorAll('[data-en]').forEach(el =>
-    el.style.display = lang === 'en' ? 'inline' : 'none');
-  document.querySelectorAll('[data-ja]').forEach(el =>
-    el.style.display = lang === 'ja' ? 'inline' : 'none');
-  document.querySelectorAll('.lang-btn').forEach(btn =>
-    btn.classList.toggle('active', btn.dataset.lang === lang));
-  document.documentElement.lang = lang;
-  try { localStorage.setItem('c4-lang', lang); } catch(e){}
+@media (max-width: 640px) {
+  #haiku-science > div > div:nth-child(3) { grid-template-columns: 1fr !important; }
 }
-// Init: 日本語デフォルト（保存済み設定があれば優先）
-// localStorage の古い 'en' 設定を無視し、日本語をデフォルトに
-const savedLang = (() => {
-  try { return localStorage.getItem('c4-lang'); } catch(e){ return null; }
-})();
-setLang(savedLang || 'ja');
 
-/* ── Scroll reveal ── */
-const observer = new IntersectionObserver(
-  entries => entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
-  }),
-  { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
-);
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+<!-- VIDEO PORTFOLIO -->
+<section id="video-lectures">
+  <div class="section-inner">
+    <p class="section-tag">Video Portfolio / 動画ポートフォリオ</p>
+    <h2>Lectures &amp; Case Studies<br>解説・事例研究動画</h2>
 
-/* ── Nav shrink ── */
-const nav = document.getElementById('main-nav');
-window.addEventListener('scroll', () => {
-  nav.style.height = window.scrollY > 50 ? '52px' : '60px';
-}, { passive: true });
-</script>
+    <div class="region-intro">
+      <strong style="font-size:0.85rem; color:var(--text);">Fukushima Tech Create / Regional Innovation EdTech — 福島イノベーション創出：教育工学的アプローチ</strong>
+      <ul style="margin-top:0.75rem;">
+        <li><strong>Regional Implementation:</strong> Thesis Dojo aims to raise the level of digital and logical thinking in regional communities, starting with Fukushima. / <strong>地域社会への実装：</strong>論文道場は、福島を起点に地域のデジタル・論理思考力を底上げするEdTechインフラを目指しています。</li>
+        <li><strong>Educational Engineering:</strong> Our latest paper proves that logical framing can be applied to cultural heritage. / <strong>教育工学の実証：</strong>最新論文は、日本の文化遺産に論理構造を与え、教育へ応用できることを証明しました。</li>
+        <li><strong>Global Accessibility:</strong> Visualizing complex logic on YouTube to embody Open Science for all. / <strong>オープンサイエンス：</strong>複雑な論理をYouTubeで可視化し、誰にでも分かりやすく公開する姿勢を貫いています。</li>
+      </ul>
+    </div>
+
+    <!-- 1. 理論・導入 -->
+    <div class="video-section-title">1. 理論・導入：構造化思考の基礎</div>
+    <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1.25rem;">C4モデルの本質を学び、あらゆる問題解決に応用するための導入部です。</p>
+    <div class="video-grid">
+      <div class="video-block">
+        <div class="video-label">▶ 万物の設計図：ソフト、俳句、AI。「論文道場」への誘い（2026）</div>
+        <a class="video-thumb" href="https://youtu.be/ZI4bsoxBhZg" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/ZI4bsoxBhZg/hqdefault.jpg" alt="万物の設計図：ソフト、俳句、AI。「論文道場」への誘い" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">万物の設計図：ソフト、俳句、AI。「論文道場」への誘い</div>
+        <div class="video-caption-sub">C4モデル研究会 2026 — C4モデルが俳句・AI・ソフトウェアをひとつの設計図で結ぶ哲学動画。</div>
+      </div>
+      <div class="video-block">
+        <div class="video-label">▶ 疑問から草稿へ：AIで論文を攻略。「論文道場」アプリ（2026）</div>
+        <a class="video-thumb" href="https://youtu.be/wtjgwbsiQHg" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/wtjgwbsiQHg/hqdefault.jpg" alt="疑問から草稿へ：AIで論文を攻略。「論文道場」アプリ" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">疑問から草稿へ：AIで論文を攻略。「論文道場」アプリ</div>
+        <div class="video-caption-sub">C4モデル研究会 2026 — Stage 0入力から草稿完成まで、論文道場の全ステップを解説。</div>
+      </div>
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=Gtyrxt6e_I8" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/Gtyrxt6e_I8/hqdefault.jpg" alt="論文道場 アプリ操作解説（日本語版）" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">論文道場 アプリの使い方 完全ガイド（日本語）</div>
+        <div class="video-caption-sub">Stage 0の入力からStage VIIのスコアリングまで、全7ステージの操作フローを日本語で解説します。</div>
+      </div>
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=gyLLYIuv85U" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/gyLLYIuv85U/hqdefault.jpg" alt="Thesis Dojo App Tutorial (English)" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">Thesis Dojo — Complete App Tutorial (English)</div>
+        <div class="video-caption-sub">A full step-by-step walkthrough of all 7 stages, from Stage 0 input to Stage VII C4 scoring.</div>
+      </div>
+      <div class="video-block">
+        <!-- [校正] placeholder.com サムネイルをYouTube実サムネイルに修正 -->
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=DhdfHpeMU9M" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/DhdfHpeMU9M/hqdefault.jpg" alt="PlantUML C4モデルで実現するチャート図解の学習・構造化思考入門" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">PlantUML C4モデルで実現する チャート図解の学習・構造化思考入門</div>
+        <div class="video-caption-sub">全10スライドで、L1（Context）からL4（Code）までの一貫した表現手法を解説。</div>
+      </div>
+      <!-- [校正] 「論文道場：誰もが論理的に書ける」(W8KAt7YeeUs) は
+           Thesis Dojoセクションに掲載済みのため、このセクションでの重複掲載を削除 -->
+    </div>
+
+    <!-- 2. 実証研究（日本文化） -->
+    <div class="video-section-title">2. 実証研究（日本文化）：俳句の科学のすすめ</div>
+    <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1.25rem;">日本の美意識を科学的に解剖し、17音の宇宙を可視化したシリーズです。</p>
+    <div class="video-grid">
+      <div class="video-block">
+        <!-- [校正] 「古池や…の構造分析」のサムネイルが英語版(t2cnj1kUzcA)になっていた。
+             日本語解説の俳句鑑賞動画(ykbQoCvpVZs)のサムネイルに修正 -->
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=ykbQoCvpVZs" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/ykbQoCvpVZs/hqdefault.jpg" alt="俳句鑑賞入門ｘＣ４モデル事例研究" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">俳句鑑賞入門ｘＣ４モデル事例研究</div>
+        <div class="video-caption-sub">科学的構造解析で俳句を読み解く。「古池や蛙飛び込む水の音」ー松尾芭蕉の構造分析。</div>
+      </div>
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=ib_ZKyWsVMs" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/ib_ZKyWsVMs/hqdefault.jpg" alt="C4モデルで俳句を理解しよう" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">C4モデルで俳句を理解しよう！"俳句の科学"のすすめ。</div>
+        <div class="video-caption-sub">松尾芭蕉「古池や蛙飛び込む水の音」のひみつ</div>
+      </div>
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=CNRBkzON518" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/CNRBkzON518/hqdefault.jpg" alt="松尾芭蕉　閑かさや岩にしみ入る蝉の声" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">松尾芭蕉「閑かさや岩にしみ入る蝉の声」</div>
+        <div class="video-caption-sub">図でみる俳句 第2弾。C4モデルで読み解く。</div>
+      </div>
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=Gsdx5PIP1Xs" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/Gsdx5PIP1Xs/hqdefault.jpg" alt="松尾芭蕉　荒海や佐渡に横たふ天の川" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">松尾芭蕉「荒海や佐渡に横たふ天の川」</div>
+        <div class="video-caption-sub">図でみる俳句 第3弾。"俳句の科学"のすすめ。</div>
+      </div>
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=XZEJsl1quAg" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/XZEJsl1quAg/hqdefault.jpg" alt="松尾芭蕉　夏草や兵どもが夢の跡" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">松尾芭蕉「夏草や兵どもが夢の跡」</div>
+        <div class="video-caption-sub">C4モデルで読み解く、俳句の科学のすすめ。</div>
+      </div>
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=JTQIR1Eak1w" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/JTQIR1Eak1w/hqdefault.jpg" alt="松尾芭蕉　旅に病んで夢は枯野をかけ廻る" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">松尾芭蕉「旅に病んで夢は枯野をかけ廻る」</div>
+        <div class="video-caption-sub">図でみる俳句 第5弾。</div>
+      </div>
+    </div>
+
+    <!-- 3. 技術解析 -->
+    <div class="video-section-title">3. 技術解析：最先端AIの構造化</div>
+    <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1.25rem;">C4モデルの視点を現代のテクノロジー解析に適用した事例です。</p>
+    <div style="display:grid; grid-template-columns: 280px; gap:1.5rem;">
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=YnJM8QmKo5k" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/YnJM8QmKo5k/hqdefault.jpg" alt="Google AI「Opal」の内部構造" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">Google AI「Opal」の内部構造解析</div>
+        <div class="video-caption-sub">推論エンジン、ワークフロー制御、ツール統合、データ管理の4層アーキテクチャを解明。</div>
+      </div>
+    </div>
+
+    <!-- 4. Global Outreach -->
+    <div class="video-section-title">4. Global Outreach：英語による発信</div>
+    <p style="font-size:0.88rem; color:var(--muted); margin-bottom:1.25rem;">世界を舞台にした研究プロジェクトであることを証明する英語シリーズです。</p>
+    <div class="video-grid">
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=A4cH9-3Ab1k" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/A4cH9-3Ab1k/hqdefault.jpg" alt="A 17 Syllable Universe" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">A 17 Syllable Universe: Haiku by Matsuo Basho</div>
+        <div class="video-caption-sub">using C4 model, study Osamu Okumura.</div>
+      </div>
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=iSD1uPT4aQY" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/iSD1uPT4aQY/hqdefault.jpg" alt="Haiku c4 EN v4" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">Haiku c4 EN v4: Using C4 model study</div>
+        <div class="video-caption-sub">by Osamu Okumura 2026.</div>
+      </div>
+      <div class="video-block">
+        <a class="video-thumb" href="https://www.youtube.com/watch?v=4GuTYcl3t-g" target="_blank" rel="noopener">
+          <img src="https://img.youtube.com/vi/4GuTYcl3t-g/hqdefault.jpg" alt="Deconstructing a Poem" />
+          <span class="play-btn">▶</span>
+        </a>
+        <div class="video-caption">Deconstructing a Poem: Matsuo Basho</div>
+        <div class="video-caption-sub">Using C4 model study, Osamu Okumura 2026.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PUBLICATIONS / BOOKS -->
+<section id="publications" style="background:var(--bg2);">
+  <div class="section-inner">
+    <p class="section-tag">Amazon Kindle Library / Amazon Kindle ライブラリ</p>
+    <h2>Research &amp; Books<br>著書・研究業績</h2>
+    <p style="font-size:0.9rem; color:var(--muted); max-width:680px; margin-bottom:0.25rem;">
+      Explore our Amazon Kindle publications applying the C4 model to literature, business, and software architecture. Click a cover to view on Amazon.
+    </p>
+    <p style="font-size:0.85rem; color:var(--muted); max-width:680px; margin-bottom:1rem;">
+      文学・ビジネス・ソフトウェア設計まで、C4モデルの応用事例を解説したAmazon Kindle書籍群です。表紙をクリックするとAmazonページへ移動します。
+    </p>
+    <p style="font-size:0.9rem; margin-bottom:1.75rem;">
+      📚 全著作一覧 →
+      <a href="https://www.amazon.co.jp/%E5%A5%A5%E6%9D%91-%E6%B2%BB/e/B0FQ9WGPFC" target="_blank" rel="noopener" style="font-weight:bold;">奥村 治 Amazon著者ページ</a>
+      &nbsp;／&nbsp;
+      <a href="https://www.amazon.co.jp/s?ie=UTF8&field-author=C4%E3%83%A2%E3%83%87%E3%83%AB%E7%A0%94%E7%A9%B6%E4%BC%9A&search-alias=digital-text" target="_blank" rel="noopener" style="font-weight:bold;">C4モデル研究会® 著作一覧</a>
+    </p>
+
+    <!-- カテゴリ：2026年 最新刊 -->
+    <p style="font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-bottom:0.75rem; font-weight:bold;">▶ 2026年 最新刊</p>
+    <div class="books-grid" style="margin-bottom:2rem;">
+
+      <!-- 2026年3月〜 最新5冊 -->
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GTCPL24M" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GTCPL24M.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GTCPL24M.09.LZZZZZZZ.jpg'"
+             alt="俳句鑑賞における認知アーキテクチャの可視化：C4モデルとDEMATEL法による感性工学的意義の定量分析" />
+        <div class="book-info">俳句鑑賞における認知アーキテクチャの可視化：C4モデルとDEMATEL法による感性工学的意義の定量分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GSZ8ZXDN" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GSZ8ZXDN.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GSZ8ZXDN.09.LZZZZZZZ.jpg'"
+             alt="Business Process Reengineering（BPR）：C4モデルで描くAI時代の組織の在り方" />
+        <div class="book-info">Business Process Reengineering（BPR）：C4モデルで描くAI時代の組織の在り方<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GSR79MW2" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GSR79MW2.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GSR79MW2.09.LZZZZZZZ.jpg'"
+             alt="富裕層向け投資用不動産情報サービスのサービタイゼーション・システム設計" />
+        <div class="book-info">富裕層向け投資用不動産情報サービスのサービタイゼーション・システム設計<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GRGG4JPL" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GRGG4JPL.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GRGG4JPL.09.LZZZZZZZ.jpg'"
+             alt="インターバルウォーキング測定アプリの開発" />
+        <div class="book-info">インターバルウォーキング測定アプリの開発<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GQQP5TKN" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GQQP5TKN.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GQQP5TKN.09.LZZZZZZZ.jpg'"
+             alt="精神ペインクリニック測定システムの設計と実装" />
+        <div class="book-info">精神ペインクリニック測定システムの設計と実装<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GQP78XLJ" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GQP78XLJ.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GQP78XLJ.09.LZZZZZZZ.jpg'"
+             alt="サービス工学手法を用いたポイント有効活用支援システムの設計と実装" />
+        <div class="book-info">サービス工学手法を用いたポイント有効活用支援システムの設計と実装<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GQJ61R4N" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GQJ61R4N.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GQJ61R4N.09.LZZZZZZZ.jpg'"
+             alt="閉鎖空間における心理的レジリエンス向上のための動態検知フレームワークの提案" />
+        <div class="book-info">閉鎖空間における心理的レジリエンス向上のための動態検知フレームワーク<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GPS3SJVV" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GPS3SJVV.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GPS3SJVV.09.LZZZZZZZ.jpg'"
+             alt="ARCS動機づけモデルの適用プロセス" />
+        <div class="book-info">ARCS動機づけモデルの適用プロセス<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GP7P34CL" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GP7P34CL.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GP7P34CL.09.LZZZZZZZ.jpg'"
+             alt="AHP（階層分析法）を用いたイノベーション管理アプリの導入選択評価に関する研究" />
+        <div class="book-info">AHP（階層分析法）を用いたイノベーション管理アプリの導入選択評価<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GNRFRN2L" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GNRFRN2L.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GNRFRN2L.09.LZZZZZZZ.jpg'"
+             alt="投資判断の意思決定モデル研究：リスクマネジメント・ワークフローの定量分析と最適化" />
+        <div class="book-info">投資判断の意思決定モデル研究<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GNM6VSWC" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GNM6VSWC.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GNM6VSWC.09.LZZZZZZZ.jpg'"
+             alt="C4モデルと動的シミュレーションを統合した構造解析UIの設計と実装" />
+        <div class="book-info">C4モデルと動的シミュレーションを統合した構造解析UIの設計と実装<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GMVLBSXK" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GMVLBSXK.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GMVLBSXK.09.LZZZZZZZ.jpg'"
+             alt="A Structural Analysis of Lafcadio Hearn's Understanding of Japan" />
+        <div class="book-info">A Structural Analysis of Lafcadio Hearn's Understanding of Japan<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GMRS8SGK" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GMRS8SGK.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GMRS8SGK.09.LZZZZZZZ.jpg'"
+             alt="Quantifying Panda Loss（パンダロス）" />
+        <div class="book-info">Quantifying Panda Loss（パンダロス）<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GMC3SRCZ" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GMC3SRCZ.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GMC3SRCZ.09.LZZZZZZZ.jpg'"
+             alt="大谷翔平への憧憬の構造とは" />
+        <div class="book-info">大谷翔平への憧憬の構造とは<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GM5T3C56" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GM5T3C56.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GM5T3C56.09.LZZZZZZZ.jpg'"
+             alt="推し活における親和性と喪失の定量化研究" />
+        <div class="book-info">推し活における親和性と喪失の定量化研究<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GKWFSPRT" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GKWFSPRT.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GKWFSPRT.09.LZZZZZZZ.jpg'"
+             alt="パンダロスを数値化する" />
+        <div class="book-info">パンダロスを数値化する<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GDFZTH7F" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GDFZTH7F.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GDFZTH7F.09.LZZZZZZZ.jpg'"
+             alt="富裕層向け投資用不動産情報サービス統合戦略マニュアル" />
+        <div class="book-info">富裕層向け投資用不動産情報サービス統合戦略マニュアル<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GLFBDCMY" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GLFBDCMY.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GLFBDCMY.09.LZZZZZZZ.jpg'"
+             alt="金融業CRMにおけるUX/UIシステム設計" />
+        <div class="book-info">金融業CRMにおけるUX/UIシステム設計<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GL3RZHSB" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GL3RZHSB.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GL3RZHSB.09.LZZZZZZZ.jpg'"
+             alt="総合的UX/UIシステム設計のガイド" />
+        <div class="book-info">総合的UX/UIシステム設計のガイド<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GKY1K9QQ" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GKY1K9QQ.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GKY1K9QQ.09.LZZZZZZZ.jpg'"
+             alt="Google Opalを用いた次世代AIワークフロー構築手法の提案" />
+        <div class="book-info">Google Opalを用いた次世代AIワークフロー構築手法の提案<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GGZGLBS3" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GGZGLBS3.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GGZGLBS3.09.LZZZZZZZ.jpg'"
+             alt="AI×C4モデル活用実践ワークブック：金融機関向け課題構造化と…" />
+        <div class="book-info">AI×C4モデル活用実践ワークブック：金融機関向け<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GGWBJMKQ" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GGWBJMKQ.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GGWBJMKQ.09.LZZZZZZZ.jpg'"
+             alt="プロンプト指向型研究オペレーティングシステムの構造分析：PlantUML C4モデルによる可視化と方法論的再構築" />
+        <div class="book-info">プロンプト指向型研究オペレーティングシステムの構造分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GGXZ74ZQ" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GGXZ74ZQ.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GGXZ74ZQ.09.LZZZZZZZ.jpg'"
+             alt="Structural Analysis of the Japanese Folktale 'Urashima Taro' Using the C4 Model" />
+        <div class="book-info">Structural Analysis of the Japanese Folktale "Urashima Taro" Using the C4 Model<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GGK5DHDX" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GGK5DHDX.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GGK5DHDX.09.LZZZZZZZ.jpg'"
+             alt="Acoustic Structure Analysis of the String-Instrumental Arpeggione" />
+        <div class="book-info">Acoustic Structure Analysis of the String-Instrumental Arpeggione<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GGMJ596Q" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GGMJ596Q.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GGMJ596Q.09.LZZZZZZZ.jpg'"
+             alt="小泉八雲文学における多感覚的認知構造の解明：感性認知科学的アプローチ" />
+        <div class="book-info">小泉八雲文学における多感覚的認知構造の解明<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GKQNSY55" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GKQNSY55.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GKQNSY55.09.LZZZZZZZ.jpg'"
+             alt="投資判断プロポーザル自動生成システム：PlantUML C4モデルに…" />
+        <div class="book-info">投資判断プロポーザル自動生成システム：PlantUML C4モデル<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GJG5J5N9" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GJG5J5N9.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GJG5J5N9.09.LZZZZZZZ.jpg'"
+             alt="Narrative Architecture in Lafcadio Hearn's Crepe Paper Books" />
+        <div class="book-info">Narrative Architecture in Lafcadio Hearn's Crepe Paper Books<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GHYBGYF4" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GHYBGYF4.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GHYBGYF4.09.LZZZZZZZ.jpg'"
+             alt="ラフカディオ・ハーンの縮緬本における物語アーキテクチャ：出版システムの構造と…" />
+        <div class="book-info">ラフカディオ・ハーンの縮緬本における物語アーキテクチャ<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GHHJS7JS" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GHHJS7JS.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GHHJS7JS.09.LZZZZZZZ.jpg'"
+             alt="小泉八雲「ちりめん本」におけるナラティブ・アーキテクチャ：C4モデル…" />
+        <div class="book-info">小泉八雲「ちりめん本」におけるナラティブ・アーキテクチャ<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GHJCD6KP" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GHJCD6KP.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GHJCD6KP.09.LZZZZZZZ.jpg'"
+             alt="AI×C4モデル問題解決実践ガイド：チャート図解で学ぶ構造化思考" />
+        <div class="book-info">AI×C4モデル問題解決実践ガイド：チャート図解で学ぶ構造化思考<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GG817BWF" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GG817BWF.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GG817BWF.09.LZZZZZZZ.jpg'"
+             alt="PlantUML C4モデル活用入門ガイド：ソフトウェア設計から文学分析まで" />
+        <div class="book-info">PlantUML C4モデル活用入門ガイド<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GFMB6S55" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GFMB6S55.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GFMB6S55.09.LZZZZZZZ.jpg'"
+             alt="小泉八雲『日本解釈』の構造分析：デジタル技術で読み解く祖先崇拝論" />
+        <div class="book-info">小泉八雲『日本解釈』の構造分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GF7W9PPT" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GF7W9PPT.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GF7W9PPT.09.LZZZZZZZ.jpg'"
+             alt="『耳なし芳一』のマインドフルネス構造" />
+        <div class="book-info">『耳なし芳一』のマインドフルネス構造<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GDKPJBHK" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GDKPJBHK.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GDKPJBHK.09.LZZZZZZZ.jpg'"
+             alt="沈黙の契約：小泉八雲『雪女』とSNS時代の秘密" />
+        <div class="book-info">沈黙の契約：小泉八雲『雪女』とSNS時代の秘密<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GDWK17LD" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GDWK17LD.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GDWK17LD.09.LZZZZZZZ.jpg'"
+             alt="ラフカディオ・ハーン「神々の国」の再解釈" />
+        <div class="book-info">ラフカディオ・ハーン「神々の国」の再解釈<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GDW92JCK" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GDW92JCK.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GDW92JCK.09.LZZZZZZZ.jpg'"
+             alt="Lafcadio Hearn: Reinterpretation of the 'Country of the Gods'" />
+        <div class="book-info">Lafcadio Hearn: Reinterpretation of the "Country of the Gods"<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GDPJPRL9" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GDPJPRL9.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GDPJPRL9.09.LZZZZZZZ.jpg'"
+             alt="正岡子規俳句における「革新」の美学定量化：C4-俳句フレームワーク" />
+        <div class="book-info">正岡子規俳句における「革新」の美学定量化<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+    </div>
+
+    <!-- カテゴリ：2025年 既刊 -->
+    <p style="font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-bottom:0.75rem; margin-top:1rem; font-weight:bold;">▶ 2025年 既刊</p>
+    <div class="books-grid" style="margin-bottom:2rem;">
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FS5LXCMR" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FS5LXCMR.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FS5LXCMR.09.LZZZZZZZ.jpg'"
+             alt="PlantUML C4 model 活用入門" />
+        <div class="book-info">PlantUML C4 model 活用入門<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GD2VSPWN" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GD2VSPWN.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GD2VSPWN.09.LZZZZZZZ.jpg'"
+             alt="NHK連続テレビ小説『ばけばけ』主題歌：ナラティブ構造のシステムアーキテクチャ分析" />
+        <div class="book-info">NHK連続テレビ小説『ばけばけ』主題歌：ナラティブ構造のシステムアーキテクチャ分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0D5FR63WP" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0D5FR63WP.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0D5FR63WP.09.LZZZZZZZ.jpg'"
+             alt="なぜ私たちは中島みゆき『糸』に感動するのか？" />
+        <div class="book-info">なぜ私たちは中島みゆき『糸』に感動するのか？<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GBMXHVD2" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GBMXHVD2.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GBMXHVD2.09.LZZZZZZZ.jpg'"
+             alt="円空の観音菩薩像における慈悲とウェルビーイング鑑賞入門" />
+        <div class="book-info">円空の観音菩薩像における慈悲とウェルビーイング鑑賞入門<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GBK87HG4" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GBK87HG4.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GBK87HG4.09.LZZZZZZZ.jpg'"
+             alt="二足歩行ロボット全国展開戦略" />
+        <div class="book-info">二足歩行ロボット全国展開戦略<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GB3MQSYW" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GB3MQSYW.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GB3MQSYW.09.LZZZZZZZ.jpg'"
+             alt="ポインセチアのひみつ：クリスマスの約束" />
+        <div class="book-info">ポインセチアのひみつ：クリスマスの約束<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GB3Y584M" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GB3Y584M.01.LZZZZZZZ.jpg" alt='怪談の"ろくろ首"' />
+        <div class="book-info">怪談の"ろくろ首"<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G991VF9D" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G991VF9D.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G991VF9D.09.LZZZZZZZ.jpg'"
+             alt="小泉八雲の「神々の国」再解釈" />
+        <div class="book-info">小泉八雲の「神々の国」再解釈<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G8T151LV" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G8T151LV.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G8T151LV.09.LZZZZZZZ.jpg'"
+             alt="小泉八雲『怪談』の自然と異界の表象" />
+        <div class="book-info">小泉八雲『怪談』の自然と異界の表象<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G7SKF5C4" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G7SKF5C4.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G7SKF5C4.09.LZZZZZZZ.jpg'"
+             alt="『千と千尋の神隠し』における主人公の成長ナラティブ分析" />
+        <div class="book-info">『千と千尋の神隠し』における主人公の成長ナラティブ分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G7N9DTWS" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G7N9DTWS.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G7N9DTWS.09.LZZZZZZZ.jpg'"
+             alt="小泉八雲『耳なし芳一の話』：怪異・記憶・身体のナラティブ分析" />
+        <div class="book-info">小泉八雲『耳なし芳一の話』：怪異・記憶・身体のナラティブ分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G7DCR7B9" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G7DCR7B9.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G7DCR7B9.09.LZZZZZZZ.jpg'"
+             alt="川端康成『伊豆の踊子』における孤独と承認のナラティブ分析" />
+        <div class="book-info">川端康成『伊豆の踊子』における孤独と承認のナラティブ分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G75RDNGR" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G75RDNGR.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G75RDNGR.09.LZZZZZZZ.jpg'"
+             alt="The Philosophy of Journey: Learning from Basho's 'Oku no Hosomichi'" />
+        <div class="book-info">The Philosophy of Journey: Learning from Basho's "Oku no Hosomichi"<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G6Z85KVR" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G6Z85KVR.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G6Z85KVR.09.LZZZZZZZ.jpg'"
+             alt="名月や北国日和定めなき：松尾芭蕉俳句の物語理論×C4モデル構造解析" />
+        <div class="book-info">名月や北国日和定めなき：松尾芭蕉俳句の物語理論×C4モデル<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G6X7BSPX" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G6X7BSPX.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G6X7BSPX.09.LZZZZZZZ.jpg'"
+             alt="映画『国宝』のPlantUML C4モデルによる構造分析" />
+        <div class="book-info">映画『国宝』のPlantUML C4モデルによる構造分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G6L3YP42" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G6L3YP42.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G6L3YP42.09.LZZZZZZZ.jpg'"
+             alt="スタジオジブリ『おもひでぽろぽろ』における二重時間構造の可視化分析" />
+        <div class="book-info">スタジオジブリ『おもひでぽろぽろ』における二重時間構造の可視化分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G61XY615" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G61XY615.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G61XY615.09.LZZZZZZZ.jpg'"
+             alt="芭蕉俳句のウェルビーイング概念と構造分析" />
+        <div class="book-info">芭蕉俳句のウェルビーイング概念と構造分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G5LT45FW" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G5LT45FW.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G5LT45FW.09.LZZZZZZZ.jpg'"
+             alt="暑き日を海に入れたり最上川：松尾芭蕉「奥の細道」・C4モデル構造解析" />
+        <div class="book-info">暑き日を海に入れたり最上川：松尾芭蕉「奥の細道」C4モデル構造解析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G59GVNPS" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G59GVNPS.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G59GVNPS.09.LZZZZZZZ.jpg'"
+             alt="松尾芭蕉「奥の細道」・C4モデル構造解析：早稲の香や分入る右は有磯海" />
+        <div class="book-info">松尾芭蕉「奥の細道」C4モデル構造解析：早稲の香や…<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G5K4NB2R" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G5K4NB2R.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G5K4NB2R.09.LZZZZZZZ.jpg'"
+             alt="松尾芭蕉の俳句をシステムで読み解く：一家に遊女も寝たり萩と月" />
+        <div class="book-info">松尾芭蕉の俳句をシステムで読み解く：一家に遊女も寝たり萩と月<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G5JL49DM" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G5JL49DM.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G5JL49DM.09.LZZZZZZZ.jpg'"
+             alt="松尾芭蕉「奥の細道」俳句の構造的研究：文月や六日も常の夜には似ず" />
+        <div class="book-info">松尾芭蕉「奥の細道」俳句の構造的研究：文月や六日も…<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G5GFD85L" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G5GFD85L.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G5GFD85L.09.LZZZZZZZ.jpg'"
+             alt="雲の峰幾つ崩れて月の山：松尾芭蕉の俳句研究" />
+        <div class="book-info">雲の峰幾つ崩れて月の山：松尾芭蕉の俳句研究<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G5BNNG64" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G5BNNG64.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G5BNNG64.09.LZZZZZZZ.jpg'"
+             alt="語られぬ湯殿にぬらす袂かな：松尾芭蕉俳句のC4モデル構造解析4" />
+        <div class="book-info">語られぬ湯殿にぬらす袂かな：松尾芭蕉俳句のC4モデル構造解析4<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G2MS6TTZ" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G2MS6TTZ.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G2MS6TTZ.09.LZZZZZZZ.jpg'"
+             alt="Visualization of Problem Structure in Generative AI Implementation" />
+        <div class="book-info">Visualization of Problem Structure in Generative AI Implementation<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FPTKK267" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FPTKK267.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FPTKK267.09.LZZZZZZZ.jpg'"
+             alt="映画「国宝」C4で映画鑑賞が変わる：映画「国宝」のPlantUML…" />
+        <div class="book-info">映画「国宝」C4で映画鑑賞が変わる<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FYJJ44WF" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FYJJ44WF.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FYJJ44WF.09.LZZZZZZZ.jpg'"
+             alt="A Structural Analysis of the Film 'National Treasure' Using PlantUML C4 Model" />
+        <div class="book-info">A Structural Analysis of the Film "National Treasure" Using PlantUML C4 Model<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G53K4W6K" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G53K4W6K.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G53K4W6K.09.LZZZZZZZ.jpg'"
+             alt="映画「国宝」が人生を豊かにする方法：映画とウエルビーイング" />
+        <div class="book-info">映画「国宝」が人生を豊かにする方法：映画とウエルビーイング<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FRHJFQGB" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FRHJFQGB.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FRHJFQGB.09.LZZZZZZZ.jpg'"
+             alt="シューベルト・ロンドD.895の構造分析におけるC4モデルの応用" />
+        <div class="book-info">シューベルト・ロンドD.895の構造分析におけるC4モデルの応用<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FRNKX5VL" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FRNKX5VL.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FRNKX5VL.09.LZZZZZZZ.jpg'"
+             alt="エスノグラフィー理論とC4モデル分析事例研究：シューベルト アヴェマリア…" />
+        <div class="book-info">エスノグラフィー理論とC4モデル分析事例研究<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FQ43BV6K" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FQ43BV6K.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FQ43BV6K.09.LZZZZZZZ.jpg'"
+             alt="俳句をシステムから鑑賞する：C4モデルによる現代俳句" />
+        <div class="book-info">俳句をシステムから鑑賞する：C4モデルによる現代俳句<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FQJ6JWKD" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FQJ6JWKD.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FQJ6JWKD.09.LZZZZZZZ.jpg'"
+             alt="俳句の構造分析：C4モデルの適用" />
+        <div class="book-info">俳句の構造分析：C4モデルの適用<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FPSNW114" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FPSNW114.01.LZZZZZZZ.jpg" alt='正岡子規俳句「夏草やベースボールの人遠し」：C4モデルによる学術分析' />
+        <div class="book-info">正岡子規俳句「夏草やベースボールの人遠し」：C4モデルによる学術分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FSXNMSY2" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FSXNMSY2.01.LZZZZZZZ.jpg" alt='図でみる"俳句"：松尾芭蕉「古池や蛙飛び込む水の音」のひみつ' />
+        <div class="book-info">図でみる"俳句"：松尾芭蕉「古池や蛙飛び込む水の音」のひみつ<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0GX5HL6NC" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0GX5HL6NC.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0GX5HL6NC.09.LZZZZZZZ.jpg'"
+             alt="教育工学的アプローチによる古典俳句の構造解析：C4モデルを援用した松尾芭蕉「風流のはじめや奥の田植え歌」の分析" />
+        <div class="book-info">教育工学的アプローチによる古典俳句の構造解析<br>C4モデルを援用した松尾芭蕉「風流のはじめや奥の田植え歌」の分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G4HG7T84" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G4HG7T84.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G4HG7T84.09.LZZZZZZZ.jpg'"
+             alt="AI動画投稿の課題" />
+        <div class="book-info">AI動画投稿の課題<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G4G6DJRM" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G4G6DJRM.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G4G6DJRM.09.LZZZZZZZ.jpg'"
+             alt="ISM Practical Workshop: Training Program" />
+        <div class="book-info">ISM Practical Workshop: Training Program<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G4155JDV" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G4155JDV.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G4155JDV.09.LZZZZZZZ.jpg'"
+             alt="ISM実践ワークショップ研修プログラム" />
+        <div class="book-info">ISM実践ワークショップ研修プログラム<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G3X17MQK" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G3X17MQK.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G3X17MQK.09.LZZZZZZZ.jpg'"
+             alt="江戸時代の公共空間におけるコミュニケーション文化の研究：式亭三馬浮…" />
+        <div class="book-info">江戸時代の公共空間におけるコミュニケーション文化の研究<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G3QFD2PR" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G3QFD2PR.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G3QFD2PR.09.LZZZZZZZ.jpg'"
+             alt="浮世絵の二重構造を見分ける" />
+        <div class="book-info">浮世絵の二重構造を見分ける<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G3PH794B" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G3PH794B.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G3PH794B.09.LZZZZZZZ.jpg'"
+             alt="江戸・近代俳句における笑いの美学：喜笑転結による比較分析" />
+        <div class="book-info">江戸・近代俳句における笑いの美学<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G3HTRRQ8" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G3HTRRQ8.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G3HTRRQ8.09.LZZZZZZZ.jpg'"
+             alt="蕪村の俳句における老いの美学" />
+        <div class="book-info">蕪村の俳句における老いの美学<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G3KGC9L4" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G3KGC9L4.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G3KGC9L4.09.LZZZZZZZ.jpg'"
+             alt="江戸俳句における笑いの美学" />
+        <div class="book-info">江戸俳句における笑いの美学<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G2LGH364" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G2LGH364.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G2LGH364.09.LZZZZZZZ.jpg'"
+             alt="生成AI導入における問題構造の可視化分析" />
+        <div class="book-info">生成AI導入における問題構造の可視化分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G2F1FZTM" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G2F1FZTM.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G2F1FZTM.09.LZZZZZZZ.jpg'"
+             alt="現代俳句「お一人様の終活」" />
+        <div class="book-info">現代俳句「お一人様の終活」<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G1LTVBKD" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G1LTVBKD.01.LZZZZZZZ.jpg" alt='Matsuo Basho&apos;s "Old Pond, Frog Jumps In, Sound of Water"' />
+        <div class="book-info">Matsuo Bashō's "Old Pond, Frog Jumps In, Sound of Water"<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G1KTCWFD" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G1KTCWFD.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G1KTCWFD.09.LZZZZZZZ.jpg'"
+             alt="Structural Analysis of Hokusai's 'The Great Wave off Kanagawa'" />
+        <div class="book-info">Structural Analysis of Hokusai's "The Great Wave off Kanagawa"<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G1K7YTCD" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G1K7YTCD.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G1K7YTCD.09.LZZZZZZZ.jpg'"
+             alt="松尾芭蕉俳句のC4モデル構造解析4" />
+        <div class="book-info">松尾芭蕉俳句のC4モデル構造解析4<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G1JTW2SZ" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G1JTW2SZ.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G1JTW2SZ.09.LZZZZZZZ.jpg'"
+             alt="松尾芭蕉俳句のC4モデル構造解析3" />
+        <div class="book-info">松尾芭蕉俳句のC4モデル構造解析3<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G1JFHKMW" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G1JFHKMW.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G1JFHKMW.09.LZZZZZZZ.jpg'"
+             alt="松尾芭蕉俳句のC4モデル構造解析2" />
+        <div class="book-info">松尾芭蕉俳句のC4モデル構造解析2<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G1D231M5" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G1D231M5.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G1D231M5.09.LZZZZZZZ.jpg'"
+             alt="松尾芭蕉俳句のC4モデル構造解析" />
+        <div class="book-info">松尾芭蕉俳句のC4モデル構造解析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G1C8G5BT" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G1C8G5BT.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G1C8G5BT.09.LZZZZZZZ.jpg'"
+             alt="中島みゆき「糸」の人間関係構造" />
+        <div class="book-info">中島みゆき「糸」の人間関係構造<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G15CRBV5" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G15CRBV5.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0G15CRBV5.09.LZZZZZZZ.jpg'"
+             alt="論文　デジタル・レガシーの継承" />
+        <div class="book-info">論文　デジタル・レガシーの継承<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FZLWJR68" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FZLWJR68.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FZLWJR68.09.LZZZZZZZ.jpg'"
+             alt="Matsuo Bashō Haiku Analysis: Narrative Theory &amp; C4 Model Structure Analysis" />
+        <div class="book-info">Matsuo Bashō Haiku Analysis: Narrative Theory &amp; C4 Model Structure Analysis<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FZBQ5MWG" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FZBQ5MWG.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FZBQ5MWG.09.LZZZZZZZ.jpg'"
+             alt="デジタル遺産相続システムアーキテクチャ" />
+        <div class="book-info">デジタル遺産相続システムアーキテクチャ<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FZ76C2TY" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FZ76C2TY.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FZ76C2TY.09.LZZZZZZZ.jpg'"
+             alt="Digital Legacy Inheritance System Architecture" />
+        <div class="book-info">Digital Legacy Inheritance System Architecture<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FZ5K48GF" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FZ5K48GF.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FZ5K48GF.09.LZZZZZZZ.jpg'"
+             alt="デジタル遺産継承の体系的モデル化" />
+        <div class="book-info">デジタル遺産継承の体系的モデル化<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FXY8GFJN" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FXY8GFJN.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FXY8GFJN.09.LZZZZZZZ.jpg'"
+             alt="秋の夜、詩と出会う：菊池三渓「秋夜読書」鑑賞への誘い" />
+        <div class="book-info">秋の夜、詩と出会う：菊池三渓「秋夜読書」鑑賞への誘い<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FVM5NB1G" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FVM5NB1G.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FVM5NB1G.09.LZZZZZZZ.jpg'"
+             alt="映画「おーい、応為」鑑賞入門" />
+        <div class="book-info">映画「おーい、応為」鑑賞入門<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FTG1SZM6" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FTG1SZM6.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FTG1SZM6.09.LZZZZZZZ.jpg'"
+             alt="松尾芭蕉俳句　ナラティブ構造とC4モデルによる学術的分析" />
+        <div class="book-info">松尾芭蕉俳句　ナラティブ構造とC4モデルによる学術的分析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0G49BBTWR" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0G49BBTWR.01.LZZZZZZZ.jpg" alt="Structural Analysis of Human Relationships in Miyuki Nakajima's 'Ito' (Thread)"
+             onerror="this.src='https://m.media-amazon.com/images/P/B0G49BBTWR.01.LZZZZZZZ.jpg'" />
+        <div class="book-info">Structural Analysis of Human Relationships in Miyuki Nakajima's "Ito"<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0CL8V9RZ5" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0CL8V9RZ5.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0CL8V9RZ5.09.LZZZZZZZ.jpg'"
+             alt="システム思考・デザイン思考論　シラバス" />
+        <div class="book-info">システム思考・デザイン思考論　シラバス<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0CDRC4CM6" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0CDRC4CM6.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0CDRC4CM6.09.LZZZZZZZ.jpg'"
+             alt="顧客の生涯価値モデリング：Customer LifeTime Value事例研究" />
+        <div class="book-info">顧客の生涯価値モデリング：Customer LifeTime Value事例研究<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <!-- 追加20冊（スクリーンショット Image20〜22より） -->
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FTXLQ9P4" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FTXLQ9P4.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FTXLQ9P4.09.LZZZZZZZ.jpg'"
+             alt="家系図を描きたいとき" />
+        <div class="book-info">家系図を描きたいとき<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FTTQ378M" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FTTQ378M.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FTTQ378M.09.LZZZZZZZ.jpg'"
+             alt="あっち向いて・ホイ！：独り灯る" />
+        <div class="book-info">あっち向いて・ホイ！：独り灯る<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FTJXRGQ2" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FTJXRGQ2.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FTJXRGQ2.09.LZZZZZZZ.jpg'"
+             alt="俳句にマイクロナラティブが宿る" />
+        <div class="book-info">俳句にマイクロナラティブが宿る<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FSL4KQJG" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FSL4KQJG.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FSL4KQJG.09.LZZZZZZZ.jpg'"
+             alt="C4 model 図解化 #2：与謝蕪村俳句「一菜の花や月は東に日は西に」" />
+        <div class="book-info">C4 model 図解化 #2：与謝蕪村俳句一菜の花や月は東に日は西に<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FSJYB78S" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FSJYB78S.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FSJYB78S.09.LZZZZZZZ.jpg'"
+             alt="C4 model 図解化" />
+        <div class="book-info">C4 model 図解化<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FRY7Q2PL" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FRY7Q2PL.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FRY7Q2PL.09.LZZZZZZZ.jpg'"
+             alt="芭蕉「奥の細道」から学ぶ旅の哲学：現代に生きる私たちへのメッセージ" />
+        <div class="book-info">芭蕉「奥の細道」から学ぶ旅の哲学：現代に生きる私たちへのメッセージ<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FR1RDM2P" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FR1RDM2P.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FR1RDM2P.09.LZZZZZZZ.jpg'"
+             alt="ナラティブ理論とC4モデル構造による俳句解析：小林一茶「雀の子 そこのけそこのけ…」" />
+        <div class="book-info">ナラティブ理論とC4モデル構造による俳句解析：小林一茶<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FQZK593S" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FQZK593S.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FQZK593S.09.LZZZZZZZ.jpg'"
+             alt="松尾芭蕉・しをらしき名や小松吹く萩すゝき：俳句評論・C4モデル構造解析" />
+        <div class="book-info">松尾芭蕉「しをらしき名や小松吹く萩すゝき」俳句評論・C4モデル構造解析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FQK41CK8" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FQK41CK8.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FQK41CK8.09.LZZZZZZZ.jpg'"
+             alt="再発見 ピンク・レディー「UFO」：C4モデルによる歌詞解析" />
+        <div class="book-info">再発見 ピンク・レディー「UFO」：C4モデルによる歌詞解析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FQP8KG15" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FQP8KG15.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FQP8KG15.09.LZZZZZZZ.jpg'"
+             alt="ウェルビーイング向上の終活・修活向け体系化：C4モデルを用いた構造解析" />
+        <div class="book-info">ウェルビーイング向上の終活・修活向け体系化：C4モデルを用いた構造解析<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FQMT7QGP" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FQMT7QGP.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FQMT7QGP.09.LZZZZZZZ.jpg'"
+             alt="俳句観賞とC4モデルによる構造分析：中西利助句" />
+        <div class="book-info">俳句観賞とC4モデルによる構造分析：中西利助句<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FQHC8924" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FQHC8924.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FQHC8924.09.LZZZZZZZ.jpg'"
+             alt="俳句の構造分析 C4モデルの適用：大橋秀一句" />
+        <div class="book-info">俳句の構造分析 C4モデルの適用：大橋秀一句<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+      <a class="book-card" href="https://www.amazon.co.jp/dp/B0FQB7KD27" target="_blank" rel="noopener">
+        <img src="https://m.media-amazon.com/images/P/B0FQB7KD27.01.LZZZZZZZ.jpg"
+             onerror="this.onerror=null; this.src='https://images-na.ssl-images-amazon.com/images/P/B0FQB7KD27.09.LZZZZZZZ.jpg'"
+             alt="リテンションマネジメントの課題：PlantUML C4モデルによる解明" />
+        <div class="book-info">リテンションマネジメントの課題：PlantUML C4モデルによる解明<br><span class="book-cta">View on Amazon →</span></div>
+      </a>
+
+    </div>
+
+    <!-- 全著作へのリンク -->
+    <div style="text-align:center; margin-top:1rem;">
+      <a class="book-card" href="https://www.amazon.co.jp/%E5%A5%A5%E6%9D%91-%E6%B2%BB/e/B0FQ9WGPFC" target="_blank" rel="noopener"
+         style="display:inline-flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem 2.5rem; background:var(--bg3); border:2px dashed var(--border); border-radius:8px; text-decoration:none; min-width:200px;">
+        <div style="font-size:2rem; margin-bottom:0.5rem;">📚</div>
+        <div style="font-size:0.9rem; font-weight:bold; color:var(--accent);">全著作を見る / View All Books</div>
+        <div style="font-size:0.78rem; color:var(--muted); margin-top:0.4rem;">Amazon 著者ページ →</div>
+      </a>
+    </div>
+
+    <p style="font-size:0.8rem; color:var(--muted); margin-top:1.25rem; text-align:center;">
+      ※ スクリーンショットから確認できた全著作を掲載しています。最新刊は
+      <a href="https://www.amazon.co.jp/%E5%A5%A5%E6%9D%91-%E6%B2%BB/e/B0FQ9WGPFC" target="_blank" rel="noopener">Amazon著者ページ</a>
+      からご確認ください。
+    </p>
+  </div>
+</section>
+
+<!-- FUKUSHIMA SECTION -->
+<section id="fukushima" style="background:linear-gradient(160deg, #0D2A1A 0%, #1A3A2A 100%); color:#C8E8D0;">
+  <div class="section-inner">
+    <p style="font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; color:#6ACA8A; margin-bottom:0.75rem; font-weight:bold;">
+      🌿 Fukushima Tech Create / Regional Innovation EdTech
+    </p>
+    <h2 style="color:#8AEA9A; margin-bottom:1rem;">
+      「白河の関」をC4モデルで解剖する<br>
+      <em style="color:#C8E8D0; font-size:0.75em;">福島の文化遺産×構造化思考教育 — 地域EdTechプロジェクト</em>
+    </h2>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem; margin-bottom:2rem;">
+
+      <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(106,202,138,0.3); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:0.72rem; color:#6ACA8A; font-weight:bold; letter-spacing:0.1em; margin-bottom:0.5rem;">WHY FUKUSHIMA / なぜ福島か</div>
+        <p style="font-size:0.9rem; color:#C8E8D0; line-height:1.75;">
+          松尾芭蕉が『奥の細道』で訪れた「白河の関」は、俳句文化の聖地です。この地の名句を最新のC4モデルで構造解析し、<strong style="color:#8AEA9A;">「詠む→理解する→論文にする」という思考の型</strong>を福島の子どもたちと地域の人々に届けます。
+        </p>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(106,202,138,0.3); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:0.72rem; color:#6ACA8A; font-weight:bold; letter-spacing:0.1em; margin-bottom:0.5rem;">WHAT WE DO / 実施内容</div>
+        <ul style="font-size:0.9rem; color:#C8E8D0; line-height:1.85; padding-left:1.2rem;">
+          <li>白河の関の名句をC4モデルで図解・教材化</li>
+          <li>論文道場アプリを活用した探究学習プログラム</li>
+          <li>地域の高校・大学・生涯学習センターへの導入</li>
+          <li>成果を査読論文・YouTube動画で国際発信</li>
+        </ul>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(106,202,138,0.3); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:0.72rem; color:#6ACA8A; font-weight:bold; letter-spacing:0.1em; margin-bottom:0.5rem;">EVIDENCE / 実証実績</div>
+        <ul style="font-size:0.9rem; color:#C8E8D0; line-height:1.85; padding-left:1.2rem;">
+          <li>SciencePC 査読論文4本（DOI付き）</li>
+          <li>ResearchGate 掲載論文7本</li>
+          <li>Amazon Kindle 出版109冊以上</li>
+          <li>YouTube 解説動画シリーズ公開済み</li>
+          <li>論文道場アプリ 実動稼働中</li>
+        </ul>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(106,202,138,0.3); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:0.72rem; color:#6ACA8A; font-weight:bold; letter-spacing:0.1em; margin-bottom:0.5rem;">GRANT TARGETS / 申請対象</div>
+        <ul style="font-size:0.9rem; color:#C8E8D0; line-height:1.85; padding-left:1.2rem;">
+          <li>🌿 福島 FTC 先導技術事業化アクセラレーション</li>
+          <li>🏙 東京都 スタートアップ支援プログラム</li>
+          <li>⚙️ NEDO 製造業DX・教育工学</li>
+          <li>🔬 JST A-STEP 研究成果展開事業</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- 白河の関 俳句事例 -->
+    <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(106,202,138,0.4); border-radius:10px; padding:1.5rem; max-width:680px;">
+      <div style="font-size:0.72rem; color:#6ACA8A; font-weight:bold; letter-spacing:0.1em; margin-bottom:0.75rem;">
+        📍 白河の関 × C4モデル構造解析 事例
+      </div>
+      <div style="font-size:1.2rem; color:#8AEA9A; font-weight:bold; text-align:center; margin-bottom:0.75rem; font-family:serif; letter-spacing:0.1em;">
+        「白河の関　越えんとや思ふ　旅の秋」
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; text-align:center; font-size:0.75rem;">
+        <div style="background:rgba(106,202,138,0.15); border-radius:5px; padding:0.5rem;">
+          <div style="color:#6ACA8A; font-weight:bold; margin-bottom:0.2rem;">L1 Context</div>
+          <div style="color:#C8E8D0;">奥の細道の旅・白河関の歴史的意義</div>
+        </div>
+        <div style="background:rgba(106,202,138,0.15); border-radius:5px; padding:0.5rem;">
+          <div style="color:#6ACA8A; font-weight:bold; margin-bottom:0.2rem;">L2 Container</div>
+          <div style="color:#C8E8D0;">上五・中七・下五の構造的区分</div>
+        </div>
+        <div style="background:rgba(106,202,138,0.15); border-radius:5px; padding:0.5rem;">
+          <div style="color:#6ACA8A; font-weight:bold; margin-bottom:0.2rem;">L3 Component</div>
+          <div style="color:#C8E8D0;">「越えんとや思ふ」の意志・問い・緊張</div>
+        </div>
+        <div style="background:rgba(106,202,138,0.15); border-radius:5px; padding:0.5rem;">
+          <div style="color:#6ACA8A; font-weight:bold; margin-bottom:0.2rem;">L4 Code</div>
+          <div style="color:#C8E8D0;">「や」「とや」の切れ字と係り結び</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:0.85rem; color:#6ACA8A; margin-top:1.5rem;">
+      📩 地域連携・実証実験のご相談：
+      <a href="mailto:info@c4model.org" style="color:#8AEA9A; font-weight:bold;">info@c4model.org</a>
+    </p>
+  </div>
+</section>
+
+<!-- BUSINESS APPLICATION SECTION -->
+<section id="business" style="background:var(--bg);">
+  <div class="section-inner">
+    <p class="section-tag">Business &amp; Industry Applications / ビジネス・産業応用</p>
+    <h2>俳句で磨いた「構造解析アルゴリズム」を<br><em>産業ドキュメントへ転用する</em></h2>
+    <p style="color:var(--text); max-width:700px; margin-bottom:0.75rem; font-size:0.95rem;">
+      The same C4 model methodology used to decode 17-syllable haiku can be directly applied to complex business documents, manufacturing specifications, and corporate knowledge management. Structure is universal.
+    </p>
+    <p style="color:var(--muted); font-size:0.9rem; max-width:700px; margin-bottom:2rem;">
+      17音の俳句を解剖するC4モデルの構造解析力は、そのままビジネス文書・製造業の仕様書・企業の暗黙知整理に転用できます。「構造」は普遍的だからです。
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1.25rem; margin-bottom:2rem;">
+
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:1.5rem; margin-bottom:0.5rem;">📄</div>
+        <div style="font-size:0.95rem; font-weight:bold; color:var(--text); margin-bottom:0.4rem;">ビジネス文書の構造化</div>
+        <div style="font-size:0.82rem; color:var(--muted);">稟議書・提案書・報告書をC4の4層で論理設計。「何を・なぜ・どのように・いつ」が一目で伝わる文書を自動生成します。</div>
+      </div>
+
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:1.5rem; margin-bottom:0.5rem;">⚙️</div>
+        <div style="font-size:0.95rem; font-weight:bold; color:var(--text); margin-bottom:0.4rem;">製造業の仕様書・技術承継</div>
+        <div style="font-size:0.82rem; color:var(--muted);">熟練技術者の暗黙知をC4図解として可視化。都内中小企業のDX推進・技術承継の標準化ツールとして機能します。</div>
+      </div>
+
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:1.5rem; margin-bottom:0.5rem;">🏢</div>
+        <div style="font-size:0.95rem; font-weight:bold; color:var(--text); margin-bottom:0.4rem;">企業研修・論理思考育成</div>
+        <div style="font-size:0.82rem; color:var(--muted);">論文道場を研修ツールとして活用。若手社員の論理的文章力を「図解の力」で底上げ。レポート→企画書→論文まで一貫したスキル習得。</div>
+      </div>
+
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:1.5rem; margin-bottom:0.5rem;">🤖</div>
+        <div style="font-size:0.95rem; font-weight:bold; color:var(--text); margin-bottom:0.4rem;">AI×C4モデル 業務自動化</div>
+        <div style="font-size:0.82rem; color:var(--muted);">Claude API + PlantUMLによる構造図の自動生成。複雑なシステム仕様・業務フローを即座に可視化し、NEDO・NEXTコンペへの応用も可能。</div>
+      </div>
+
+    </div>
+
+    <!-- Technology Stack -->
+    <div id="tech-stack" style="background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:1.5rem; max-width:680px;">
+      <p style="font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); font-weight:bold; margin-bottom:1rem;">
+        🔧 Technology Stack / 技術構成
+      </p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:0.75rem;">
+        <div style="text-align:center; padding:0.75rem; background:var(--bg); border:1px solid var(--border); border-radius:6px;">
+          <div style="font-size:0.8rem; font-weight:bold; color:var(--text);">AI Engine</div>
+          <div style="font-size:0.9rem; color:var(--accent); font-weight:bold; margin-top:0.2rem;">Claude API</div>
+          <div style="font-size:0.72rem; color:var(--muted);">Anthropic</div>
+        </div>
+        <div style="text-align:center; padding:0.75rem; background:var(--bg); border:1px solid var(--border); border-radius:6px;">
+          <div style="font-size:0.8rem; font-weight:bold; color:var(--text);">Backend</div>
+          <div style="font-size:0.9rem; color:var(--accent); font-weight:bold; margin-top:0.2rem;">Cloudflare Workers</div>
+          <div style="font-size:0.72rem; color:var(--muted);">+ D1 Database</div>
+        </div>
+        <div style="text-align:center; padding:0.75rem; background:var(--bg); border:1px solid var(--border); border-radius:6px;">
+          <div style="font-size:0.8rem; font-weight:bold; color:var(--text);">Diagram</div>
+          <div style="font-size:0.9rem; color:var(--accent); font-weight:bold; margin-top:0.2rem;">PlantUML</div>
+          <div style="font-size:0.72rem; color:var(--muted);">C4 Model Standard</div>
+        </div>
+        <div style="text-align:center; padding:0.75rem; background:var(--bg); border:1px solid var(--border); border-radius:6px;">
+          <div style="font-size:0.8rem; font-weight:bold; color:var(--text);">Hosting</div>
+          <div style="font-size:0.9rem; color:var(--accent); font-weight:bold; margin-top:0.2rem;">GitHub Pages</div>
+          <div style="font-size:0.72rem; color:var(--muted);">c4model.org</div>
+        </div>
+        <div style="text-align:center; padding:0.75rem; background:var(--bg); border:1px solid var(--border); border-radius:6px;">
+          <div style="font-size:0.8rem; font-weight:bold; color:var(--text);">Contact</div>
+          <div style="font-size:0.9rem; color:var(--accent); font-weight:bold; margin-top:0.2rem;">info@c4model.org</div>
+          <div style="font-size:0.72rem; color:var(--muted);">迅速対応体制</div>
+        </div>
+        <div style="text-align:center; padding:0.75rem; background:var(--bg); border:1px solid var(--border); border-radius:6px;">
+          <div style="font-size:0.8rem; font-weight:bold; color:var(--text);">Framework</div>
+          <div style="font-size:0.9rem; color:var(--accent); font-weight:bold; margin-top:0.2rem;">C4 Model</div>
+          <div style="font-size:0.72rem; color:var(--muted);">Simon Brown (UK)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADVISORY / NETWORK SECTION -->
+<section id="advisory" style="background:var(--bg2);">
+  <div class="section-inner">
+    <p class="section-tag">Advisory &amp; Network / アドバイザリー・ネットワーク</p>
+    <h2>Collaboration &amp; Partners<br>連携・協力ネットワーク</h2>
+    <p style="color:var(--text); max-width:700px; margin-bottom:0.5rem; font-size:0.95rem;">
+      C4 Model Study Group® builds interdisciplinary networks spanning academia, regional government, and industry to ensure the real-world implementation of our EdTech platform.
+    </p>
+    <p style="color:var(--muted); font-size:0.88rem; max-width:700px; margin-bottom:2rem;">
+      C4モデル研究会®は、学術・地域行政・産業界にまたがる学際的ネットワークを構築し、EdTechプラットフォームの実世界への実装を推進します。
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem; margin-bottom:2rem;">
+
+      <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:0.72rem; color:var(--gold); font-weight:bold; letter-spacing:0.1em; margin-bottom:0.5rem;">🎓 ACADEMIC PARTNERS</div>
+        <p style="font-size:0.88rem; color:var(--text); line-height:1.75;">
+          産業技術大学院大学（AIIT）での研究を起点に、国内外の学術誌（SciencePC）への査読論文掲載実績。ORCIDによる研究者識別子で国際的に認証済み。
+        </p>
+        <p style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;">
+          ORCID: <a href="https://orcid.org/0009-0006-0015-938X" target="_blank" rel="noopener" style="color:var(--accent);">0009-0006-0015-938X</a>
+        </p>
+      </div>
+
+      <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:0.72rem; color:var(--gold); font-weight:bold; letter-spacing:0.1em; margin-bottom:0.5rem;">🌿 REGIONAL PARTNERS（福島）</div>
+        <p style="font-size:0.88rem; color:var(--text); line-height:1.75;">
+          福島Tech Create（FTC）プログラムへの申請を通じ、白河の関の文化遺産を教育コンテンツに変換する地域実証プロジェクトを推進。伴走支援機関との連携体制を構築中。
+        </p>
+        <p style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;">
+          ※ 実証協力者・推薦者は承諾次第、順次掲載予定
+        </p>
+      </div>
+
+      <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:0.72rem; color:var(--gold); font-weight:bold; letter-spacing:0.1em; margin-bottom:0.5rem;">🏙 TOKYO / NEDO NETWORK</div>
+        <p style="font-size:0.88rem; color:var(--text); line-height:1.75;">
+          都内中小企業のDX支援・技術承継を対象に、C4モデルによる業務可視化ツールの実証実験を計画。NEDO・東京都スタートアップ支援プログラムへ申請中。
+        </p>
+        <p style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;">
+          対象：製造業・IT・教育機関
+        </p>
+      </div>
+
+      <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1.25rem;">
+        <div style="font-size:0.72rem; color:var(--gold); font-weight:bold; letter-spacing:0.1em; margin-bottom:0.5rem;">🤝 ADVISORY BOARD（構築中）</div>
+        <p style="font-size:0.88rem; color:var(--text); line-height:1.75;">
+          教育工学・情報工学・地域創生・文学研究の各分野から、アドバイザーを招聘予定。承諾が得られ次第、お名前・所属・専門領域を掲載します。
+        </p>
+        <p style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;">
+          ご参加ご希望の方：<a href="mailto:info@c4model.org" style="color:var(--accent);">info@c4model.org</a>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Collaboration CTA -->
+    <div style="background:var(--bg); border:2px solid var(--border); border-radius:10px; padding:1.5rem; max-width:680px; text-align:center;">
+      <div style="font-size:1rem; font-weight:bold; color:var(--text); margin-bottom:0.5rem;">
+        研究連携・実証実験・顧問就任のご相談
+      </div>
+      <div style="font-size:0.88rem; color:var(--muted); margin-bottom:1rem;">
+        福島FTC・NEDO・JST A-STEP・東京都各プログラムへの共同申請、実証実験の協力機関募集中です。
+      </div>
+      <a href="mailto:info@c4model.org" style="display:inline-block; background:var(--accent); color:#fff; padding:0.65rem 1.8rem; border-radius:6px; font-size:0.95rem; font-weight:bold; text-decoration:none;">
+        📩 info@c4model.org へ連絡する
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ORGANIZATION & CONTACT -->
+<section id="org">
+  <div class="section-inner">
+    <p class="section-tag">Organization &amp; Contact / 組織・連絡先</p>
+    <h2>C4 Model Study Group®<br>C4モデル 研究会®</h2>
+    <p style="font-size:0.9rem; color:var(--muted); max-width:680px; margin-bottom:0.5rem;">
+      An independent research organization dedicated to advancing the C4 model framework across academia, literature, and AI-assisted knowledge work.
+    </p>
+    <p style="font-size:0.85rem; color:var(--muted); max-width:680px; margin-bottom:2rem;">
+      C4モデルを学術・文学・AI支援型知識創造に応用する、独立研究組織です。
+    </p>
+
+    <div class="org-grid">
+      <div class="org-profile">
+        <div class="org-name">奥村 治 / Osamu Okumura</div>
+        <div class="org-role">Principal · C4 Model Study Group®</div>
+        <!-- [校正] M.S.の英語大学名を正式名称 Advanced Institute of Industrial Technology (AIIT) に修正。
+             旧表記 "Tokyo Metropolitan University of Technology" は非公式名称 -->
+        <p class="org-bio">
+          Former Director, Dentsu PR Consulting Research Bureau. Former Senior Strategy Consultant, Osaka Gas Think Tank (KRI). Ph.D. (Newport University), M.S. (<a href="https://aiit.ac.jp/" target="_blank" rel="noopener" style="color:var(--accent);">東京都立産業技術大学院大学（AIIT）</a>). Prolific Amazon Kindle author. ORCID: 0009-0006-0015-938X.
+        </p>
+        <p class="org-bio" style="margin-top:0.5rem; color:var(--muted); font-size:0.82rem;">
+          電通PRコンサルティング企画調査局ディレクター、大阪ガスシンクタンクKRI事業戦略主席コンサルタントを経て現職。Ph.D.（Newport University）、M.S.（<a href="https://aiit.ac.jp/" target="_blank" rel="noopener" style="color:var(--accent);">東京都立産業技術大学院大学（AIIT）</a>）。Amazon Kindle著作多数。ORCID: 0009-0006-0015-938X。
+        </p>
+        <div class="org-links">
+          <a href="https://orcid.org/0009-0006-0015-938X" target="_blank" rel="noopener">ORCID →</a>
+          <!-- [校正] ResearchGateリンクをトップページから著者プロフィールページに修正 -->
+          <a href="https://www.researchgate.net/profile/Osamu-Okumura" target="_blank" rel="noopener">ResearchGate →</a>
+          <a href="https://www.youtube.com/watch?v=CYPYNjxFKOg" target="_blank" rel="noopener">YouTube Demo →</a>
+        </div>
+      </div>
+
+      <div class="org-contact">
+        <h3>Get in Touch / お問い合わせ</h3>
+        <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1rem;">
+          For research collaboration, grant inquiries (ものづくり補助金 / JST A-STEP), academic partnerships, or Thesis Dojo access requests, please contact us via email.<br>
+          研究連携・補助金申請（ものづくり補助金 / JST A-STEP）・学術パートナーシップ・論文道場アクセスのご相談は、メールにてお問い合わせください。
+        </p>
+        <div class="contact-item">
+          <div class="contact-label">Email</div>
+          <div class="contact-value"><a href="mailto:info@c4model.org">info@c4model.org</a></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">Web</div>
+          <div class="contact-value"><a href="https://c4model.org">https://c4model.org</a></div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">Domain</div>
+          <div class="contact-value" style="font-size:0.82rem; color:var(--muted);">Hosted on GitHub Pages · c4model.org</div>
+        </div>
+        <p style="font-size:0.8rem; color:var(--muted); margin-top:0.75rem;">
+          We typically respond within 2 business days (Japan time). / 通常、2営業日以内にご返答します（日本時間）。
+        </p>
+        <div class="contact-tags">
+          <span class="ctag">福島FTC申請中</span>
+          <span class="ctag">ものづくり補助金</span>
+          <span class="ctag">JST A-STEP</span>
+          <span class="ctag">NEDO</span>
+          <span class="ctag">ICTスタートアップリーグ</span>
+          <span class="ctag">東京都スタートアップ支援</span>
+          <span class="ctag">研究連携</span>
+          <span class="ctag">Advisory Board 募集中</span>
+          <span class="ctag">Academic Collaboration</span>
+          <span class="ctag">Thesis Dojo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">c4model.org</span>
+  <div class="footer-links">
+    <a href="#concept">Concept</a>
+    <a href="#dojo">Thesis Dojo</a>
+    <a href="haiku.html" style="color:var(--gold);">俳句の科学</a>
+    <a href="#fukushima">Fukushima</a>
+    <a href="#business">Business</a>
+    <a href="#advisory">Advisory</a>
+    <a href="#publications">Publications</a>
+    <a href="mailto:info@c4model.org">info@c4model.org</a>
+  </div>
+  <p class="footer-copy">© 2025–2026 C4モデル研究会® / Osamu Okumura. All rights reserved.</p>
+</footer>
 
 </body>
 </html>

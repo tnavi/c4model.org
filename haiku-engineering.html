@@ -1240,6 +1240,8 @@ footer {
       <button class="dtab active" onclick="switchTab('ctx')">L1 · Context</button>
       <button class="dtab" onclick="switchTab('ctr')">L2 · Container</button>
       <button class="dtab" onclick="switchTab('cmp')">L3 · Component</button>
+      <button class="dtab" onclick="switchTab('seq')">シーケンス図</button>
+      <button class="dtab" onclick="switchTab('sta')">状態遷移図</button>
     </div>
 
     <!-- L1 Context -->
@@ -1263,6 +1265,22 @@ footer {
       <div class="puml-wrap">
         <div class="puml-loading" id="load-cmp">📐 図を読み込み中…</div>
         <img id="puml-cmp" class="puml-svg" alt="L3 Component — 古池や" style="display:none; max-width:100%;">
+      </div>
+    </div>
+
+    <!-- Sequence Diagram -->
+    <div class="diagram-panel" id="panel-seq">
+      <div class="puml-wrap">
+        <div class="puml-loading" id="load-seq">📐 図を読み込み中…</div>
+        <img id="puml-seq" class="puml-svg" alt="シーケンス図 — 古池や" style="display:none; max-width:100%;">
+      </div>
+    </div>
+
+    <!-- State Diagram -->
+    <div class="diagram-panel" id="panel-sta">
+      <div class="puml-wrap">
+        <div class="puml-loading" id="load-sta">📐 図を読み込み中…</div>
+        <img id="puml-sta" class="puml-svg" alt="状態遷移図 — 古池や" style="display:none; max-width:100%;">
       </div>
     </div>
   </div>
@@ -1621,7 +1639,7 @@ footer {
       </div>
       <div class="author-right">
         <p class="author-bio">
-          C4モデルシステムコンサルタント。俳句の科学（Haiku Science）と俳句システム研究会を主宰し、松尾芭蕉・小林一茶の作品をC4モデルで構造分析する研究・創作活動の第一人者。「図でみる俳句」シリーズをYouTubeで公開。Amazon Kindle著作多数。学術論文の執筆支援システム「論文道場」を開発・運営。
+          C4モデルシステムコンサルタント。俳句の科学（Haiku Science）と俳句システム研究会を主宰し、松尾芭蕉・小林一茶の作品をC4モデルで構造分析する研究・創作活動を推進している。「図でみる俳句」シリーズをYouTubeで公開。Amazon Kindle著作多数。学術論文の執筆支援システム「論文道場」を開発・運営。
         </p>
         <div class="author-career">
           <div class="career-item">
@@ -1638,7 +1656,7 @@ footer {
           </div>
           <div class="career-item">
             <span class="career-era">学歴</span>
-            <span class="career-role">Newport University Ph.D. / 都立産業技術大学院大学 M.S. / 中央大学 B.A.</span>
+            <span class="career-role">Newport University Ph.D. / 都立産業技術大学院大学（AIIT）M.S. / 中央大学 B.A.</span>
           </div>
           <div class="career-item">
             <span class="career-era">学会</span>
@@ -1689,32 +1707,45 @@ function deflateRaw(str) {
   return new Uint8Array([0x78,0x01,...chunks,(adler>>24)&0xFF,(adler>>16)&0xFF,(adler>>8)&0xFF,adler&0xFF]);
 }
 function encodePuml(puml) { return '~1' + encode64(deflateRaw(puml)); }
+/*
+ * renderPuml — 図レンダリング（根本修正版）
+ * ─────────────────────────────────────────
+ * 【原因】plantuml.com への GET リクエストは日本語含む !include 付き PUML で
+ *         エンコード失敗・CORS エラー・タイムアウトが頻発する。
+ * 【対策】kroki.io POST をプライマリに昇格（UTF-8 対応・CORS 許可・安定稼動）。
+ *         kroki.io が失敗した場合のみ plantuml.com にフォールバック。
+ * 【再発防止】①フォールバック先も blob URL 経由で img.src に設定しタグの
+ *   src に直接ドメイン URL を指定しない（Mixed-Content 回避）。
+ *   ②ローディング要素の display を明示的にリセットしてから操作。
+ */
 function renderPuml(puml, imgEl, loadEl) {
-  const enc = encodePuml(puml);
   loadEl.style.display = 'block';
+  loadEl.textContent = '📐 図を読み込み中…';
   imgEl.style.display = 'none';
 
-  // plantuml.com（~1プレフィックス付き）で試行
-  const tryKroki = () => {
-    // kroki.io POSTエンドポイント（マルチバイト対応・確実）
-    fetch('https://kroki.io/plantuml/svg', {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Accept': 'image/svg+xml' },
-      body: puml
-    })
-    .then(r => { if (!r.ok) throw new Error('kroki error'); return r.blob(); })
-    .then(blob => {
-      const url = URL.createObjectURL(blob);
-      imgEl.onload = () => { loadEl.style.display='none'; imgEl.style.display='block'; };
-      imgEl.onerror = () => { loadEl.textContent = '⚠ 図の読み込みに失敗しました'; };
-      imgEl.src = url;
-    })
-    .catch(() => { loadEl.textContent = '⚠ 図の読み込みに失敗しました'; });
+  const showImg = (url) => {
+    imgEl.onload = () => { loadEl.style.display = 'none'; imgEl.style.display = 'block'; };
+    imgEl.onerror = () => { loadEl.textContent = '⚠ 図の読み込みに失敗しました'; };
+    imgEl.src = url;
   };
 
-  imgEl.onload = () => { loadEl.style.display='none'; imgEl.style.display='block'; };
-  imgEl.onerror = () => { tryKroki(); };
-  imgEl.src = `https://www.plantuml.com/plantuml/svg/${enc}`;
+  const tryPlantuml = () => {
+    const enc = encodePuml(puml);
+    fetch(`https://www.plantuml.com/plantuml/svg/${enc}`)
+      .then(r => { if (!r.ok) throw new Error('plantuml error'); return r.blob(); })
+      .then(blob => showImg(URL.createObjectURL(blob)))
+      .catch(() => { loadEl.textContent = '⚠ 図の読み込みに失敗しました'; });
+  };
+
+  // プライマリ: kroki.io POST（日本語・!include 対応・CORS OK）
+  fetch('https://kroki.io/plantuml/svg', {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Accept': 'image/svg+xml' },
+    body: puml
+  })
+  .then(r => { if (!r.ok) throw new Error('kroki error ' + r.status); return r.blob(); })
+  .then(blob => showImg(URL.createObjectURL(blob)))
+  .catch(() => tryPlantuml()); // フォールバック: plantuml.com GET
 }
 
 /* ── PlantUML Definitions ── */
@@ -1784,8 +1815,96 @@ Rel(verb, sound2, "行為 → 結果 の因果")
 Rel(sound2, blank, "音が消えた後の沈黙")
 @enduml`;
 
+const PUML_SEQ = `@startuml
+skinparam backgroundColor #FAFAF8
+skinparam defaultFontName "Source Serif 4"
+skinparam defaultFontSize 13
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipantBorderColor #1A1A2E
+skinparam sequenceParticipantBackgroundColor #F4F1EC
+skinparam sequenceLifeLineBorderColor #1A7A8A
+skinparam noteBorderColor #B8860B
+skinparam noteBackgroundColor #FDF6E3
+title シーケンス図 — 読者の認知プロセス「古池や」
+
+actor "読者\\n(Reader)" as R
+participant "古池や\\n（第1句）" as K1 #FAFAF8
+participant "蛙飛びこむ\\n（第2句）" as K2 #FAFAF8
+participant "水の音\\n（第3句）" as K3 #FAFAF8
+participant "読者の記憶\\n(Long-term Memory)" as MEM #E8F4F8
+
+R -> K1 : 詠む（視覚入力）
+activate K1
+K1 --> R : 静寂な古池の情景を喚起
+note right of K1 : 季語なし\\n舞台設定のみ
+deactivate K1
+
+R -> K2 : 詠む（動的情景）
+activate K2
+K2 --> R : 蛙が飛びこむ瞬間（春・生命）
+note right of K2 : 季語：蛙（春）\\n動き・音のトリガー
+deactivate K2
+
+R -> K3 : 詠む（聴覚入力）
+activate K3
+K3 --> R : 水の音が響く
+K3 --> MEM : 余韻・余白が記憶を活性化
+note right of K3 : 音 → 沈黙\\n17音の外の世界へ
+deactivate K3
+
+MEM --> R : 個人の原風景・感情が重なる
+note over R, MEM : 俳句の美的体験が完結\\n（読者によって異なる補完）
+@enduml`;
+
+const PUML_STA = `@startuml
+skinparam backgroundColor #FAFAF8
+skinparam defaultFontName "Source Serif 4"
+skinparam defaultFontSize 13
+skinparam StateBorderColor #1A1A2E
+skinparam StateBackgroundColor #F4F1EC
+skinparam ArrowColor #1A7A8A
+skinparam StateStartColor #B8860B
+skinparam StateEndColor #1A1A2E
+title 状態遷移図 — 読者の感情状態「古池や」
+
+[*] --> 日常意識 : 俳句を読み始める
+
+state "日常意識\\n(Everyday Mind)" as S0 {
+  [*] --> 散漫
+  散漫 --> 注意集中 : 「古池や」で引き込まれる
+}
+
+S0 --> 情景想起 : 静けさを感じる
+
+state "情景想起\\n(Scene Recall)" as S1 {
+  [*] --> 静寂認識
+  静寂認識 --> 期待感 : 「蛙飛びこむ」でドラマが始まる
+}
+
+S1 --> 瞬間体験 : 動きと音の衝突
+
+state "瞬間体験\\n(Momentary Experience)" as S2 {
+  [*] --> 動きの知覚
+  動きの知覚 --> 音の知覚 : 「水の音」が聞こえる
+  音の知覚 --> 沈黙 : 音が消える
+}
+
+S2 --> 余韻の世界 : 17音が終わった後
+
+state "余韻の世界\\n(Lingering Echo)" as S3 {
+  [*] --> 余白の補完
+  余白の補完 --> 個人的記憶との融合 : 原風景が浮かぶ
+  個人的記憶との融合 --> 美的感動 : 俳句体験の完結
+}
+
+S3 --> [*] : 句が心に刻まれる
+
+note right of S2 : 「動」→「静」\\nの対比が\\n美的緊張を生む
+note right of S3 : 読者ごとに\\n異なる余白\\n（間）の体験
+@enduml`;
+
 /* ── Tab Switcher ── */
-const panels = { ctx: 'panel-ctx', ctr: 'panel-ctr', cmp: 'panel-cmp' };
+const panels = { ctx: 'panel-ctx', ctr: 'panel-ctr', cmp: 'panel-cmp', seq: 'panel-seq', sta: 'panel-sta' };
 const loaded = {};
 function switchTab(key) {
   document.querySelectorAll('.diagram-panel').forEach(p => p.classList.remove('active'));
@@ -1798,7 +1917,9 @@ function loadDiagram(key) {
   const map = {
     ctx: { puml: PUML_CTX, img: 'puml-ctx', load: 'load-ctx' },
     ctr: { puml: PUML_CTR, img: 'puml-ctr', load: 'load-ctr' },
-    cmp: { puml: PUML_CMP, img: 'puml-cmp', load: 'load-cmp' }
+    cmp: { puml: PUML_CMP, img: 'puml-cmp', load: 'load-cmp' },
+    seq: { puml: PUML_SEQ, img: 'puml-seq', load: 'load-seq' },
+    sta: { puml: PUML_STA, img: 'puml-sta', load: 'load-sta' },
   };
   const m = map[key];
   renderPuml(m.puml, document.getElementById(m.img), document.getElementById(m.load));

@@ -978,6 +978,23 @@ footer {
 .btn-replay:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .btn-delete:hover { background: #c0392b; color: #fff; border-color: #c0392b; }
 
+/* ── 新出力フォーマット（Copilot形式） ── */
+.out-overall{font-size:.95rem;color:var(--ink-mid);margin-top:.6rem;line-height:1.7;font-style:italic;}
+.eval-section{background:var(--white);border:1px solid var(--border);border-left:4px solid var(--gold);padding:1.5rem 1.5rem 1.5rem 1.4rem;margin-bottom:1.2rem;}
+.eval-sec-title{font-family:var(--font-display);font-size:1.15rem;color:var(--ink);margin-bottom:.8rem;font-weight:700;}
+.eval-sec-body{font-size:.95rem;color:var(--ink-mid);line-height:1.8;white-space:pre-wrap;}
+.out-haiku-disp{font-family:var(--font-display);font-size:clamp(1.2rem,3vw,1.8rem);color:var(--ink);padding:.6rem 0;margin-bottom:.8rem;border-left:3px solid var(--gold-lt);padding-left:.8rem;}
+.eval-table{width:100%;border-collapse:collapse;margin:.5rem 0 1rem;font-size:.9rem;}
+.eval-table th{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.08em;background:var(--ink);color:var(--bg);padding:.5rem .75rem;text-align:left;}
+.eval-table td{padding:.5rem .75rem;border-bottom:1px solid var(--border-lt);color:var(--ink-mid);vertical-align:top;}
+.eval-table tr:last-child td{border-bottom:none;}
+.eval-table tr:hover td{background:var(--bg-alt);}
+.eval-table td:nth-child(2){font-family:var(--font-mono);font-size:.8rem;color:var(--teal);white-space:nowrap;}
+.eval-mini-card{background:var(--bg-alt);border:1px solid var(--border-lt);padding:1rem;text-align:center;}
+.eval-mini-label{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;color:var(--ink-lite);margin-bottom:.4rem;}
+.eval-mini-score{font-family:var(--font-display);font-size:1.8rem;color:var(--gold);line-height:1;}
+.eval-summary{background:var(--bg-alt);border-left:3px solid var(--teal);padding:1rem 1.2rem;margin-top:1rem;font-size:.92rem;color:var(--ink-mid);line-height:1.7;}
+
 /* ── RESPONSIVE FADESHEET ── */
 @media (max-width: 768px) {
   .fs-form { grid-template-columns: 1fr; }
@@ -1439,6 +1456,7 @@ footer {
               <div class="pdf-meta-line" id="pdf-place"></div>
               <div class="pdf-meta-line" id="pdf-gendate"></div>
             </div>
+            <div id="out-overall" class="out-overall"></div>
           </div>
 
           <!-- 背景 -->
@@ -1493,34 +1511,53 @@ footer {
           <div class="pdf-section-title">C4図解説</div>
           <div class="pdf-body-text" id="pdf-c4-desc">—</div>
 
-          <!-- 評価 -->
-          <div class="pdf-section-title">俳句の工学的評価</div>
-          <div class="pdf-eval-grid">
-            <div class="pdf-eval-item">
-              <div class="pdf-eval-label">季語の効果</div>
-              <div class="pdf-eval-score" id="ev-kigo">—</div>
-              <div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-kigo-bar" style="width:0%"></div></div>
-            </div>
-            <div class="pdf-eval-item">
-              <div class="pdf-eval-label">音韻設計</div>
-              <div class="pdf-eval-score" id="ev-sound">—</div>
-              <div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-sound-bar" style="width:0%"></div></div>
-            </div>
-            <div class="pdf-eval-item">
-              <div class="pdf-eval-label">余白・間</div>
-              <div class="pdf-eval-score" id="ev-ma">—</div>
-              <div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-ma-bar" style="width:0%"></div></div>
-            </div>
-            <div class="pdf-eval-item">
-              <div class="pdf-eval-label">情景の深度</div>
-              <div class="pdf-eval-score" id="ev-scene">—</div>
-              <div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-scene-bar" style="width:0%"></div></div>
+          <!-- ── 🌿 季語の判定 ── -->
+          <div class="eval-section">
+            <div class="eval-sec-title">🌿 季語の判定</div>
+            <div class="eval-sec-body" id="ev-kigo-body">—</div>
+            <div class="eval-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-top:1.2rem;">
+              <div class="eval-mini-card">
+                <div class="eval-mini-label">季語の効果 · Kigo</div>
+                <div class="eval-mini-score" id="ev-kigo">—</div>
+                <div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-kigo-bar" style="width:0%"></div></div>
+              </div>
             </div>
           </div>
 
-          <!-- アドバイス -->
-          <div class="pdf-section-title">アドバイス</div>
-          <div class="pdf-advice" id="pdf-advice">—</div>
+          <!-- ── 🍶 句の読みと鑑賞 ── -->
+          <div class="eval-section">
+            <div class="eval-sec-title">🍶 句の読みと鑑賞</div>
+            <div class="out-haiku-disp" id="out-haiku-disp">—</div>
+            <div class="eval-sec-body" id="ev-kansha">—</div>
+          </div>
+
+          <!-- ── 📊 評価ポイント（俳句的観点） ── -->
+          <div class="eval-section">
+            <div class="eval-sec-title">📊 評価ポイント（俳句的観点）</div>
+            <table class="eval-table" id="eval-table">
+              <thead>
+                <tr><th>観点</th><th>評価</th><th>コメント</th></tr>
+              </thead>
+              <tbody id="eval-table-body">
+                <tr><td>季語の働き</td><td id="ev-t-kigo">—</td><td id="ev-t-kigo-c">—</td></tr>
+                <tr><td>写生性</td><td id="ev-t-photo">—</td><td id="ev-t-photo-c">—</td></tr>
+                <tr><td>余情</td><td id="ev-t-ma">—</td><td id="ev-t-ma-c">—</td></tr>
+                <tr><td>リズム</td><td id="ev-t-rhythm">—</td><td id="ev-t-rhythm-c">—</td></tr>
+              </tbody>
+            </table>
+            <div class="eval-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-top:1.2rem;">
+              <div class="eval-mini-card"><div class="eval-mini-label">音韻設計 · Sound</div><div class="eval-mini-score" id="ev-sound">—</div><div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-sound-bar" style="width:0%"></div></div></div>
+              <div class="eval-mini-card"><div class="eval-mini-label">余白の間 · Ma</div><div class="eval-mini-score" id="ev-ma">—</div><div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-ma-bar" style="width:0%"></div></div></div>
+              <div class="eval-mini-card"><div class="eval-mini-label">情景の深度 · Scene</div><div class="eval-mini-score" id="ev-scene">—</div><div class="pdf-eval-bar"><div class="pdf-eval-bar-fill" id="ev-scene-bar" style="width:0%"></div></div></div>
+            </div>
+            <div class="eval-summary" id="ev-summary">—</div>
+          </div>
+
+          <!-- ── 🔍 アドバイス ── -->
+          <div class="eval-section">
+            <div class="eval-sec-title">🔍 俳句の科学からのアドバイス</div>
+            <div class="eval-sec-body" id="pdf-advice">—</div>
+          </div>
 
         </div><!-- /#fs-pdf-target -->
 
@@ -1897,23 +1934,38 @@ S1 --> S2 : トリガー
 /* ── 評価・解説プロンプト ── */
 function buildEvalPrompt(d) {
   const haiku = getHaikuFull(d);
-  return `俳句の科学の専門家として、以下の俳句を評価してください。
+  const bg = d.bg ? d.bg.substring(0, 300) : 'なし';
+  return `あなたは俳句の科学の専門家です。以下の俳句を詳細に評価し、必ず下記のJSON形式のみで返答してください（マークダウン・コードブロック不可）。
 
 俳句：${haiku}
+読み：${[d.yomi1, d.yomi2, d.yomi3].filter(Boolean).join(' / ')}
+季語：${d.kigo || '不明'}
+題名：${d.title || 'なし'}
+作句の背景：${bg}
 作者：${d.name || '不明'}
-背景：${d.bg || 'なし'}
+経験：${d.level || '不明'}
 
-以下のJSON形式のみで返答（マークダウン不可）：
+返答形式（このJSONのみ。キーは英語・値は日本語）：
 {
-  "c4desc": "C4モデル図の解説（200字程度）",
-  "kigo": 数値0-100,
-  "sound": 数値0-100,
-  "ma": 数値0-100,
-  "scene": 数値0-100,
-  "advice": "俳句の科学的アドバイス（200字程度）"
-}
-
-kigo=季語の効果、sound=音韻設計、ma=余白の間、scene=情景の深度`;
+  "overall": "「${haiku}」の評価を生成しました。のような一文",
+  "c4desc": "C4モデル図の解説200字程度",
+  "kigo_body": "季語の詳細解析（季語名・季節・文学的効果・歳時記出典を含む200字以上）",
+  "kansha": "句の読みと鑑賞（各語の働き・句全体の運びを含む300字以上）",
+  "t_kigo": "良／高い／低い／普通のいずれか",
+  "t_kigo_c": "季語の働きについての一文コメント",
+  "t_photo": "良／高い／低い／普通のいずれか",
+  "t_photo_c": "写生性についての一文コメント",
+  "t_ma": "良／高い／低い／普通のいずれか",
+  "t_ma_c": "余情についての一文コメント",
+  "t_rhythm": "良／高い／低い／普通のいずれか",
+  "t_rhythm_c": "リズムについての一文コメント",
+  "summary": "総合的な一言評価（20字以内）",
+  "kigo": 季語の効果スコア0-100,
+  "sound": 音韻設計スコア0-100,
+  "ma": 余白の間スコア0-100,
+  "scene": 情景の深度スコア0-100,
+  "advice": "作者の背景・意図を踏まえた俳句の科学的アドバイス300字以上"
+}`;
 }
 
 /* ── JSON安全パース ── */
@@ -1988,7 +2040,28 @@ async function generateFacesheet() {
 
     // フォールバック: APIキーなし or エラー時はテンプレート生成
     const puml = pumlData || buildFallbackPuml(d);
-    const ev   = evalData || buildFallbackEval(d);
+    const fb   = buildFallbackEval(d);
+    const ev   = evalData ? {
+      // APIのレスポンスを優先しつつ欠落キーはフォールバックで補完
+      overall:   evalData.overall   || fb.overall,
+      c4desc:    evalData.c4desc    || fb.c4desc,
+      kigo_body: evalData.kigo_body || fb.kigo_body,
+      kansha:    evalData.kansha    || fb.kansha,
+      t_kigo:    evalData.t_kigo    || fb.t_kigo,
+      t_kigo_c:  evalData.t_kigo_c  || fb.t_kigo_c,
+      t_photo:   evalData.t_photo   || fb.t_photo,
+      t_photo_c: evalData.t_photo_c || fb.t_photo_c,
+      t_ma:      evalData.t_ma      || fb.t_ma,
+      t_ma_c:    evalData.t_ma_c    || fb.t_ma_c,
+      t_rhythm:  evalData.t_rhythm  || fb.t_rhythm,
+      t_rhythm_c:evalData.t_rhythm_c|| fb.t_rhythm_c,
+      summary:   evalData.summary   || fb.summary,
+      kigo:      evalData.kigo      || fb.kigo,
+      sound:     evalData.sound     || fb.sound,
+      ma:        evalData.ma        || fb.ma,
+      scene:     evalData.scene     || fb.scene,
+      advice:    (evalData.advice && evalData.advice.length > 30) ? evalData.advice : fb.advice,
+    } : fb;
 
     // seq・staが欠落していた場合もフォールバックで補完
     if (!puml.seq) puml.seq = buildFallbackPuml(d).seq;
@@ -2112,7 +2185,15 @@ function buildFallbackEval(d) {
   const haiku = getHaikuFull(d);
   const scores = { kigo: 78, sound: 82, ma: 85, scene: 80 };
   return {
+    overall: `「${haiku}」の評価を生成しました。`,
     c4desc: `「${haiku}」のC4モデル図は、読者（Person）が俳句システム（System）を通じて季語・音響・時間の3つの外部システム（System_Ext）と相互作用する構造を示しています。L2 Container図では、上の句・中の句・下の句の3コンテナが情報を受け渡す流れを可視化しました。`,
+    kigo_body: '季語の詳細解析を生成中です。',
+    kansha: '句の鑑賞を生成中です。',
+    t_kigo: '良', t_kigo_c: '季節感を表現しています。',
+    t_photo: '良', t_photo_c: '具体的な描写があります。',
+    t_ma: '良', t_ma_c: '余情が感じられます。',
+    t_rhythm: '良', t_rhythm_c: '五七五のリズムが整っています。',
+    summary: '安定した句です。',
     ...scores,
     advice: `「${d.ku1 || '上の句'}」の設定から「${d.ku2 || '中の句'}」の展開、そして「${d.ku3 || '下の句'}」の余韻へという三段構造は、C4モデルのContext→Container→Componentの階層と見事に対応しています。季語の選択が俳句全体の「コンテキスト」を決定する重要な役割を担っており、工学的に見ても高い完成度を持つ句です。`
   };
@@ -2159,15 +2240,39 @@ function renderOutput(res) {
   // C4図解説
   document.getElementById('pdf-c4-desc').textContent = ev.c4desc || '—';
 
+  // ── 新フォーマット項目の適用 ──
+  const elOverall = document.getElementById('out-overall');
+  if(elOverall) elOverall.textContent = ev.overall || '';
+
+  const elKigoBody = document.getElementById('ev-kigo-body');
+  if(elKigoBody) elKigoBody.textContent = ev.kigo_body || '—';
+
+  const elHaikuDisp = document.getElementById('out-haiku-disp');
+  if(elHaikuDisp) elHaikuDisp.textContent = haiku;
+
+  const elKansha = document.getElementById('ev-kansha');
+  if(elKansha) elKansha.textContent = ev.kansha || '—';
+
+  const td = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val || '—'; };
+  td('ev-t-kigo', ev.t_kigo); td('ev-t-kigo-c', ev.t_kigo_c);
+  td('ev-t-photo', ev.t_photo); td('ev-t-photo-c', ev.t_photo_c);
+  td('ev-t-ma', ev.t_ma); td('ev-t-ma-c', ev.t_ma_c);
+  td('ev-t-rhythm', ev.t_rhythm); td('ev-t-rhythm-c', ev.t_rhythm_c);
+
+  const elSummary = document.getElementById('ev-summary');
+  if(elSummary) elSummary.textContent = ev.summary || '—';
+
   // 評価スコア
   const scoreMap = [
     ['kigo', ev.kigo], ['sound', ev.sound], ['ma', ev.ma], ['scene', ev.scene]
   ];
   scoreMap.forEach(([key, val]) => {
     const score = Math.min(100, Math.max(0, parseInt(val) || 0));
-    document.getElementById('ev-' + key).textContent = score;
+    const scoreEl = document.getElementById('ev-' + key);
+    if(scoreEl) scoreEl.textContent = score;
     setTimeout(() => {
-      document.getElementById('ev-' + key + '-bar').style.width = score + '%';
+      const bar = document.getElementById('ev-' + key + '-bar');
+      if(bar) bar.style.width = score + '%';
     }, 100);
   });
 

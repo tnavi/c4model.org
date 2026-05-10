@@ -325,6 +325,25 @@
       border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem;
     }
 
+    /* ===== ASSIST HINT (Q2-Q5) ===== */
+    .assist-hint {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      background: #EAF4FB; border: 1px solid #A8CEE8; border-radius: 8px;
+      padding: 0.85rem 1rem; margin-bottom: 1.25rem;
+      font-size: 0.88rem; color: #1A3A52; line-height: 1.65;
+    }
+    .assist-hint .hint-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .assist-hint-inline {
+      font-size: 0.82rem; color: #2A6080; margin-top: -0.6rem;
+      margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.4rem;
+    }
+    .assist-hint-inline::before { content: "💡"; font-size: 0.88rem; }
+    label .opt-badge {
+      font-size: 0.72rem; background: #D6EEF8; color: #1A6B7A;
+      border-radius: 4px; padding: 1px 6px; margin-left: 6px;
+      font-weight: normal; vertical-align: middle;
+    }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       aside { display: none; }
@@ -392,7 +411,7 @@
     <div class="stage-tag"><span data-ja>STAGE 0 · 論文情報入力</span><span data-en style="display:none">STAGE 0 · Paper Input</span></div>
     <!-- [変更] 右側文字拡大（h1は1.9rem、本文は1rem以上） -->
     <h1><span data-ja>200の実証例をワンクリックで再現する<br>『思考の自動化ツール』</span><span data-en style="display:none">Reproduce 200 Validated Cases in One Click<br>"Automated Thinking Tool"</span></h1>
-    <p class="stage-note"><span data-ja>必須項目（*）を入力してください。スコアが28点以上になると「分析開始」ボタンが有効になります。</span><span data-en style="display:none">Fill in required fields (*). The "Start Analysis" button activates when the score reaches 28 or above.</span></p>
+    <p class="stage-note"><span data-ja>まず <strong>01 著者情報</strong>（必須 *）を入力してください。Q2〜Q5はあいまいな入力・空欄のまま先へ進めます。後から補足入力するとスコアが上がり、AIの精度も上がります。</span><span data-en style="display:none">Start with <strong>01 Author Info</strong> (required *). Sections Q2–Q5 are optional — you can proceed with partial or blank entries and fill them in later.</span></p>
 
     <!-- HOW-TO -->
     <div class="howto-box">
@@ -455,20 +474,26 @@
     <!-- 02 論文情報 -->
     <div class="form-section">
       <div class="form-section-title">02 · 論文情報 Paper Information</div>
+      <div class="assist-hint">
+        <span class="hint-icon">ℹ️</span>
+        <span><strong>Q2はあいまい入力・空欄でも先へ進めます。</strong><br>
+        題名や投稿先が未定の場合は、仮のタイトルやキーワードだけでも入力しておくと、後でAIによる提案が精度よく返ってきます。後から何度でも上書き保存できます。</span>
+      </div>
       <label>論文題名 <span class="req">*</span></label>
-      <input type="text" id="title" placeholder="例：C4モデルを用いた俳句の構造解析" />
-      <label>投稿先ジャーナル・学会</label>
-      <input type="text" id="journal" placeholder="例：情報処理学会" />
-      <label>執筆言語 <span class="req">*</span></label>
+      <input type="text" id="title" placeholder="例：C4モデルを用いた俳句の構造解析（仮題でも可）" />
+      <label>投稿先ジャーナル・学会 <span class="opt-badge">任意</span></label>
+      <input type="text" id="journal" placeholder="例：情報処理学会（未定でも空欄でも可）" />
+      <label>執筆言語 <span class="opt-badge">任意</span></label>
       <select id="lang">
-        <option value="">選択してください</option>
+        <option value="">未定 / あとで選ぶ</option>
         <option value="ja">日本語</option>
         <option value="en">English</option>
         <option value="bilingual">日英バイリンガル</option>
       </select>
-      <label>投稿フォーマット <span class="req">*</span></label>
+      <p class="assist-hint-inline">未定の場合はそのまま空欄でOKです。後で変更できます。</p>
+      <label>投稿フォーマット <span class="opt-badge">任意</span></label>
       <select id="format">
-        <option value="">選択してください</option>
+        <option value="">未定 / あとで選ぶ</option>
         <!-- [変更] 感性工学会を削除 -->
         <option value="ipsj">情報処理学会</option>
         <option value="ieee">IEEE</option>
@@ -476,28 +501,41 @@
         <option value="thesis">卒論・修論</option>
         <option value="free">自由形式</option>
       </select>
-      <label>キーワード（カンマ区切り） <span class="req">*</span></label>
+      <p class="assist-hint-inline">投稿先が決まったら後で選択すると、フォーマット規程が自動反映されます。</p>
+      <label>キーワード（カンマ区切り） <span class="opt-badge">任意</span></label>
       <!-- [変更] 感性工学会をキーワードから削除し、汎用的なプレースホルダーに変更 -->
-      <input type="text" id="keywords" placeholder="例：C4モデル, 論文執筆, 構造化思考, 教育工学" />
+      <input type="text" id="keywords" placeholder="例：C4モデル, 論文執筆, 構造化思考（未定なら空欄でも可）" />
+      <p class="assist-hint-inline">1つでも入力しておくと、AIが関連テーマを提案しやすくなります。</p>
     </div>
 
     <!-- 03 要旨・研究課題 -->
     <div class="form-section">
       <div class="form-section-title">03 · 要旨・研究課題 Abstract & Research Question</div>
-      <label>要旨（200字以上推奨） <span class="req">*</span></label>
-      <textarea id="abstract" rows="5" placeholder="研究の目的・方法・結果・結論を簡潔にまとめてください。" oninput="updateCharCount(this,'abstract-count')"></textarea>
-      <div class="char-count"><span id="abstract-count">0</span> 字</div>
-      <label>研究課題 RQ（Research Question） <span class="req">*</span></label>
-      <textarea id="rq" rows="3" placeholder="例：C4モデルは俳句の構造を可視化する有効な手法となりうるか？" oninput="updateCharCount(this,'rq-count')"></textarea>
-      <div class="char-count"><span id="rq-count">0</span> 字</div>
-      <label>仮説（Hypothesis）</label>
-      <textarea id="hypothesis" rows="2" placeholder="例：C4モデルの4層構造は、俳句の17音に内在する文脈・構造・要素・表現を体系的に整理できる。"></textarea>
+      <div class="assist-hint">
+        <span class="hint-icon">ℹ️</span>
+        <span><strong>Q3はあいまいな言葉・断片的な文章でも大丈夫です。</strong><br>
+        「まだ書けない」場合は、思ったことをメモ書き程度に入力するだけでも構いません。20字以上あればAIが補ってくれます。後でブラッシュアップしましょう。</span>
+      </div>
+      <label>要旨（200字以上推奨） <span class="opt-badge">任意・あいまいでも可</span></label>
+      <textarea id="abstract" rows="5" placeholder="研究の目的・方法・結果・結論を簡潔にまとめてください。まだ書けない場合はメモ書き程度でも構いません。" oninput="updateCharCount(this,'abstract-count')"></textarea>
+      <div class="char-count"><span id="abstract-count">0</span> 字 <span style="color:#2A6080;">（20字以上でスコア加点されます）</span></div>
+      <label>研究課題 RQ（Research Question） <span class="opt-badge">任意・あいまいでも可</span></label>
+      <textarea id="rq" rows="3" placeholder="例：C4モデルは俳句の構造を可視化する有効な手法となりうるか？（疑問形でなくても、「〜を調べたい」などでも可）" oninput="updateCharCount(this,'rq-count')"></textarea>
+      <div class="char-count"><span id="rq-count">0</span> 字 <span style="color:#2A6080;">（10字以上でスコア加点されます）</span></div>
+      <p class="assist-hint-inline">RQが決まっていない場合は「〜について明らかにしたい」と書くだけでも先へ進めます。</p>
+      <label>仮説（Hypothesis）<span class="opt-badge">任意</span></label>
+      <textarea id="hypothesis" rows="2" placeholder="例：C4モデルの4層構造は、俳句の17音に内在する文脈・構造・要素・表現を体系的に整理できる。（空欄でも可）"></textarea>
     </div>
 
     <!-- 04 論文構成 -->
     <div class="form-section">
       <div class="form-section-title">04 · 論文構成 Paper Structure</div>
-      <label>目次・章立て（1行1章） <span class="req">*</span></label>
+      <div class="assist-hint">
+        <span class="hint-icon">ℹ️</span>
+        <span><strong>Q4はデフォルトの章立てが入力済みです。</strong><br>
+        そのまま使っても、一部だけ書き換えても構いません。「とりあえず進む」場合はこのままでOKです。後でいつでも編集できます。</span>
+      </div>
+      <label>目次・章立て（1行1章） <span class="opt-badge">デフォルト入力済み・変更可</span></label>
       <textarea id="toc" rows="10">1. 題名
 2. 要旨
 3. キーワード
@@ -516,7 +554,8 @@
 16. 付録
 17. 連絡先</textarea>
       <div class="char-count" style="margin-top:-0.8rem; margin-bottom:1rem;" id="toc-count">17 章</div>
-      <label>想定字数（目安）</label>
+      <p class="assist-hint-inline">章の数は1つ以上あればスコアに加点されます。デフォルトの章立てはそのまま使えます。</p>
+      <label>想定字数（目安） <span class="opt-badge">任意</span></label>
       <select id="wordcount">
         <option value="">未定</option>
         <option value="3000">〜3,000字（短報）</option>
@@ -529,12 +568,19 @@
     <!-- 05 先行研究 -->
     <div class="form-section">
       <div class="form-section-title">05 · 先行研究・参考文献 References</div>
-      <label>先行研究の要点</label>
-      <textarea id="priorWork" rows="3" placeholder="先行研究の主要な発見や議論を簡潔にまとめてください。"></textarea>
-      <label>参考文献リスト（1行1件） <span class="req">*</span></label>
+      <div class="assist-hint">
+        <span class="hint-icon">ℹ️</span>
+        <span><strong>Q5は空欄のまま先へ進めます。</strong><br>
+        参考文献が1件も集まっていない場合でも分析は開始できます。ただし <strong>6件以上</strong> 入力するとスコアが満点になり、AIの引用提案精度も大幅に上がります。後でまとめて入力することをおすすめします。</span>
+      </div>
+      <label>先行研究の要点 <span class="opt-badge">任意</span></label>
+      <textarea id="priorWork" rows="3" placeholder="先行研究の主要な発見や議論を簡潔にまとめてください。（空欄でも可）"></textarea>
+      <label>参考文献リスト（1行1件） <span class="opt-badge">任意・後から追加OK</span></label>
       <textarea id="references" rows="5" placeholder="[例] Okumura, O. (2025). Structural Analysis of Classical Haiku Using the C4 Model...
-[例] 奥村治 (2025). 松尾芭蕉俳句のC4モデルによる構造解析..."></textarea>
-      <div class="char-count" id="ref-count">0 件（6件以上で満点）</div>
+[例] 奥村治 (2025). 松尾芭蕉俳句のC4モデルによる構造解析...
+（空欄でも先へ進めます。後で6件以上入力するとスコアが満点になります）"></textarea>
+      <div class="char-count" id="ref-count">0 件 <span style="color:#2A6080;">（6件以上で満点 ／ 1件でもスコアに加点されます）</span></div>
+      <p class="assist-hint-inline">今は0件でも大丈夫です。文献が集まったら後から入力して「下書き保存」してください。</p>
     </div>
   </section>
 
@@ -573,7 +619,7 @@
       </div>
       <button class="btn-analyze" id="btnAnalyze" onclick="startAnalysis()" disabled>→ 分析開始</button>
     </div>
-    <div class="score-hint" id="scoreHint"><span data-ja>必須項目を入力してスコアを28点以上にしてください</span><span data-en style="display:none">Fill in required fields to reach a score of 28 or above</span></div>
+    <div class="score-hint" id="scoreHint"><span data-ja>⚠️ 01 著者情報の「著者氏名」を入力すると分析開始ボタンが有効になります</span><span data-en style="display:none">Enter your name in Author Info to activate the Start Analysis button</span></div>
   </div>
 
   <!-- STAGE I -->
@@ -968,14 +1014,17 @@ Rel(d, p, "図コード送信")
     const refs  = (document.getElementById('references')?.value || '').trim().split('\n').filter(l=>l.trim()).length;
     const toc   = (document.getElementById('toc')?.value || '').trim().split('\n').filter(l=>l.trim()).length;
 
-    const rqScore    = rq.length >= 20 ? 5 : rq.length > 0 ? 2 : 0;
-    const absScore   = abs.length >= 200 ? 5 : abs.length >= 100 ? 3 : abs.length > 0 ? 1 : 0;
-    const authScore  = (auth && email && aff) ? 5 : (auth || email) ? 2 : 0;
-    const fmtScore   = fmt ? 5 : 0;
-    const refScore   = refs >= 6 ? 5 : refs >= 3 ? 3 : refs > 0 ? 1 : 0;
-    const structScore= toc >= 10 ? 5 : toc >= 5 ? 3 : toc > 0 ? 1 : 0;
+    // Q1 著者情報：満点5点（必須）
+    const authScore  = (auth && email && aff) ? 5 : (auth && (email || aff)) ? 3 : auth ? 1 : 0;
 
-    score = rqScore + absScore + authScore + fmtScore + refScore + structScore;
+    // Q2-Q5：緩和スコア（あいまい入力・空欄でも部分点）
+    const rqScore    = rq.length >= 20 ? 5 : rq.length >= 10 ? 3 : rq.length > 0 ? 1 : 0;
+    const absScore   = abs.length >= 200 ? 5 : abs.length >= 50 ? 3 : abs.length > 0 ? 1 : 0;
+    const fmtScore   = fmt ? 5 : 1;  // 未選択でも1点（完全ブロックしない）
+    const refScore   = refs >= 6 ? 5 : refs >= 3 ? 3 : refs > 0 ? 1 : 0;
+    const structScore= toc >= 5 ? 5 : toc >= 2 ? 3 : toc > 0 ? 1 : 0;
+
+    score = authScore + rqScore + absScore + fmtScore + refScore + structScore;
     score = Math.min(score, 30);
 
     document.getElementById('scoreNum').textContent = score;
@@ -988,19 +1037,36 @@ Rel(d, p, "図コード送信")
 
     const btn = document.getElementById('btnAnalyze');
     const hint= document.getElementById('scoreHint');
-    if (score >= 28) {
+
+    // Q1（著者情報：氏名）が入力されていれば分析開始を解放
+    const q1Ready = auth.length > 0;
+
+    if (q1Ready && score >= 28) {
       btn.disabled = false; btn.classList.add('ready');
       hint.textContent = '✅ スコア28点以上です。「分析開始」を押してください。';
+    } else if (q1Ready) {
+      btn.disabled = false; btn.classList.add('ready');
+      // Q2-Q5で入力が少ない項目を案内
+      const incomplete = [];
+      if(rqScore < 3)    incomplete.push('研究課題 RQ（10字以上推奨）');
+      if(absScore < 3)   incomplete.push('要旨（50字以上推奨）');
+      if(refScore < 3)   incomplete.push('参考文献（3件以上推奨）');
+      if(structScore < 3) incomplete.push('章立て（2章以上推奨）');
+      if(incomplete.length > 0) {
+        hint.innerHTML = `✅ 分析開始できます。<br>💡 後で入力すると精度が上がります：<strong>${incomplete.join('・')}</strong>`;
+      } else {
+        hint.textContent = '✅ 分析開始できます。';
+      }
     } else {
       btn.disabled = true; btn.classList.remove('ready');
-      const missing = [];
-      if(rqScore < 5) missing.push('RQ');
-      if(absScore < 5) missing.push('要旨');
-      if(authScore < 5) missing.push('著者情報');
-      if(fmtScore < 5) missing.push('フォーマット');
-      if(refScore < 5) missing.push('参考文献');
-      if(structScore < 5) missing.push('論文構成');
-      hint.textContent = `あと ${28-score} 点入力してください（不足：${missing.join('・')}）`;
+      hint.textContent = '⚠️ 01 著者情報の「著者氏名」を入力すると分析開始ボタンが有効になります。';
+    }
+
+    // 参考文献件数表示を更新
+    const refCountEl = document.getElementById('ref-count');
+    if(refCountEl) {
+      const suffix = refs >= 6 ? '✅ 満点' : refs > 0 ? `（あと${6-refs}件で満点）` : '（6件以上で満点 ／ 1件でもスコアに加点されます）`;
+      refCountEl.innerHTML = `${refs} 件 <span style="color:#2A6080;">${suffix}</span>`;
     }
   }
 

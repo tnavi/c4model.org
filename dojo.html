@@ -1114,7 +1114,7 @@ Rel(d, p, "図コード送信")
     // 参考文献件数表示を更新
     const refCountEl = document.getElementById('ref-count');
     if(refCountEl) {
-      const suffix = refs >= 6 ? '✅ 満点' : refs > 0 ? `（あと${6-refs}件で満点）` : '（6件以上で満点 ／ 1件でもスコアに加点されます）`;
+      const suffix = refs >= 6 ? '✅ 満点' : refs > 0 ? `（あと${6-refs}件で満点）` : '（6件以上で満点 ／ 1件でもスコアに加点されます）';
       refCountEl.innerHTML = `${refs} 件 <span style="color:#2A6080;">${suffix}</span>`;
     }
   }

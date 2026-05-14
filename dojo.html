@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>論文道場 — Academic Paper Dojo | c4model.org</title>
   <meta name="description" content="論文道場：C4モデル×AIで論文を構造化する学術執筆支援プラットフォーム。" />
-  <!-- pako: PlantUML Deflate エンコードに使用 -->
+  <!-- pako 2.1.0: PlantUML Deflate Raw エンコードに必須 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
   <style>
     /* ===== RESET ===== */
@@ -1153,30 +1153,87 @@ Rel(d, p, "図コード送信")
 
   function startAnalysis() {
     const score = parseInt(document.getElementById('scoreNum').textContent);
-    let notice = '';
-    
-    // 精度告知パターン
-    if (score < 15) {
-      notice = '⚠️ 入力情報が少ないため、分析結果は概要レベルになります。後から補足するとAIの精度が上がります。';
-    } else if (score < 28) {
-      notice = '💡 いくつかの項目を追加入力すると、より詳細な分析が得られます。';
-    } else {
-      notice = '✅ 十分な情報が入力されています。高精度な分析を開始します。';
-    }
-    
-    showNotice(notice + '<br>🔄 Claude APIで分析中...（デモ版のため数秒お待ちください）');
-    const btn = document.getElementById('btnAnalyze');
-    btn.disabled = true;
+    const btn   = document.getElementById('btnAnalyze');
+    const hint  = document.getElementById('scoreHint');
+
+    // 精度告知
+    let notice = score < 15
+      ? '⚠️ 入力情報が少ないため分析は概要レベルです。後から補足するとAIの精度が上がります。'
+      : score < 28
+        ? '💡 いくつかの項目を追加入力するとより詳細な分析が得られます。'
+        : '✅ 十分な情報が入力されています。高精度な分析を開始します。';
+
+    hint.innerHTML = notice + '<br>🔄 Claude APIで分析中…';
+    btn.disabled   = true;
     btn.textContent = '分析中...';
-    
-    // API連携のモック（ダミー遅延処理）
-    setTimeout(() => {
-      btn.disabled = false;
+
+    // フォームデータ収集
+    const get = id => document.getElementById(id)?.value?.trim() || '';
+    const prompt = `あなたは学術論文の執筆支援AIです。以下の情報をもとに、論文の改善提案・構成アドバイス・C4モデル活用提案を日本語で詳しく出力してください。
+
+【著者情報】
+- 氏名：${get('authorName')}
+- 所属：${get('affiliation')}
+- メール：${get('email')}
+- 学位：${get('degree')}
+
+【論文基本情報】
+- 題名：${get('title') || '（未入力）'}
+- 投稿先：${get('journal') || '（未定）'}
+- 言語：${get('lang') || '（未定）'}
+- フォーマット：${get('format') || '（未定）'}
+- キーワード：${get('keywords') || '（未入力）'}
+
+【研究課題（RQ）】
+${get('rq') || '（未入力）'}
+
+【仮説】
+${get('hypothesis') || '（未入力）'}
+
+【要旨】
+${get('abstract') || '（未入力）'}
+
+【章立て】
+${get('toc')}
+
+【先行研究の要点】
+${get('priorWork') || '（未入力）'}
+
+【参考文献】
+${get('references') || '（未入力）'}
+
+以下の観点でアドバイスしてください：
+1. 論文題名・RQの改善提案
+2. 要旨の強化ポイント
+3. 章構成のバランスと改善案
+4. C4モデル（L1〜L4）の各層への適用方法
+5. 参考文献充実のための検索キーワード提案`;
+
+    fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      const text = (data.content || []).map(b => b.text || '').join('\n').trim()
+        || '（AIからの応答がありませんでした）';
+      // 結果をscore-hintエリアに表示
+      hint.innerHTML = '<strong>📄 AI分析結果</strong><br><pre style="white-space:pre-wrap; font-family:inherit; font-size:0.85rem; margin-top:0.5rem;">' + text + '</pre>';
+      btn.disabled   = false;
       btn.textContent = '→ 分析完了';
-      alert('分析が完了しました！\n（※現在はデモモードのため、実際のAPI通信費用はかかりません）');
-      // ここで本来はAPIレスポンスをUIに反映する処理が入ります
+      // C4図も描画
       renderPuml();
-    }, 2500);
+    })
+    .catch(e => {
+      hint.innerHTML = '<span style="color:#ffddaa;">⚠️ API接続エラー: ' + e.message + '</span>';
+      btn.disabled   = false;
+      btn.textContent = '→ 分析開始';
+    });
   }
 
   /* ===== SAMPLE DATA ===== */
@@ -1251,50 +1308,48 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
     a.click();
   }
 
-  /* ===== PLANTUML ===== */
-  /* --- PlantUML Deflate エンコーダ（修正版）---
-   * ~1 プレフィックス + pako.deflateRaw + PlantUML独自6bit Base64
-   * 旧: btoa(unescape(...)) → HUFFMAN扱いでエラー
-   * 新: deflateRaw → encode64 → ~1 プレフィックス付与
-   */
-  function _pumlEncode64(data) {
-    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
+  /* ===== PLANTUML — Deflate Raw エンコーダ（修正版）=====
+   * 【旧・誤】btoa(unescape(...)) = Base64/HUFFMAN → ~1プレフィックスと不整合
+   * 【新・正】pako.deflateRaw() + PlantUML独自6bit Base64 + ~1プレフィックス
+   ================================================================*/
+  function _puml6b64(data) {
+    const T = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
     let r = '';
-    for (let i = 0; i < data.length; i += 3) {
+    for (let i = 0, n = data.length; i < n; i += 3) {
       const b1 = data[i], b2 = data[i+1] || 0, b3 = data[i+2] || 0;
-      r += chars[b1 >> 2];
-      r += chars[((b1 & 0x3) << 4) | (b2 >> 4)];
-      if (i + 1 < data.length) r += chars[((b2 & 0xF) << 2) | (b3 >> 6)]; else r += '=';
-      if (i + 2 < data.length) r += chars[b3 & 0x3F]; else r += '=';
+      r += T[b1 >> 2];
+      r += T[((b1 & 3) << 4) | (b2 >> 4)];
+      r += (i+1 < n) ? T[((b2 & 15) << 2) | (b3 >> 6)] : '=';
+      r += (i+2 < n) ? T[b3 & 63] : '=';
     }
     return r;
   }
 
-  function _encodePlantUML(code) {
-    if (typeof pako === 'undefined') throw new Error('pakoライブラリが読み込まれていません。少し待って再試行してください。');
-    const utf8 = new TextEncoder().encode(code);
-    const compressed = pako.deflateRaw(utf8);
-    return 'https://www.plantuml.com/plantuml/svg/~1' + _pumlEncode64(compressed);
+  function _pumlURL(code) {
+    if (typeof pako === 'undefined')
+      throw new Error('pako読込中です。1〜2秒後に再度「描画」を押してください。');
+    const compressed = pako.deflateRaw(new TextEncoder().encode(code));
+    return 'https://www.plantuml.com/plantuml/svg/~1' + _puml6b64(compressed);
   }
 
   function renderPuml() {
-    const code = document.getElementById('pumlCode')?.value || '';
-    const prev = document.getElementById('pumlPreview');
-    if (!code.trim()) { if(prev) prev.innerHTML = '（コードが空です）'; return; }
+    const code = (document.getElementById('pumlCode')?.value || '').trim();
+    const prev  = document.getElementById('pumlPreview');
+    if (!prev) return;
+    if (!code) { prev.innerHTML = '<span style="color:#C0392B;">コードが空です。</span>'; return; }
+    prev.innerHTML = '<span style="color:#5A5040; font-size:0.88rem;">⏳ 描画中…</span>';
     try {
-      const url = _encodePlantUML(code);
-      if (prev) {
-        prev.innerHTML = '<span style="color:#5A5040; font-size:0.85rem;">描画中…</span>';
-        const img = document.createElement('img');
-        img.alt = 'C4図';
-        img.style.maxWidth = '100%';
-        img.style.height = 'auto';
-        img.onload  = () => { prev.innerHTML = ''; prev.appendChild(img); };
-        img.onerror = () => { prev.innerHTML = '<span style="color:#C0392B; font-size:0.85rem;">描画エラー。PlantUMLコードを確認してください。</span>'; };
-        img.src = url;
-      }
+      const url = _pumlURL(code);
+      const img = new Image();
+      img.alt = 'C4図';
+      img.style.cssText = 'max-width:100%; height:auto; display:block;';
+      img.onload  = () => { prev.innerHTML = ''; prev.appendChild(img); };
+      img.onerror = () => {
+        prev.innerHTML = '<span style="color:#C0392B; font-size:0.85rem;">⚠️ PlantUMLサーバーエラーまたはコード構文エラーです。</span>';
+      };
+      img.src = url;
     } catch(e) {
-      if (prev) prev.innerHTML = `<span style="color:#C0392B; font-size:0.85rem;">${e.message}</span>`;
+      prev.innerHTML = '<span style="color:#C0392B; font-size:0.85rem;">⚠️ ' + e.message + '</span>';
     }
   }
 

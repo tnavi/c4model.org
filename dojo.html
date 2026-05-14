@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>論文道場 — Academic Paper Dojo | c4model.org</title>
   <meta name="description" content="論文道場：C4モデル×AIで論文を構造化する学術執筆支援プラットフォーム。" />
+  <!-- pako: PlantUML Deflate エンコードに使用 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
   <style>
     /* ===== RESET ===== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1066,12 +1068,12 @@ Rel(d, p, "図コード送信")
     // Q1 著者情報：満点5点（必須）
     const authScore  = (auth && email && aff) ? 5 : (auth && (email || aff)) ? 3 : auth ? 1 : 0;
 
-    // Q2-Q5：緩和スコア（あいまい入力・空欄でも部分点）
-    const rqScore    = rq.length >= 20 ? 5 : rq.length >= 10 ? 3 : rq.length > 0 ? 1 : 0;
-    const absScore   = abs.length >= 200 ? 5 : abs.length >= 50 ? 3 : abs.length > 0 ? 1 : 0;
-    const fmtScore   = fmt ? 5 : 1;  // 未選択でも1点（完全ブロックしない）
-    const refScore   = refs >= 6 ? 5 : refs >= 3 ? 3 : refs > 0 ? 1 : 0;
-    const structScore= toc >= 5 ? 5 : toc >= 2 ? 3 : toc > 0 ? 1 : 0;
+    // Q2-Q5：緩和スコア（あいまい入力・空欄でも部分点・最低1点保証）
+    const rqScore    = rq.length >= 20 ? 5 : rq.length >= 10 ? 3 : 1;
+    const absScore   = abs.length >= 200 ? 5 : abs.length >= 50 ? 3 : 1;
+    const fmtScore   = fmt ? 5 : 1;
+    const refScore   = refs >= 6 ? 5 : refs >= 3 ? 3 : 1;
+    const structScore= toc >= 5 ? 5 : toc >= 2 ? 3 : 1;
 
     score = authScore + rqScore + absScore + fmtScore + refScore + structScore;
     score = Math.min(score, 30);
@@ -1095,14 +1097,25 @@ Rel(d, p, "図コード送信")
       hint.textContent = '✅ スコア28点以上です。「分析開始」を押してください。';
     } else if (q1Ready) {
       btn.disabled = false; btn.classList.add('ready');
-      // Q2-Q5で入力が少ない項目を案内
+      // Wellbeing UX: 提案口調のヒントメッセージ（最大2件まで）
+      const hints = {
+        rq:     '研究課題（RQ）を10字以上書くと、分析の軸がはっきりします💡',
+        abs:    '要旨を50字以上書くと、AIの分析精度が大幅に上がります💡',
+        ref:    '参考文献は後から追加OK。3件以上あるとスコアが上がります📚',
+        struct: '章立ては2章以上あると構造分析ができます。後から編集OKです✏️',
+        fmt:    '投稿先フォーマットを選ぶと、引用形式の自動調整が有効になります'
+      };
+      
       const incomplete = [];
-      if(rqScore < 3)    incomplete.push('研究課題 RQ（10字以上推奨）');
-      if(absScore < 3)   incomplete.push('要旨（50字以上推奨）');
-      if(refScore < 3)   incomplete.push('参考文献（3件以上推奨）');
-      if(structScore < 3) incomplete.push('章立て（2章以上推奨）');
-      if(incomplete.length > 0) {
-        hint.innerHTML = `✅ 分析開始できます。<br>💡 後で入力すると精度が上がります：<strong>${incomplete.join('・')}</strong>`;
+      if(rqScore < 3)    incomplete.push(hints.rq);
+      if(absScore < 3)   incomplete.push(hints.abs);
+      if(refScore < 3)   incomplete.push(hints.ref);
+      if(structScore < 3) incomplete.push(hints.struct);
+      
+      const displayHints = incomplete.slice(0, 2);
+      
+      if(displayHints.length > 0) {
+        hint.innerHTML = `✅ 分析開始できます。<br>${displayHints.join('<br>')}`;
       } else {
         hint.textContent = '✅ 分析開始できます。';
       }
@@ -1133,8 +1146,37 @@ Rel(d, p, "図コード送信")
     calcScore();
   }
 
+  function showNotice(msg) {
+    const hint = document.getElementById('scoreHint');
+    if(hint) hint.innerHTML = `<span style="color:#C0392B;">${msg}</span>`;
+  }
+
   function startAnalysis() {
-    alert('分析を開始します。（Claude APIとの連携機能は実装中です）');
+    const score = parseInt(document.getElementById('scoreNum').textContent);
+    let notice = '';
+    
+    // 精度告知パターン
+    if (score < 15) {
+      notice = '⚠️ 入力情報が少ないため、分析結果は概要レベルになります。後から補足するとAIの精度が上がります。';
+    } else if (score < 28) {
+      notice = '💡 いくつかの項目を追加入力すると、より詳細な分析が得られます。';
+    } else {
+      notice = '✅ 十分な情報が入力されています。高精度な分析を開始します。';
+    }
+    
+    showNotice(notice + '<br>🔄 Claude APIで分析中...（デモ版のため数秒お待ちください）');
+    const btn = document.getElementById('btnAnalyze');
+    btn.disabled = true;
+    btn.textContent = '分析中...';
+    
+    // API連携のモック（ダミー遅延処理）
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '→ 分析完了';
+      alert('分析が完了しました！\n（※現在はデモモードのため、実際のAPI通信費用はかかりません）');
+      // ここで本来はAPIレスポンスをUIに反映する処理が入ります
+      renderPuml();
+    }, 2500);
   }
 
   /* ===== SAMPLE DATA ===== */
@@ -1210,12 +1252,50 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
   }
 
   /* ===== PLANTUML ===== */
+  /* --- PlantUML Deflate エンコーダ（修正版）---
+   * ~1 プレフィックス + pako.deflateRaw + PlantUML独自6bit Base64
+   * 旧: btoa(unescape(...)) → HUFFMAN扱いでエラー
+   * 新: deflateRaw → encode64 → ~1 プレフィックス付与
+   */
+  function _pumlEncode64(data) {
+    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
+    let r = '';
+    for (let i = 0; i < data.length; i += 3) {
+      const b1 = data[i], b2 = data[i+1] || 0, b3 = data[i+2] || 0;
+      r += chars[b1 >> 2];
+      r += chars[((b1 & 0x3) << 4) | (b2 >> 4)];
+      if (i + 1 < data.length) r += chars[((b2 & 0xF) << 2) | (b3 >> 6)]; else r += '=';
+      if (i + 2 < data.length) r += chars[b3 & 0x3F]; else r += '=';
+    }
+    return r;
+  }
+
+  function _encodePlantUML(code) {
+    if (typeof pako === 'undefined') throw new Error('pakoライブラリが読み込まれていません。少し待って再試行してください。');
+    const utf8 = new TextEncoder().encode(code);
+    const compressed = pako.deflateRaw(utf8);
+    return 'https://www.plantuml.com/plantuml/svg/~1' + _pumlEncode64(compressed);
+  }
+
   function renderPuml() {
     const code = document.getElementById('pumlCode')?.value || '';
-    const encoded = btoa(unescape(encodeURIComponent(code)));
-    const url = `https://www.plantuml.com/plantuml/svg/${encoded}`;
     const prev = document.getElementById('pumlPreview');
-    if(prev) prev.innerHTML = `<img src="${url}" alt="C4図" style="max-width:100%;" onerror="this.parentElement.innerHTML='描画エラー。コードを確認してください。'">`;
+    if (!code.trim()) { if(prev) prev.innerHTML = '（コードが空です）'; return; }
+    try {
+      const url = _encodePlantUML(code);
+      if (prev) {
+        prev.innerHTML = '<span style="color:#5A5040; font-size:0.85rem;">描画中…</span>';
+        const img = document.createElement('img');
+        img.alt = 'C4図';
+        img.style.maxWidth = '100%';
+        img.style.height = 'auto';
+        img.onload  = () => { prev.innerHTML = ''; prev.appendChild(img); };
+        img.onerror = () => { prev.innerHTML = '<span style="color:#C0392B; font-size:0.85rem;">描画エラー。PlantUMLコードを確認してください。</span>'; };
+        img.src = url;
+      }
+    } catch(e) {
+      if (prev) prev.innerHTML = `<span style="color:#C0392B; font-size:0.85rem;">${e.message}</span>`;
+    }
   }
 
   function copyPuml() {

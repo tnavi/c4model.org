@@ -405,6 +405,189 @@
     border: 1px solid rgba(0,0,0,0.10);
   }
 
+  /* ===== CREDIT SYSTEM ===== */
+  .credit-meter-wrap {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
+    margin-right: 0.5rem; position: relative;
+  }
+  .credit-meter-label {
+    font-size: 0.65rem; color: rgba(255,255,255,0.85); letter-spacing: 0.1em;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .credit-free-badge {
+    font-size: 0.58rem; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 3px; padding: 1px 5px; letter-spacing: 0.06em; color: #F1C40F;
+  }
+  .credit-row { display: flex; align-items: center; gap: 0.5rem; }
+  .credit-display {
+    font-size: 1.35rem; font-weight: bold; line-height: 1;
+    color: #F1C40F; transition: color 0.3s;
+  }
+  .credit-display.warning { color: #E74C3C !important; }
+  .credit-display.caution { color: #E67E22 !important; }
+  .credit-denom { font-size: 0.72rem; color: rgba(255,255,255,0.5); }
+  .credit-bar-bg {
+    width: 72px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden;
+  }
+  .credit-bar-fill {
+    height: 100%; background: #F1C40F; border-radius: 2px; transition: width 0.4s, background 0.4s;
+  }
+  .credit-bar-fill.warning { background: #E74C3C; }
+  .credit-bar-fill.caution { background: #E67E22; }
+  .btn-charge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.28rem 0.65rem;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 4px; color: rgba(255,255,255,0.9);
+    font-size: 0.7rem; letter-spacing: 0.05em; cursor: pointer;
+    transition: background 0.2s; white-space: nowrap; font-family: inherit;
+  }
+  .btn-charge:hover { background: rgba(255,255,255,0.22); }
+  .zero-stop-note {
+    font-size: 0.62rem; color: rgba(255,255,255,0.48); margin-top: 2px; text-align: right;
+  }
+  .btn-analyze.credit-blocked {
+    background: rgba(231,76,60,0.2) !important; color: rgba(255,120,120,0.9) !important;
+    border-color: rgba(231,76,60,0.5) !important; cursor: not-allowed !important;
+  }
+
+  /* ===== CHARGE MODAL — クリーンミニマル ===== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 2000;
+    background: rgba(10,15,20,0.6); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 1.25rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: #FAFAF8; border-radius: 4px; max-width: 460px; width: 100%;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+    animation: modalIn 0.22s ease;
+    overflow: hidden;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+  }
+  .modal-header {
+    background: var(--teal); color: #fff;
+    padding: 1rem 1.4rem; display: flex; justify-content: space-between; align-items: center;
+    border-bottom: none;
+  }
+  .modal-header-inner { display: flex; flex-direction: column; gap: 0.15rem; }
+  .modal-header-title { font-size: 0.95rem; font-weight: bold; letter-spacing: 0.02em; }
+  .modal-header-sub { font-size: 0.7rem; opacity: 0.75; letter-spacing: 0.06em; }
+  .modal-close {
+    background: none; border: none; color: rgba(255,255,255,0.7); font-size: 1.4rem;
+    cursor: pointer; line-height: 1; padding: 0; transition: color 0.15s; margin-left: 1rem;
+  }
+  .modal-close:hover { color: #fff; }
+  .modal-body { padding: 1.4rem 1.5rem; }
+
+  /* データ保護バナー */
+  .modal-data-safe {
+    background: #EAF4EC; border-left: 3px solid #4A9A5A;
+    padding: 0.65rem 0.9rem; margin-bottom: 1rem; font-size: 0.83rem; color: #1A4A2E;
+    display: flex; align-items: flex-start; gap: 0.45rem; line-height: 1.6;
+    border-radius: 0 4px 4px 0;
+  }
+  .modal-data-safe .icon { font-size: 1rem; flex-shrink: 0; line-height: 1.6; }
+
+  /* プラン選択 */
+  .modal-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 1.2rem; }
+  .plan-card {
+    border: 1.5px solid var(--card-border); border-radius: 4px; padding: 0.9rem 0.75rem;
+    text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    position: relative; background: #fff;
+  }
+  .plan-card:hover { border-color: var(--teal); background: #F0F7F8; }
+  .plan-card.selected { border-color: var(--teal); background: #F0F7F8; }
+  .plan-badge {
+    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+    background: var(--teal); color: #fff; font-size: 0.6rem; letter-spacing: 0.1em;
+    padding: 2px 8px; border-radius: 10px; white-space: nowrap; font-weight: bold;
+  }
+  .plan-credits { font-size: 1.4rem; font-weight: bold; color: var(--teal); line-height: 1; margin-bottom: 0.25rem; }
+  .plan-credits small { font-size: 0.68rem; font-weight: normal; color: var(--main-muted); }
+  .plan-price { font-size: 0.88rem; font-weight: bold; color: var(--main-text); margin: 0.2rem 0; }
+  .plan-per { font-size: 0.68rem; color: var(--main-muted); }
+  .plan-note { font-size: 0.68rem; color: var(--main-muted); margin-top: 0.25rem; }
+
+  /* 決済フォームエリア */
+  .payment-section { margin-bottom: 1.1rem; }
+  .payment-label {
+    font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--main-muted); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .payment-label::after { content: ''; flex: 1; height: 1px; background: var(--card-border); }
+  .stripe-btn {
+    display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+    width: 100%; padding: 0.8rem 1rem;
+    background: #635BFF; color: #fff; border: none; border-radius: 4px;
+    font-size: 0.9rem; font-weight: bold; letter-spacing: 0.02em;
+    cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+    font-family: inherit;
+  }
+  .stripe-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .stripe-btn:active { transform: translateY(0); }
+  .stripe-logo {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 0.78rem; font-weight: bold; letter-spacing: -0.02em;
+    background: rgba(255,255,255,0.15); border-radius: 3px; padding: 1px 6px;
+  }
+
+  /* カードブランドアイコン (テキストのみ・ミニマル) */
+  .card-brands {
+    display: flex; align-items: center; gap: 0.4rem; margin-top: 0.6rem;
+    justify-content: center; flex-wrap: wrap;
+  }
+  .card-brand {
+    font-size: 0.6rem; font-weight: bold; letter-spacing: 0.06em;
+    color: var(--main-muted); border: 1px solid var(--card-border);
+    padding: 2px 6px; border-radius: 3px; background: #fff;
+  }
+
+  /* ゼロストップ保証フッター */
+  .modal-zero-stop {
+    background: #FFF8EE; border-left: 3px solid #D4AF6A;
+    padding: 0.6rem 0.9rem; margin-top: 0.85rem; font-size: 0.8rem; color: #7A5C2E;
+    display: flex; align-items: flex-start; gap: 0.45rem; line-height: 1.6;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .modal-footer-note { text-align: center; font-size: 0.7rem; color: var(--main-muted); margin-top: 0.85rem; line-height: 1.7; }
+
+  /* ===== PRICING SECTION (redesigned) ===== */
+  .pricing-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 2rem; }
+  @media (max-width: 640px) { .pricing-cards { grid-template-columns: 1fr; } }
+  .pricing-card {
+    border: 1.5px solid var(--card-border); border-radius: 10px;
+    padding: 1.5rem; background: #fff; position: relative; overflow: hidden;
+  }
+  .pricing-card.featured { border-color: var(--teal); }
+  .pricing-card.featured::before {
+    content: 'おすすめ'; position: absolute; top: 12px; right: -18px;
+    background: var(--teal); color: #fff; font-size: 0.65rem; letter-spacing: 0.1em;
+    padding: 3px 28px; transform: rotate(35deg); font-weight: bold;
+  }
+  .pricing-tag { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--teal); font-weight: bold; margin-bottom: 0.5rem; }
+  .pricing-price { font-size: 1.8rem; font-weight: bold; color: var(--main-text); line-height: 1.1; }
+  .pricing-price small { font-size: 0.85rem; font-weight: normal; color: var(--main-muted); }
+  .pricing-credits { font-size: 0.88rem; color: var(--teal); font-weight: bold; margin: 0.5rem 0 0.4rem; }
+  .pricing-per-credit { font-size: 0.78rem; color: var(--main-muted); margin-bottom: 1rem;
+    background: #EAF4FB; display: inline-block; padding: 2px 8px; border-radius: 4px; }
+  .pricing-features { list-style: none; padding: 0; font-size: 0.84rem; color: var(--main-muted); }
+  .pricing-features li { padding: 0.28rem 0; display: flex; align-items: flex-start; gap: 0.4rem; line-height: 1.55; }
+  .pricing-features li::before { content: '✓'; color: var(--teal); flex-shrink: 0; font-weight: bold; }
+  .guarantee-box {
+    background: #FFF8EE; border: 1px solid #D4AF6A; border-radius: 8px;
+    padding: 1.2rem 1.4rem; margin: 1.5rem 0;
+    display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start;
+  }
+  .guarantee-icon { font-size: 2rem; line-height: 1; }
+  .guarantee-title { font-size: 0.95rem; font-weight: bold; color: var(--accent); margin-bottom: 0.3rem; }
+  .guarantee-text { font-size: 0.84rem; color: var(--main-muted); line-height: 1.8; }
+
 </style>
 </head>
 <body>
@@ -679,12 +862,21 @@
           <div class="axis-label">著者情報</div>
         </div>
       </div>
-      <!-- クレジットメーター -->
-      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; margin-right:1rem;">
-        <div style="font-size:0.72rem; color:rgba(255,255,255,0.85); letter-spacing:0.1em;"><span data-ja>残りクレジット</span><span data-en style="display:none">Credits</span></div>
-        <div style="font-size:1.4rem; font-weight:bold; line-height:1; color:#F1C40F;"><span id="creditNum">100</span><span style="font-size:0.8rem; color:rgba(255,255,255,0.6);">/100</span></div>
+      <!-- クレジットメーター (ゼロストップ・ガバナンス) -->
+      <div class="credit-meter-wrap">
+        <div class="credit-meter-label">
+          <span data-ja>残りクレジット</span><span data-en style="display:none">Credits</span>
+          <span class="credit-free-badge" id="creditFreeBadge">初回体験 50cr付与済み</span>
+        </div>
+        <div class="credit-row">
+          <div class="credit-bar-bg"><div class="credit-bar-fill" id="creditBarFill" style="width:50%"></div></div>
+          <span class="credit-display" id="creditNum">50</span>
+          <span class="credit-denom">/100</span>
+          <button class="btn-charge" onclick="openChargeModal()">＋ チャージ</button>
+        </div>
+        <div class="zero-stop-note">※ 残量0でも自動引き落としは一切されません</div>
       </div>
-      <button class="btn-analyze" id="btnAnalyze" onclick="startAnalysis()" disabled>→ 分析開始</button>
+      <button class="btn-analyze" id="btnAnalyze" onclick="startAnalysis()" disabled>→ 分析開始（−10 Cr）</button>
     </div>
     <div class="score-hint" id="scoreHint"><span data-ja>⚠️ 01 著者情報の「著者氏名」を入力すると分析開始ボタンが有効になります</span><span data-en style="display:none">Enter your name in Author Info to activate the Start Analysis button</span></div>
   </div>
@@ -1029,44 +1221,106 @@ Rel(d, p, "図コード送信")
   <!-- PRICING -->
   <section class="stage-block" id="pricing">
     <div class="stage-tag"><span data-ja>PRICING · 料金体系</span><span data-en style="display:none">PRICING</span></div>
-    <h1><span data-ja>論文道場・プロフェッショナルプラン</span><span data-en style="display:none">Professional Plan</span></h1>
+    <h1><span data-ja>フェアなクレジット制 ── 使った分だけ</span><span data-en style="display:none">Fair Credit-Based Pricing</span></h1>
     <p style="margin-bottom:1.5rem; font-size:0.95rem; color:var(--main-muted);">
-      <span data-ja>教育工学ツールとして「価格の透明性・安心感」と「持続可能なシステム提供」を両立する、ハイブリッド型・デバッグ・クレジットシステムを採用しています。</span>
-      <span data-en style="display:none">We adopt a hybrid debug credit system that balances price transparency with sustainable system provision.</span>
+      <span data-ja>サブスクリプションではありません。クレジットを使い切っても<strong>自動引き落としは一切なし</strong>。予算超過・予期せぬ請求がゼロの「ゼロストップ・ガバナンス」を採用しています。</span>
+      <span data-en style="display:none">No subscription. Credits are consumed per use. Zero auto-billing, zero surprise charges.</span>
     </p>
 
-    <div class="c4-card" style="border-top: 3px solid var(--teal);">
-      <h3 style="font-size:1.2rem; color:var(--teal); margin-bottom:0.5rem;"><span data-ja>月額利用料: 3,000円（税込）</span><span data-en style="display:none">Monthly Fee: 3,000 JPY (Tax incl.)</span></h3>
-      <p style="margin-bottom:1rem; font-weight:bold;"><span data-ja>【付与特典】毎月 100 クレジット（約 300,000 トークン相当）</span><span data-en style="display:none">[Included] 100 Credits / month (approx. 300,000 tokens)</span></p>
-      <ul class="checklist" style="margin-bottom: 1rem;">
-        <li><input type="checkbox" checked disabled> <span data-ja>論文1本分の完全構造化・デバッグに十分な量（一般的な利用の90%以上をカバー）</span><span data-en style="display:none">Sufficient for full structuring and debugging of one paper.</span></li>
-        <li><input type="checkbox" checked disabled> <span data-ja>C4モデルによる論理の矛盾（バグ）の可視化とリファイン</span><span data-en style="display:none">Visualize and refine logical contradictions using C4 model.</span></li>
-      </ul>
-      <p style="font-size:0.85rem; color:var(--main-muted); background:#EAF4FB; padding:0.75rem; border-radius:5px;">
-        <span data-ja><strong>追加購入:</strong> 50クレジット / 1,500円（締め切り前の大規模な修正など、どうしても必要な場合のみワンクリックで追加可能）</span>
-        <span data-en style="display:none"><strong>Additional Purchase:</strong> 50 credits / 1,500 JPY (Available for large-scale revisions before deadlines).</span>
-      </p>
+    <!-- ゼロストップ保証ボックス -->
+    <div class="guarantee-box">
+      <div class="guarantee-icon">🛡️</div>
+      <div>
+        <div class="guarantee-title">ゼロストップ・ガバナンス保証</div>
+        <div class="guarantee-text">
+          クレジットが0になった時点でAI機能は自動でロックされます。<strong>追加の承認なく請求されることは絶対にありません。</strong>
+          毎月の利用状況はダッシュボードで確認でき、必要なときだけ任意でチャージできます。
+        </div>
+      </div>
     </div>
 
-    <h2 style="font-size:1.2rem; margin-top:2rem;"><span data-ja>消費ガバナンス（制限・請求の手順）</span><span data-en style="display:none">Consumption Governance</span></h2>
-    <div class="howto-grid" style="margin-top:1rem; gap: 1rem; margin-bottom:2rem;">
+    <!-- 料金プランカード -->
+    <div class="pricing-cards">
+      <div class="pricing-card">
+        <div class="pricing-tag">スターター</div>
+        <div class="pricing-price">無料 <small>（体験枠）</small></div>
+        <div class="pricing-credits">🎁 初回 50クレジット付与</div>
+        <div class="pricing-per-credit">1クレジット ≈ 1回の分析 ≒ 約0円</div>
+        <ul class="pricing-features">
+          <li>Stage 0〜III の全機能を体験可能</li>
+          <li>C4モデル構造図の生成（PlantUML）</li>
+          <li>クレジット枯渇後も入力データは保持</li>
+          <li>クレジット消費は操作前に常時表示</li>
+        </ul>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-tag">プロフェッショナル</div>
+        <div class="pricing-price">¥3,000 <small>／月（税込）</small></div>
+        <div class="pricing-credits">毎月 100クレジット付与（≈ 論文10本分）</div>
+        <div class="pricing-per-credit">1クレジット ≈ 約30円 ／ 分析1回</div>
+        <ul class="pricing-features">
+          <li>全ステージ（Stage 0〜VII）フルアクセス</li>
+          <li>C4モデル図 + PlantUMLエクスポート無制限</li>
+          <li>論文ドラフト保存・バージョン管理</li>
+          <li>追加チャージ：50cr / ¥1,500（任意）</li>
+          <li>クレジット残量アラート・自動ロック</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 消費コスト透明化テーブル -->
+    <h2 style="font-size:1.15rem; margin-bottom:0.75rem;">各アクションのクレジット消費量</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>アクション</th>
+          <th>消費クレジット</th>
+          <th>プロプランでの換算</th>
+          <th>補足</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>→ 分析開始（Stage 0 AI分析）</td><td style="font-weight:bold; color:var(--teal);">10 cr</td><td>約 ¥300</td><td>論文1本に1〜3回程度</td></tr>
+        <tr><td>Stage III ライティング支援</td><td style="font-weight:bold; color:var(--teal);">5 cr</td><td>約 ¥150</td><td>章ごとのフィードバック</td></tr>
+        <tr><td>Stage IV 論証スコア評価</td><td style="font-weight:bold; color:var(--teal);">5 cr</td><td>約 ¥150</td><td>評価＋改善提案</td></tr>
+        <tr><td>C4図生成（PlantUML）</td><td style="font-weight:bold; color:var(--teal);">2 cr</td><td>約 ¥60</td><td>図解のみ、テキスト応答なし</td></tr>
+        <tr><td>下書き保存・読込・Markdown出力</td><td style="font-weight:bold; color:var(--teal);">0 cr</td><td>無料</td><td>ローカル保存のため消費なし</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ガバナンスフロー -->
+    <h2 style="font-size:1.15rem; margin-top:2rem; margin-bottom:1rem;">消費ガバナンス・フロー</h2>
+    <div class="howto-grid" style="gap:1rem; margin-bottom:2rem;">
       <div class="howto-card">
         <span class="howto-num">1</span>
-        <h4><span data-ja>可視化とアラート</span><span data-en style="display:none">Visualization & Alerts</span></h4>
-        <p style="font-size:0.85rem;"><span data-ja>画面に「残りクレジット」を常時表示。残量が少なくなると事前の警告アラートを出します。</span><span data-en style="display:none">Remaining credits displayed at all times. Advance warnings when running low.</span></p>
+        <h4>アクション前に消費量を明示</h4>
+        <p style="font-size:0.85rem;">ボタンに「−10 Cr」と表示。押す前に何クレジット使うか分かります。</p>
       </div>
       <div class="howto-card">
         <span class="howto-num">2</span>
-        <h4><span data-ja>消費ゼロでの安全停止</span><span data-en style="display:none">Safe Stop on Zero</span></h4>
-        <p style="font-size:0.85rem;"><span data-ja>クレジットが0になった時点でAI応答をシステムロックし、「予期せぬ高額請求」を完全に防ぎます。</span><span data-en style="display:none">AI responses are locked when credits reach zero, completely preventing unexpected high charges.</span></p>
+        <h4>残量20%以下で警告色に変化</h4>
+        <p style="font-size:0.85rem;">クレジットバーがオレンジ→赤に変化し、補充のタイミングを視覚的に通知します。</p>
       </div>
-      <div class="howto-card" style="grid-column: 1 / -1; background:#FFF8EE; border-color:#D4AF6A;">
-        <span class="howto-num" style="background:#D4AF6A;">3</span>
-        <h4><span data-ja>特別研究モニター枠（実証実験）</span><span data-en style="display:none">Special Research Monitor</span></h4>
-        <p style="font-size:0.85rem;"><span data-ja>初期6ヶ月間は「日本の学術インフラDX・実証実験」の特待生枠（限定100名）として利用料免除。条件として、C4モデルを用いた論文執筆のビフォー・アフターデータをシステムにフィードバックしていただきます。</span><span data-en style="display:none">Free for the first 6 months as a special monitor. Requires feedback data on C4 model structuring.</span></p>
+      <div class="howto-card">
+        <span class="howto-num">3</span>
+        <h4>残量不足でボタンを事前ブロック</h4>
+        <p style="font-size:0.85rem;">クレジットが分析コストを下回ると分析ボタンが無効化され、データ消失事故を防ぎます。</p>
+      </div>
+      <div class="howto-card" style="background:#FFF8EE; border-color:#D4AF6A;">
+        <span class="howto-num" style="background:#D4AF6A;">4</span>
+        <h4>チャージはモーダルで完結</h4>
+        <p style="font-size:0.85rem;">「＋チャージ」ボタンを押してもページ遷移せず、入力中のデータは保護されます。</p>
       </div>
     </div>
+
+    <!-- 特別研究モニター -->
+    <div class="howto-card" style="background:#EAF4EC; border-color:#A8D5B5; margin-bottom:2rem;">
+      <span class="howto-num" style="background:var(--teal);">★</span>
+      <h4 style="color:var(--teal);">特別研究モニター枠（実証実験・限定100名）</h4>
+      <p style="font-size:0.85rem;">初期6ヶ月間は「日本の学術インフラDX・実証実験」の特待生枠として利用料免除。条件として、C4モデルを用いた論文執筆のビフォー・アフターデータのフィードバックをお願いします。</p>
+    </div>
   </section>
+
 
   <!-- SETTINGS -->
   <section class="stage-block" id="settings">
@@ -1097,6 +1351,81 @@ Rel(d, p, "図コード送信")
 
 </main>
 </div><!-- /.layout -->
+
+<!-- ===== CHARGE MODAL — Stripe / Card Only ===== -->
+<div class="modal-overlay" id="chargeModal" onclick="if(event.target===this)closeChargeModal()">
+  <div class="modal-box">
+    <!-- ヘッダー -->
+    <div class="modal-header">
+      <div class="modal-header-inner">
+        <span class="modal-header-title">クレジットをチャージ</span>
+        <span class="modal-header-sub">THESIS DOJO — Credit Purchase</span>
+      </div>
+      <button class="modal-close" onclick="closeChargeModal()" title="閉じる">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- データ保護バナー -->
+      <div class="modal-data-safe">
+        <span class="icon">🔒</span>
+        <span><strong>入力中のデータはブラウザに自動保存されています。</strong>安心してお手続きください。チャージ後すぐに続きから作業できます。</span>
+      </div>
+
+      <!-- プラン選択 -->
+      <div class="modal-plans">
+        <div class="plan-card" data-credits="50" onclick="selectPlan(this)">
+          <div class="plan-credits">50<small> Cr</small></div>
+          <div class="plan-price">¥1,500</div>
+          <div class="plan-per">1 Cr ≈ ¥30</div>
+          <div class="plan-note">分析 5回分</div>
+        </div>
+        <div class="plan-card selected" data-credits="120" onclick="selectPlan(this)">
+          <div class="plan-badge">おすすめ</div>
+          <div class="plan-credits">120<small> Cr</small></div>
+          <div class="plan-price">¥3,000<small> /月</small></div>
+          <div class="plan-per">1 Cr ≈ ¥25（お得）</div>
+          <div class="plan-note">論文10本分の目安</div>
+        </div>
+      </div>
+
+      <!-- 決済セクション：Stripe / クレジットカードのみ -->
+      <div class="payment-section">
+        <div class="payment-label">お支払い方法</div>
+
+        <!-- Stripe Checkout ボタン（モック） -->
+        <button class="stripe-btn" onclick="doCharge()">
+          <span>カードで安全に支払う</span>
+          <span class="stripe-logo">
+            <svg width="36" height="15" viewBox="0 0 60 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M27.5 10c0-2.8-1.4-5-4.3-5-2.9 0-4.7 2.2-4.7 5s1.7 5 4.7 5c2 0 3.2-.9 3.9-2.2l-1.9-.8c-.4.8-1.1 1.2-2 1.2-1.2 0-2-.7-2.2-2h6.5c0-.1 0-.1 0-.2zm-6.4-.9c.2-1.1.9-1.8 2-1.8s1.7.7 1.9 1.8h-3.9zm9.9-1.6c.5 0 1 .2 1.3.5l1.3-1.4c-.6-.6-1.6-1-2.6-1-2.1 0-3.6 1.1-3.6 2.9 0 3.4 4.6 2.2 4.6 3.8 0 .6-.5 1-1.4 1-.8 0-1.5-.4-1.9-1l-1.3 1.4c.7.9 1.8 1.4 3.2 1.4 2.2 0 3.7-1.1 3.7-2.9 0-3.5-4.6-2.3-4.6-3.8 0-.5.5-.9 1.3-.9zm5.9-3.7v1.9h-1.3v1.8h1.3V15h2.2V7.5h1.7V5.7h-1.7V4.8c0-.6.2-.9.8-.9.4 0 .7.1.9.3V2.5c-.4-.2-.9-.3-1.5-.3-1.7 0-2.4 1-2.4 2.6zm6.6 10.2V5.7h-2.2V15h2.2zm-1.1-10.5c.7 0 1.3-.6 1.3-1.3S43.1 1.9 42.4 1.9s-1.3.6-1.3 1.3.6 1.3 1.3 1.3zm7.5 0c-2.9 0-4.9 2.1-4.9 5s2 5 4.9 5 4.9-2.1 4.9-5-2-5-4.9-5zm0 8.1c-1.5 0-2.6-1.3-2.6-3.1s1.1-3.1 2.6-3.1 2.6 1.3 2.6 3.1-1.1 3.1-2.6 3.1zm8.4-7.9l-.1.8c-.5-.6-1.3-1-2.2-1-2.1 0-3.7 2-3.7 5s1.6 5 3.7 5c.9 0 1.7-.4 2.2-1l.1.8h2V5.7h-2zm-1.9 8c-1.2 0-2-1.1-2-3s.8-3 2-3 2 1.1 2 3-.8 3-2 3z" fill="white"/>
+            </svg>
+          </span>
+        </button>
+
+        <!-- 対応カードブランド（ロゴなしテキストのみ・ミニマル） -->
+        <div class="card-brands">
+          <span class="card-brand">VISA</span>
+          <span class="card-brand">Mastercard</span>
+          <span class="card-brand">Amex</span>
+          <span class="card-brand">JCB</span>
+          <span style="font-size:0.6rem;color:var(--main-muted);margin-left:0.25rem;">のみ対応</span>
+        </div>
+      </div>
+
+      <!-- ゼロストップ保証 -->
+      <div class="modal-zero-stop">
+        <span style="font-size:1rem;flex-shrink:0;line-height:1.6;">🛡️</span>
+        <span><strong>ゼロストップ保証：</strong>残高0になっても自動引き落とし・自動更新は一切されません。次回チャージは常に手動・任意です。</span>
+      </div>
+
+      <div class="modal-footer-note">
+        決済はStripeで安全に処理されます。カード番号はサーバーに保存されません。<br>
+        ※ PayPay等のローカル決済は非対応です。
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script>
   function setLang(lang) {
@@ -1188,20 +1517,86 @@ Rel(d, p, "図コード送信")
       const suffix = refs >= 6 ? '✅ 満点' : refs > 0 ? `（あと${6-refs}件で満点）` : '（6件以上で満点 ／ 1件でもスコアに加点されます）';
       refCountEl.innerHTML = `${refs} 件 <span style="color:#2A6080;">${suffix}</span>`;
     }
+
+    // クレジット不足チェック（calcScore後にも適用）
+    updateCreditUI();
   }
+
+  /* ===== CREDIT UI (ゼロストップ・ガバナンス) ===== */
+  const ANALYSIS_COST = 10; // 1回の分析コスト
 
   function updateCreditUI() {
     let credits = parseInt(localStorage.getItem('dojo-credits'));
     if (isNaN(credits)) {
-      credits = 100; // 初期付与
+      credits = 50; // 初回無料体験付与
       localStorage.setItem('dojo-credits', credits);
     }
-    const creditEl = document.getElementById('creditNum');
-    if (creditEl) {
-      creditEl.textContent = credits;
-      if (credits <= 10) creditEl.style.color = '#E74C3C';
-      else creditEl.style.color = '#F1C40F';
+    const TOTAL = 100;
+    const pct = Math.max(0, credits / TOTAL * 100);
+
+    const numEl  = document.getElementById('creditNum');
+    const barEl  = document.getElementById('creditBarFill');
+    const badge  = document.getElementById('creditFreeBadge');
+
+    if (numEl) {
+      numEl.textContent = credits;
+      numEl.classList.remove('warning', 'caution');
+      if (credits <= 10)       numEl.classList.add('warning');
+      else if (credits <= 20)  numEl.classList.add('caution');
     }
+    if (barEl) {
+      barEl.style.width = pct + '%';
+      barEl.classList.remove('warning', 'caution');
+      if (credits <= 10)       barEl.classList.add('warning');
+      else if (credits <= 20)  barEl.classList.add('caution');
+    }
+    if (badge) {
+      if (credits === 50 && !localStorage.getItem('dojo-credits-used')) {
+        badge.style.display = '';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // ボタンの disabled 制御（クレジット不足ブロック）
+    const btn = document.getElementById('btnAnalyze');
+    if (btn && credits < ANALYSIS_COST) {
+      btn.disabled = true;
+      btn.classList.remove('ready');
+      btn.classList.add('credit-blocked');
+      btn.textContent = '→ クレジットが不足しています';
+      const hint = document.getElementById('scoreHint');
+      if (hint) hint.innerHTML = '<span style="color:#ffddaa;">⚠️ クレジットが不足しているため分析を開始できません。「＋ チャージ」からクレジットを補充してください。</span>';
+    } else if (btn) {
+      btn.classList.remove('credit-blocked');
+      btn.textContent = '→ 分析開始（−10 Cr）';
+    }
+  }
+
+  /* ===== CHARGE MODAL ===== */
+  function openChargeModal() {
+    document.getElementById('chargeModal').classList.add('open');
+  }
+  function closeChargeModal() {
+    document.getElementById('chargeModal').classList.remove('open');
+  }
+  function selectPlan(el) {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  function doCharge() {
+    // モック：Stripe Checkoutへ遷移する想定。ここではデモ用にクレジット追加
+    const selected = document.querySelector('.plan-card.selected');
+    const cr = selected ? parseInt(selected.dataset.credits || '50') : 50;
+    let credits = parseInt(localStorage.getItem('dojo-credits') || '0');
+    credits = Math.min(credits + cr, 200);
+    localStorage.setItem('dojo-credits', credits);
+    localStorage.setItem('dojo-credits-used', '1');
+    updateCreditUI();
+    closeChargeModal();
+    // calcScore を再実行してボタン状態を更新
+    calcScore();
+    alert(`✅ ${cr}クレジットをチャージしました。残高：${credits} Cr`);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -1225,9 +1620,10 @@ Rel(d, p, "図コード送信")
   }
 
   function startAnalysis() {
-    let credits = parseInt(localStorage.getItem('dojo-credits') || '100');
-    if (credits <= 0) {
-      alert('【クレジット残量ゼロ】\nクレジットが不足しています。AIの利用を自動ロックしました。\n「料金プラン」ページから追加チャージを行ってください。');
+    let credits = parseInt(localStorage.getItem('dojo-credits') || '50');
+    if (credits < ANALYSIS_COST) {
+      // クレジット不足: モーダルを開く
+      openChargeModal();
       return;
     }
 
@@ -1303,8 +1699,9 @@ ${get('references') || '（未入力）'}
     .then(r => r.json())
     .then(data => {
       // クレジット消費ロジック
-      credits -= 1;
+      credits -= ANALYSIS_COST;
       localStorage.setItem('dojo-credits', credits);
+      localStorage.setItem('dojo-credits-used', '1');
       updateCreditUI();
 
       const text = (data.content || []).map(b => b.text || '').join('\n').trim()

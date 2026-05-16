@@ -445,6 +445,7 @@
   <!-- [校正] ツールリンクを正しいidに修正 -->
   <a href="#tools-c4"><span data-ja>C4モデル図集</span><span data-en style="display:none">C4 Diagram Gallery</span></a>
   <a href="#tools-format"><span data-ja>学会フォーマット</span><span data-en style="display:none">Journal Formats</span></a>
+  <a href="#pricing"><span data-ja>料金プラン</span><span data-en style="display:none">Pricing</span></a>
   <a href="#settings"><span data-ja>設定</span><span data-en style="display:none">Settings</span></a>
 </aside>
 
@@ -484,9 +485,19 @@
       <button class="btn-sample" onclick="loadSample()"><span data-ja>💡 迷ったらここをクリック！（サンプルデータを入力して体験する）</span><span data-en style="display:none">💡 Click Here to Try Sample Data</span></button>
     </div>
     <!-- [校正] basho-case.html へのリンク（相対パスで正しく設定） -->
-    <p style="margin-bottom:1.5rem; font-size:0.95rem;">
-      📖 <a href="https://c4model.org/basho-case.html">論文道場の活用事例を読む</a>
-    </p>
+    <!-- 活用事例 -->
+    <div style="background:#FFF8EE; border:1px solid var(--card-border); border-radius:8px; padding:1.25rem; margin-bottom:2rem; font-size:0.95rem;">
+      <h3 style="font-size:1.1rem; color:var(--accent); margin-bottom:0.5rem;">📖 論文道場の活用事例</h3>
+      <ul style="list-style:none; padding:0; line-height:1.8;">
+        <li style="margin-bottom:0.8rem;">
+          <a href="foodloss_c4_paper.html" style="color:var(--teal); font-weight:bold;">【NEW】地域催事における余剰食材の子ども食堂へのデリバリー経路最適化に関する研究</a><br>
+          <span style="font-size:0.85rem; color:var(--main-muted); display:inline-block; margin-top:0.2rem; background:#FFEDD5; padding:2px 6px; border-radius:4px; color:#9B3A18;">✨ NHK「列島ニュースアップ」報道事例のC4モデル分析</span>
+        </li>
+        <li>
+          <a href="https://c4model.org/basho-case.html" style="color:var(--teal); font-weight:bold;">松尾芭蕉「おくのほそ道」のC4モデル構造解析</a>
+        </li>
+      </ul>
+    </div>
 
     <div class="action-row">
       <button class="btn-ghost" onclick="exportMarkdown()"><span data-ja>⬇️ Markdown出力</span><span data-en style="display:none">⬇️ Export Markdown</span></button>
@@ -667,6 +678,11 @@
           <div class="axis-bar"><div class="axis-bar-fill" id="bar-auth" style="width:0%"></div></div>
           <div class="axis-label">著者情報</div>
         </div>
+      </div>
+      <!-- クレジットメーター -->
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; margin-right:1rem;">
+        <div style="font-size:0.72rem; color:rgba(255,255,255,0.85); letter-spacing:0.1em;"><span data-ja>残りクレジット</span><span data-en style="display:none">Credits</span></div>
+        <div style="font-size:1.4rem; font-weight:bold; line-height:1; color:#F1C40F;"><span id="creditNum">100</span><span style="font-size:0.8rem; color:rgba(255,255,255,0.6);">/100</span></div>
       </div>
       <button class="btn-analyze" id="btnAnalyze" onclick="startAnalysis()" disabled>→ 分析開始</button>
     </div>
@@ -1010,6 +1026,48 @@ Rel(d, p, "図コード送信")
     </table>
   </section>
 
+  <!-- PRICING -->
+  <section class="stage-block" id="pricing">
+    <div class="stage-tag"><span data-ja>PRICING · 料金体系</span><span data-en style="display:none">PRICING</span></div>
+    <h1><span data-ja>論文道場・プロフェッショナルプラン</span><span data-en style="display:none">Professional Plan</span></h1>
+    <p style="margin-bottom:1.5rem; font-size:0.95rem; color:var(--main-muted);">
+      <span data-ja>教育工学ツールとして「価格の透明性・安心感」と「持続可能なシステム提供」を両立する、ハイブリッド型・デバッグ・クレジットシステムを採用しています。</span>
+      <span data-en style="display:none">We adopt a hybrid debug credit system that balances price transparency with sustainable system provision.</span>
+    </p>
+
+    <div class="c4-card" style="border-top: 3px solid var(--teal);">
+      <h3 style="font-size:1.2rem; color:var(--teal); margin-bottom:0.5rem;"><span data-ja>月額利用料: 3,000円（税込）</span><span data-en style="display:none">Monthly Fee: 3,000 JPY (Tax incl.)</span></h3>
+      <p style="margin-bottom:1rem; font-weight:bold;"><span data-ja>【付与特典】毎月 100 クレジット（約 300,000 トークン相当）</span><span data-en style="display:none">[Included] 100 Credits / month (approx. 300,000 tokens)</span></p>
+      <ul class="checklist" style="margin-bottom: 1rem;">
+        <li><input type="checkbox" checked disabled> <span data-ja>論文1本分の完全構造化・デバッグに十分な量（一般的な利用の90%以上をカバー）</span><span data-en style="display:none">Sufficient for full structuring and debugging of one paper.</span></li>
+        <li><input type="checkbox" checked disabled> <span data-ja>C4モデルによる論理の矛盾（バグ）の可視化とリファイン</span><span data-en style="display:none">Visualize and refine logical contradictions using C4 model.</span></li>
+      </ul>
+      <p style="font-size:0.85rem; color:var(--main-muted); background:#EAF4FB; padding:0.75rem; border-radius:5px;">
+        <span data-ja><strong>追加購入:</strong> 50クレジット / 1,500円（締め切り前の大規模な修正など、どうしても必要な場合のみワンクリックで追加可能）</span>
+        <span data-en style="display:none"><strong>Additional Purchase:</strong> 50 credits / 1,500 JPY (Available for large-scale revisions before deadlines).</span>
+      </p>
+    </div>
+
+    <h2 style="font-size:1.2rem; margin-top:2rem;"><span data-ja>消費ガバナンス（制限・請求の手順）</span><span data-en style="display:none">Consumption Governance</span></h2>
+    <div class="howto-grid" style="margin-top:1rem; gap: 1rem; margin-bottom:2rem;">
+      <div class="howto-card">
+        <span class="howto-num">1</span>
+        <h4><span data-ja>可視化とアラート</span><span data-en style="display:none">Visualization & Alerts</span></h4>
+        <p style="font-size:0.85rem;"><span data-ja>画面に「残りクレジット」を常時表示。残量が少なくなると事前の警告アラートを出します。</span><span data-en style="display:none">Remaining credits displayed at all times. Advance warnings when running low.</span></p>
+      </div>
+      <div class="howto-card">
+        <span class="howto-num">2</span>
+        <h4><span data-ja>消費ゼロでの安全停止</span><span data-en style="display:none">Safe Stop on Zero</span></h4>
+        <p style="font-size:0.85rem;"><span data-ja>クレジットが0になった時点でAI応答をシステムロックし、「予期せぬ高額請求」を完全に防ぎます。</span><span data-en style="display:none">AI responses are locked when credits reach zero, completely preventing unexpected high charges.</span></p>
+      </div>
+      <div class="howto-card" style="grid-column: 1 / -1; background:#FFF8EE; border-color:#D4AF6A;">
+        <span class="howto-num" style="background:#D4AF6A;">3</span>
+        <h4><span data-ja>特別研究モニター枠（実証実験）</span><span data-en style="display:none">Special Research Monitor</span></h4>
+        <p style="font-size:0.85rem;"><span data-ja>初期6ヶ月間は「日本の学術インフラDX・実証実験」の特待生枠（限定100名）として利用料免除。条件として、C4モデルを用いた論文執筆のビフォー・アフターデータをシステムにフィードバックしていただきます。</span><span data-en style="display:none">Free for the first 6 months as a special monitor. Requires feedback data on C4 model structuring.</span></p>
+      </div>
+    </div>
+  </section>
+
   <!-- SETTINGS -->
   <section class="stage-block" id="settings">
     <div class="stage-tag">SETTINGS</div>
@@ -1132,7 +1190,22 @@ Rel(d, p, "図コード送信")
     }
   }
 
+  function updateCreditUI() {
+    let credits = parseInt(localStorage.getItem('dojo-credits'));
+    if (isNaN(credits)) {
+      credits = 100; // 初期付与
+      localStorage.setItem('dojo-credits', credits);
+    }
+    const creditEl = document.getElementById('creditNum');
+    if (creditEl) {
+      creditEl.textContent = credits;
+      if (credits <= 10) creditEl.style.color = '#E74C3C';
+      else creditEl.style.color = '#F1C40F';
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
+    updateCreditUI();
     document.querySelectorAll('input, textarea, select').forEach(el => {
       el.addEventListener('input', calcScore);
       el.addEventListener('change', calcScore);
@@ -1152,6 +1225,12 @@ Rel(d, p, "図コード送信")
   }
 
   function startAnalysis() {
+    let credits = parseInt(localStorage.getItem('dojo-credits') || '100');
+    if (credits <= 0) {
+      alert('【クレジット残量ゼロ】\nクレジットが不足しています。AIの利用を自動ロックしました。\n「料金プラン」ページから追加チャージを行ってください。');
+      return;
+    }
+
     const score = parseInt(document.getElementById('scoreNum').textContent);
     const btn   = document.getElementById('btnAnalyze');
     const hint  = document.getElementById('scoreHint');
@@ -1207,7 +1286,10 @@ ${get('references') || '（未入力）'}
 2. 要旨の強化ポイント
 3. 章構成のバランスと改善案
 4. C4モデル（L1〜L4）の各層への適用方法
-5. 参考文献充実のための検索キーワード提案`;
+5. 参考文献充実のための検索キーワード提案
+
+【システム指示】
+ユーザーは「ハイブリッド・クレジットシステム（従量制）」を利用しています。無駄なトークン消費を抑えるため、冗長な挨拶は省き、簡潔かつ最も価値のある構造的アドバイスを直接出力してください。`;
 
     fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -1220,6 +1302,11 @@ ${get('references') || '（未入力）'}
     })
     .then(r => r.json())
     .then(data => {
+      // クレジット消費ロジック
+      credits -= 1;
+      localStorage.setItem('dojo-credits', credits);
+      updateCreditUI();
+
       const text = (data.content || []).map(b => b.text || '').join('\n').trim()
         || '（AIからの応答がありませんでした）';
       // 結果をscore-hintエリアに表示

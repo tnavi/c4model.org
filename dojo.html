@@ -451,6 +451,69 @@
     border-color: rgba(231,76,60,0.5) !important; cursor: not-allowed !important;
   }
 
+  /* ===== 印刷ボタン ===== */
+  .btn-print {
+    display: none; /* 分析完了後にJSでblock表示 */
+    margin-top: 0.75rem;
+    padding: 0.55rem 1.2rem;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn-print:hover { background: var(--accent); color: #fff; }
+
+  /* ===== 分析回数バッジ ===== */
+  #analysisCountBadge {
+    display: inline-block;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.6);
+    margin-top: 4px;
+  }
+
+  /* ===== @media print ===== */
+  @media print {
+    .topnav,
+    aside,
+    .score-bar,
+    #btnAnalyze,
+    .btn-print,
+    .btn-charge,
+    .modal-overlay,
+    .stage-block:not(#stage0),
+    nav,
+    .btn-ghost,
+    .btn-primary,
+    .feedback-section,
+    #feedback,
+    #pricing,
+    #tools-c4,
+    .zero-stop-note,
+    .credit-meter-wrap {
+      display: none !important;
+    }
+    body { background: #fff; color: #000; font-size: 11pt; line-height: 1.6; }
+    .main-content { margin: 0; padding: 0; }
+    #stage0 { border: none; margin: 0; padding: 0; }
+    #scoreHint {
+      border: 1px solid #ccc;
+      padding: 1rem;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-size: 10pt;
+      page-break-inside: avoid;
+    }
+    #scoreHint pre { font-size: 9.5pt; }
+    .puml-img { max-width: 100%; page-break-inside: avoid; }
+    h1 { font-size: 14pt; }
+    h2 { font-size: 12pt; }
+    a { color: #000; text-decoration: none; }
+  }
+
   /* ===== CHARGE MODAL — クリーンミニマル ===== */
   .modal-overlay {
     display: none; position: fixed; inset: 0; z-index: 2000;
@@ -876,9 +939,11 @@
         </div>
         <div class="zero-stop-note">※ 残量0でも自動引き落としは一切されません</div>
       </div>
-      <button class="btn-analyze" id="btnAnalyze" onclick="startAnalysis()" disabled>→ 分析開始（−10 Cr）</button>
+      <button class="btn-analyze" id="btnAnalyze" onclick="startAnalysis()" disabled>→ 分析開始（−10 Cr / 1分析）</button>
     </div>
     <div class="score-hint" id="scoreHint"><span data-ja>⚠️ 01 著者情報の「著者氏名」を入力すると分析開始ボタンが有効になります</span><span data-en style="display:none">Enter your name in Author Info to activate the Start Analysis button</span></div>
+    <button class="btn-print" id="btnPrint" onclick="window.print()">📄 分析結果を印刷・PDF保存</button>
+    <div id="analysisCountBadge"></div>
   </div>
 
   <!-- STAGE I -->
@@ -1105,7 +1170,7 @@
         <label><input type="radio" name="q_a" value="4"> 4. 悪い</label>
         <label><input type="radio" name="q_a" value="5"> 5. 非常に悪い</label>
       </div>
-      <textarea rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
+      <textarea id="fb_a_text" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
 
     <div class="form-section">
@@ -1117,7 +1182,7 @@
         <label><input type="radio" name="q_b" value="4"> 4. 悪い</label>
         <label><input type="radio" name="q_b" value="5"> 5. 非常に悪い</label>
       </div>
-      <textarea rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
+      <textarea id="fb_b_text" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
 
     <div class="form-section">
@@ -1129,7 +1194,7 @@
         <label><input type="radio" name="q_c" value="4"> 4. 悪い</label>
         <label><input type="radio" name="q_c" value="5"> 5. 非常に悪い</label>
       </div>
-      <textarea rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
+      <textarea id="fb_c_text" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
 
     <div class="form-section">
@@ -1141,7 +1206,7 @@
         <label><input type="radio" name="q_d" value="4"> 4. 悪い</label>
         <label><input type="radio" name="q_d" value="5"> 5. 非常に悪い</label>
       </div>
-      <textarea rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
+      <textarea id="fb_d_text" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
 
     <div class="form-section">
@@ -1153,10 +1218,11 @@
         <label><input type="radio" name="q_e" value="4"> 4. 悪い</label>
         <label><input type="radio" name="q_e" value="5"> 5. 非常に悪い</label>
       </div>
-      <textarea rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
+      <textarea id="fb_e_text" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
 
-    <button class="btn-primary" style="font-size:1rem; padding:0.7rem 1.8rem;">📤 アンケートを送信する</button>
+    <button id="btnFeedback" class="btn-primary" style="font-size:1rem; padding:0.7rem 1.8rem;" onclick="submitFeedback()">📤 アンケートを送信する</button>
+    <p id="feedbackSent" style="display:none; margin-top:1rem; color:var(--teal); font-size:0.9rem; font-weight:bold;">✅ 送信完了。ご協力ありがとうございました。回答はブラウザに保存されました。</p>
   </section>
 
   <!-- TOOLS: C4モデル図集 -->
@@ -1280,7 +1346,7 @@ Rel(d, p, "図コード送信")
         </tr>
       </thead>
       <tbody>
-        <tr><td>→ 分析開始（Stage 0 AI分析）</td><td style="font-weight:bold; color:var(--teal);">10 cr</td><td>約 ¥300</td><td>論文1本に1〜3回程度</td></tr>
+        <tr><td>→ 分析開始（Stage 0 AI分析）<br><small style="color:var(--main-muted);">※ 1ボタン押下＝1分析。入力修正後の再分析もそれぞれ10 Cr消費します。</small></td><td style="font-weight:bold; color:var(--teal);">10 cr<br><small style="font-weight:normal;">/ 1分析</small></td><td>約 ¥300</td><td>論文1本に1〜3分析が目安</td></tr>
         <tr><td>Stage III ライティング支援</td><td style="font-weight:bold; color:var(--teal);">5 cr</td><td>約 ¥150</td><td>章ごとのフィードバック</td></tr>
         <tr><td>Stage IV 論証スコア評価</td><td style="font-weight:bold; color:var(--teal);">5 cr</td><td>約 ¥150</td><td>評価＋改善提案</td></tr>
         <tr><td>C4図生成（PlantUML）</td><td style="font-weight:bold; color:var(--teal);">2 cr</td><td>約 ¥60</td><td>図解のみ、テキスト応答なし</td></tr>
@@ -1525,11 +1591,35 @@ Rel(d, p, "図コード送信")
   /* ===== CREDIT UI (ゼロストップ・ガバナンス) ===== */
   const ANALYSIS_COST = 10; // 1回の分析コスト
 
+  /* Cookie ユーティリティ */
+  function _setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + days * 864e5);
+    document.cookie = name + '=' + value + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+  }
+  function _getCookie(name) {
+    const m = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+
   function updateCreditUI() {
     let credits = parseInt(localStorage.getItem('dojo-credits'));
+    const cookieFlag = _getCookie('dojo_first_credit');
+
     if (isNaN(credits)) {
-      credits = 50; // 初回無料体験付与
-      localStorage.setItem('dojo-credits', credits);
+      if (cookieFlag === '1') {
+        // Cookieがある = 初回付与済み → 残高0として扱う（再付与しない）
+        credits = 0;
+        localStorage.setItem('dojo-credits', 0);
+      } else {
+        // 真の初回 → 50Cr付与してCookieを365日間保持
+        credits = 50;
+        localStorage.setItem('dojo-credits', credits);
+        _setCookie('dojo_first_credit', '1', 365);
+      }
+    } else if (cookieFlag !== '1') {
+      // localStorageには値があるがCookieが消えている → Cookieを復元
+      _setCookie('dojo_first_credit', '1', 365);
     }
     const TOTAL = 100;
     const pct = Math.max(0, credits / TOTAL * 100);
@@ -1569,7 +1659,7 @@ Rel(d, p, "図コード送信")
       if (hint) hint.innerHTML = '<span style="color:#ffddaa;">⚠️ クレジットが不足しているため分析を開始できません。「＋ チャージ」からクレジットを補充してください。</span>';
     } else if (btn) {
       btn.classList.remove('credit-blocked');
-      btn.textContent = '→ 分析開始（−10 Cr）';
+      btn.textContent = '→ 分析開始（−10 Cr / 1分析）';
     }
   }
 
@@ -1706,17 +1796,39 @@ ${get('references') || '（未入力）'}
 
       const text = (data.content || []).map(b => b.text || '').join('\n').trim()
         || '（AIからの応答がありませんでした）';
-      // 結果をscore-hintエリアに表示
-      hint.innerHTML = '<strong>📄 AI分析結果</strong><br><pre style="white-space:pre-wrap; font-family:inherit; font-size:0.85rem; margin-top:0.5rem;">' + text + '</pre>';
+      // ── 要件3: 分析回数・日時トラッキング ──
+      const now = new Date().toISOString();
+      const prevCount = parseInt(localStorage.getItem('dojo-analysis-count') || '0');
+      const newCount = prevCount + 1;
+      localStorage.setItem('dojo-analysis-count', newCount);
+      localStorage.setItem('dojo-last-used-at', now);
+      if (!localStorage.getItem('dojo-first-used-at')) {
+        localStorage.setItem('dojo-first-used-at', now);
+      }
+      // 分析回数バッジを更新
+      const badge = document.getElementById('analysisCountBadge');
+      if (badge) badge.textContent = 'この論文の分析回数：' + newCount + ' 回（合計 ' + (newCount * ANALYSIS_COST) + ' Cr 消費）';
+
+      // ── 要件4: 分析結果をscoreHintに表示しlocalStorageにも保存 ──
+      const resultHTML = '<strong>📄 AI分析結果（第' + newCount + '回）</strong><br><pre style="white-space:pre-wrap; font-family:inherit; font-size:0.85rem; margin-top:0.5rem;">' + text + '</pre>';
+      hint.innerHTML = resultHTML;
+      // AI結果フラグ付きで保存（isAiResult: true でエラーメッセージと区別）
+      localStorage.setItem('dojo-ai-result', JSON.stringify({ html: resultHTML, savedAt: now, count: newCount, isAiResult: true }));
+
       btn.disabled   = false;
-      btn.textContent = '→ 分析完了';
+      btn.textContent = '→ 再分析（−10 Cr / 1分析）';
+
+      // ── 要件5: 印刷ボタンを表示 ──
+      const printBtn = document.getElementById('btnPrint');
+      if (printBtn) printBtn.style.display = 'block';
+
       // C4図も描画
       renderPuml();
     })
     .catch(e => {
       hint.innerHTML = '<span style="color:#ffddaa;">⚠️ API接続エラー: ' + e.message + '</span>';
       btn.disabled   = false;
-      btn.textContent = '→ 分析開始';
+      btn.textContent = '→ 分析開始（−10 Cr / 1分析）';
     });
   }
 
@@ -1754,8 +1866,18 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
       const el = document.getElementById(id);
       if(el) data[id] = el.value;
     });
+    // 要件4: AI分析結果も保存（isAiResult フラグがある場合のみ）
+    try {
+      const aiRaw = localStorage.getItem('dojo-ai-result');
+      if (aiRaw) {
+        const aiObj = JSON.parse(aiRaw);
+        if (aiObj && aiObj.isAiResult) data._aiResult = aiObj;
+      }
+    } catch(e) {}
+    data._analysisCount = localStorage.getItem('dojo-analysis-count') || '0';
+    data._savedAt = new Date().toISOString();
     localStorage.setItem('dojoDraft', JSON.stringify(data));
-    alert('下書きを保存しました。');
+    alert('下書きを保存しました。（AI分析結果も含まれています）');
   }
 
   function loadDraft() {
@@ -1763,11 +1885,24 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
     if(!raw) { alert('保存された下書きがありません。'); return; }
     const data = JSON.parse(raw);
     Object.keys(data).forEach(id => {
+      if (id.startsWith('_')) return; // 内部フィールドはスキップ
       const el = document.getElementById(id);
       if(el) el.value = data[id];
     });
+    // 要件4: AI分析結果を復元
+    if (data._aiResult && data._aiResult.isAiResult) {
+      const hint = document.getElementById('scoreHint');
+      if (hint) hint.innerHTML = data._aiResult.html + '<br><small style="color:var(--main-muted);">[保存日時: ' + (data._savedAt || '不明') + ' / 分析' + (data._aiResult.count || '?') + '回目]</small>';
+      // 印刷ボタンも復元表示
+      const printBtn = document.getElementById('btnPrint');
+      if (printBtn) printBtn.style.display = 'block';
+      // 分析回数バッジ復元
+      const badge = document.getElementById('analysisCountBadge');
+      const cnt = parseInt(data._analysisCount || '0');
+      if (badge && cnt > 0) badge.textContent = 'この論文の分析回数：' + cnt + ' 回（合計 ' + (cnt * 10) + ' Cr 消費）';
+    }
     calcScore();
-    alert('下書きを読み込みました。');
+    alert('下書きを読み込みました。' + (data._aiResult ? '\nAI分析結果も復元しました。' : ''));
   }
 
   function clearAll() {
@@ -1855,6 +1990,64 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
   }, {threshold: 0.15});
 
   document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+
+  /* ===== 要件2: アンケート送信（モック + localStorage保存） ===== */
+  function submitFeedback() {
+    const btn  = document.getElementById('btnFeedback');
+    const sent = document.getElementById('feedbackSent');
+
+    const answers = {
+      q_a: document.querySelector('[name=q_a]:checked')?.value || '未回答',
+      q_a_text: document.getElementById('fb_a_text')?.value || '',
+      q_b: document.querySelector('[name=q_b]:checked')?.value || '未回答',
+      q_b_text: document.getElementById('fb_b_text')?.value || '',
+      q_c: document.querySelector('[name=q_c]:checked')?.value || '未回答',
+      q_c_text: document.getElementById('fb_c_text')?.value || '',
+      q_d: document.querySelector('[name=q_d]:checked')?.value || '未回答',
+      q_d_text: document.getElementById('fb_d_text')?.value || '',
+      q_e: document.querySelector('[name=q_e]:checked')?.value || '未回答',
+      q_e_text: document.getElementById('fb_e_text')?.value || '',
+      // モニタリング連携データ
+      analysisCount: localStorage.getItem('dojo-analysis-count') || '0',
+      firstUsedAt:   localStorage.getItem('dojo-first-used-at') || '未記録',
+      lastUsedAt:    localStorage.getItem('dojo-last-used-at')  || '未記録',
+      creditsRemain: localStorage.getItem('dojo-credits') || '不明',
+      submittedAt:   new Date().toISOString(),
+    };
+
+    // モック: コンソールにJSON出力（将来はfetchでサーバーへ送信）
+    console.log('[論文道場] アンケート回答:', JSON.stringify(answers, null, 2));
+
+    // localStorageに保存（エクスポート用）
+    localStorage.setItem('dojo-survey-result', JSON.stringify(answers));
+
+    // UI: 二重送信防止
+    if (btn)  { btn.disabled = true; btn.textContent = '✅ 送信完了（ご協力ありがとうございました）'; }
+    if (sent) { sent.style.display = 'block'; }
+  }
+
+  /* ===== 起動時: AI結果・分析回数バッジを復元 ===== */
+  document.addEventListener('DOMContentLoaded', () => {
+    // 分析回数バッジ
+    const cnt = parseInt(localStorage.getItem('dojo-analysis-count') || '0');
+    if (cnt > 0) {
+      const badge = document.getElementById('analysisCountBadge');
+      if (badge) badge.textContent = 'この論文の分析回数：' + cnt + ' 回（合計 ' + (cnt * 10) + ' Cr 消費）';
+    }
+    // AI分析結果の自動復元（ページリロード時）
+    try {
+      const aiRaw = localStorage.getItem('dojo-ai-result');
+      if (aiRaw) {
+        const aiObj = JSON.parse(aiRaw);
+        if (aiObj && aiObj.isAiResult) {
+          const hint = document.getElementById('scoreHint');
+          if (hint) hint.innerHTML = aiObj.html + '<br><small style="color:var(--main-muted);">[前回分析: ' + (aiObj.savedAt || '不明') + ']</small>';
+          const printBtn = document.getElementById('btnPrint');
+          if (printBtn) printBtn.style.display = 'block';
+        }
+      }
+    } catch(e) {}
+  });
 </script>
 
 <!-- フッター：Zotero連携注記 -->

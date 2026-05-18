@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI論文時代の新しい問い — 論文道場</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Zen+Kaku+Gothic+New:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:     #1a1814;
+  --ink2:    #3d3a34;
+  --ink3:    #7a7570;
+  --paper:   #f7f4ef;
+  --paper2:  #edeae3;
+  --accent:  #8b3a2a;
+  --accent2: #c4622d;
+  --line:    rgba(26,24,20,0.1);
+  --serif:   'Noto Serif JP', serif;
+  --sans:    'Zen Kaku Gothic New', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 300;
+  line-height: 1.9;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 4rem;
+  background: rgba(247,244,239,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 0.5px solid var(--line);
+}
+.nav-logo {
+  font-family: var(--serif); font-size: 1rem; letter-spacing: 0.15em;
+  color: var(--ink); text-decoration: none;
+}
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a {
+  font-size: 0.78rem; letter-spacing: 0.1em; color: var(--ink3);
+  text-decoration: none; transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: grid; place-items: center;
+  padding: 8rem 4rem 5rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '問';
+  position: absolute; right: -2rem; top: 50%; transform: translateY(-55%);
+  font-family: var(--serif); font-size: clamp(20rem, 35vw, 42rem);
+  color: rgba(26,24,20,0.035); line-height: 1;
+  pointer-events: none; user-select: none;
+}
+.hero-inner { max-width: 820px; }
+.hero-eyebrow {
+  font-size: 0.72rem; letter-spacing: 0.25em; color: var(--accent);
+  text-transform: uppercase; margin-bottom: 2rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.hero-eyebrow::before {
+  content: ''; display: block; width: 2.5rem; height: 1px; background: var(--accent);
+}
+.hero h1 {
+  font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 300; line-height: 1.4; letter-spacing: 0.05em;
+  margin-bottom: 2.5rem;
+}
+.hero h1 em {
+  font-style: normal; color: var(--accent2);
+  border-bottom: 1.5px solid var(--accent2);
+}
+.hero-lead {
+  font-size: 1.05rem; color: var(--ink2); max-width: 600px;
+  line-height: 2; margin-bottom: 3rem;
+}
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 0.75rem;
+  font-size: 0.82rem; letter-spacing: 0.15em;
+  color: var(--ink); border: 1px solid var(--ink);
+  padding: 0.85rem 2rem; text-decoration: none;
+  transition: all 0.25s;
+}
+.hero-cta:hover {
+  background: var(--ink); color: var(--paper);
+}
+.hero-cta svg { width: 16px; height: 16px; transition: transform 0.25s; }
+.hero-cta:hover svg { transform: translateX(4px); }
+
+/* ── SECTION COMMON ── */
+section { padding: 7rem 4rem; }
+.section-label {
+  font-size: 0.7rem; letter-spacing: 0.3em; color: var(--accent);
+  text-transform: uppercase; margin-bottom: 1.2rem;
+  display: flex; align-items: center; gap: 0.8rem;
+}
+.section-label::before {
+  content: ''; width: 1.5rem; height: 1px; background: var(--accent);
+}
+.section-title {
+  font-family: var(--serif); font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 300; line-height: 1.5; margin-bottom: 1.5rem;
+}
+
+/* ── PROBLEM SECTION ── */
+.problem { background: var(--ink); color: var(--paper); }
+.problem .section-label { color: #c4622d; }
+.problem .section-label::before { background: #c4622d; }
+.problem .section-title { color: var(--paper); }
+.problem-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  margin-top: 4rem; border: 0.5px solid rgba(255,255,255,0.1);
+}
+.problem-item {
+  padding: 2.5rem; border: 0.5px solid rgba(255,255,255,0.1);
+  position: relative; overflow: hidden;
+  transition: background 0.3s;
+}
+.problem-item:hover { background: rgba(255,255,255,0.04); }
+.problem-num {
+  font-family: var(--serif); font-size: 3.5rem; font-weight: 300;
+  color: rgba(196,98,45,0.25); line-height: 1;
+  margin-bottom: 1rem;
+}
+.problem-item h3 {
+  font-family: var(--serif); font-size: 1.05rem; font-weight: 400;
+  margin-bottom: 0.8rem; color: #e8d5c8;
+}
+.problem-item p { font-size: 0.88rem; color: rgba(247,244,239,0.6); line-height: 1.9; }
+
+/* ── INSIGHT ── */
+.insight { background: var(--paper2); }
+.insight-inner { max-width: 860px; margin: 0 auto; }
+.insight-quote {
+  border-left: 2px solid var(--accent);
+  padding: 2rem 3rem;
+  margin: 3rem 0;
+  background: rgba(139,58,42,0.04);
+}
+.insight-quote p {
+  font-family: var(--serif); font-size: 1.2rem; line-height: 2;
+  color: var(--ink); font-weight: 400;
+}
+.insight-quote cite {
+  display: block; margin-top: 1rem;
+  font-size: 0.78rem; letter-spacing: 0.1em;
+  color: var(--ink3); font-style: normal;
+}
+.insight-body { font-size: 0.95rem; color: var(--ink2); line-height: 2.1; }
+
+/* ── SOLUTION ── */
+.solution {}
+.solution-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0; margin-top: 4rem;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.solution-card {
+  padding: 2.5rem 2rem;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+.solution-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 0; height: 2px; background: var(--accent);
+  transition: width 0.4s ease;
+}
+.solution-card:hover::after { width: 100%; }
+.solution-icon {
+  width: 40px; height: 40px; margin-bottom: 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.solution-icon svg { width: 100%; height: 100%; }
+.solution-card h3 {
+  font-family: var(--serif); font-size: 1rem; font-weight: 400;
+  margin-bottom: 0.8rem; color: var(--ink);
+}
+.solution-card p { font-size: 0.85rem; color: var(--ink3); line-height: 1.9; }
+
+/* ── PROCESS ── */
+.process { background: var(--paper2); }
+.process-steps {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 0; margin-top: 4rem; position: relative;
+}
+.process-steps::before {
+  content: ''; position: absolute;
+  top: 28px; left: calc(12.5% + 20px); right: calc(12.5% + 20px);
+  height: 1px; background: var(--line);
+}
+.process-step { padding: 0 1.5rem; text-align: center; }
+.step-dot {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--paper2);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-family: var(--serif); font-size: 1.1rem; color: var(--accent);
+  position: relative; z-index: 1;
+  transition: all 0.3s;
+}
+.process-step:hover .step-dot {
+  background: var(--accent); color: var(--paper); border-color: var(--accent);
+}
+.process-step h4 {
+  font-size: 0.88rem; font-weight: 700; margin-bottom: 0.6rem;
+  letter-spacing: 0.05em;
+}
+.process-step p { font-size: 0.8rem; color: var(--ink3); line-height: 1.8; }
+
+/* ── CTA SECTION ── */
+.cta-section {
+  background: var(--accent); color: var(--paper);
+  text-align: center; padding: 6rem 4rem;
+}
+.cta-section .section-title {
+  color: var(--paper); margin-bottom: 1rem;
+}
+.cta-section p {
+  font-size: 0.95rem; color: rgba(247,244,239,0.75);
+  margin-bottom: 2.5rem; max-width: 500px; margin-inline: auto;
+}
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 0.75rem;
+  font-size: 0.82rem; letter-spacing: 0.15em;
+  color: var(--accent); background: var(--paper);
+  padding: 1rem 2.5rem; text-decoration: none;
+  transition: all 0.25s; font-family: var(--sans);
+  border: 1px solid transparent;
+}
+.cta-btn:hover {
+  background: transparent; color: var(--paper);
+  border-color: rgba(247,244,239,0.5);
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 2.5rem 4rem;
+  border-top: 0.5px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center;
+}
+footer p { font-size: 0.78rem; color: var(--ink3); letter-spacing: 0.05em; }
+
+/* ── ANIMATIONS ── */
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: none; }
+
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  section { padding: 5rem 1.5rem; }
+  .hero { padding: 7rem 1.5rem 4rem; }
+  .hero::before { font-size: 14rem; right: -1rem; }
+  .problem-grid { grid-template-columns: 1fr; }
+  .solution-grid { grid-template-columns: 1fr; }
+  .process-steps { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .process-steps::before { display: none; }
+  footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">論文<span>道場</span> <span style="font-family:var(--sans);font-size:0.7rem;color:var(--ink3);letter-spacing:0.1em;">× C4 MODEL</span></a>
+  <ul class="nav-links">
+    <li><a href="#problem">課題</a></li>
+    <li><a href="#insight">洞察</a></li>
+    <li><a href="#solution">解決策</a></li>
+    <li><a href="#process">プロセス</a></li>
+    <li><a href="#academic-foundation">信頼の根拠</a></li>
+    <li><a href="https://c4model.org/dojo.html">道場へ入る</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner reveal">
+    <div class="hero-eyebrow">AI論文時代の新しい問い</div>
+    <h1>
+      速く書ける時代に、<br>
+      なぜ論文の<em>質</em>が<br>
+      問われるのか。
+    </h1>
+    <p class="hero-lead">
+      生成AIが文章を自動で量産できる今、「書く」ことの本質的な価値が問い直されています。
+      論文道場は、AIと「共に設計する」という新しい知的プロセスを提供します。
+    </p>
+    <a href="#problem" class="hero-cta">
+      課題を読む
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="reveal">
+    <div class="section-label">Problem</div>
+    <h2 class="section-title">AI生成論文が抱える、<br>構造的な限界</h2>
+    <p style="color:rgba(247,244,239,0.6); font-size:0.92rem; max-width:580px; line-height:2;">
+      自動生成ツールの普及により、誰でも短時間で長文の論文草稿を得られる時代になりました。
+      しかしその裏側には、見過ごされがちな3つの本質的問題が潜んでいます。
+    </p>
+  </div>
+  <div class="problem-grid reveal">
+    <div class="problem-item">
+      <div class="problem-num">01</div>
+      <h3>論理の階層が崩壊する</h3>
+      <p>背景・目的・論拠・結論の間に、知覚しにくい「論理的断絶」が生まれます。章ごとに一貫性があるように見えても、全体を通じた論証の構造が成立していないケースが多く報告されています。</p>
+    </div>
+    <div class="problem-item">
+      <div class="problem-num">02</div>
+      <h3>独創性が消える</h3>
+      <p>既存の文献を合成することには優れていますが、「まだ誰も解いていない問い」を設定し、独自の仮説を構築するプロセスは、機械には代替できません。独創性こそが学術の核心です。</p>
+    </div>
+    <div class="problem-item">
+      <div class="problem-num">03</div>
+      <h3>オーサーシップが空洞化する</h3>
+      <p>論文はその著者が思考を深めた証明です。生成AIにすべてを委ねた論文は、提出者の知的営為を反映しておらず、学術的誠実性の観点から深刻なリスクをはらんでいます。</p>
+    </div>
+    <div class="problem-item">
+      <div class="problem-num">04</div>
+      <h3>修正コストが見えない</h3>
+      <p>一括生成は「速さ」を提供しますが、生成後の論理整合性チェックと修正にかかる工数が見積もられていません。結果として、構造から設計した場合より総工数が増えることがあります。</p>
+    </div>
+  </div>
+</section>
+
+<!-- INSIGHT -->
+<section class="insight" id="insight">
+  <div class="insight-inner">
+    <div class="reveal">
+      <div class="section-label">Insight</div>
+      <h2 class="section-title">「書く」ことは、<br>思考する手段である</h2>
+    </div>
+    <div class="insight-quote reveal">
+      <p>
+        論文を書くとは、答えを「出力」することではなく、問いを「構造化」することです。
+        背景から始まり、仮説を立て、論拠を積み上げ、結論へ至る——この過程そのものが、
+        研究者の知的貢献の本体です。
+      </p>
+      <cite>— 論文道場 設計思想より</cite>
+    </div>
+    <div class="insight-body reveal">
+      <p>
+        C4モデルは、ソフトウェアアーキテクチャの世界で「複雑な構造を4つの抽象レベルで可視化する」手法として生まれました。
+        論文道場はこの思想を学術執筆に応用し、Context（背景）・Container（章立て）・Component（節の構成）・Code（表現）の
+        4層で論文の論理構造を設計・検証する独自フレームワークを構築しています。
+      </p>
+      <br>
+      <p>
+        AIに「書かせる」のではなく、AIと「設計する」。この転換が、AI時代における論文の質と
+        オーサーシップを同時に守る、論文道場の根本的なアプローチです。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution" id="solution">
+  <div class="reveal">
+    <div class="section-label">Solution</div>
+    <h2 class="section-title">論文道場が提供する<br>3つの独自価値</h2>
+  </div>
+  <div class="solution-grid reveal">
+    <div class="solution-card">
+      <div class="solution-icon">
+        <svg viewBox="0 0 40 40" fill="none" stroke="var(--accent)" stroke-width="1">
+          <rect x="6" y="6" width="28" height="28" rx="2"/>
+          <line x1="6" y1="16" x2="34" y2="16"/>
+          <line x1="6" y1="26" x2="34" y2="26"/>
+          <line x1="16" y1="6" x2="16" y2="34"/>
+        </svg>
+      </div>
+      <h3>論理構造の可視化</h3>
+      <p>C4モデルの4層フレームワークにより、執筆前に論文全体の論理設計図を完成させます。章の間の矛盾や論証の飛躍を、文章を書く前の段階で発見・修正できます。</p>
+    </div>
+    <div class="solution-card">
+      <div class="solution-icon">
+        <svg viewBox="0 0 40 40" fill="none" stroke="var(--accent)" stroke-width="1">
+          <circle cx="20" cy="20" r="14"/>
+          <path d="M20 10v10l6 4"/>
+        </svg>
+      </div>
+      <h3>思考プロセスの記録</h3>
+      <p>どのように問いを立て、どのように構造を積み上げたかの全履歴が保存されます。これは「AIが書いた」のではなく「あなたが設計した」証明として機能します。</p>
+    </div>
+    <div class="solution-card">
+      <div class="solution-icon">
+        <svg viewBox="0 0 40 40" fill="none" stroke="var(--accent)" stroke-width="1">
+          <path d="M8 32L20 8l12 24"/>
+          <path d="M12 24h16"/>
+        </svg>
+      </div>
+      <h3>評価ポイントの数値化</h3>
+      <p>定型論文の構造要件に基づき、各章・各節の論証強度をスコアで可視化します。感覚ではなく、構造的根拠に基づいた改善指針を得られます。</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="process">
+  <div class="reveal">
+    <div class="section-label">Process</div>
+    <h2 class="section-title">論文道場の<br>4ステップ設計フロー</h2>
+  </div>
+  <div class="process-steps reveal">
+    <div class="process-step">
+      <div class="step-dot">一</div>
+      <h4>Context 設計</h4>
+      <p>研究背景・問い・目的を明確化し、論文全体の存在理由を確定する</p>
+    </div>
+    <div class="process-step">
+      <div class="step-dot">二</div>
+      <h4>Container 設計</h4>
+      <p>章立てと各章の役割・論証責任を定義し、全体の骨格を可視化する</p>
+    </div>
+    <div class="process-step">
+      <div class="step-dot">三</div>
+      <h4>Component 設計</h4>
+      <p>各節の論証要素・引用配置・主張の流れを設計し、論拠密度を確認する</p>
+    </div>
+    <div class="process-step">
+      <div class="step-dot">四</div>
+      <h4>Code 執筆・評価</h4>
+      <p>設計図に沿って執筆し、評価スコアで論証の質を検証・ブラッシュアップする</p>
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDY -->
+<section class="case-study" id="case-study" style="background:var(--paper); border-top:1px solid var(--line);">
+  <div class="reveal">
+    <div class="section-label">Case Study</div>
+    <h2 class="section-title">実践事例：C4モデルによる<br>心理現象の構造解析</h2>
+    <p style="font-size:0.95rem; color:var(--ink2); line-height:2.1; margin-bottom:3rem; max-width:680px;">
+      論理の飛躍を防ぎ、説得力を持たせる「論文道場」の設計思想は、様々な研究領域に応用可能です。以下は、人間の心理現象である「シャワー効果（入浴時のひらめき現象）」をC4モデルの4層構造で解明した最新の実践事例です。
+    </p>
+    <div style="max-width:800px; margin:0 auto; border:1px solid var(--line); padding:0.5rem; background:#fff; border-radius:4px;">
+      <div style="position:relative; width:100%; padding-bottom:56.25%; height:0; overflow:hidden;">
+        <iframe style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" src="https://www.youtube.com/embed/VOXEpMWjLHw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+    </div>
+    <p style="text-align:center; font-size:0.8rem; color:var(--ink3); margin-top:1rem;">▲ C4モデルを用いた「シャワー効果」の構造解析と創造性支援システムへの応用</p>
+  </div>
+</section>
+
+<!-- ACADEMIC FOUNDATION -->
+<style>
+  .academic-foundation { background: var(--ink); color: var(--paper); }
+  .academic-foundation .section-label { color: var(--accent2); }
+  .academic-foundation .section-label::before { background: var(--accent2); }
+  .academic-timeline {
+    display: grid; grid-template-columns: 1fr; gap: 3.5rem;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    padding-left: 3rem; position: relative; margin-top: 4rem;
+  }
+  .timeline-item { position: relative; }
+  .timeline-dot {
+    position: absolute; left: -3.45rem; top: 0;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: rgba(255,255,255,0.2); border: 3px solid var(--ink);
+  }
+  .timeline-item.active .timeline-dot { background: var(--accent2); }
+  .timeline-date {
+    font-family: var(--serif); font-size: 0.8rem;
+    color: rgba(255,255,255,0.4); letter-spacing: 0.1em; margin-bottom: 0.5rem;
+  }
+  .timeline-item.active .timeline-date { color: var(--accent2); }
+  .timeline-item h3 {
+    font-family: var(--serif); font-size: 1.2rem; font-weight: 400;
+    margin-bottom: 1rem; color: #e8d5c8;
+  }
+  .timeline-item p {
+    font-size: 0.85rem; color: rgba(247,244,239,0.6); line-height: 1.9;
+  }
+  @media (max-width: 768px) {
+    .academic-timeline { padding-left: 2rem; }
+    .timeline-dot { left: -2.45rem; }
+  }
+</style>
+<section class="academic-foundation" id="academic-foundation">
+  <div class="reveal" style="max-width:900px; margin:0 auto;">
+    <div class="section-label">Origin & Authority</div>
+    <h2 class="section-title" style="color:var(--paper);">Thesis Dojoを裏付ける<br>システム工学のルーツと国際ネットワーク</h2>
+    <p style="font-size:0.95rem; color:rgba(247,244,239,0.7); line-height:2.1;">
+      Thesis Dojoが提供するC4モデルによる論文設計アプローチは、単なる思いつきではありません。それは高度なシステムズエンジニアリングの厳格な学術的バックグラウンドと、長年にわたる国際的な研究実績に根ざしています。
+    </p>
+
+    <div class="academic-timeline">
+      <!-- STEP 1: AIIT & SysML -->
+      <div class="timeline-item active reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2013 - 2014</div>
+        <h3>AIITにおけるSysMLの習得と国際発表</h3>
+        <p>
+          産業技術大学院大学（AIIT）にて、川田誠一教授の指導のもと、SysML（モデルベースシステムズエンジニアリング）を用いた「外国人向け実時間誘導システム」の設計プロジェクト（PBL）に従事。複雑なシステムを俯瞰・構造化するハードコアな設計手法を習得し、中南大学（中国・長沙）での国際会議でも発表を行いました。これがすべての原点です。
+        </p>
+      </div>
+
+      <!-- STEP 2: Evolution to C4 -->
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Evolution</div>
+        <h3>SysMLからC4モデルへの進化と「学際的応用」</h3>
+        <p>
+          厳密で重厚なSysMLの思想をベースに持ちながら、よりアジャイルで視覚的に伝わりやすいソフトウェア・アーキテクチャ記述法「C4モデル（PlantUML）」へと手法を最適化。このシステム設計のパラダイムを「シューベルトの楽曲」や「松尾芭蕉の文学」、「日本昔話（浦島太郎・カチカチ山）や映像の物語構造解析」、「写真芸術（視覚的表象分析）」、「デジタル遺産システム」といった非IT領域のリバースエンジニアリングに適用する独自の学際的アプローチを確立しました。
+        </p>
+      </div>
+
+      <!-- STEP 3: Validation & Network -->
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025 - 2026</div>
+        <h3>広範な実証実験による閲読率の向上と、国際的な研究基盤</h3>
+        <p>
+          音楽・文学・映像・芸術・工学の多分野にC4モデルを適用した「広範囲な実証実験」は、ResearchGate上で驚異的な<b>閲読率（Reads）の向上と引用（Citation）</b>を獲得しました。この結果は、C4モデルが学術研究にもたらす以下の4つの圧倒的な優位性を証明しています。
+        </p>
+        <ul style="list-style:none; padding:0; margin:1.2rem 0; font-size:0.88rem; color:#e8d5c8; display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
+          <li style="display:flex; align-items:center; gap:0.5rem;"><span style="color:var(--accent2);">✔</span> オリジナル性の創出</li>
+          <li style="display:flex; align-items:center; gap:0.5rem;"><span style="color:var(--accent2);">✔</span> 属人性を排した再現性</li>
+          <li style="display:flex; align-items:center; gap:0.5rem;"><span style="color:var(--accent2);">✔</span> 構造に基づく説得性</li>
+          <li style="display:flex; align-items:center; gap:0.5rem;"><span style="color:var(--accent2);">✔</span> 思考回路の完全な可視化</li>
+        </ul>
+        <p>
+          さらに、現在も中国地質大学（China University of Geosciences）の正教授であられる恩師・川田教授とのネットワークを通じ、国際的な研究基盤と信頼性を担保しています。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="section-title reveal">AI時代の論文は、<br>設計から始まる。</h2>
+  <p class="reveal">速さではなく、崩れない論理を。論文道場で、あなたの思考を構造化してください。</p>
+  <a href="https://c4model.org/dojo.html" class="cta-btn reveal">
+    論文道場へ入る
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+  </a>
+</section>
+
+<footer>
+  <p>© 2025 論文道場 — C4 Model Academic Writing Framework</p>
+  <p style="font-size:0.72rem;">c4model.org/dojo.html</p>
+</footer>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

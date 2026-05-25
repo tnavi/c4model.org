@@ -5,8 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>論文道場 — Academic Paper Dojo | c4model.org</title>
   <meta name="description" content="論文道場：C4モデル×AIで論文を構造化する学術執筆支援プラットフォーム。" />
+  <!-- CSP: api.anthropic.com / plantuml / cdnjs への接続を許可 -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src  'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
+    style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src    'self' https://fonts.gstatic.com;
+    connect-src 'self' https://api.anthropic.com https://www.plantuml.com https://raw.githubusercontent.com;
+    img-src     * data: blob:;
+    frame-src   *;
+  " />
   <!-- pako 2.1.0: PlantUML Deflate Raw エンコードに必須 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  <!-- Skills Filter v1.0: インライン埋め込み（外部ファイル不要・CSP対応） -->
+  <script>
+  (function(global){'use strict';
+  var SF_L0=['あなたは C4モデル研究会 の学術 AI アシスタントです。','以下の「出力品質文法（Skills Filter v1.0）」に従って、すべての出力を生成してください。','','[Rule 0: エンコーディング宣言（最重要）]','すべての出力は UTF-8 で生成すること。','BOM を絶対に含めないこと。','置換文字が出力に含まれた場合は、その箇所を「[文字不明]」に置換して出力すること。','ASCII 範囲外の文字（日本語・漢字・ひらがな・カタカナ）は、エスケープせずそのまま出力すること。','','[Rule 1: 日本語出力の必須規約]','・読点は「、」、句点は「。」を使用すること','・「.」（ピリオド）を句点として使わないこと','・カギ括弧は「」を使用すること','・半角カタカナ（ｱｲｳ等）を使わないこと。必ず全角カタカナを使用すること','','[Rule 2: 文字化けリスク語彙の禁止]','以下のパターンを出力に含めてはいけない：','・□□□ や ??? が連続する表現','・HTMLエンティティの不正使用','・コードブロック外でのエスケープシーケンス（\\uXXXX形式）','','[Rule 3: 自己校正義務]','出力前に以下を内部チェックすること：','1. 日本語テキストに全角文字が正しく含まれているか','2. PlantUML を生成した場合、skinparam defaultFontName が含まれているか','3. コードブロックの開閉が正しく対応しているか','不合格の場合は自動修正して出力すること。'].join('\n');
+  var SF_L1=['[PlantUML Rule 1: 必須ヘッダー]','すべての PlantUML コードは @startuml の直後に必ず以下を含めること：','','@startuml','skinparam defaultFontName "Noto Sans CJK JP"','skinparam defaultFontSize 13','skinparam backgroundColor #FAFAF8','skinparam ArrowColor #1A6B7A','skinparam BorderColor #5A5040','skinparam shadowing false','','[PlantUML Rule 2: ラベル文字列の規約]','Person(), System() 等のラベルに日本語を使用する場合、必ず "" で囲むこと。','正しい例：Person(user, "研究者", "論文執筆者")','','[PlantUML Rule 3: コードブロック禁止]','PlantUML コードを ``` で囲まないこと。@startuml から @enduml までをそのまま出力すること。','','[PlantUML Rule 5: C4 インクルードの固定 URL]','L1: !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml','L2: !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml','L3: !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml'].join('\n');
+  var SF_L2=['[Japanese Rule 1: 語彙の統一]','論文道場 / C4モデル / PlantUML / 俳句 / 文字化け / Claude API — 表記を統一すること','','[Japanese Rule 2: 数値・単位の表記]','・数字は半角アラビア数字：1, 2, 3','・単位は半角英字：100px, 1rem, 13pt','・パーセントは半角：80%','','[Japanese Rule 3: 敬体・常体の統一]','・UI説明文：です・ます調','・コード内コメント：だ・である調','・同一段落内で混在させないこと'].join('\n');
+  var SF_L3=['[自己校正アルゴリズム：出力確定前に必ず内部実行すること]','チェック1: PlantUML コードを含む場合','□ skinparam defaultFontName "Noto Sans CJK JP" が @startuml の直後にあるか','□ Person(), System() 等のラベルが "" で囲まれているか','□ コードが ``` で囲まれていないか','→ 不合格項目を自動修正してから出力すること','','チェック2: 日本語テキストを含む場合','□ 句読点が「、」「。」（全角）になっているか','□ 半角カタカナが含まれていないか','□ 置換文字（U+FFFD）が含まれていないか','→ 不合格項目を自動修正してから出力すること'].join('\n');
+  function buildSystemPrompt(levels){
+    levels=levels||['L0','L1','L2','L3'];
+    var map={L0:SF_L0,L1:SF_L1,L2:SF_L2,L3:SF_L3};
+    return levels.map(function(l){return map[l]||'';}).join('\n\n');
+  }
+  global.SkillsFilter={SF_L0:SF_L0,SF_L1:SF_L1,SF_L2:SF_L2,SF_L3:SF_L3,buildSystemPrompt:buildSystemPrompt};
+  })(window);
+  </script>
   <style>
     /* ===== RESET ===== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -300,6 +325,88 @@
       color: var(--main-muted); font-size: 0.88rem; text-align: center; padding: 1rem;
     }
 
+    /* ===== 国際標準 Abstract プレビュー ===== */
+    .pdf-preview-wrapper {
+      background: #f7f9fc;
+      border: 1px solid #dde3ea;
+      border-radius: 10px;
+      padding: 1.75rem 1.5rem;
+      margin: 2rem 0;
+    }
+    .pdf-preview-label {
+      font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--teal); font-weight: bold; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .pdf-preview-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--teal); opacity: 0.3;
+    }
+    .pdf-preview-frame {
+      background: #ffffff;
+      border: 1px solid #d5d9e0;
+      border-radius: 3px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05);
+      padding: 2.2rem 2.8rem;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 0.87rem;
+      line-height: 1.8;
+      color: #1a1a1a;
+      position: relative;
+    }
+    .pdf-frame-header {
+      text-align: center;
+      padding-bottom: 1rem;
+      margin-bottom: 1.2rem;
+      border-bottom: 1.5px solid #1a1a1a;
+    }
+    .pdf-frame-title {
+      font-size: 1.05rem; font-weight: bold; line-height: 1.4;
+      margin-bottom: 0.5rem;
+    }
+    .pdf-frame-authors {
+      font-size: 0.83rem; color: #444; margin-bottom: 0.3rem;
+    }
+    .pdf-frame-affil {
+      font-size: 0.77rem; color: #666; font-style: italic;
+    }
+    .pdf-frame-section {
+      font-size: 0.8rem; font-weight: bold; text-transform: uppercase;
+      letter-spacing: 0.05em; margin: 1rem 0 0.4rem;
+      color: #1a1a1a;
+    }
+    .pdf-frame-abstract {
+      font-size: 0.86rem; line-height: 1.85; color: #222;
+      text-align: justify;
+    }
+    .pdf-frame-keywords {
+      font-size: 0.8rem; color: #555; margin-top: 0.75rem;
+    }
+    .pdf-frame-keywords strong { color: #1a1a1a; }
+    .pdf-watermark {
+      position: absolute; top: 0.6rem; right: 1rem;
+      font-size: 0.62rem; color: #bbb; letter-spacing: 0.08em;
+      font-family: 'Georgia', serif; font-style: italic;
+    }
+    .abstract-gen-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-top: 1rem; flex-wrap: wrap;
+    }
+    .btn-gen-abstract {
+      background: var(--teal); color: #fff;
+      border: none; border-radius: 5px;
+      padding: 0.55rem 1.2rem; font-size: 0.85rem;
+      cursor: pointer; font-family: inherit;
+      transition: background 0.15s;
+    }
+    .btn-gen-abstract:hover { background: #145a68; }
+    .btn-gen-abstract:disabled { background: #aaa; cursor: not-allowed; }
+    .abstract-gen-note {
+      font-size: 0.78rem; color: var(--main-muted);
+    }
+    .abstract-status {
+      font-size: 0.82rem; color: var(--teal); margin-top: 0.5rem; min-height: 1.2em;
+    }
+
     /* ===== ACTION BUTTONS ===== */
     .action-row {
       display: flex; gap: 0.75rem; flex-wrap: wrap; margin: 1rem 0;
@@ -449,69 +556,6 @@
   .btn-analyze.credit-blocked {
     background: rgba(231,76,60,0.2) !important; color: rgba(255,120,120,0.9) !important;
     border-color: rgba(231,76,60,0.5) !important; cursor: not-allowed !important;
-  }
-
-  /* ===== 印刷ボタン ===== */
-  .btn-print {
-    display: none; /* 分析完了後にJSでblock表示 */
-    margin-top: 0.75rem;
-    padding: 0.55rem 1.2rem;
-    background: transparent;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    border-radius: 4px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.2s, color 0.2s;
-  }
-  .btn-print:hover { background: var(--accent); color: #fff; }
-
-  /* ===== 分析回数バッジ ===== */
-  #analysisCountBadge {
-    display: inline-block;
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.6);
-    margin-top: 4px;
-  }
-
-  /* ===== @media print ===== */
-  @media print {
-    .topnav,
-    aside,
-    .score-bar,
-    #btnAnalyze,
-    .btn-print,
-    .btn-charge,
-    .modal-overlay,
-    .stage-block:not(#stage0),
-    nav,
-    .btn-ghost,
-    .btn-primary,
-    .feedback-section,
-    #feedback,
-    #pricing,
-    #tools-c4,
-    .zero-stop-note,
-    .credit-meter-wrap {
-      display: none !important;
-    }
-    body { background: #fff; color: #000; font-size: 11pt; line-height: 1.6; }
-    .main-content { margin: 0; padding: 0; }
-    #stage0 { border: none; margin: 0; padding: 0; }
-    #scoreHint {
-      border: 1px solid #ccc;
-      padding: 1rem;
-      border-radius: 4px;
-      white-space: pre-wrap;
-      font-size: 10pt;
-      page-break-inside: avoid;
-    }
-    #scoreHint pre { font-size: 9.5pt; }
-    .puml-img { max-width: 100%; page-break-inside: avoid; }
-    h1 { font-size: 14pt; }
-    h2 { font-size: 12pt; }
-    a { color: #000; text-decoration: none; }
   }
 
   /* ===== CHARGE MODAL — クリーンミニマル ===== */
@@ -745,8 +789,61 @@
       </ul>
     </div>
 
+    <!-- ===== 国際標準 Abstract プレビューフレーム ===== -->
+    <div class="pdf-preview-wrapper">
+      <div class="pdf-preview-label">
+        📄 国際標準出力プレビュー — English Abstract (IMRaD) 仕上がりイメージ
+      </div>
+      <div class="pdf-preview-frame" id="pdfPreviewFrame">
+        <div class="pdf-watermark">1段組・フル幅固定仕様</div>
+        <div class="pdf-frame-header">
+          <div class="pdf-frame-title" id="previewTitle">
+            Structural Analysis of Academic Journaling Using the C4 Model:<br>
+            A Mixed-Methods Study on Wellbeing Writing and Cognitive Load Reduction
+          </div>
+          <div class="pdf-frame-authors" id="previewAuthors">
+            Osamu Okumura
+          </div>
+          <div class="pdf-frame-affil" id="previewAffil">
+            C4 Model Study Project®, Japan &nbsp;·&nbsp; info@c4model.org
+          </div>
+        </div>
+        <div class="pdf-frame-section">Abstract</div>
+        <div class="pdf-frame-abstract" id="previewAbstractText">
+          This study investigates the application of the C4 model—a software architecture
+          visualization framework developed by Simon Brown—to the structural analysis of
+          academic journaling practices. Using a mixed-methods approach combining
+          quantitative access log analysis (N=847 sessions) and qualitative C4 model
+          mapping, we examine how structured thinking frameworks reduce cognitive load in
+          academic writing contexts. Results demonstrate that C4 model integration
+          significantly improves writing structure coherence (p&lt;0.01) and reduces
+          revision cycles by 34% compared to unstructured journaling. The proposed
+          "Wellbeing Writing" methodology, grounded in Seligman's PERMA framework and
+          Sweller's cognitive load theory, offers a scalable solution for academic writing
+          support systems. Implications extend to educational technology design,
+          particularly for non-native English writers in Japanese higher education contexts.
+        </div>
+        <div class="pdf-frame-keywords">
+          <strong>Keywords:</strong>
+          <span id="previewKeywords">C4 model, academic journaling, wellbeing writing,
+          cognitive load theory, structural analysis, educational technology</span>
+        </div>
+      </div>
+      <div class="abstract-gen-row">
+        <button class="btn-gen-abstract" id="btnGenAbstract" onclick="generateEnglishAbstract()">
+          ✨ AI で英語版 Abstract を自動生成（−5 Cr）
+        </button>
+        <span class="abstract-gen-note">
+          入力情報をもとに IMRaD 形式の英語Abstract（150〜200語）を生成し、プレビューに反映します。
+        </span>
+      </div>
+      <div class="abstract-status" id="abstractStatus"></div>
+    </div>
+    <!-- ===== /国際標準 Abstract プレビューフレーム ===== -->
+
     <div class="action-row">
       <button class="btn-ghost" onclick="exportMarkdown()"><span data-ja>⬇️ Markdown出力</span><span data-en style="display:none">⬇️ Export Markdown</span></button>
+      <button class="btn-ghost" onclick="exportMarkdownWithAbstract()"><span data-ja>🌐 英語Abstract付き Markdown</span><span data-en style="display:none">🌐 MD with English Abstract</span></button>
       <button class="btn-ghost" onclick="saveDraft()"><span data-ja>💾 下書き保存</span><span data-en style="display:none">💾 Save Draft</span></button>
       <button class="btn-ghost" onclick="loadDraft()"><span data-ja>📂 下書き読込</span><span data-en style="display:none">📂 Load Draft</span></button>
       <button class="btn-ghost" onclick="clearAll()"><span data-ja>🗑 クリア</span><span data-en style="display:none">🗑 Clear</span></button>
@@ -939,11 +1036,9 @@
         </div>
         <div class="zero-stop-note">※ 残量0でも自動引き落としは一切されません</div>
       </div>
-      <button class="btn-analyze" id="btnAnalyze" onclick="startAnalysis()" disabled>→ 分析開始（−10 Cr / 1分析）</button>
+      <button class="btn-analyze" id="btnAnalyze" onclick="startAnalysis()" disabled>→ 分析開始（−10 Cr）</button>
     </div>
     <div class="score-hint" id="scoreHint"><span data-ja>⚠️ 01 著者情報の「著者氏名」を入力すると分析開始ボタンが有効になります</span><span data-en style="display:none">Enter your name in Author Info to activate the Start Analysis button</span></div>
-    <button class="btn-print" id="btnPrint" onclick="window.print()">📄 分析結果を印刷・PDF保存</button>
-    <div id="analysisCountBadge"></div>
   </div>
 
   <!-- STAGE I -->
@@ -1170,7 +1265,7 @@
         <label><input type="radio" name="q_a" value="4"> 4. 悪い</label>
         <label><input type="radio" name="q_a" value="5"> 5. 非常に悪い</label>
       </div>
-      <textarea id="fb_a_text" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
+      <textarea id="qa_comment" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
 
     <div class="form-section">
@@ -1182,7 +1277,7 @@
         <label><input type="radio" name="q_b" value="4"> 4. 悪い</label>
         <label><input type="radio" name="q_b" value="5"> 5. 非常に悪い</label>
       </div>
-      <textarea id="fb_b_text" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
+      <textarea id="qb_comment" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
 
     <div class="form-section">
@@ -1194,7 +1289,7 @@
         <label><input type="radio" name="q_c" value="4"> 4. 悪い</label>
         <label><input type="radio" name="q_c" value="5"> 5. 非常に悪い</label>
       </div>
-      <textarea id="fb_c_text" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
+      <textarea id="qc_comment" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
 
     <div class="form-section">
@@ -1206,7 +1301,7 @@
         <label><input type="radio" name="q_d" value="4"> 4. 悪い</label>
         <label><input type="radio" name="q_d" value="5"> 5. 非常に悪い</label>
       </div>
-      <textarea id="fb_d_text" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
+      <textarea id="qd_comment" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
 
     <div class="form-section">
@@ -1218,11 +1313,16 @@
         <label><input type="radio" name="q_e" value="4"> 4. 悪い</label>
         <label><input type="radio" name="q_e" value="5"> 5. 非常に悪い</label>
       </div>
-      <textarea id="fb_e_text" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
+      <textarea id="qe_comment" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
 
-    <button id="btnFeedback" class="btn-primary" style="font-size:1rem; padding:0.7rem 1.8rem;" onclick="submitFeedback()">📤 アンケートを送信する</button>
-    <p id="feedbackSent" style="display:none; margin-top:1rem; color:var(--teal); font-size:0.9rem; font-weight:bold;">✅ 送信完了。ご協力ありがとうございました。回答はブラウザに保存されました。</p>
+    <div style="margin-top:1.5rem; padding:1rem; background:#f0f7fb; border-radius:8px; border-left:4px solid #2A6080;">
+      <p style="font-size:0.88rem; color:var(--main-muted); margin-bottom:0.75rem; line-height:1.7;">
+        📬 「送信」を押すと、回答内容がメールアプリで <strong>info@c4model.org</strong> 宛に自動作成されます。<br>
+        未回答の項目があっても送信できます。ご協力ありがとうございます。
+      </p>
+      <button class="btn-primary" style="font-size:1rem; padding:0.7rem 1.8rem;" onclick="submitFeedback()">📤 アンケートを送信する</button>
+    </div>
   </section>
 
   <!-- TOOLS: C4モデル図集 -->
@@ -1236,7 +1336,10 @@
       <div class="puml-editor">
         <textarea class="puml-code" id="pumlCode">@startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+skinparam defaultFontName "Noto Sans CJK JP"
+skinparam defaultFontSize 13
 skinparam backgroundColor #FAFAF8
+skinparam ArrowColor #1A6B7A
 title L1 Context — Academic Paper Dojo
 Person(w, "研究者", "論文執筆者")
 System(d, "論文道場", "C4モデル×AI論文支援")
@@ -1346,7 +1449,7 @@ Rel(d, p, "図コード送信")
         </tr>
       </thead>
       <tbody>
-        <tr><td>→ 分析開始（Stage 0 AI分析）<br><small style="color:var(--main-muted);">※ 1ボタン押下＝1分析。入力修正後の再分析もそれぞれ10 Cr消費します。</small></td><td style="font-weight:bold; color:var(--teal);">10 cr<br><small style="font-weight:normal;">/ 1分析</small></td><td>約 ¥300</td><td>論文1本に1〜3分析が目安</td></tr>
+        <tr><td>→ 分析開始（Stage 0 AI分析）</td><td style="font-weight:bold; color:var(--teal);">10 cr</td><td>約 ¥300</td><td>論文1本に1〜3回程度</td></tr>
         <tr><td>Stage III ライティング支援</td><td style="font-weight:bold; color:var(--teal);">5 cr</td><td>約 ¥150</td><td>章ごとのフィードバック</td></tr>
         <tr><td>Stage IV 論証スコア評価</td><td style="font-weight:bold; color:var(--teal);">5 cr</td><td>約 ¥150</td><td>評価＋改善提案</td></tr>
         <tr><td>C4図生成（PlantUML）</td><td style="font-weight:bold; color:var(--teal);">2 cr</td><td>約 ¥60</td><td>図解のみ、テキスト応答なし</td></tr>
@@ -1403,6 +1506,41 @@ Rel(d, p, "図コード送信")
       </div>
     </div>
 
+    <!-- モニター参加者向け APIキー設定 -->
+    <div class="settings-card" id="settings-apikey" style="border-left:4px solid #8B7355; background:#fdf8f2;">
+      <h3>🔑 モニター参加者の方へ — APIキー設定</h3>
+      <p style="font-size:0.85rem; color:var(--main-muted); margin-bottom:0.75rem; line-height:1.7;">
+        招待メールに記載の <strong>APIキー（sk-ant-で始まる文字列）</strong> を入力して「保存」を押してください。<br>
+        キーはこのブラウザにのみ保存され、外部には送信されません。<strong>一度設定すれば次回以降は不要です。</strong>
+      </p>
+      <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off"
+          style="flex:1; min-width:220px; padding:0.55rem 0.9rem; font-family:monospace; font-size:0.85rem;
+                 border:1px solid #C5B99A; background:#fff; border-radius:4px;"
+          oninput="updateApiKeyStatus()">
+        <button class="btn-ghost" onclick="saveApiKey()" style="white-space:nowrap;">💾 保存</button>
+        <button class="btn-ghost" onclick="clearApiKey()" style="white-space:nowrap; color:#c0392b;">🗑 削除</button>
+      </div>
+      <div id="apiKeyStatus" style="font-size:0.8rem; margin-top:0.5rem; color:var(--main-muted);"></div>
+    </div>
+
+    <div class="settings-card" style="border-left:4px solid #2A6080; background:linear-gradient(135deg,#f0f7fb 0%,#e8f4f0 100%);">
+      <h3>🎁 特別研究モニター枠（キャンペーン実施中）</h3>
+      <p style="font-size:0.9rem; line-height:1.8; color:var(--main-body);">
+        現在、<strong>初期モニタリング期間（〜2026年7月末）</strong>として、
+        論文執筆支援AIを <strong>100クレジット（約10回の分析）無料</strong> でご利用いただけます。
+      </p>
+      <p style="font-size:0.9rem; line-height:1.8; margin-top:0.75rem; color:var(--main-body);">
+        📅 <strong>キャンペーン期間終了後のご案内</strong><br>
+        期間終了前に、AI分析サービスの継続ご利用方法（APIキーのご提供など）について、
+        <strong>ご登録者様へメールにてご連絡</strong>いたします。
+      </p>
+      <p style="font-size:0.82rem; margin-top:0.75rem; color:var(--main-muted); border-top:1px solid #C5B99A; padding-top:0.6rem;">
+        ※ 現在のクレジットは無料体験用です。残量0になっても<strong>自動引き落としは一切ありません</strong>。<br>
+        ※ ご意見・ご要望は <a href="mailto:info@c4model.org" style="color:var(--teal);">info@c4model.org</a> までお寄せください。
+      </p>
+    </div>
+
     <div class="settings-card">
       <h3>ℹ️ このアプリについて</h3>
       <p style="font-size:0.9rem; color:var(--main-muted); line-height:1.8;">
@@ -1418,79 +1556,10 @@ Rel(d, p, "図コード送信")
 </main>
 </div><!-- /.layout -->
 
-<!-- ===== CHARGE MODAL — Stripe / Card Only ===== -->
-<div class="modal-overlay" id="chargeModal" onclick="if(event.target===this)closeChargeModal()">
-  <div class="modal-box">
-    <!-- ヘッダー -->
-    <div class="modal-header">
-      <div class="modal-header-inner">
-        <span class="modal-header-title">クレジットをチャージ</span>
-        <span class="modal-header-sub">THESIS DOJO — Credit Purchase</span>
-      </div>
-      <button class="modal-close" onclick="closeChargeModal()" title="閉じる">✕</button>
-    </div>
+<!-- ===== CHARGE MODAL 削除済み（5〜7月モニタリング期間：メール誘導のみ） ===== -->
 
-    <div class="modal-body">
-      <!-- データ保護バナー -->
-      <div class="modal-data-safe">
-        <span class="icon">🔒</span>
-        <span><strong>入力中のデータはブラウザに自動保存されています。</strong>安心してお手続きください。チャージ後すぐに続きから作業できます。</span>
-      </div>
 
-      <!-- プラン選択 -->
-      <div class="modal-plans">
-        <div class="plan-card" data-credits="50" onclick="selectPlan(this)">
-          <div class="plan-credits">50<small> Cr</small></div>
-          <div class="plan-price">¥1,500</div>
-          <div class="plan-per">1 Cr ≈ ¥30</div>
-          <div class="plan-note">分析 5回分</div>
-        </div>
-        <div class="plan-card selected" data-credits="120" onclick="selectPlan(this)">
-          <div class="plan-badge">おすすめ</div>
-          <div class="plan-credits">120<small> Cr</small></div>
-          <div class="plan-price">¥3,000<small> /月</small></div>
-          <div class="plan-per">1 Cr ≈ ¥25（お得）</div>
-          <div class="plan-note">論文10本分の目安</div>
-        </div>
-      </div>
 
-      <!-- 決済セクション：Stripe / クレジットカードのみ -->
-      <div class="payment-section">
-        <div class="payment-label">お支払い方法</div>
-
-        <!-- Stripe Checkout ボタン（モック） -->
-        <button class="stripe-btn" onclick="doCharge()">
-          <span>カードで安全に支払う</span>
-          <span class="stripe-logo">
-            <svg width="36" height="15" viewBox="0 0 60 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M27.5 10c0-2.8-1.4-5-4.3-5-2.9 0-4.7 2.2-4.7 5s1.7 5 4.7 5c2 0 3.2-.9 3.9-2.2l-1.9-.8c-.4.8-1.1 1.2-2 1.2-1.2 0-2-.7-2.2-2h6.5c0-.1 0-.1 0-.2zm-6.4-.9c.2-1.1.9-1.8 2-1.8s1.7.7 1.9 1.8h-3.9zm9.9-1.6c.5 0 1 .2 1.3.5l1.3-1.4c-.6-.6-1.6-1-2.6-1-2.1 0-3.6 1.1-3.6 2.9 0 3.4 4.6 2.2 4.6 3.8 0 .6-.5 1-1.4 1-.8 0-1.5-.4-1.9-1l-1.3 1.4c.7.9 1.8 1.4 3.2 1.4 2.2 0 3.7-1.1 3.7-2.9 0-3.5-4.6-2.3-4.6-3.8 0-.5.5-.9 1.3-.9zm5.9-3.7v1.9h-1.3v1.8h1.3V15h2.2V7.5h1.7V5.7h-1.7V4.8c0-.6.2-.9.8-.9.4 0 .7.1.9.3V2.5c-.4-.2-.9-.3-1.5-.3-1.7 0-2.4 1-2.4 2.6zm6.6 10.2V5.7h-2.2V15h2.2zm-1.1-10.5c.7 0 1.3-.6 1.3-1.3S43.1 1.9 42.4 1.9s-1.3.6-1.3 1.3.6 1.3 1.3 1.3zm7.5 0c-2.9 0-4.9 2.1-4.9 5s2 5 4.9 5 4.9-2.1 4.9-5-2-5-4.9-5zm0 8.1c-1.5 0-2.6-1.3-2.6-3.1s1.1-3.1 2.6-3.1 2.6 1.3 2.6 3.1-1.1 3.1-2.6 3.1zm8.4-7.9l-.1.8c-.5-.6-1.3-1-2.2-1-2.1 0-3.7 2-3.7 5s1.6 5 3.7 5c.9 0 1.7-.4 2.2-1l.1.8h2V5.7h-2zm-1.9 8c-1.2 0-2-1.1-2-3s.8-3 2-3 2 1.1 2 3-.8 3-2 3z" fill="white"/>
-            </svg>
-          </span>
-        </button>
-
-        <!-- 対応カードブランド（ロゴなしテキストのみ・ミニマル） -->
-        <div class="card-brands">
-          <span class="card-brand">VISA</span>
-          <span class="card-brand">Mastercard</span>
-          <span class="card-brand">Amex</span>
-          <span class="card-brand">JCB</span>
-          <span style="font-size:0.6rem;color:var(--main-muted);margin-left:0.25rem;">のみ対応</span>
-        </div>
-      </div>
-
-      <!-- ゼロストップ保証 -->
-      <div class="modal-zero-stop">
-        <span style="font-size:1rem;flex-shrink:0;line-height:1.6;">🛡️</span>
-        <span><strong>ゼロストップ保証：</strong>残高0になっても自動引き落とし・自動更新は一切されません。次回チャージは常に手動・任意です。</span>
-      </div>
-
-      <div class="modal-footer-note">
-        決済はStripeで安全に処理されます。カード番号はサーバーに保存されません。<br>
-        ※ PayPay等のローカル決済は非対応です。
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <script>
@@ -1521,12 +1590,12 @@ Rel(d, p, "図コード送信")
     // Q1 著者情報：満点5点（必須）
     const authScore  = (auth && email && aff) ? 5 : (auth && (email || aff)) ? 3 : auth ? 1 : 0;
 
-    // Q2-Q5：緩和スコア（あいまい入力・空欄でも部分点・最低1点保証）
-    const rqScore    = rq.length >= 20 ? 5 : rq.length >= 10 ? 3 : 1;
-    const absScore   = abs.length >= 200 ? 5 : abs.length >= 50 ? 3 : 1;
+    // Q2-Q5：緩和スコア（あいまい入力・空欄でも部分点）
+    const rqScore    = rq.length >= 20 ? 5 : rq.length >= 10 ? 3 : rq.length > 0 ? 1 : 0;
+    const absScore   = abs.length >= 200 ? 5 : abs.length >= 50 ? 3 : abs.length > 0 ? 1 : 0;
     const fmtScore   = fmt ? 5 : 1;
-    const refScore   = refs >= 6 ? 5 : refs >= 3 ? 3 : 1;
-    const structScore= toc >= 5 ? 5 : toc >= 2 ? 3 : 1;
+    const refScore   = refs >= 6 ? 5 : refs >= 3 ? 3 : refs > 0 ? 1 : 0;
+    const structScore= toc >= 5 ? 5 : toc >= 2 ? 3 : toc > 0 ? 1 : 0;
 
     score = authScore + rqScore + absScore + fmtScore + refScore + structScore;
     score = Math.min(score, 30);
@@ -1545,36 +1614,41 @@ Rel(d, p, "図コード送信")
     // Q1（著者情報：氏名）が入力されていれば分析開始を解放
     const q1Ready = auth.length > 0;
 
-    if (q1Ready && score >= 28) {
-      btn.disabled = false; btn.classList.add('ready');
-      hint.textContent = '✅ スコア28点以上です。「分析開始」を押してください。';
-    } else if (q1Ready) {
-      btn.disabled = false; btn.classList.add('ready');
-      // Wellbeing UX: 提案口調のヒントメッセージ（最大2件まで）
-      const hints = {
-        rq:     '研究課題（RQ）を10字以上書くと、分析の軸がはっきりします💡',
-        abs:    '要旨を50字以上書くと、AIの分析精度が大幅に上がります💡',
-        ref:    '参考文献は後から追加OK。3件以上あるとスコアが上がります📚',
-        struct: '章立ては2章以上あると構造分析ができます。後から編集OKです✏️',
-        fmt:    '投稿先フォーマットを選ぶと、引用形式の自動調整が有効になります'
-      };
+    if (q1Ready) {
+      btn.disabled = false;
+      btn.classList.add('ready');
       
-      const incomplete = [];
-      if(rqScore < 3)    incomplete.push(hints.rq);
-      if(absScore < 3)   incomplete.push(hints.abs);
-      if(refScore < 3)   incomplete.push(hints.ref);
-      if(structScore < 3) incomplete.push(hints.struct);
-      
-      const displayHints = incomplete.slice(0, 2);
-      
-      if(displayHints.length > 0) {
-        hint.innerHTML = `✅ 分析開始できます。<br>${displayHints.join('<br>')}`;
+      if (score >= 28) {
+        hint.textContent = '✅ スコア28点以上です。「分析開始」を押してください。';
       } else {
-        hint.textContent = '✅ 分析開始できます。';
+        // Wellbeing UX: 提案口調のヒントメッセージ（最大2件まで）
+        const hints = {
+          rq:     '研究課題（RQ）を10字以上書くと、分析の軸がはっきりします💡',
+          abs:    '要旨を50字以上書くと、AIの分析精度が大幅に上がります💡',
+          ref:    '参考文献は後から追加OK。3件以上あるとスコアが上がります📚',
+          struct: '章立ては2章以上あると構造分析ができます。後から編集OKです✏️',
+          fmt:    '投稿先フォーマットを選ぶと、引用形式の自動調整が有効になります'
+        };
+        
+        const incomplete = [];
+        if(rqScore < 3)    incomplete.push(hints.rq);
+        if(absScore < 3)   incomplete.push(hints.abs);
+        if(refScore < 3)   incomplete.push(hints.ref);
+        if(structScore < 3) incomplete.push(hints.struct);
+        if(fmtScore < 5)    incomplete.push(hints.fmt);
+        
+        const displayHints = incomplete.slice(0, 2);
+        
+        if(displayHints.length > 0) {
+          hint.innerHTML = `✅ 分析開始できます。💡 後で入力すると精度が上がります：<br>${displayHints.join('<br>')}`;
+        } else {
+          hint.textContent = '✅ 分析開始できます。';
+        }
       }
     } else {
-      btn.disabled = true; btn.classList.remove('ready');
-      hint.textContent = '⚠️ 01 著者情報の「著者氏名」を入力すると分析開始ボタンが有効になります。';
+      btn.disabled = true;
+      btn.classList.remove('ready');
+      hint.textContent = '⚠️ 01 著者情報の「著者氏名」を入力すると分析開始ボタンが有効になります';
     }
 
     // 参考文献件数表示を更新
@@ -1591,35 +1665,17 @@ Rel(d, p, "図コード送信")
   /* ===== CREDIT UI (ゼロストップ・ガバナンス) ===== */
   const ANALYSIS_COST = 10; // 1回の分析コスト
 
-  /* Cookie ユーティリティ */
-  function _setCookie(name, value, days) {
-    const d = new Date();
-    d.setTime(d.getTime() + days * 864e5);
-    document.cookie = name + '=' + value + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
-  }
-  function _getCookie(name) {
-    const m = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
-    return m ? decodeURIComponent(m[1]) : null;
-  }
-
   function updateCreditUI() {
+    // ── バージョンチェック：古いLocalStorageを自動リセット ──
+    if (localStorage.getItem('dojo-version') !== 'v2') {
+      localStorage.setItem('dojo-credits', '100');
+      localStorage.setItem('dojo-version', 'v2');
+      localStorage.removeItem('dojo-credits-used');
+    }
     let credits = parseInt(localStorage.getItem('dojo-credits'));
-    const cookieFlag = _getCookie('dojo_first_credit');
-
     if (isNaN(credits)) {
-      if (cookieFlag === '1') {
-        // Cookieがある = 初回付与済み → 残高0として扱う（再付与しない）
-        credits = 0;
-        localStorage.setItem('dojo-credits', 0);
-      } else {
-        // 真の初回 → 50Cr付与してCookieを365日間保持
-        credits = 50;
-        localStorage.setItem('dojo-credits', credits);
-        _setCookie('dojo_first_credit', '1', 365);
-      }
-    } else if (cookieFlag !== '1') {
-      // localStorageには値があるがCookieが消えている → Cookieを復元
-      _setCookie('dojo_first_credit', '1', 365);
+      credits = 100; // 初回無料体験付与（100クレジット）
+      localStorage.setItem('dojo-credits', credits);
     }
     const TOTAL = 100;
     const pct = Math.max(0, credits / TOTAL * 100);
@@ -1641,7 +1697,7 @@ Rel(d, p, "図コード送信")
       else if (credits <= 20)  barEl.classList.add('caution');
     }
     if (badge) {
-      if (credits === 50 && !localStorage.getItem('dojo-credits-used')) {
+      if (credits === 100 && !localStorage.getItem('dojo-credits-used')) {
         badge.style.display = '';
       } else {
         badge.style.display = 'none';
@@ -1656,20 +1712,53 @@ Rel(d, p, "図コード送信")
       btn.classList.add('credit-blocked');
       btn.textContent = '→ クレジットが不足しています';
       const hint = document.getElementById('scoreHint');
-      if (hint) hint.innerHTML = '<span style="color:#ffddaa;">⚠️ クレジットが不足しているため分析を開始できません。「＋ チャージ」からクレジットを補充してください。</span>';
+      if (hint) hint.innerHTML = '<span style="color:#ffddaa;">⚠️ 無料体験クレジット（100Cr）を使い切りました。引き続きご利用の場合は <a href="mailto:info@c4model.org" style="color:#F1C40F;">info@c4model.org</a> までご連絡ください。</span>';
     } else if (btn) {
       btn.classList.remove('credit-blocked');
-      btn.textContent = '→ 分析開始（−10 Cr / 1分析）';
+      btn.textContent = '→ 分析開始（−10 Cr）';
     }
   }
 
-  /* ===== CHARGE MODAL ===== */
+  /* ===== CHARGE MODAL（5〜7月モニタリング期間：メール誘導のみ）===== */
   function openChargeModal() {
-    document.getElementById('chargeModal').classList.add('open');
+    const hint = document.getElementById('scoreHint');
+    if (hint) {
+      hint.innerHTML = '<span style="color:#ffddaa;">⚠️ 無料体験クレジット（100Cr）を使い切りました。引き続きご利用の場合は <a href="mailto:info@c4model.org" style="color:#F1C40F;">info@c4model.org</a> までご連絡ください。</span>';
+    }
   }
-  function closeChargeModal() {
-    document.getElementById('chargeModal').classList.remove('open');
+
+  function selectPlan(el) {}
+  function doCharge() {}
+
+  /* ===== アンケート送信（mailto） ===== */
+  function submitFeedback() {
+    const radio = name => {
+      const el = document.querySelector(`input[name="${name}"]:checked`);
+      return el ? el.value + '点' : '未回答';
+    };
+    const txt = id => (document.getElementById(id)?.value || '').trim() || '（なし）';
+
+    const author = document.getElementById('authorName')?.value || '（未入力）';
+    const score  = document.getElementById('scoreNum')?.textContent || '?';
+    const date   = new Date().toLocaleDateString('ja-JP');
+
+    const subject = encodeURIComponent(`【論文道場アンケート】${author} — ${date}`);
+    const body = encodeURIComponent(
+      `■ 論文道場 評価アンケート（Ver 1.0 実証用）\n` +
+      `送信日：${date}\n` +
+      `著者名：${author}\n` +
+      `論文スコア：${score}/30点\n\n` +
+      `A. みやすさ：${radio('q_a')}\n　コメント：${txt('qa_comment')}\n\n` +
+      `B. 解説のわかりやすさ：${radio('q_b')}\n　コメント：${txt('qb_comment')}\n\n` +
+      `C. 操作方法：${radio('q_c')}\n　コメント：${txt('qc_comment')}\n\n` +
+      `D. 出力結果：${radio('q_d')}\n　コメント：${txt('qd_comment')}\n\n` +
+      `E. 全体評価：${radio('q_e')}\n　コメント：${txt('qe_comment')}\n\n` +
+      `---\n送信元：論文道場 Academic Paper Dojo\n` +
+      `https://tnavi.github.io/ronbun-dojo/dojo.html`
+    );
+    window.location.href = `mailto:info@c4model.org?subject=${subject}&body=${body}`;
   }
+
   function selectPlan(el) {
     document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
@@ -1691,12 +1780,56 @@ Rel(d, p, "図コード送信")
 
   document.addEventListener('DOMContentLoaded', () => {
     updateCreditUI();
+    // APIキー初期表示
+    const saved = localStorage.getItem('dojo-api-key');
+    if (saved) {
+      const el = document.getElementById('apiKeyInput');
+      if (el) el.value = saved;
+      updateApiKeyStatus();
+    }
     document.querySelectorAll('input, textarea, select').forEach(el => {
       el.addEventListener('input', calcScore);
       el.addEventListener('change', calcScore);
     });
     calcScore();
   });
+
+  /* ===== API KEY MANAGEMENT ===== */
+  function saveApiKey() {
+    const el  = document.getElementById('apiKeyInput');
+    const key = el ? el.value.trim() : '';
+    if (!key) { alert('APIキーを入力してください。'); return; }
+    if (!key.startsWith('sk-ant-')) {
+      if (!confirm('入力されたキーが「sk-ant-」で始まっていません。このまま保存しますか？')) return;
+    }
+    localStorage.setItem('dojo-api-key', key);
+    updateApiKeyStatus();
+    alert('✅ APIキーを保存しました。分析開始ボタンをお試しください。');
+  }
+
+  function clearApiKey() {
+    if (!confirm('APIキーを削除しますか？')) return;
+    localStorage.removeItem('dojo-api-key');
+    const el = document.getElementById('apiKeyInput');
+    if (el) el.value = '';
+    updateApiKeyStatus();
+  }
+
+  function updateApiKeyStatus() {
+    const statusEl = document.getElementById('apiKeyStatus');
+    if (!statusEl) return;
+    const saved = localStorage.getItem('dojo-api-key');
+    const inputVal = (document.getElementById('apiKeyInput') || {}).value || '';
+    if (saved) {
+      const masked = saved.slice(0, 10) + '••••••••••••••' + saved.slice(-4);
+      statusEl.innerHTML = `✅ <span style="color:#2A6080; font-family:monospace;">${masked}</span> が保存済みです。`;
+    } else if (inputVal) {
+      statusEl.innerHTML = '⚠️ 未保存です。「💾 保存」を押してください。';
+    } else {
+      statusEl.innerHTML = '❌ APIキーが設定されていません。上の欄に入力して保存してください。';
+    }
+  }
+
 
   function updateCharCount(el, countId) {
     const span = document.getElementById(countId);
@@ -1710,7 +1843,7 @@ Rel(d, p, "図コード送信")
   }
 
   function startAnalysis() {
-    let credits = parseInt(localStorage.getItem('dojo-credits') || '50');
+    let credits = parseInt(localStorage.getItem('dojo-credits') || '100');
     if (credits < ANALYSIS_COST) {
       // クレジット不足: モーダルを開く
       openChargeModal();
@@ -1777,16 +1910,43 @@ ${get('references') || '（未入力）'}
 【システム指示】
 ユーザーは「ハイブリッド・クレジットシステム（従量制）」を利用しています。無駄なトークン消費を抑えるため、冗長な挨拶は省き、簡潔かつ最も価値のある構造的アドバイスを直接出力してください。`;
 
+    // Skills Filter v1.0: system フィールドで品質保証（L0+L1+L2+L3 全層適用）
+    const systemPrompt = (typeof window.SkillsFilter !== 'undefined')
+      ? window.SkillsFilter.buildSystemPrompt(['L0', 'L1', 'L2', 'L3'])
+      : 'あなたはC4モデル研究会の学術AIアシスタントです。すべての出力はUTF-8で生成し、PlantUMLコードには skinparam defaultFontName "Noto Sans CJK JP" を必ず含めてください。';
+
+    // APIキーをlocalStorageから取得
+    const apiKey = localStorage.getItem('dojo-api-key') || '';
+    if (!apiKey) {
+      hint.innerHTML = '<span style="color:#ffddaa;">⚠️ 現在、AI分析サービスは準備中です。しばらくお待ちください。</span>';
+      btn.disabled   = false;
+      btn.textContent = '→ 分析開始（−10 Cr）';
+      return;
+    }
+
     fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
+        model: 'claude-opus-4-5',
+        max_tokens: 1500,
+        system: systemPrompt,
         messages: [{ role: 'user', content: prompt }]
       })
     })
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok) return r.json().then(e => Promise.reject(new Error(
+        r.status === 401 ? '❌ APIキーが無効です。設定から正しいキーを入力してください。' :
+        r.status === 429 ? '❌ API利用制限に達しました。しばらくお待ちください。' :
+        e.error?.message || `APIエラー (HTTP ${r.status})`
+      )));
+      return r.json();
+    })
     .then(data => {
       // クレジット消費ロジック
       credits -= ANALYSIS_COST;
@@ -1796,39 +1956,18 @@ ${get('references') || '（未入力）'}
 
       const text = (data.content || []).map(b => b.text || '').join('\n').trim()
         || '（AIからの応答がありませんでした）';
-      // ── 要件3: 分析回数・日時トラッキング ──
-      const now = new Date().toISOString();
-      const prevCount = parseInt(localStorage.getItem('dojo-analysis-count') || '0');
-      const newCount = prevCount + 1;
-      localStorage.setItem('dojo-analysis-count', newCount);
-      localStorage.setItem('dojo-last-used-at', now);
-      if (!localStorage.getItem('dojo-first-used-at')) {
-        localStorage.setItem('dojo-first-used-at', now);
-      }
-      // 分析回数バッジを更新
-      const badge = document.getElementById('analysisCountBadge');
-      if (badge) badge.textContent = 'この論文の分析回数：' + newCount + ' 回（合計 ' + (newCount * ANALYSIS_COST) + ' Cr 消費）';
-
-      // ── 要件4: 分析結果をscoreHintに表示しlocalStorageにも保存 ──
-      const resultHTML = '<strong>📄 AI分析結果（第' + newCount + '回）</strong><br><pre style="white-space:pre-wrap; font-family:inherit; font-size:0.85rem; margin-top:0.5rem;">' + text + '</pre>';
-      hint.innerHTML = resultHTML;
-      // AI結果フラグ付きで保存（isAiResult: true でエラーメッセージと区別）
-      localStorage.setItem('dojo-ai-result', JSON.stringify({ html: resultHTML, savedAt: now, count: newCount, isAiResult: true }));
-
+      // 結果をscore-hintエリアに表示
+      hint.innerHTML = '<strong>📄 AI分析結果</strong><br><pre style="white-space:pre-wrap; font-family:inherit; font-size:0.85rem; margin-top:0.5rem;">' + text + '</pre>';
       btn.disabled   = false;
-      btn.textContent = '→ 再分析（−10 Cr / 1分析）';
-
-      // ── 要件5: 印刷ボタンを表示 ──
-      const printBtn = document.getElementById('btnPrint');
-      if (printBtn) printBtn.style.display = 'block';
-
+      btn.textContent = '→ 分析完了';
       // C4図も描画
-      renderPuml();
+      const pumlCode = document.getElementById('pumlCode')?.value?.trim() || '';
+      if (pumlCode) renderPuml();
     })
     .catch(e => {
       hint.innerHTML = '<span style="color:#ffddaa;">⚠️ API接続エラー: ' + e.message + '</span>';
       btn.disabled   = false;
-      btn.textContent = '→ 分析開始（−10 Cr / 1分析）';
+      btn.textContent = '→ 分析開始';
     });
   }
 
@@ -1866,18 +2005,8 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
       const el = document.getElementById(id);
       if(el) data[id] = el.value;
     });
-    // 要件4: AI分析結果も保存（isAiResult フラグがある場合のみ）
-    try {
-      const aiRaw = localStorage.getItem('dojo-ai-result');
-      if (aiRaw) {
-        const aiObj = JSON.parse(aiRaw);
-        if (aiObj && aiObj.isAiResult) data._aiResult = aiObj;
-      }
-    } catch(e) {}
-    data._analysisCount = localStorage.getItem('dojo-analysis-count') || '0';
-    data._savedAt = new Date().toISOString();
     localStorage.setItem('dojoDraft', JSON.stringify(data));
-    alert('下書きを保存しました。（AI分析結果も含まれています）');
+    alert('下書きを保存しました。');
   }
 
   function loadDraft() {
@@ -1885,24 +2014,11 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
     if(!raw) { alert('保存された下書きがありません。'); return; }
     const data = JSON.parse(raw);
     Object.keys(data).forEach(id => {
-      if (id.startsWith('_')) return; // 内部フィールドはスキップ
       const el = document.getElementById(id);
       if(el) el.value = data[id];
     });
-    // 要件4: AI分析結果を復元
-    if (data._aiResult && data._aiResult.isAiResult) {
-      const hint = document.getElementById('scoreHint');
-      if (hint) hint.innerHTML = data._aiResult.html + '<br><small style="color:var(--main-muted);">[保存日時: ' + (data._savedAt || '不明') + ' / 分析' + (data._aiResult.count || '?') + '回目]</small>';
-      // 印刷ボタンも復元表示
-      const printBtn = document.getElementById('btnPrint');
-      if (printBtn) printBtn.style.display = 'block';
-      // 分析回数バッジ復元
-      const badge = document.getElementById('analysisCountBadge');
-      const cnt = parseInt(data._analysisCount || '0');
-      if (badge && cnt > 0) badge.textContent = 'この論文の分析回数：' + cnt + ' 回（合計 ' + (cnt * 10) + ' Cr 消費）';
-    }
     calcScore();
-    alert('下書きを読み込みました。' + (data._aiResult ? '\nAI分析結果も復元しました。' : ''));
+    alert('下書きを読み込みました。');
   }
 
   function clearAll() {
@@ -1927,6 +2043,187 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
     a.click();
   }
 
+  /* ===== 英語Abstract付き Markdown出力 ===== */
+  function exportMarkdownWithAbstract() {
+    const title   = document.getElementById('title')?.value || '（未入力）';
+    const author  = document.getElementById('authorName')?.value || '（未入力）';
+    const affil   = document.getElementById('affiliation')?.value || '';
+    const email   = document.getElementById('email')?.value || '';
+    const kw      = document.getElementById('keywords')?.value || '';
+    const abs     = document.getElementById('abstract')?.value || '';
+    const rq      = document.getElementById('rq')?.value || '';
+    const toc     = document.getElementById('toc')?.value || '';
+    const refs    = document.getElementById('references')?.value || '';
+    const engAbs  = window._lastGeneratedAbstract
+      || document.getElementById('previewAbstractText')?.innerText?.trim()
+      || '（英語版Abstractが未生成です。「AI で英語版 Abstract を自動生成」ボタンを押してください。）';
+
+    const md = `# ${title}
+
+**著者：** ${author}
+**所属：** ${affil}
+**連絡先：** ${email}
+**キーワード：** ${kw}
+
+---
+
+## English Abstract (IMRaD)
+
+${engAbs}
+
+---
+
+## 要旨（日本語）
+
+${abs}
+
+## 研究課題（RQ）
+
+${rq}
+
+## 目次
+
+${toc}
+
+## 参考文献
+
+${refs}
+
+---
+*Generated by 論文道場 Academic Paper Dojo — c4model.org*
+`;
+    const blob = new Blob([md], {type:'text/markdown; charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'draft_with_abstract.md';
+    a.click();
+  }
+
+  /* ===== 英語Abstract自動生成（IMRaD準拠）===== */
+  async function generateEnglishAbstract() {
+    const ABSTRACT_COST = 5;
+    let credits = parseInt(localStorage.getItem('dojo-credits') || '0');
+    if (credits < ABSTRACT_COST) {
+      alert('クレジットが不足しています。info@c4model.org までご連絡ください。');
+      return;
+    }
+
+    const apiKey = localStorage.getItem('dojo-api-key') || '';
+    if (!apiKey) {
+      document.getElementById('abstractStatus').innerHTML =
+        '<span style="color:#c0392b;">⚠️ APIキーが設定されていません。「設定」タブでAPIキーを入力してください。</span>';
+      return;
+    }
+
+    const get = id => document.getElementById(id)?.value?.trim() || '';
+    const title     = get('title') || '（未入力）';
+    const rq        = get('rq') || '（未入力）';
+    const hypothesis= get('hypothesis') || '';
+    const abstract  = get('abstract') || '';
+    const keywords  = get('keywords') || '';
+    const format    = get('format') || '';
+
+    const btn = document.getElementById('btnGenAbstract');
+    const status = document.getElementById('abstractStatus');
+    btn.disabled = true;
+    btn.textContent = '⏳ 生成中...';
+    status.innerHTML = '🔄 Claude API で英語版Abstractを生成しています…';
+
+    const prompt = `You are an expert academic writing assistant specializing in Japanese-to-English translation for scholarly papers.
+
+Based on the following Japanese research information, generate a high-quality English Abstract in IMRaD format (strictly 150-200 words).
+
+CRITICAL RULES:
+1. Output ONLY the English Abstract text. No preamble, no Japanese text, no markdown formatting, no section labels.
+2. The abstract must follow IMRaD order: Background → Objective → Methods → Results/Findings → Conclusion/Implications.
+3. Use formal academic English appropriate for international journals.
+4. Target length: 150-200 words (enforce strictly).
+5. Single paragraph format (no line breaks within the abstract).
+
+Research Title (Japanese): ${title}
+Research Question: ${rq}
+Hypothesis: ${hypothesis}
+Japanese Abstract: ${abstract}
+Keywords: ${keywords}
+Target Format: ${format}`;
+
+    // Skills Filter L0のみ適用（英語出力のため日本語ルールは除外）
+    const systemPrompt = 'You are an expert academic writing assistant. Generate output in English only. All output must be valid UTF-8. Never use BOM. Produce formal academic English prose.';
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-opus-4-5',
+          max_tokens: 400,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error?.message || `HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      const generatedAbstract = (data.content || []).map(b => b.text || '').join('').trim();
+
+      // クレジット消費
+      credits -= ABSTRACT_COST;
+      localStorage.setItem('dojo-credits', credits);
+      localStorage.setItem('dojo-credits-used', '1');
+      updateCreditUI();
+
+      // プレビュー更新
+      window._lastGeneratedAbstract = generatedAbstract;
+      document.getElementById('previewAbstractText').textContent = generatedAbstract;
+
+      // プレビューの著者・タイトル・キーワードもリアルタイム更新
+      _updatePreviewMeta();
+
+      status.innerHTML = `✅ 生成完了（${generatedAbstract.split(/\s+/).length}語）。上のプレビューに反映されました。`;
+      btn.textContent = '✨ AI で英語版 Abstract を自動生成（−5 Cr）';
+
+    } catch(e) {
+      status.innerHTML = '<span style="color:#c0392b;">⚠️ エラー: ' + e.message + '</span>';
+      btn.textContent = '✨ AI で英語版 Abstract を自動生成（−5 Cr）';
+    }
+    btn.disabled = false;
+  }
+
+  /* ===== プレビューのメタ情報をフォーム入力に同期 ===== */
+  function _updatePreviewMeta() {
+    const title   = document.getElementById('title')?.value?.trim();
+    const author  = document.getElementById('authorName')?.value?.trim();
+    const affil   = document.getElementById('affiliation')?.value?.trim();
+    const email   = document.getElementById('email')?.value?.trim();
+    const kw      = document.getElementById('keywords')?.value?.trim();
+
+    if (title)  document.getElementById('previewTitle').textContent = title;
+    if (author) document.getElementById('previewAuthors').textContent = author;
+    const affilText = [affil, email].filter(Boolean).join(' · ');
+    if (affilText) document.getElementById('previewAffil').textContent = affilText;
+    if (kw) document.getElementById('previewKeywords').textContent = kw;
+  }
+
+  /* ===== フォーム入力でプレビューをリアルタイム更新 ===== */
+  (function _initPreviewSync() {
+    const syncIds = ['title', 'authorName', 'affiliation', 'email', 'keywords'];
+    document.addEventListener('DOMContentLoaded', () => {
+      syncIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', _updatePreviewMeta);
+      });
+    });
+  })();
+
   /* ===== PLANTUML — Deflate Raw エンコーダ（修正版）=====
    * 【旧・誤】btoa(unescape(...)) = Base64/HUFFMAN → ~1プレフィックスと不整合
    * 【新・正】pako.deflateRaw() + PlantUML独自6bit Base64 + ~1プレフィックス
@@ -1935,11 +2232,11 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
     const T = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
     let r = '';
     for (let i = 0, n = data.length; i < n; i += 3) {
-      const b1 = data[i], b2 = data[i+1] || 0, b3 = data[i+2] || 0;
+      const b1 = data[i], b2 = i+1 < n ? data[i+1] : 0, b3 = i+2 < n ? data[i+2] : 0;
       r += T[b1 >> 2];
       r += T[((b1 & 3) << 4) | (b2 >> 4)];
-      r += (i+1 < n) ? T[((b2 & 15) << 2) | (b3 >> 6)] : '=';
-      r += (i+2 < n) ? T[b3 & 63] : '=';
+      r += T[((b2 & 15) << 2) | (b3 >> 6)];
+      r += T[b3 & 63];
     }
     return r;
   }
@@ -1947,8 +2244,12 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
   function _pumlURL(code) {
     if (typeof pako === 'undefined')
       throw new Error('pako読込中です。1〜2秒後に再度「描画」を押してください。');
-    const compressed = pako.deflateRaw(new TextEncoder().encode(code));
-    return 'https://www.plantuml.com/plantuml/svg/~1' + _puml6b64(compressed);
+    // ── エンコーディングガード：BOM・置換文字除去 ──
+    const cleanCode = code
+      .replace(/^\uFEFF/, '')         // BOM除去
+      .replace(/[\uFFFD]/g, '?');     // 置換文字を ? に変換
+    const compressed = pako.deflateRaw(new TextEncoder().encode(cleanCode));
+    return 'https://www.plantuml.com/plantuml/svg/' + _puml6b64(compressed);
   }
 
   function renderPuml() {
@@ -1956,13 +2257,37 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
     const prev  = document.getElementById('pumlPreview');
     if (!prev) return;
     if (!code) { prev.innerHTML = '<span style="color:#C0392B;">コードが空です。</span>'; return; }
+    // ── skinparam 自動補完：含まれていなければ先頭に挿入 ──
+    const hasSkinparam = /skinparam\s+defaultFontName/i.test(code);
+    const guardedCode = (!hasSkinparam && code.includes('@startuml'))
+      ? code.replace('@startuml', `@startuml\nskinparam defaultFontName "Noto Sans CJK JP"\nskinparam defaultFontSize 13`)
+      : code;
     prev.innerHTML = '<span style="color:#5A5040; font-size:0.88rem;">⏳ 描画中…</span>';
     try {
-      const url = _pumlURL(code);
+      const url = _pumlURL(guardedCode);
       const img = new Image();
       img.alt = 'C4図';
       img.style.cssText = 'max-width:100%; height:auto; display:block;';
-      img.onload  = () => { prev.innerHTML = ''; prev.appendChild(img); };
+      img.onload = () => {
+        prev.innerHTML = '';
+        prev.appendChild(img);
+        // ── SVG文字化け自動検出 ──
+        fetch(url)
+          .then(r => r.text())
+          .then(svgText => {
+            const mojibakePattern = /[\uFFFD]{2,}|(\?{3,})|(\u25A1{2,})/;
+            const textNodes = [...svgText.matchAll(/<text[^>]*>([^<]+)<\/text>/g)]
+                                .map(m => m[1]);
+            const hasMojibake = textNodes.some(t => mojibakePattern.test(t));
+            if (hasMojibake) {
+              const warn = document.createElement('div');
+              warn.style.cssText = 'background:#FFF3CD;border:1px solid #D4AF6A;border-radius:6px;padding:0.6rem 0.9rem;margin-top:0.5rem;font-size:0.82rem;color:#7A5C2E;';
+              warn.innerHTML = '⚠️ <strong>日本語が文字化けしている可能性があります。</strong><br>PlantUMLコードの冒頭に <code>skinparam defaultFontName "Noto Sans CJK JP"</code> を追加してください。';
+              prev.appendChild(warn);
+            }
+          })
+          .catch(() => { /* CORS等によるfetch失敗はサイレントスキップ */ });
+      };
       img.onerror = () => {
         prev.innerHTML = '<span style="color:#C0392B; font-size:0.85rem;">⚠️ PlantUMLサーバーエラーまたはコード構文エラーです。</span>';
       };
@@ -1990,64 +2315,6 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
   }, {threshold: 0.15});
 
   document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
-
-  /* ===== 要件2: アンケート送信（モック + localStorage保存） ===== */
-  function submitFeedback() {
-    const btn  = document.getElementById('btnFeedback');
-    const sent = document.getElementById('feedbackSent');
-
-    const answers = {
-      q_a: document.querySelector('[name=q_a]:checked')?.value || '未回答',
-      q_a_text: document.getElementById('fb_a_text')?.value || '',
-      q_b: document.querySelector('[name=q_b]:checked')?.value || '未回答',
-      q_b_text: document.getElementById('fb_b_text')?.value || '',
-      q_c: document.querySelector('[name=q_c]:checked')?.value || '未回答',
-      q_c_text: document.getElementById('fb_c_text')?.value || '',
-      q_d: document.querySelector('[name=q_d]:checked')?.value || '未回答',
-      q_d_text: document.getElementById('fb_d_text')?.value || '',
-      q_e: document.querySelector('[name=q_e]:checked')?.value || '未回答',
-      q_e_text: document.getElementById('fb_e_text')?.value || '',
-      // モニタリング連携データ
-      analysisCount: localStorage.getItem('dojo-analysis-count') || '0',
-      firstUsedAt:   localStorage.getItem('dojo-first-used-at') || '未記録',
-      lastUsedAt:    localStorage.getItem('dojo-last-used-at')  || '未記録',
-      creditsRemain: localStorage.getItem('dojo-credits') || '不明',
-      submittedAt:   new Date().toISOString(),
-    };
-
-    // モック: コンソールにJSON出力（将来はfetchでサーバーへ送信）
-    console.log('[論文道場] アンケート回答:', JSON.stringify(answers, null, 2));
-
-    // localStorageに保存（エクスポート用）
-    localStorage.setItem('dojo-survey-result', JSON.stringify(answers));
-
-    // UI: 二重送信防止
-    if (btn)  { btn.disabled = true; btn.textContent = '✅ 送信完了（ご協力ありがとうございました）'; }
-    if (sent) { sent.style.display = 'block'; }
-  }
-
-  /* ===== 起動時: AI結果・分析回数バッジを復元 ===== */
-  document.addEventListener('DOMContentLoaded', () => {
-    // 分析回数バッジ
-    const cnt = parseInt(localStorage.getItem('dojo-analysis-count') || '0');
-    if (cnt > 0) {
-      const badge = document.getElementById('analysisCountBadge');
-      if (badge) badge.textContent = 'この論文の分析回数：' + cnt + ' 回（合計 ' + (cnt * 10) + ' Cr 消費）';
-    }
-    // AI分析結果の自動復元（ページリロード時）
-    try {
-      const aiRaw = localStorage.getItem('dojo-ai-result');
-      if (aiRaw) {
-        const aiObj = JSON.parse(aiRaw);
-        if (aiObj && aiObj.isAiResult) {
-          const hint = document.getElementById('scoreHint');
-          if (hint) hint.innerHTML = aiObj.html + '<br><small style="color:var(--main-muted);">[前回分析: ' + (aiObj.savedAt || '不明') + ']</small>';
-          const printBtn = document.getElementById('btnPrint');
-          if (printBtn) printBtn.style.display = 'block';
-        }
-      }
-    } catch(e) {}
-  });
 </script>
 
 <!-- フッター：Zotero連携注記 -->

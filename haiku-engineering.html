@@ -855,6 +855,9 @@ footer {
 .pdf-ctab.active { background: var(--ink); color: var(--bg); }
 .pdf-c4-panel { display: none; }
 .pdf-c4-panel.active { display: block; }
+/* PDF出力モード: 全パネル強制表示・タブUI非表示 */
+#fs-pdf-target.pdf-exporting .pdf-c4-panel { display: block !important; visibility: visible !important; }
+#fs-pdf-target.pdf-exporting .pdf-c4-tabs  { display: none  !important; }
 .pdf-c4-img-wrap {
   border: 1px solid var(--border);
   background: var(--bg);
@@ -1064,6 +1067,29 @@ footer {
     border: 1px solid rgba(0,0,0,0.10);
   }
 
+
+/* ── 共通フッターナビ ── */
+.site-footer-nav {
+  background: var(--ink);
+  padding: 0.6rem 2rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: 0.4rem;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  border-top: 0.5px solid rgba(255,255,255,0.1);
+}
+.site-footer-nav a {
+  font-family: var(--font-mono); font-size: 0.72rem;
+  letter-spacing: 0.08em; color: rgba(255,255,255,0.6);
+  text-decoration: none; padding: 0.3rem 0.7rem;
+  transition: background 0.15s, color 0.15s; white-space: nowrap;
+}
+.site-footer-nav a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.site-footer-nav a.current {
+  background: rgba(212,160,26,0.3); color: var(--gold);
+  font-weight: 700; border-radius: 2px;
+}
+.site-footer-nav .nav-sep { color: rgba(255,255,255,0.2); font-size: 0.65rem; }
+body { padding-bottom: 2.8rem; }
 </style>
 </head>
 <body>
@@ -1071,7 +1097,7 @@ footer {
 <!-- ═══════════════════ NAV ═══════════════════ -->
 <nav>
   <span class="nav-qr" title="このページのQRコード"><svg width="44" height="44" version="1.1" viewBox="0 0 33 33" xmlns="http://www.w3.org/2000/svg"><path d="M2,2H3V3H2zM3,2H4V3H3zM4,2H5V3H4zM5,2H6V3H5zM6,2H7V3H6zM7,2H8V3H7zM8,2H9V3H8zM11,2H12V3H11zM12,2H13V3H12zM13,2H14V3H13zM14,2H15V3H14zM16,2H17V3H16zM17,2H18V3H17zM19,2H20V3H19zM20,2H21V3H20zM21,2H22V3H21zM24,2H25V3H24zM25,2H26V3H25zM26,2H27V3H26zM27,2H28V3H27zM28,2H29V3H28zM29,2H30V3H29zM30,2H31V3H30zM2,3H3V4H2zM8,3H9V4H8zM10,3H11V4H10zM12,3H13V4H12zM14,3H15V4H14zM16,3H17V4H16zM17,3H18V4H17zM19,3H20V4H19zM21,3H22V4H21zM22,3H23V4H22zM24,3H25V4H24zM30,3H31V4H30zM2,4H3V5H2zM4,4H5V5H4zM5,4H6V5H5zM6,4H7V5H6zM8,4H9V5H8zM12,4H13V5H12zM17,4H18V5H17zM22,4H23V5H22zM24,4H25V5H24zM26,4H27V5H26zM27,4H28V5H27zM28,4H29V5H28zM30,4H31V5H30zM2,5H3V6H2zM4,5H5V6H4zM5,5H6V6H5zM6,5H7V6H6zM8,5H9V6H8zM11,5H12V6H11zM13,5H14V6H13zM20,5H21V6H20zM21,5H22V6H21zM24,5H25V6H24zM26,5H27V6H26zM27,5H28V6H27zM28,5H29V6H28zM30,5H31V6H30zM2,6H3V7H2zM4,6H5V7H4zM5,6H6V7H5zM6,6H7V7H6zM8,6H9V7H8zM10,6H11V7H10zM11,6H12V7H11zM12,6H13V7H12zM13,6H14V7H13zM15,6H16V7H15zM16,6H17V7H16zM17,6H18V7H17zM19,6H20V7H19zM20,6H21V7H20zM21,6H22V7H21zM24,6H25V7H24zM26,6H27V7H26zM27,6H28V7H27zM28,6H29V7H28zM30,6H31V7H30zM2,7H3V8H2zM8,7H9V8H8zM12,7H13V8H12zM13,7H14V8H13zM14,7H15V8H14zM16,7H17V8H16zM17,7H18V8H17zM18,7H19V8H18zM21,7H22V8H21zM24,7H25V8H24zM30,7H31V8H30zM2,8H3V9H2zM3,8H4V9H3zM4,8H5V9H4zM5,8H6V9H5zM6,8H7V9H6zM7,8H8V9H7zM8,8H9V9H8zM10,8H11V9H10zM12,8H13V9H12zM14,8H15V9H14zM16,8H17V9H16zM18,8H19V9H18zM20,8H21V9H20zM22,8H23V9H22zM24,8H25V9H24zM25,8H26V9H25zM26,8H27V9H26zM27,8H28V9H27zM28,8H29V9H28zM29,8H30V9H29zM30,8H31V9H30zM12,9H13V10H12zM13,9H14V10H13zM14,9H15V10H14zM15,9H16V10H15zM17,9H18V10H17zM19,9H20V10H19zM20,9H21V10H20zM21,9H22V10H21zM2,10H3V11H2zM4,10H5V11H4zM6,10H7V11H6zM8,10H9V11H8zM12,10H13V11H12zM13,10H14V11H13zM14,10H15V11H14zM15,10H16V11H15zM17,10H18V11H17zM18,10H19V11H18zM19,10H20V11H19zM21,10H22V11H21zM22,10H23V11H22zM26,10H27V11H26zM29,10H30V11H29zM5,11H6V12H5zM6,11H7V12H6zM7,11H8V12H7zM9,11H10V12H9zM12,11H13V12H12zM14,11H15V12H14zM18,11H19V12H18zM19,11H20V12H19zM20,11H21V12H20zM22,11H23V12H22zM23,11H24V12H23zM24,11H25V12H24zM27,11H28V12H27zM30,11H31V12H30zM4,12H5V13H4zM5,12H6V13H5zM6,12H7V13H6zM8,12H9V13H8zM9,12H10V13H9zM13,12H14V13H13zM14,12H15V13H14zM16,12H17V13H16zM18,12H19V13H18zM23,12H24V13H23zM24,12H25V13H24zM25,12H26V13H25zM28,12H29V13H28zM29,12H30V13H29zM30,12H31V13H30zM3,13H4V14H3zM6,13H7V14H6zM7,13H8V14H7zM10,13H11V14H10zM11,13H12V14H11zM12,13H13V14H12zM13,13H14V14H13zM14,13H15V14H14zM15,13H16V14H15zM19,13H20V14H19zM20,13H21V14H20zM22,13H23V14H22zM23,13H24V14H23zM26,13H27V14H26zM29,13H30V14H29zM3,14H4V15H3zM5,14H6V15H5zM7,14H8V15H7zM8,14H9V15H8zM9,14H10V15H9zM10,14H11V15H10zM11,14H12V15H11zM14,14H15V15H14zM15,14H16V15H15zM19,14H20V15H19zM20,14H21V15H20zM21,14H22V15H21zM22,14H23V15H22zM23,14H24V15H23zM24,14H25V15H24zM27,14H28V15H27zM29,14H30V15H29zM30,14H31V15H30zM6,15H7V16H6zM7,15H8V16H7zM9,15H10V16H9zM10,15H11V16H10zM13,15H14V16H13zM14,15H15V16H14zM15,15H16V16H15zM16,15H17V16H16zM18,15H19V16H18zM23,15H24V16H23zM24,15H25V16H24zM27,15H28V16H27zM30,15H31V16H30zM4,16H5V17H4zM5,16H6V17H5zM8,16H9V17H8zM10,16H11V17H10zM13,16H14V17H13zM14,16H15V17H14zM23,16H24V17H23zM24,16H25V17H24zM25,16H26V17H25zM26,16H27V17H26zM27,16H28V17H27zM29,16H30V17H29zM30,16H31V17H30zM2,17H3V18H2zM3,17H4V18H3zM9,17H10V18H9zM11,17H12V18H11zM14,17H15V18H14zM15,17H16V18H15zM17,17H18V18H17zM18,17H19V18H18zM19,17H20V18H19zM20,17H21V18H20zM22,17H23V18H22zM26,17H27V18H26zM27,17H28V18H27zM29,17H30V18H29zM3,18H4V19H3zM4,18H5V19H4zM5,18H6V19H5zM6,18H7V19H6zM8,18H9V19H8zM9,18H10V19H9zM10,18H11V19H10zM11,18H12V19H11zM13,18H14V19H13zM14,18H15V19H14zM15,18H16V19H15zM18,18H19V19H18zM19,18H20V19H19zM22,18H23V19H22zM23,18H24V19H23zM24,18H25V19H24zM27,18H28V19H27zM29,18H30V19H29zM30,18H31V19H30zM3,19H4V20H3zM5,19H6V20H5zM9,19H10V20H9zM12,19H13V20H12zM13,19H14V20H13zM14,19H15V20H14zM18,19H19V20H18zM19,19H20V20H19zM22,19H23V20H22zM23,19H24V20H23zM24,19H25V20H24zM27,19H28V20H27zM28,19H29V20H28zM30,19H31V20H30zM2,20H3V21H2zM4,20H5V21H4zM5,20H6V21H5zM6,20H7V21H6zM7,20H8V21H7zM8,20H9V21H8zM10,20H11V21H10zM11,20H12V21H11zM12,20H13V21H12zM13,20H14V21H13zM22,20H23V21H22zM23,20H24V21H23zM26,20H27V21H26zM29,20H30V21H29zM30,20H31V21H30zM3,21H4V22H3zM5,21H6V22H5zM7,21H8V22H7zM9,21H10V22H9zM11,21H12V22H11zM12,21H13V22H12zM15,21H16V22H15zM16,21H17V22H16zM17,21H18V22H17zM18,21H19V22H18zM19,21H20V22H19zM20,21H21V22H20zM23,21H24V22H23zM27,21H28V22H27zM29,21H30V22H29zM2,22H3V23H2zM5,22H6V23H5zM6,22H7V23H6zM7,22H8V23H7zM8,22H9V23H8zM10,22H11V23H10zM11,22H12V23H11zM13,22H14V23H13zM14,22H15V23H14zM15,22H16V23H15zM18,22H19V23H18zM19,22H20V23H19zM22,22H23V23H22zM23,22H24V23H23zM24,22H25V23H24zM25,22H26V23H25zM26,22H27V23H26zM10,23H11V24H10zM14,23H15V24H14zM18,23H19V24H18zM22,23H23V24H22zM26,23H27V24H26zM28,23H29V24H28zM29,23H30V24H29zM30,23H31V24H30zM2,24H3V25H2zM3,24H4V25H3zM4,24H5V25H4zM5,24H6V25H5zM6,24H7V25H6zM7,24H8V25H7zM8,24H9V25H8zM11,24H12V25H11zM13,24H14V25H13zM18,24H19V25H18zM19,24H20V25H19zM21,24H22V25H21zM22,24H23V25H22zM24,24H25V25H24zM26,24H27V25H26zM27,24H28V25H27zM29,24H30V25H29zM30,24H31V25H30zM2,25H3V26H2zM8,25H9V26H8zM13,25H14V26H13zM14,25H15V26H14zM15,25H16V26H15zM18,25H19V26H18zM19,25H20V26H19zM22,25H23V26H22zM26,25H27V26H26zM27,25H28V26H27zM29,25H30V26H29zM30,25H31V26H30zM2,26H3V27H2zM4,26H5V27H4zM5,26H6V27H5zM6,26H7V27H6zM8,26H9V27H8zM10,26H11V27H10zM11,26H12V27H11zM12,26H13V27H12zM14,26H15V27H14zM16,26H17V27H16zM17,26H18V27H17zM18,26H19V27H18zM19,26H20V27H19zM22,26H23V27H22zM23,26H24V27H23zM24,26H25V27H24zM25,26H26V27H25zM26,26H27V27H26zM2,27H3V28H2zM4,27H5V28H4zM5,27H6V28H5zM6,27H7V28H6zM8,27H9V28H8zM11,27H12V28H11zM12,27H13V28H12zM13,27H14V28H13zM14,27H15V28H14zM18,27H19V28H18zM19,27H20V28H19zM22,27H23V28H22zM23,27H24V28H23zM26,27H27V28H26zM28,27H29V28H28zM29,27H30V28H29zM30,27H31V28H30zM2,28H3V29H2zM4,28H5V29H4zM5,28H6V29H5zM6,28H7V29H6zM8,28H9V29H8zM10,28H11V29H10zM12,28H13V29H12zM14,28H15V29H14zM15,28H16V29H15zM19,28H20V29H19zM21,28H22V29H21zM26,28H27V29H26zM27,28H28V29H27zM30,28H31V29H30zM2,29H3V30H2zM8,29H9V30H8zM11,29H12V30H11zM15,29H16V30H15zM16,29H17V30H16zM17,29H18V30H17zM19,29H20V30H19zM20,29H21V30H20zM21,29H22V30H21zM22,29H23V30H22zM24,29H25V30H24zM26,29H27V30H26zM29,29H30V30H29zM2,30H3V31H2zM3,30H4V31H3zM4,30H5V31H4zM5,30H6V31H5zM6,30H7V31H6zM7,30H8V31H7zM8,30H9V31H8zM10,30H11V31H10zM11,30H12V31H11zM12,30H13V31H12zM15,30H16V31H15zM17,30H18V31H17zM18,30H19V31H18zM19,30H20V31H19zM21,30H22V31H21zM22,30H23V31H22zM26,30H27V31H26zM29,30H30V31H29zM30,30H31V31H30z" id="qr-path" fill="#000000" fill-opacity="1" fill-rule="nonzero" stroke="none"/></svg></span>
-  <a href="https://c4model.org/" class="nav-logo">c4model.org</a>
+  <a href="index.html" class="nav-logo">c4model.org</a>
   <ul class="nav-links">
     <li><a href="#pillars">三位一体</a></li>
     <li><a href="#structure">書籍構成</a></li>
@@ -1079,14 +1105,13 @@ footer {
     <li><a href="#videos">動画</a></li>
     <li><a href="#facesheet">Facesheet</a></li>
     <li><a href="haiku-casestudy.html" style="color: var(--gold); font-weight: bold;">事例研究</a></li>
-    <li><a href="https://forms.gle/DEoG2H8EEf5wKY6S9" id="survey-nav-link" target="_blank" rel="noopener" style="color: var(--gold); font-weight: bold;">アンケート</a></li>
   </ul>
   <div class="nav-right">
     <div class="lang-toggle">
       <button class="lang-btn active" data-lang="ja" onclick="setLang('ja')">日本語</button>
       <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
     </div>
-    <a href="https://c4model.org/dojo.html" class="nav-cta">論文道場 →</a>
+    <a href="dojo.html" class="nav-cta">論文道場 →</a>
   </div>
 </nav>
 
@@ -1537,31 +1562,31 @@ footer {
           <div class="pdf-c4-panel active" id="pdf-panel-ctx">
             <div class="pdf-c4-img-wrap">
               <div class="pdf-c4-loading" id="pdf-load-ctx">図を生成中…</div>
-              <img id="pdf-img-ctx" alt="L1 Context" style="display:none; max-width:100%;">
+              <img id="pdf-img-ctx" class="pdf-c4-img-el" alt="L1 Context" style="display:none; max-width:100%;">
             </div>
           </div>
           <div class="pdf-c4-panel" id="pdf-panel-ctr">
             <div class="pdf-c4-img-wrap">
               <div class="pdf-c4-loading" id="pdf-load-ctr">図を生成中…</div>
-              <img id="pdf-img-ctr" alt="L2 Container" style="display:none; max-width:100%;">
+              <img id="pdf-img-ctr" class="pdf-c4-img-el" alt="L2 Container" style="display:none; max-width:100%;">
             </div>
           </div>
           <div class="pdf-c4-panel" id="pdf-panel-cmp">
             <div class="pdf-c4-img-wrap">
               <div class="pdf-c4-loading" id="pdf-load-cmp">図を生成中…</div>
-              <img id="pdf-img-cmp" alt="L3 Component" style="display:none; max-width:100%;">
+              <img id="pdf-img-cmp" class="pdf-c4-img-el" alt="L3 Component" style="display:none; max-width:100%;">
             </div>
           </div>
           <div class="pdf-c4-panel" id="pdf-panel-seq">
             <div class="pdf-c4-img-wrap">
               <div class="pdf-c4-loading" id="pdf-load-seq">図を生成中…</div>
-              <img id="pdf-img-seq" alt="シーケンス図" style="display:none; max-width:100%;">
+              <img id="pdf-img-seq" class="pdf-c4-img-el" alt="シーケンス図" style="display:none; max-width:100%;">
             </div>
           </div>
           <div class="pdf-c4-panel" id="pdf-panel-sta">
             <div class="pdf-c4-img-wrap">
               <div class="pdf-c4-loading" id="pdf-load-sta">図を生成中…</div>
-              <img id="pdf-img-sta" alt="状態遷移図" style="display:none; max-width:100%;">
+              <img id="pdf-img-sta" class="pdf-c4-img-el" alt="状態遷移図" style="display:none; max-width:100%;">
             </div>
           </div>
 
@@ -1662,9 +1687,9 @@ footer {
       <span data-en style="display:none">For those who want to turn haiku science research into an academic paper. "Thesis Dojo" is an AI academic writing support tool for everyone from high school students to researchers, combining the Claude API with the C4 Model.</span>
     </p>
     <div class="cta-buttons reveal">
-      <a href="https://c4model.org/haiku.html" class="btn-primary">あなたの句をAI分析する →</a>
-      <a href="https://c4model.org/dojo.html" class="btn-outline">論文道場を開く →</a>
-      <a href="https://c4model.org/" class="btn-outline">c4model.org へ</a>
+      <a href="haiku.html" class="btn-primary">あなたの句をAI分析する →</a>
+      <a href="dojo.html" class="btn-outline">論文道場を開く →</a>
+      <a href="index.html" class="btn-outline">c4model.org へ</a>
     </div>
   </div>
 </section>
@@ -1681,7 +1706,7 @@ footer {
         <div class="author-org">C4 Model Study Group®</div>
         <div class="author-email">
           <div class="qr-inline-wrap" style="margin-top:0.4rem;">
-            <a href="/cdn-cgi/l/email-protection#6f060109002f0c5b02000b0a0341001d08" style="color:inherit;"><span class="__cf_email__" data-cfemail="bdd4d3dbd2fdde89d0d2d9d8d193d2cfda">[email&#160;protected]</span></a>
+            <a href="mailto:info@c4model.org" style="color:inherit;">info@c4model.org</a>
             <span class="qr-badge"><svg width="56" height="56" version="1.1" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><path d="M2,2H3V3H2zM3,2H4V3H3zM4,2H5V3H4zM5,2H6V3H5zM6,2H7V3H6zM7,2H8V3H7zM8,2H9V3H8zM11,2H12V3H11zM12,2H13V3H12zM14,2H15V3H14zM18,2H19V3H18zM20,2H21V3H20zM21,2H22V3H21zM22,2H23V3H22zM23,2H24V3H23zM24,2H25V3H24zM25,2H26V3H25zM26,2H27V3H26zM2,3H3V4H2zM8,3H9V4H8zM12,3H13V4H12zM14,3H15V4H14zM16,3H17V4H16zM17,3H18V4H17zM20,3H21V4H20zM26,3H27V4H26zM2,4H3V5H2zM4,4H5V5H4zM5,4H6V5H5zM6,4H7V5H6zM8,4H9V5H8zM10,4H11V5H10zM11,4H12V5H11zM13,4H14V5H13zM14,4H15V5H14zM16,4H17V5H16zM17,4H18V5H17zM18,4H19V5H18zM20,4H21V5H20zM22,4H23V5H22zM23,4H24V5H23zM24,4H25V5H24zM26,4H27V5H26zM2,5H3V6H2zM4,5H5V6H4zM5,5H6V6H5zM6,5H7V6H6zM8,5H9V6H8zM10,5H11V6H10zM13,5H14V6H13zM14,5H15V6H14zM15,5H16V6H15zM16,5H17V6H16zM17,5H18V6H17zM20,5H21V6H20zM22,5H23V6H22zM23,5H24V6H23zM24,5H25V6H24zM26,5H27V6H26zM2,6H3V7H2zM4,6H5V7H4zM5,6H6V7H5zM6,6H7V7H6zM8,6H9V7H8zM10,6H11V7H10zM11,6H12V7H11zM12,6H13V7H12zM14,6H15V7H14zM15,6H16V7H15zM18,6H19V7H18zM20,6H21V7H20zM22,6H23V7H22zM23,6H24V7H23zM24,6H25V7H24zM26,6H27V7H26zM2,7H3V8H2zM8,7H9V8H8zM10,7H11V8H10zM11,7H12V8H11zM13,7H14V8H13zM14,7H15V8H14zM16,7H17V8H16zM17,7H18V8H17zM18,7H19V8H18zM20,7H21V8H20zM26,7H27V8H26zM2,8H3V9H2zM3,8H4V9H3zM4,8H5V9H4zM5,8H6V9H5zM6,8H7V9H6zM7,8H8V9H7zM8,8H9V9H8zM10,8H11V9H10zM12,8H13V9H12zM14,8H15V9H14zM16,8H17V9H16zM18,8H19V9H18zM20,8H21V9H20zM21,8H22V9H21zM22,8H23V9H22zM23,8H24V9H23zM24,8H25V9H24zM25,8H26V9H25zM26,8H27V9H26zM10,9H11V10H10zM11,9H12V10H11zM12,9H13V10H12zM18,9H19V10H18zM2,10H3V11H2zM4,10H5V11H4zM5,10H6V11H5zM6,10H7V11H6zM7,10H8V11H7zM8,10H9V11H8zM13,10H14V11H13zM14,10H15V11H14zM15,10H16V11H15zM20,10H21V11H20zM21,10H22V11H21zM22,10H23V11H22zM23,10H24V11H23zM24,10H25V11H24zM4,11H5V12H4zM6,11H7V12H6zM9,11H10V12H9zM10,11H11V12H10zM11,11H12V12H11zM13,11H14V12H13zM14,11H15V12H14zM15,11H16V12H15zM18,11H19V12H18zM21,11H22V12H21zM23,11H24V12H23zM24,11H25V12H24zM5,12H6V13H5zM8,12H9V13H8zM10,12H11V13H10zM12,12H13V13H12zM13,12H14V13H13zM14,12H15V13H14zM15,12H16V13H15zM16,12H17V13H16zM17,12H18V13H17zM18,12H19V13H18zM19,12H20V13H19zM20,12H21V13H20zM22,12H23V13H22zM25,12H26V13H25zM26,12H27V13H26zM2,13H3V14H2zM3,13H4V14H3zM9,13H10V14H9zM10,13H11V14H10zM11,13H12V14H11zM12,13H13V14H12zM13,13H14V14H13zM14,13H15V14H14zM17,13H18V14H17zM18,13H19V14H18zM21,13H22V14H21zM22,13H23V14H22zM25,13H26V14H25zM26,13H27V14H26zM3,14H4V15H3zM6,14H7V15H6zM7,14H8V15H7zM8,14H9V15H8zM9,14H10V15H9zM10,14H11V15H10zM12,14H13V15H12zM14,14H15V15H14zM15,14H16V15H15zM16,14H17V15H16zM19,14H20V15H19zM20,14H21V15H20zM22,14H23V15H22zM23,14H24V15H23zM24,14H25V15H24zM26,14H27V15H26zM2,15H3V16H2zM3,15H4V16H3zM4,15H5V16H4zM9,15H10V16H9zM11,15H12V16H11zM12,15H13V16H12zM15,15H16V16H15zM18,15H19V16H18zM21,15H22V16H21zM24,15H25V16H24zM2,16H3V17H2zM4,16H5V17H4zM6,16H7V17H6zM8,16H9V17H8zM12,16H13V17H12zM13,16H14V17H13zM14,16H15V17H14zM15,16H16V17H15zM16,16H17V17H16zM17,16H18V17H17zM19,16H20V17H19zM21,16H22V17H21zM23,16H24V17H23zM25,16H26V17H25zM26,16H27V17H26zM2,17H3V18H2zM5,17H6V18H5zM7,17H8V18H7zM9,17H10V18H9zM10,17H11V18H10zM12,17H13V18H12zM13,17H14V18H13zM16,17H17V18H16zM17,17H18V18H17zM18,17H19V18H18zM19,17H20V18H19zM22,17H23V18H22zM25,17H26V18H25zM26,17H27V18H26zM2,18H3V19H2zM4,18H5V19H4zM5,18H6V19H5zM7,18H8V19H7zM8,18H9V19H8zM11,18H12V19H11zM12,18H13V19H12zM13,18H14V19H13zM15,18H16V19H15zM16,18H17V19H16zM17,18H18V19H17zM18,18H19V19H18zM19,18H20V19H19zM20,18H21V19H20zM21,18H22V19H21zM22,18H23V19H22zM24,18H25V19H24zM25,18H26V19H25zM10,19H11V20H10zM11,19H12V20H11zM12,19H13V20H12zM14,19H15V20H14zM16,19H17V20H16zM18,19H19V20H18zM22,19H23V20H22zM2,20H3V21H2zM3,20H4V21H3zM4,20H5V21H4zM5,20H6V21H5zM6,20H7V21H6zM7,20H8V21H7zM8,20H9V21H8zM15,20H16V21H15zM18,20H19V21H18zM20,20H21V21H20zM22,20H23V21H22zM23,20H24V21H23zM25,20H26V21H25zM26,20H27V21H26zM2,21H3V22H2zM8,21H9V22H8zM10,21H11V22H10zM11,21H12V22H11zM12,21H13V22H12zM14,21H15V22H14zM17,21H18V22H17zM18,21H19V22H18zM22,21H23V22H22zM25,21H26V22H25zM2,22H3V23H2zM4,22H5V23H4zM5,22H6V23H5zM6,22H7V23H6zM8,22H9V23H8zM10,22H11V23H10zM11,22H12V23H11zM12,22H13V23H12zM14,22H15V23H14zM15,22H16V23H15zM16,22H17V23H16zM17,22H18V23H17zM18,22H19V23H18zM19,22H20V23H19zM20,22H21V23H20zM21,22H22V23H21zM22,22H23V23H22zM23,22H24V23H23zM24,22H25V23H24zM25,22H26V23H25zM26,22H27V23H26zM2,23H3V24H2zM4,23H5V24H4zM5,23H6V24H5zM6,23H7V24H6zM8,23H9V24H8zM10,23H11V24H10zM12,23H13V24H12zM18,23H19V24H18zM19,23H20V24H19zM20,23H21V24H20zM22,23H23V24H22zM24,23H25V24H24zM25,23H26V24H25zM26,23H27V24H26zM2,24H3V25H2zM4,24H5V25H4zM5,24H6V25H5zM6,24H7V25H6zM8,24H9V25H8zM10,24H11V25H10zM11,24H12V25H11zM12,24H13V25H12zM13,24H14V25H13zM14,24H15V25H14zM15,24H16V25H15zM16,24H17V25H16zM17,24H18V25H17zM20,24H21V25H20zM21,24H22V25H21zM24,24H25V25H24zM26,24H27V25H26zM2,25H3V26H2zM8,25H9V26H8zM11,25H12V26H11zM13,25H14V26H13zM16,25H17V26H16zM17,25H18V26H17zM18,25H19V26H18zM20,25H21V26H20zM22,25H23V26H22zM23,25H24V26H23zM26,25H27V26H26zM2,26H3V27H2zM3,26H4V27H3zM4,26H5V27H4zM5,26H6V27H5zM6,26H7V27H6zM7,26H8V27H7zM8,26H9V27H8zM10,26H11V27H10zM11,26H12V27H11zM12,26H13V27H12zM13,26H14V27H13zM14,26H15V27H14zM20,26H21V27H20zM22,26H23V27H22zM24,26H25V27H24zM25,26H26V27H25zM26,26H27V27H26z" id="qr-path" fill="#000000" fill-opacity="1" fill-rule="nonzero" stroke="none"/></svg><span class="qr-badge-label">QR → メール</span></span>
           </div>
         </div>
@@ -1709,10 +1734,42 @@ footer {
           </div>
           <div class="career-item">
             <span class="career-era">学会</span>
-            <span class="career-role">日本図書館情報学会 会員</span>
+            <span class="career-role">日本図書館学会 会員</span>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ SURVEY BANNER（常設） ═══════════════════ -->
+<section id="survey-banner" style="background: var(--bg-alt); padding: 3rem 2.5rem; border-top: 1px solid var(--border);">
+  <div style="max-width: 960px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;
+                border: 1px solid var(--border); background: var(--white); padding: 2rem 2.5rem;">
+      <div>
+        <div style="font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.14em; color: var(--ink-lite);
+                    border-left: 2px solid var(--gold); padding-left: 0.8rem; margin-bottom: 0.75rem;">
+          survey · ご意見をお聞かせください
+        </div>
+        <div style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; color: var(--ink); margin-bottom: 0.5rem;">
+          俳句の科学入門 — ご利用アンケート
+        </div>
+        <p style="font-size: 0.92rem; color: var(--ink-mid); line-height: 1.7; max-width: 520px;">
+          ChatGPT・Copilot などとの比較も含め、5〜8分で回答できます。<br>
+          皆様のご意見が研究・改善に直結します。
+        </p>
+      </div>
+      <a href="https://forms.gle/DEoG2H8EEf5wKY6S9" target="_blank" rel="noopener"
+         style="display: inline-block; font-family: var(--font-mono); font-size: 0.85rem;
+                letter-spacing: 0.1em; padding: 0.9rem 2.2rem;
+                background: var(--ink); color: var(--bg);
+                text-decoration: none; white-space: nowrap;
+                transition: background 0.2s;"
+         onmouseover="this.style.background='var(--gold)';this.style.color='var(--ink)';"
+         onmouseout="this.style.background='var(--ink)';this.style.color='var(--bg)';">
+        📝 アンケートに答える →
+      </a>
     </div>
   </div>
 </section>
@@ -1723,8 +1780,21 @@ footer {
   <div class="footer-copy">© 2025 Osamu Okumura · 奥村治 · All rights reserved</div>
 </footer>
 
+<!-- 共通フッターナビ -->
+<nav class="site-footer-nav" aria-label="サイト共通ナビゲーション">
+  <a href="index.html">🏠 TOP</a>
+  <span class="nav-sep">|</span>
+  <a href="dojo.html">⛩ 論文道場</a>
+  <span class="nav-sep">|</span>
+  <a href="pitch.html">📊 ソリューション紹介</a>
+  <span class="nav-sep">|</span>
+  <a href="haiku-engineering.html" class="current">🌸 俳句の科学</a>
+  <span class="nav-sep">|</span>
+  <a href="dojo-challenge.html">🏆 道場チャレンジ</a>
+</nav>
+
 <!-- ═══════════════════ SCRIPTS ═══════════════════ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* ── PlantUML Encoder ── */
 const PUML_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
 function encode64(data) {
@@ -2267,51 +2337,49 @@ function buildFallbackPuml(d) {
   const author = d.name || '作者';
   return {
     ctx: `@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 skinparam backgroundColor #FAFAF8
 title L1 Context - ${haiku}
-Person(reader, "読者", "${author}の句を読む人")
-System(haiku, "${ku1}", "俳句が生み出す美的体験の場")
-System_Ext(kigo, "季語システム", "自然・季節の象徴")
-System_Ext(oto, "音響システム", "音・余韻・沈黙")
-System_Ext(time, "時間システム", "刹那と永遠の交差")
-Rel(reader, haiku, "情景を想像する")
-Rel(haiku, kigo, "季節感を呼び起こす")
-Rel(haiku, oto, "音を体験させる")
-Rel(haiku, time, "時間を止める")
+rectangle "読者" as reader
+rectangle "${haiku}" as haiku_sys
+rectangle "季語システム" as kigo
+rectangle "音響システム" as oto
+rectangle "時間システム" as time
+reader -down-> haiku_sys : 情景を想像する
+haiku_sys -down-> kigo : 季節感を呼び起こす
+haiku_sys -down-> oto : 音を体験させる
+haiku_sys -down-> time : 時間を止める
 @enduml`,
     ctr: `@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 skinparam backgroundColor #FAFAF8
 title L2 Container - ${haiku}
-Person(reader, "読者", "${author}の句を読む人")
-System_Boundary(h, "${haiku}") {
-  Container(c1, "${ku1}", "上の句", "舞台の設定")
-  Container(c2, "${ku2}", "中の句", "展開・転換")
-  Container(c3, "${ku3}", "下の句", "余韻・余白")
+rectangle "読者" as reader
+rectangle "${haiku}" as h {
+  rectangle "${ku1}" as c1
+  rectangle "${ku2}" as c2
+  rectangle "${ku3}" as c3
 }
-Rel(reader, c1, "情景を受け取る")
-Rel(c1, c2, "静から動への転換")
-Rel(c2, c3, "動から余韻へ")
-Rel(c3, reader, "余白で想像が完結する")
+reader -down-> c1 : 情景を受け取る
+c1 -down-> c2 : 静から動への転換
+c2 -down-> c3 : 動から余韻へ
+c3 -down-> reader : 余白で想像が完結する
 @enduml`,
     cmp: `@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 skinparam backgroundColor #FAFAF8
 title L3 Component - ${ku2}の工学的分解
-Container_Boundary(main, "${ku2}") {
-  Component(kigo, "季語", "自然の象徴", "感情を圧縮した言葉")
-  Component(doshi, "動詞", "動きの表現", "瞬間の動作を切り取る")
-  Component(oto, "音", "聴覚体験", "余韻を生む音の配置")
+rectangle "${ku2}" as main {
+  rectangle "季語" as kigo
+  rectangle "動詞" as doshi
+  rectangle "音" as oto
 }
-Container_Boundary(end, "${ku3}") {
-  Component(yoin, "余韻", "余白の設計", "読者の想像を促す沈黙")
+rectangle "${ku3}" as end {
+  rectangle "余韻" as yoin
 }
-Rel(kigo, doshi, "生命と動きの合成")
-Rel(doshi, oto, "行為から音響へ")
-Rel(oto, yoin, "音が消えた後の余白")
+kigo -down-> doshi : 生命と動きの合成
+doshi -down-> oto : 行為から音響へ
+oto -down-> yoin : 音が消えた後の余白
 @enduml`,
     seq: `@startuml
+autonumber
 skinparam backgroundColor #FAFAF8
 skinparam sequenceArrowThickness 2
 skinparam defaultFontName "Source Serif 4"
@@ -2340,136 +2408,14 @@ state "情景が浮かぶ" as S3
 state "感動・共鳴" as S4
 state "余韻の中にいる" as S5
 state "俳句の世界に生きる" as S6
-S1 --> S2 : 俳句を目にする
-S2 --> S3 : ${ku1}を受け取る
-S3 --> S4 : ${ku2}で動きを感じる
-S4 --> S5 : ${ku3}で余白に入る
-S5 --> S6 : 想像が完結する
-S6 --> [*]
+S1 -down-> S2 : 俳句を目にする
+S2 -down-> S3 : ${ku1}を受け取る
+S3 -down-> S4 : ${ku2}で動きを感じる
+S4 -down-> S5 : ${ku3}で余白に入る
+S5 -down-> S6 : 想像が完結する
+S6 -down-> [*]
 @enduml`
   };
-}
-
-/* ── フォールバック: 評価テンプレート ── */
-function buildFallbackEval(d) {
-  const haiku = getHaikuFull(d);
-  const scores = { kigo: 78, sound: 82, ma: 85, scene: 80 };
-  return {
-    overall: `「${haiku}」の評価を生成しました。`,
-    c4desc: `「${haiku}」のC4モデル図は、読者（Person）が俳句システム（System）を通じて季語・音響・時間の3つの外部システム（System_Ext）と相互作用する構造を示しています。L2 Container図では、上の句・中の句・下の句の3コンテナが情報を受け渡す流れを可視化しました。`,
-    kigo_body: '季語の詳細解析を生成中です。',
-    kansha: '句の鑑賞を生成中です。',
-    t_kigo: '良', t_kigo_c: '季節感を表現しています。',
-    t_photo: '良', t_photo_c: '具体的な描写があります。',
-    t_ma: '良', t_ma_c: '余情が感じられます。',
-    t_rhythm: '良', t_rhythm_c: '五七五のリズムが整っています。',
-    summary: '安定した句です。',
-    ...scores,
-    advice: `「${d.ku1 || '上の句'}」の設定から「${d.ku2 || '中の句'}」の展開、そして「${d.ku3 || '下の句'}」の余韻へという三段構造は、C4モデルのContext→Container→Componentの階層と見事に対応しています。季語の選択が俳句全体の「コンテキスト」を決定する重要な役割を担っており、工学的に見ても高い完成度を持つ句です。`
-  };
-}
-
-/* ── 出力レンダリング ── */
-function renderOutput(res) {
-  const { d, puml, ev } = res;
-  const haiku = getHaikuFull(d);
-
-  // ヘッダー
-  document.getElementById('fs-output-title').textContent = d.title || haiku;
-  document.getElementById('pdf-haiku-display').textContent = haiku;
-  document.getElementById('pdf-name').textContent = d.name || '—';
-  document.getElementById('pdf-org').textContent  = d.org || '';
-  document.getElementById('pdf-period').textContent = d.period || '';
-  document.getElementById('pdf-place').textContent  = d.place || '';
-  document.getElementById('pdf-gendate').textContent = '生成日：' + new Date().toLocaleDateString('ja-JP');
-  // 背景テキスト：URLを短縮リンクに変換して表示（はみ出し防止）
-  const bgEl = document.getElementById('pdf-background');
-  const bgText = d.bg || '—';
-  bgEl.innerHTML = bgText.replace(/(https?:\/\/[^\s]+)/g, (url) => {
-    const display = url.length > 50 ? url.substring(0, 47) + '…' : url;
-    return `<a href="${url}" target="_blank" rel="noopener"
-      style="color:var(--teal);word-break:break-all;overflow-wrap:anywhere;font-size:0.88em;"
-      title="${url}">${display}</a>`;
-  });
-
-  // PlantUMLコード表示（L1）
-  document.getElementById('pdf-puml-code').textContent = puml.ctx || '';
-
-  // C4図レンダリング
-  const c4map = {
-    ctx: { puml: puml.ctx, img: 'pdf-img-ctx', load: 'pdf-load-ctx' },
-    ctr: { puml: puml.ctr, img: 'pdf-img-ctr', load: 'pdf-load-ctr' },
-    cmp: { puml: puml.cmp, img: 'pdf-img-cmp', load: 'pdf-load-cmp' },
-    seq: { puml: puml.seq, img: 'pdf-img-seq', load: 'pdf-load-seq' },
-    sta: { puml: puml.sta, img: 'pdf-img-sta', load: 'pdf-load-sta' },
-  };
-  Object.entries(c4map).forEach(([key, cfg]) => {
-    if (cfg.puml) renderPuml(cfg.puml, document.getElementById(cfg.img), document.getElementById(cfg.load));
-  });
-
-  // C4図解説
-  document.getElementById('pdf-c4-desc').textContent = ev.c4desc || '—';
-
-  // ── 新フォーマット項目の適用 ──
-  const elOverall = document.getElementById('out-overall');
-  if(elOverall) elOverall.textContent = ev.overall || '';
-
-  const elKigoBody = document.getElementById('ev-kigo-body');
-  if(elKigoBody) elKigoBody.textContent = ev.kigo_body || '—';
-
-  const elHaikuDisp = document.getElementById('out-haiku-disp');
-  if(elHaikuDisp) elHaikuDisp.textContent = haiku;
-
-  const elKansha = document.getElementById('ev-kansha');
-  if(elKansha) elKansha.textContent = ev.kansha || '—';
-
-  const td = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val || '—'; };
-  td('ev-t-kigo', ev.t_kigo); td('ev-t-kigo-c', ev.t_kigo_c);
-  td('ev-t-photo', ev.t_photo); td('ev-t-photo-c', ev.t_photo_c);
-  td('ev-t-ma', ev.t_ma); td('ev-t-ma-c', ev.t_ma_c);
-  td('ev-t-rhythm', ev.t_rhythm); td('ev-t-rhythm-c', ev.t_rhythm_c);
-
-  const elSummary = document.getElementById('ev-summary');
-  if(elSummary) elSummary.textContent = ev.summary || '—';
-
-  // 評価スコア
-  const scoreMap = [
-    ['kigo', ev.kigo], ['sound', ev.sound], ['ma', ev.ma], ['scene', ev.scene]
-  ];
-  scoreMap.forEach(([key, val]) => {
-    const score = Math.min(100, Math.max(0, parseInt(val) || 0));
-    const scoreEl = document.getElementById('ev-' + key);
-    if(scoreEl) scoreEl.textContent = score;
-    setTimeout(() => {
-      const bar = document.getElementById('ev-' + key + '-bar');
-      if(bar) bar.style.width = score + '%';
-    }, 100);
-  });
-
-  // アドバイス
-  document.getElementById('pdf-advice').textContent = ev.advice || '—';
-
-  // 表示
-  document.getElementById('fs-output-wrap').classList.add('active');
-  document.getElementById('fs-output-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-/* ── C4タブ切替（アウトプットエリア） ── */
-function switchPdfTab(key, btn) {
-  document.querySelectorAll('.pdf-c4-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.pdf-ctab').forEach(b => b.classList.remove('active'));
-  document.getElementById('pdf-panel-' + key).classList.add('active');
-  btn.classList.add('active');
-}
-
-/* ════════════════════
-   LocalStorage 保存・再生
-════════════════════ */
-const LS_KEY = 'c4_facesheet_v1';
-
-function loadHistory() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
-  catch(e) { return []; }
 }
 function saveHistory(arr) {
   localStorage.setItem(LS_KEY, JSON.stringify(arr));
@@ -2551,179 +2497,117 @@ function clearHistory() {
   renderHistory();
 }
 
-/* ════════════════════
-   PDF出力（html2pdf.js）
-   
-   【修正履歴 2025-05-10】
-   バグ①: fs-output-wrap が display:none のまま html2pdf に渡すと白紙になる
-           → PDF生成前に一時的に visibility:visible / display:block を強制付与し、
-             生成後に元に戻す
-   バグ②: finally で全 pdf-c4-panel を display:'' にリセットした後、
-           active パネルを再表示する順序が不正確で表示状態が壊れる
-           → activeパネルのみ先に保存し、finally で確実に復元する
-   バグ③: PlantUML 画像が非同期読み込み中に html2canvas がキャプチャすると
-           図が欠けることがある
-           → 全 img 要素の complete 確認 + 500ms の安定待機を追加
-════════════════════ */
+/* ════════════════════════════════════════════════
+   PDF出力（html2pdf.js）— 完全修正版 2026-05-31
+
+   根本修正: display:none パネル内の img はブラウザがロードをスキップする。
+   CSS クラス .pdf-exporting を付与し、全パネルを !important で強制表示してから
+   img の onload を待機する。finally で除去するだけで自動復元。
+════════════════════════════════════════════════ */
 async function exportPDF() {
   if (!currentResult) { alert('先に俳句を生成してください。'); return; }
 
   const btn = event.target;
+  const origText = btn.textContent;
   btn.textContent = '⏳ PDF生成中…';
   btn.disabled = true;
 
-  // ── 現在アクティブなパネルを記録（後で復元）
-  const activePanel = document.querySelector('.pdf-c4-panel.active');
+  // STEP1: アクティブパネルを記録
+  const activePanel  = document.querySelector('.pdf-c4-panel.active');
+  const activePanelId = activePanel ? activePanel.id : 'pdf-panel-ctx';
 
-  // ── バグ①修正: fs-output-wrap の表示を強制（display:none だと白紙になる）
-  const outputWrap = document.getElementById('fs-output-wrap');
+  // STEP2: fs-output-wrap が非表示なら一時表示
+  const outputWrap   = document.getElementById('fs-output-wrap');
   const wrapWasHidden = !outputWrap.classList.contains('active');
-  if (wrapWasHidden) {
-    outputWrap.style.display = 'block';
-    outputWrap.style.visibility = 'visible';
-  }
+  if (wrapWasHidden) outputWrap.style.display = 'block';
 
-  // ── バグ②修正: 全 C4 パネルを表示（PDF では全図を出力）
-  document.querySelectorAll('.pdf-c4-panel').forEach(p => {
-    p.style.display = 'block';
-    p.style.visibility = 'visible';
-  });
-
-  // ── バグ③修正: 全 img が読み込み完了するまで待機
-  const imgs = document.querySelectorAll('#fs-pdf-target img');
-  await Promise.all([...imgs].map(img => {
-    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-    return new Promise(resolve => {
-      img.onload  = resolve;
-      img.onerror = resolve; // 読み込み失敗でも続行
-      setTimeout(resolve, 5000); // 最大5秒タイムアウト
-    });
-  }));
-  // 画像読み込み後、レイアウト安定のため追加待機
-  await new Promise(r => setTimeout(r, 500));
-
-  const haiku = getHaikuFull(currentResult.d);
-  const filename = `Facesheet_${(haiku || 'haiku').replace(/[　\s]/g,'_')}.pdf`;
-
-  const target = document.getElementById('fs-pdf-target');
-  const opt = {
-    margin:      [10, 10, 10, 10],
-    filename:    filename,
-    image:       { type: 'jpeg', quality: 0.95 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#FAFAF8',
-      // バグ①修正: スクロール位置をリセットして全体を確実にキャプチャ
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: document.documentElement.scrollWidth,
-      logging: false
-    },
-    jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] }
-  };
+  // STEP3: .pdf-exporting 付与
+  //   → CSS で全パネルが display:block !important になる
+  //   → この時点でブラウザが img src のロードを開始する
+  const pdfTarget = document.getElementById('fs-pdf-target');
+  pdfTarget.classList.add('pdf-exporting');
 
   try {
-    await html2pdf().set(opt).from(target).save();
-  } catch(e) {
-    alert('PDF生成に失敗しました。ブラウザの印刷機能（Ctrl+P）をお試しください。');
-    console.error('[exportPDF] error:', e);
+    // STEP4: 全 img.pdf-c4-img-el のロード完了を待機
+    //   ★ .pdf-exporting 付与の「後」に待機するのが必須
+    const allImgs = Array.from(
+      document.querySelectorAll('#fs-pdf-target img.pdf-c4-img-el')
+    ).filter(img => img.src && img.src !== '' && img.src !== window.location.href);
+
+    await Promise.all(allImgs.map(img => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+      return new Promise(resolve => {
+        const cleanup = () => {
+          img.removeEventListener('load',  onL);
+          img.removeEventListener('error', onE);
+          clearTimeout(t);
+        };
+        const onL = () => { cleanup(); resolve(); };
+        const onE = () => { cleanup(); resolve(); };
+        img.addEventListener('load',  onL, { once: true });
+        img.addEventListener('error', onE, { once: true });
+        const t = setTimeout(() => { cleanup(); resolve(); }, 8000);
+      });
+    }));
+
+    // STEP5: SVGレンダリング安定化 800ms 待機
+    await new Promise(r => setTimeout(r, 800));
+
+    // STEP6: PDF生成
+    const haiku = getHaikuFull(currentResult.d);
+    const safeName = (haiku || 'haiku')
+      .replace(/[　\s\/\\:*?"<>|・。、「」『』（）【】]/g, '_').slice(0, 50);
+    const filename = `Fadesheet_${safeName}.pdf`;
+
+    const opt = {
+      margin:      [10, 10, 10, 10],
+      filename,
+      image:       { type: 'jpeg', quality: 0.95 },
+      html2canvas: {
+        scale:           2,
+        useCORS:         true,
+        allowTaint:      true,
+        backgroundColor: '#FAFAF8',
+        logging:         false,
+        letterRendering: true,
+        scrollX:         0,
+        scrollY:         0,
+      },
+      jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] },
+    };
+
+    await html2pdf().set(opt).from(pdfTarget).save();
+    console.log('[exportPDF] 完了:', filename);
+
+  } catch(err) {
+    console.error('[exportPDF] エラー:', err);
+    alert('PDF出力中にエラーが発生しました。\n' + err.message);
+
   } finally {
-    // ── バグ②修正: パネル表示を正確に復元
-    document.querySelectorAll('.pdf-c4-panel').forEach(p => {
-      p.style.display = '';
-      p.style.visibility = '';
+    // STEP7: 後処理 — .pdf-exporting 除去で自動復元
+    pdfTarget.classList.remove('pdf-exporting');
+
+    document.querySelectorAll('.pdf-c4-panel').forEach(p => p.classList.remove('active'));
+    const restorePanel = document.getElementById(activePanelId);
+    if (restorePanel) restorePanel.classList.add('active');
+
+    document.querySelectorAll('.pdf-ctab').forEach(b => b.classList.remove('active'));
+    const activeKey = activePanelId.replace('pdf-panel-', '');
+    document.querySelectorAll('.pdf-ctab').forEach(b => {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${activeKey}'`)) {
+        b.classList.add('active');
+      }
     });
-    // activeパネルだけ明示的に block に戻す
-    if (activePanel) {
-      activePanel.style.display = 'block';
-    }
 
-    // ── バグ①修正: output-wrap を元の非表示状態に戻す
-    if (wrapWasHidden) {
-      outputWrap.style.display = '';
-      outputWrap.style.visibility = '';
-    }
-
-    btn.textContent = '📄 PDF出力';
+    if (wrapWasHidden) outputWrap.style.display = '';
+    btn.textContent = origText;
     btn.disabled = false;
-
-    // アンケートモーダル表示（PDF保存完了0.8秒後）
-    setTimeout(() => openSurveyModal(), 800);
   }
 }
 
 /* ── 初期化 ── */
 renderHistory();
-</script>
-
-<!-- ===== アンケートモーダル ===== -->
-<div id="survey-modal"
-     role="dialog" aria-modal="true" aria-labelledby="survey-modal-title"
-     style="display:none; position:fixed; inset:0; z-index:9999;
-            background:rgba(26,26,46,0.75);
-            align-items:center; justify-content:center; padding:1rem;">
-  <div style="background:#FAFAF8; border-radius:14px; max-width:500px; width:100%;
-              max-height:90vh; overflow-y:auto; padding:2.4rem 2rem 2rem;
-              position:relative; box-shadow:0 12px 52px rgba(0,0,0,0.28);
-              text-align:center; font-family:'Source Serif 4',Georgia,serif;">
-    <button onclick="closeSurveyModal()" aria-label="閉じる"
-            style="position:absolute; top:.9rem; right:1rem; background:none; border:none;
-                   font-size:1.3rem; cursor:pointer; color:#7A7A9A;">✕</button>
-    <div style="font-size:2.2rem; margin-bottom:.4rem;">🌸</div>
-    <h3 id="survey-modal-title"
-        style="font-family:'Fraunces',Georgia,serif; color:#1A1A2E; font-size:1.15rem;
-               margin:0 0 .6rem; font-weight:700;">PDF出力 ありがとうございます</h3>
-    <p style="color:#3D3D5C; font-size:.86rem; line-height:1.8; margin:0 0 .5rem; text-align:left;">
-      俳句の科学入門・Facesheetをご利用いただきありがとうございます。<br>
-      よろしければ、<strong>5〜8分ほどのアンケート</strong>にご協力ください。
-    </p>
-    <div style="background:#f0ede8; border-left:3px solid #8B7355; border-radius:6px;
-                padding:.7rem 1rem; margin:.7rem 0 1.2rem; text-align:left;">
-      <p style="margin:0; font-size:.82rem; color:#3D3D5C; line-height:1.7;">
-        📊 アンケートでは<strong>「ChatGPT・Copilotなど他のAIとの比較」</strong>もお聞きします。<br>
-        皆様のご意見が、本システムの学術研究・改善に直結します。
-      </p>
-    </div>
-    <a id="survey-modal-link" href="https://forms.gle/DEoG2H8EEf5wKY6S9"
-       target="_blank" rel="noopener"
-       style="display:block; background:#1A1A2E; color:#FAFAF8; padding:.82rem 2rem;
-              border-radius:8px; text-decoration:none; font-size:.92rem; font-weight:700;
-              letter-spacing:.05em; margin-bottom:.75rem;">
-      📝 アンケートに答える（5〜8分）
-    </a>
-    <button onclick="closeSurveyModal()"
-            style="background:none; border:none; color:#7A7A9A; font-size:.8rem;
-                   cursor:pointer; text-decoration:underline;">今回はスキップする</button>
-    <p style="margin:.5rem 0 0; font-size:.74rem; color:#9A9AB0;">
-      ご回答は研究・改善目的のみに使用します。個人情報の入力は不要です。
-    </p>
-  </div>
-</div>
-
-<script>
-// ★ GoogleフォームURLが確定したら SURVEY_URL を1箇所書き換えるだけで全導線に反映
-const SURVEY_URL = 'https://forms.gle/DEoG2H8EEf5wKY6S9';
-
-function openSurveyModal() {
-  const navLink = document.getElementById('survey-nav-link');
-  if (navLink) navLink.href = SURVEY_URL;
-  document.getElementById('survey-modal-link').href = SURVEY_URL;
-  document.getElementById('survey-modal').style.display = 'flex';
-}
-function closeSurveyModal() {
-  document.getElementById('survey-modal').style.display = 'none';
-}
-document.addEventListener('DOMContentLoaded', function () {
-  document.getElementById('survey-modal').addEventListener('click', function (e) {
-    if (e.target === this) closeSurveyModal();
-  });
-});
-document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') closeSurveyModal();
-});
 </script>
 
 </body>

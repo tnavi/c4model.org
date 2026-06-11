@@ -1081,19 +1081,60 @@ Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
     navigator.clipboard.writeText(code).then(() => alert('コードをコピーしました。'));
   }
 
-  /* ===== SIDEBAR ACTIVE STATE ===== */
-  const observer = new IntersectionObserver((entries) => {
+ /* ===== SIDEBAR ACTIVE STATE & DOJO HUB (連動パッチ適用) ===== */
+const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
-      if(e.isIntersecting) {
-        document.querySelectorAll('aside a').forEach(a => a.classList.remove('active'));
-        const id = e.target.id;
-        const link = document.querySelector(`aside a[href="#${id}"]`);
-        if(link) link.classList.add('active');
-      }
+        if(e.isIntersecting) {
+            document.querySelectorAll('aside a').forEach(a => a.classList.remove('active'));
+            const id = e.target.id;
+            const link = document.querySelector(`aside a[href="#${id}"]`);
+            if(link) {
+                link.classList.add('active');
+                // ★ [パッチ①] スクロールやクリックでステージが切り替わったことをHub(app.js)に通知
+                if (typeof onNavigate === 'function') { 
+                    onNavigate(id); 
+                }
+            }
+        }
     });
-  }, {threshold: 0.15});
+}, {threshold: 0.15});
 
-  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+
+
+/* ── [パッチ②] Stage 0「分析開始」ボタンとデータ連動の追加 ── */
+function startAnalysis() {
+    // ★ 入力値を収集して localStorage へ安全に保存
+    if (typeof saveDojoData === 'function') {
+        saveDojoData({
+            author:      _v('authorName'),
+            affiliation: _v('affiliation'),
+            email:       _v('email'),
+            title:       _v('title'),
+            abstract:    _v('abstract'),
+            rq:          _v('rq'),
+            hypothesis:  _v('hypothesis'),
+            structure:   _v('toc'),         // 目次・章立て
+            refs:        _v('references'),  // 参考文献
+            prior:       _v('priorWork'),
+            keywords:    _v('keywords') ? _v('keywords').split(/[,、\s]+/).filter(Boolean) : [],
+            format:      _v('format')
+        });
+    }
+
+    // 保存後、自動で Stage I（発想）の位置へスムーズにスクロール
+    const stage1El = document.getElementById('stage1');
+    if (stage1El) {
+        stage1El.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+/** 値取得ヘルパー（input / textarea 共通） */
+function _v(id) {
+    const el = document.getElementById(id);
+    if (!el) return '';
+    return (el.value || el.textContent || '').trim();
+}
 </script>
 </body>
 </html>

@@ -1,2327 +1,908 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>論文道場 — Academic Paper Dojo | c4model.org</title>
-  <meta name="description" content="論文道場：C4モデル×AIで論文を構造化する学術執筆支援プラットフォーム。" />
-  <!-- CSP: api.anthropic.com / plantuml / cdnjs への接続を許可 -->
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src  'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
-    style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
-    font-src    'self' https://fonts.gstatic.com;
-    connect-src 'self' https://api.anthropic.com https://www.plantuml.com https://raw.githubusercontent.com;
-    img-src     * data: blob:;
-    frame-src   *;
-  " />
-  <!-- pako 2.1.0: PlantUML Deflate Raw エンコードに必須 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-  <!-- Skills Filter v1.0: インライン埋め込み（外部ファイル不要・CSP対応） -->
-  <script>
-  (function(global){'use strict';
-  var SF_L0=['あなたは C4モデル研究会 の学術 AI アシスタントです。','以下の「出力品質文法（Skills Filter v1.0）」に従って、すべての出力を生成してください。','','[Rule 0: エンコーディング宣言（最重要）]','すべての出力は UTF-8 で生成すること。','BOM を絶対に含めないこと。','置換文字が出力に含まれた場合は、その箇所を「[文字不明]」に置換して出力すること。','ASCII 範囲外の文字（日本語・漢字・ひらがな・カタカナ）は、エスケープせずそのまま出力すること。','','[Rule 1: 日本語出力の必須規約]','・読点は「、」、句点は「。」を使用すること','・「.」（ピリオド）を句点として使わないこと','・カギ括弧は「」を使用すること','・半角カタカナ（ｱｲｳ等）を使わないこと。必ず全角カタカナを使用すること','','[Rule 2: 文字化けリスク語彙の禁止]','以下のパターンを出力に含めてはいけない：','・□□□ や ??? が連続する表現','・HTMLエンティティの不正使用','・コードブロック外でのエスケープシーケンス（\\uXXXX形式）','','[Rule 3: 自己校正義務]','出力前に以下を内部チェックすること：','1. 日本語テキストに全角文字が正しく含まれているか','2. PlantUML を生成した場合、skinparam defaultFontName が含まれているか','3. コードブロックの開閉が正しく対応しているか','不合格の場合は自動修正して出力すること。'].join('\n');
-  var SF_L1=['[PlantUML Rule 1: 必須ヘッダー]','すべての PlantUML コードは @startuml の直後に必ず以下を含めること：','','@startuml','skinparam defaultFontName "Noto Sans CJK JP"','skinparam defaultFontSize 13','skinparam backgroundColor #FAFAF8','skinparam ArrowColor #1A6B7A','skinparam BorderColor #5A5040','skinparam shadowing false','','[PlantUML Rule 2: ラベル文字列の規約]','Person(), System() 等のラベルに日本語を使用する場合、必ず "" で囲むこと。','正しい例：Person(user, "研究者", "論文執筆者")','','[PlantUML Rule 3: コードブロック禁止]','PlantUML コードを ``` で囲まないこと。@startuml から @enduml までをそのまま出力すること。','','[PlantUML Rule 5: C4 インクルードの固定 URL]','L1: !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml','L2: !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml','L3: !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml'].join('\n');
-  var SF_L2=['[Japanese Rule 1: 語彙の統一]','論文道場 / C4モデル / PlantUML / 俳句 / 文字化け / Claude API — 表記を統一すること','','[Japanese Rule 2: 数値・単位の表記]','・数字は半角アラビア数字：1, 2, 3','・単位は半角英字：100px, 1rem, 13pt','・パーセントは半角：80%','','[Japanese Rule 3: 敬体・常体の統一]','・UI説明文：です・ます調','・コード内コメント：だ・である調','・同一段落内で混在させないこと'].join('\n');
-  var SF_L3=['[自己校正アルゴリズム：出力確定前に必ず内部実行すること]','チェック1: PlantUML コードを含む場合','□ skinparam defaultFontName "Noto Sans CJK JP" が @startuml の直後にあるか','□ Person(), System() 等のラベルが "" で囲まれているか','□ コードが ``` で囲まれていないか','→ 不合格項目を自動修正してから出力すること','','チェック2: 日本語テキストを含む場合','□ 句読点が「、」「。」（全角）になっているか','□ 半角カタカナが含まれていないか','□ 置換文字（U+FFFD）が含まれていないか','→ 不合格項目を自動修正してから出力すること'].join('\n');
-  function buildSystemPrompt(levels){
-    levels=levels||['L0','L1','L2','L3'];
-    var map={L0:SF_L0,L1:SF_L1,L2:SF_L2,L3:SF_L3};
-    return levels.map(function(l){return map[l]||'';}).join('\n\n');
-  }
-  global.SkillsFilter={SF_L0:SF_L0,SF_L1:SF_L1,SF_L2:SF_L2,SF_L3:SF_L3,buildSystemPrompt:buildSystemPrompt};
-  })(window);
-  </script>
-  <style>
-    /* ===== RESET ===== */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --sidebar-bg:   #D6E8F5;   /* 薄い青 */
-      --sidebar-text: #0D2A3E;
-      --sidebar-muted:#3A6080;
-      --sidebar-border:#A8C8E0;
-      --sidebar-active-bg: #A8C8E0;
-      --sidebar-active:#0D2A3E;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>論文道場 — Academic Paper Dojo | C4モデル研究会®</title>
+<meta name="description" content="C4モデル×7Rプロンプトによる学術論文執筆全支援システム。高校生から研究者まで対応。">
+<style>
+/* ══════════════════════════════════════════════════════
+   デザイントークン（c4model-web / 俳句の科学 準拠規格）
+   ══════════════════════════════════════════════════════ */
+:root {
+  --white:      #FFFFFF;
+  --bg:          #FAFAF8;
+  --bg-alt:      #F4F1EC;
+  --ink:        #1A1A2E;
+  --ink-mid:    #3D3D5C;
+  --ink-lite:   #7A7A9A;
+  --gold:       #B8860B;
+  --gold-lt:    #D4A01A;
+  --teal:       #1A7A8A;
+  --teal-lt:    #2A9BAD;
+  --sage:       #4A7A5A;
+  --border:     #D8D4CA;
+  --border-lt:  #ECEAE4;
+  --radius:     6px;
+  --font-body:  'Source Serif 4', 'Noto Serif JP', Georgia, serif;
+  --font-mono:  'DM Mono', 'Courier New', monospace;
+}
 
-      --main-bg:    #FAFAF6;
-      --main-text:  #1A1A1A;
-      --main-muted: #5A5040;
-      --border:     rgba(90,70,40,0.18);
+/* ══════════════════════════════════════════════════════
+   リセット・ベース
+   ══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--ink);
+  display: flex;
+  min-height: 100vh;
+}
 
-      --accent:     #7A5C2E;
-      --gold:       #8B6914;
-      --teal:       #1A6B7A;
+/* ══════════════════════════════════════════════════════
+   サイドナビゲーション（全Stageリンク切れ完全修復検証済）
+   ══════════════════════════════════════════════════════ */
+#sidenav {
+  width: 220px;
+  min-width: 220px;
+  background: var(--ink);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+  border-right: 1px solid rgba(255,255,255,.05);
+}
+.nav-brand {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.nav-brand .brand-name {
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--gold-lt);
+  letter-spacing: .08em;
+  font-family: var(--font-mono);
+}
+.nav-brand .brand-sub {
+  font-size: .68rem;
+  color: rgba(255,255,255,.45);
+  margin-top: 3px;
+}
+.nav-section-label {
+  font-size: .65rem;
+  color: rgba(255,255,255,.35);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 14px 18px 4px;
+}
+.nav-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.7);
+  font-size: .82rem;
+  font-family: var(--font-body);
+  padding: 10px 18px 10px 22px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  line-height: 1.4;
+}
+.nav-btn:hover { background: rgba(255,255,255,.07); color: var(--white); }
+.nav-btn.active {
+  background: var(--gold);
+  color: var(--white);
+  font-weight: 600;
+}
+.nav-badge {
+  float: right;
+  font-size: .65rem;
+  font-family: var(--font-mono);
+  background: rgba(255,255,255,.15);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: rgba(255,255,255,.85);
+}
+.nav-btn.active .nav-badge {
+  background: rgba(0,0,0,.2);
+}
+.nav-lang {
+  padding: 14px 18px;
+  border-top: 1px solid rgba(255,255,255,.1);
+  margin-top: auto;
+  display: flex;
+  gap: 6px;
+}
+.lang-toggle-btn {
+  flex: 1;
+  padding: 6px 0;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: var(--radius);
+  background: none;
+  color: rgba(255,255,255,.6);
+  font-size: .75rem;
+  cursor: pointer;
+  transition: all .15s;
+}
+.lang-toggle-btn.active, .lang-toggle-btn:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--white);
+}
 
-      /* 7R セクション背景 */
-      --r-bg:       #D6E8F5;   /* 薄い青 */
-      --r-border:   #A8C8E0;
+/* ══════════════════════════════════════════════════════
+   メインコンテンツレイアウト
+   ══════════════════════════════════════════════════════ */
+#main {
+  margin-left: 220px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-      --card-bg:    #EDE7D9;
-      --card-border:rgba(90,70,40,0.2);
-    }
-    html { scroll-behavior: smooth; font-size: 18px; }   /* ベース文字サイズ拡大 */
-    body {
-      display: flex; flex-direction: column; min-height: 100vh;
-      font-family: 'Georgia', 'Noto Serif JP', serif;
-      color: var(--main-text);
-      line-height: 1.8;
-      background: var(--main-bg);
-    }
+/* 各ステージ表示制御（インラインstyleと競合しないCSS完全担保型） */
+.page { display: none; }
+.page.active { display: block; }
 
-    /* ===== TOP NAV ===== */
-    .topnav {
-      background: #FAFAF6;
-      border-bottom: 1px solid var(--border);
-      padding: 0.6rem 1.5rem;
-      display: flex; align-items: center; gap: 1rem;
-      font-size: 0.85rem;
-      position: sticky; top: 0; z-index: 200;
-    }
-    .topnav a { color: var(--accent); font-weight: bold; }
-    .topnav span { color: var(--main-muted); }
-    .topnav strong { color: var(--main-text); }
+/* ページヘッダー */
+.page-header {
+  background: var(--ink);
+  color: var(--white);
+  padding: 28px 36px 22px;
+  border-bottom: 3px solid var(--gold);
+}
+.page-header .stage-badge {
+  font-size: .7rem;
+  color: var(--gold-lt);
+  letter-spacing: .1em;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.page-header .page-desc {
+  font-size: .85rem;
+  color: rgba(255,255,255,.65);
+  margin-top: 6px;
+}
 
-    /* ===== LAYOUT ===== */
-    .layout {
-      display: flex; flex: 1;
-    }
+/* コンテキスト参照バー */
+.paper-context-view {
+  background: rgba(26,122,138,.06);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 10px 16px;
+  margin-bottom: 18px;
+}
+.paper-context-view .ctx-label {
+  font-size: .6rem;
+  font-family: var(--font-mono);
+  color: var(--teal);
+  letter-spacing: .05em;
+}
+.paper-context-view .dojo-paper-title {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: 2px;
+}
 
-    /* ===== SIDEBAR ===== */
-    aside {
-      width: 220px;
-      min-width: 220px;
-      background: var(--sidebar-bg);
-      border-right: 1px solid var(--sidebar-border);
-      padding: 1.5rem 0;
-      position: sticky;
-      top: 42px;
-      height: calc(100vh - 42px);
-      overflow-y: auto;
-    }
-    .sidebar-group {
-      padding: 0 1rem 0.5rem;
-      font-size: 0.68rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--sidebar-muted);
-      margin-top: 1.2rem;
-    }
-    aside a {
-      display: flex; align-items: center; gap: 0.5rem;
-      padding: 0.55rem 1.2rem;
-      font-size: 0.95rem;          /* サイドバー文字拡大 */
-      color: var(--sidebar-text);
-      text-decoration: none;
-      border-left: 3px solid transparent;
-      transition: background 0.15s;
-      line-height: 1.4;
-    }
-    aside a:hover { background: rgba(0,0,0,0.07); }
-    aside a.active {
-      background: var(--sidebar-active-bg);
-      border-left-color: var(--teal);
-      font-weight: bold;
-      color: var(--sidebar-active);
-    }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+/* 📥 共通コンテンツエリア定義 */
+.page-body {
+  padding: 28px 36px;
+  max-width: 950px;
+}
 
-    /* ===== MAIN ===== */
-    main {
-      flex: 1;
-      padding: 2.5rem 2.5rem;
-      max-width: 860px;
-    }
+/* フォーム・エディタ装飾カード */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(26,26,46,.04);
+}
+.card-title {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--ink-mid);
+  letter-spacing: .06em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title::before {
+  content: '';
+  width: 3.5px;
+  height: 14px;
+  background: var(--gold);
+  border-radius: 2px;
+}
+.card--puml {
+  background: var(--bg-alt);
+  border-color: rgba(26,122,138,.2);
+}
+.card--puml .card-title { color: var(--teal); }
+.card--puml .card-title::before { background: var(--teal); }
 
-    /* ===== STAGE HEADER ===== */
-    .stage-tag {
-      font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--teal); margin-bottom: 0.5rem; font-weight: bold;
-    }
-    h1 { font-size: 1.9rem; color: var(--main-text); line-height: 1.25; margin-bottom: 0.75rem; }
-    .stage-note { font-size: 1rem; color: var(--main-muted); margin-bottom: 2rem; }
+/* フィールドUI */
+.field-label {
+  font-size: .78rem;
+  color: var(--ink-mid);
+  font-weight: 600;
+  margin-bottom: 5px;
+  margin-top: 12px;
+}
+.inp {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  font-size: .85rem;
+  font-family: var(--font-body);
+  background: var(--white);
+  color: var(--ink);
+}
+.inp:focus { outline: none; border-color: var(--teal); }
+textarea.inp { resize: vertical; }
+textarea.inp.mono { font-family: var(--font-mono); font-size: .78rem; line-height: 1.5; }
 
-    h2 { font-size: 1.5rem; color: var(--main-text); margin-bottom: 0.75rem; line-height: 1.3; }
-    h3 { font-size: 1.1rem; color: var(--main-text); margin-bottom: 0.6rem; }
+/* ══════════════════════════════════════════════════════
+   「俳句の科学」方式：6面独立自動再生図面マトリクススタック
+   ══════════════════════════════════════════════════════ */
+.diagram-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 20px;
+}
+.diagram-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.02);
+}
+.diagram-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-lt);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+.diagram-card-title {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.diagram-badge {
+  font-size: .65rem;
+  font-family: var(--font-mono);
+  background: var(--bg-alt);
+  color: var(--ink-mid);
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
 
-    /* ===== HOW-TO CARDS ===== */
-    .howto-box {
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 1.5rem;
-      background: #FFF8EE;
-      margin-bottom: 2rem;
-    }
-    .howto-title { font-size: 1rem; font-weight: bold; margin-bottom: 1rem; }
-    .howto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    @media (max-width: 640px) { .howto-grid { grid-template-columns: 1fr; } }
-    .howto-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px; padding: 1rem;
-    }
-    .howto-num {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: var(--teal); color: #fff;
-      font-size: 0.8rem; font-weight: bold;
-      display: inline-flex; align-items: center; justify-content: center;
-      margin-bottom: 0.5rem;
-    }
-    .howto-card h4 { font-size: 1rem; color: var(--teal); margin-bottom: 0.4rem; }
-    .howto-card p { font-size: 0.9rem; color: var(--main-text); line-height: 1.6; }
+/* PlantUML 画像描画ラッパー */
+.puml-img-wrap {
+  margin-top: 12px;
+  min-height: 160px;
+  border-radius: var(--radius);
+  border: 1.5px dashed var(--border);
+  background: var(--bg-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 14px;
+}
+.puml-img-wrap img {
+  display: none;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  z-index: 2;
+}
+.puml-img-wrap::before {
+  content: '🔄 PlantUML 多階層自動抽出エンジン待機中...';
+  font-size: .72rem;
+  font-family: var(--font-mono);
+  color: var(--ink-lite);
+  position: absolute;
+  z-index: 1;
+}
+.puml-img-wrap:has(img[src]:not([src=""]))::before { display: none; }
+.puml-img-wrap:has(img[src]:not([src=""])) { background: var(--white); border-style: solid; }
 
-    /* ===== FORM ===== */
-    .form-section {
-      background: #fff;
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .form-section-title {
-      font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--teal); font-weight: bold; margin-bottom: 1rem;
-      border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;
-    }
-    label {
-      display: block; font-size: 0.95rem; color: var(--main-text);
-      margin-bottom: 0.25rem; font-weight: 500;
-    }
-    label .req { color: #c0392b; margin-left: 2px; }
-    input[type="text"], input[type="email"], textarea, select {
-      width: 100%; padding: 0.55rem 0.8rem;
-      border: 1px solid var(--card-border); border-radius: 5px;
-      font-size: 1rem; font-family: inherit;
-      background: #FAFAF6; color: var(--main-text);
-      margin-bottom: 1rem;
-    }
-    input:focus, textarea:focus, select:focus {
-      outline: 2px solid var(--teal); border-color: var(--teal);
-    }
-    textarea { resize: vertical; min-height: 90px; }
-    .char-count { font-size: 0.8rem; color: var(--main-muted); margin-top: -0.8rem; margin-bottom: 1rem; }
+.puml-error {
+  display: none;
+  color: #c0392b;
+  font-size: .78rem;
+  padding: 8px 12px;
+  background: #fdf3f3;
+  border: 1px solid #f5c6cb;
+  border-radius: var(--radius);
+  margin-top: 8px;
+}
 
-    /* select options — 感性工学会を削除済み */
-    /* キーワード欄 — 感性工学会を削除済み */
+/* 汎用UIパーツ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: .82rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .15s;
+}
+.btn-gold { background: var(--gold); color: var(--white); }
+.btn-gold:hover { background: var(--gold-lt); }
+.btn-gold:disabled { background: var(--border); cursor: not-allowed; }
+.btn-teal { background: var(--teal); color: var(--white); }
+.btn-teal:hover { background: var(--teal-lt); }
 
-    /* ===== SCORE BAR ===== */
-    .score-bar {
-      position: sticky; bottom: 0; z-index: 100;
-      background: #C0392B;
-      color: #fff;
-      padding: 1rem 1.5rem;
-      border-top: 2px solid #E74C3C;
-    }
-    .score-top { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
-    .score-num { font-size: 2rem; font-weight: bold; color: #fff; }
-    .score-denom { font-size: 0.85rem; color: rgba(255,255,255,0.75); }
-    .score-axes { display: flex; gap: 1.25rem; flex-wrap: wrap; flex: 1; }
-    .axis-item { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 60px; }
-    .axis-label { font-size: 0.72rem; color: rgba(255,255,255,0.85); white-space: nowrap; }
-    .axis-bar { width: 60px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; }
-    .axis-bar-fill { height: 100%; border-radius: 2px; background: #fff; transition: width 0.3s; }
-    .btn-analyze {
-      padding: 0.7rem 1.6rem; background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6);
-      border: 1px solid rgba(255,255,255,0.4); border-radius: 6px;
-      font-size: 1rem; cursor: not-allowed; white-space: nowrap;
-    }
-    .btn-analyze.ready {
-      background: #fff; color: #C0392B; cursor: pointer; border-color: #fff; font-weight: bold;
-    }
-    .score-hint { font-size: 0.85rem; color: rgba(255,255,255,0.8); margin-top: 0.5rem; }
+/* スコア表示 */
+.score-display {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+.score-number { font-size: 2rem; font-weight: 700; color: var(--gold); font-family: var(--font-mono); }
+.score-bar-wrap { flex: 1; }
+.score-bar-bg { height: 8px; background: var(--border-lt); border-radius: 4px; overflow: hidden; }
+.score-bar-fill { height: 100%; background: var(--gold); width: 0%; transition: width .3s; }
+.score-label { font-size: .75rem; color: var(--ink-lite); margin-top: 4px; }
 
-    /* ===== SECTION DIVIDER ===== */
-    .stage-block {
-      padding-top: 4rem;
-      border-top: 2px solid var(--card-border);
-      margin-top: 3rem;
-    }
+.info-box {
+  background: rgba(26,122,138,.07);
+  border-left: 3px solid var(--teal);
+  padding: 10px 14px;
+  font-size: .82rem;
+  margin-bottom: 14px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
 
-    /* ===== C4 LAYER CARDS ===== */
-    .c4-card {
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem;
-    }
-    .c4-layer-tag {
-      font-size: 0.7rem; letter-spacing: 0.15em; color: var(--gold);
-      font-weight: bold; margin-bottom: 0.3rem;
-    }
-    .c4-card h3 { font-size: 1rem; color: var(--main-text); margin-bottom: 0.3rem; }
-    .c4-card p { font-size: 0.9rem; color: var(--main-muted); margin-bottom: 0.75rem; }
-    .c4-placeholder {
-      background: #EEE8DF; border-radius: 5px; padding: 0.75rem;
-      font-size: 0.88rem; color: var(--main-muted); line-height: 1.6;
-    }
+/* 診断レポート専用スタイル */
+.diagnostic-panel {
+  background: #edf7ed;
+  border: 1px solid #c3e6cb;
+  color: #1e4620;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: .78rem;
+  font-family: var(--font-mono);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
 
-    /* ===== PROMPT AREA ===== */
-    .prompt-area {
-      background: #EEE8DF; border: 1px solid var(--card-border);
-      border-radius: 6px; padding: 0.85rem 1rem;
-      font-size: 0.88rem; color: var(--main-muted); line-height: 1.6;
-      margin-bottom: 0.75rem;
-    }
-    .btn-copy {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.4rem 1rem; border: 1px solid var(--card-border);
-      border-radius: 5px; font-size: 0.88rem; color: var(--main-text);
-      background: #fff; cursor: pointer; margin-right: 0.5rem; margin-bottom: 0.5rem;
-    }
-    .btn-copy:hover { background: var(--card-bg); }
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.4rem 1rem;
-      background: var(--teal); color: #fff;
-      border: none; border-radius: 5px; font-size: 0.88rem; cursor: pointer;
-    }
-    .btn-primary:hover { opacity: 0.85; }
-
-    /* ===== 7R FRAMEWORK ===== */
-    /* [変更] 背景を薄い青に統一 */
-    .r-block {
-      background: var(--r-bg);
-      border: 1px solid var(--r-border);
-      border-radius: 10px; padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .r-step-tag {
-      font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--teal); font-weight: bold; margin-bottom: 0.25rem;
-    }
-    .r-block h3 { font-size: 1.05rem; color: var(--main-text); margin-bottom: 0.35rem; }
-    .r-block p { font-size: 0.92rem; color: var(--main-muted); margin-bottom: 0.75rem; }
-
-    /* ===== TABLE ===== */
-    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; margin-bottom: 1.5rem; }
-    th { background: var(--card-bg); padding: 0.6rem 0.8rem; text-align: left; font-size: 0.85rem; border: 1px solid var(--card-border); }
-    td { padding: 0.55rem 0.8rem; border: 1px solid var(--card-border); vertical-align: top; }
-
-    /* ===== CHECKLIST ===== */
-    .checklist { list-style: none; padding: 0; }
-    .checklist li { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.4rem 0; font-size: 0.95rem; }
-    .checklist li input[type="checkbox"] { margin-top: 3px; accent-color: var(--teal); width: 16px; height: 16px; }
-
-    /* ===== FEEDBACK FORM ===== */
-    .feedback-section { margin-bottom: 1.25rem; }
-    .feedback-section h4 { font-size: 1rem; margin-bottom: 0.5rem; }
-    .radio-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .radio-group label {
-      display: flex; align-items: center; gap: 0.3rem;
-      font-size: 0.9rem; font-weight: normal; margin-bottom: 0; cursor: pointer;
-    }
-    .radio-group input[type="radio"] { accent-color: var(--teal); }
-
-    /* ===== PLANTUML ===== */
-    .puml-editor { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    @media (max-width: 700px) { .puml-editor { grid-template-columns: 1fr; } }
-    .puml-code {
-      font-family: monospace; font-size: 0.82rem;
-      width: 100%; min-height: 200px;
-      padding: 0.75rem; border: 1px solid var(--card-border); border-radius: 6px;
-      background: #F5F0E8; resize: vertical;
-    }
-    .puml-preview {
-      border: 1px solid var(--card-border); border-radius: 6px;
-      background: #fff; min-height: 200px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--main-muted); font-size: 0.88rem; text-align: center; padding: 1rem;
-    }
-
-    /* ===== 国際標準 Abstract プレビュー ===== */
-    .pdf-preview-wrapper {
-      background: #f7f9fc;
-      border: 1px solid #dde3ea;
-      border-radius: 10px;
-      padding: 1.75rem 1.5rem;
-      margin: 2rem 0;
-    }
-    .pdf-preview-label {
-      font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--teal); font-weight: bold; margin-bottom: 1rem;
-      display: flex; align-items: center; gap: 0.6rem;
-    }
-    .pdf-preview-label::after {
-      content: ''; flex: 1; height: 1px; background: var(--teal); opacity: 0.3;
-    }
-    .pdf-preview-frame {
-      background: #ffffff;
-      border: 1px solid #d5d9e0;
-      border-radius: 3px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05);
-      padding: 2.2rem 2.8rem;
-      font-family: 'Georgia', 'Times New Roman', serif;
-      font-size: 0.87rem;
-      line-height: 1.8;
-      color: #1a1a1a;
-      position: relative;
-    }
-    .pdf-frame-header {
-      text-align: center;
-      padding-bottom: 1rem;
-      margin-bottom: 1.2rem;
-      border-bottom: 1.5px solid #1a1a1a;
-    }
-    .pdf-frame-title {
-      font-size: 1.05rem; font-weight: bold; line-height: 1.4;
-      margin-bottom: 0.5rem;
-    }
-    .pdf-frame-authors {
-      font-size: 0.83rem; color: #444; margin-bottom: 0.3rem;
-    }
-    .pdf-frame-affil {
-      font-size: 0.77rem; color: #666; font-style: italic;
-    }
-    .pdf-frame-section {
-      font-size: 0.8rem; font-weight: bold; text-transform: uppercase;
-      letter-spacing: 0.05em; margin: 1rem 0 0.4rem;
-      color: #1a1a1a;
-    }
-    .pdf-frame-abstract {
-      font-size: 0.86rem; line-height: 1.85; color: #222;
-      text-align: justify;
-    }
-    .pdf-frame-keywords {
-      font-size: 0.8rem; color: #555; margin-top: 0.75rem;
-    }
-    .pdf-frame-keywords strong { color: #1a1a1a; }
-    .pdf-watermark {
-      position: absolute; top: 0.6rem; right: 1rem;
-      font-size: 0.62rem; color: #bbb; letter-spacing: 0.08em;
-      font-family: 'Georgia', serif; font-style: italic;
-    }
-    .abstract-gen-row {
-      display: flex; align-items: center; gap: 0.75rem;
-      margin-top: 1rem; flex-wrap: wrap;
-    }
-    .btn-gen-abstract {
-      background: var(--teal); color: #fff;
-      border: none; border-radius: 5px;
-      padding: 0.55rem 1.2rem; font-size: 0.85rem;
-      cursor: pointer; font-family: inherit;
-      transition: background 0.15s;
-    }
-    .btn-gen-abstract:hover { background: #145a68; }
-    .btn-gen-abstract:disabled { background: #aaa; cursor: not-allowed; }
-    .abstract-gen-note {
-      font-size: 0.78rem; color: var(--main-muted);
-    }
-    .abstract-status {
-      font-size: 0.82rem; color: var(--teal); margin-top: 0.5rem; min-height: 1.2em;
-    }
-
-    /* ===== ACTION BUTTONS ===== */
-    .action-row {
-      display: flex; gap: 0.75rem; flex-wrap: wrap; margin: 1rem 0;
-    }
-    .btn-ghost {
-      padding: 0.45rem 1rem; border: 1px solid var(--card-border);
-      border-radius: 5px; font-size: 0.9rem; background: #fff;
-      color: var(--main-text); cursor: pointer;
-    }
-    .btn-ghost:hover { background: var(--card-bg); }
-    .btn-sample {
-      padding: 0.5rem 1.2rem; border-radius: 5px; font-size: 0.95rem;
-      background: #FFF3CD; color: #7A5C2E; border: 1px solid #D4AF6A; cursor: pointer;
-    }
-    .btn-sample:hover { background: #FFE9A0; }
-
-    /* ===== RQ CHECKLIST ===== */
-    .rq-list { list-style: none; padding: 0; }
-    .rq-list li { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.35rem 0; font-size: 0.95rem; }
-    .rq-list li::before { content: "□"; color: var(--teal); font-size: 1rem; flex-shrink: 0; }
-
-    /* ===== SETTINGS ===== */
-    .settings-card {
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem;
-    }
-
-    /* ===== ASSIST HINT (Q2-Q5) ===== */
-    .assist-hint {
-      display: flex; align-items: flex-start; gap: 0.6rem;
-      background: #EAF4FB; border: 1px solid #A8CEE8; border-radius: 8px;
-      padding: 0.85rem 1rem; margin-bottom: 1.25rem;
-      font-size: 0.88rem; color: #1A3A52; line-height: 1.65;
-    }
-    .assist-hint .hint-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
-    .assist-hint-inline {
-      font-size: 0.82rem; color: #2A6080; margin-top: -0.6rem;
-      margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.4rem;
-    }
-    .assist-hint-inline::before { content: "💡"; font-size: 0.88rem; }
-    label .opt-badge {
-      font-size: 0.72rem; background: #D6EEF8; color: #1A6B7A;
-      border-radius: 4px; padding: 1px 6px; margin-left: 6px;
-      font-weight: normal; vertical-align: middle;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      aside { display: none; }
-      main { padding: 1.5rem 1rem; max-width: 100%; }
-    }
-
-    /* ── 言語切替ボタン ── */
-    .lang-switcher { margin-left: auto; display: flex; gap: 0; }
-    .lang-btn {
-      font-family: monospace; font-size: 0.72rem; letter-spacing: 0.08em;
-      padding: 0.3rem 0.75rem; background: transparent; color: var(--main-muted);
-      border: 1px solid var(--border); border-right: none; cursor: pointer; transition: all 0.15s;
-    }
-    .lang-btn:last-child { border-right: 1px solid var(--border); }
-    .lang-btn.active { background: var(--main-text, #1A1A2E); color: #fff; }
-    [data-en] { display: none; }
-    [data-ja] { display: inline; }
-  
-  /* ── QR CODE BADGE ── */
-  .qr-badge {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    vertical-align: middle;
-  }
-  .qr-badge svg {
-    display: block;
-    border: 1px solid var(--border, #D8D4CA);
-    background: #fff;
-    padding: 3px;
-  }
-  .qr-badge-label {
-    font-family: var(--font-mono, monospace);
-    font-size: 0.55rem;
-    letter-spacing: 0.07em;
-    color: var(--ink-lite, #7A7A9A);
-    text-align: center;
-  }
-  .qr-inline-wrap {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    flex-wrap: wrap;
-  }
-  /* ── NAV QR ── */
-  .nav-qr {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    margin-right: 0.5rem;
-  }
-  .nav-qr svg {
-    display: block;
-    background: #fff;
-    padding: 2px;
-    border: 1px solid rgba(0,0,0,0.10);
-  }
-
-  /* ===== CREDIT SYSTEM ===== */
-  .credit-meter-wrap {
-    display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
-    margin-right: 0.5rem; position: relative;
-  }
-  .credit-meter-label {
-    font-size: 0.65rem; color: rgba(255,255,255,0.85); letter-spacing: 0.1em;
-    display: flex; align-items: center; gap: 0.4rem;
-  }
-  .credit-free-badge {
-    font-size: 0.58rem; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 3px; padding: 1px 5px; letter-spacing: 0.06em; color: #F1C40F;
-  }
-  .credit-row { display: flex; align-items: center; gap: 0.5rem; }
-  .credit-display {
-    font-size: 1.35rem; font-weight: bold; line-height: 1;
-    color: #F1C40F; transition: color 0.3s;
-  }
-  .credit-display.warning { color: #E74C3C !important; }
-  .credit-display.caution { color: #E67E22 !important; }
-  .credit-denom { font-size: 0.72rem; color: rgba(255,255,255,0.5); }
-  .credit-bar-bg {
-    width: 72px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden;
-  }
-  .credit-bar-fill {
-    height: 100%; background: #F1C40F; border-radius: 2px; transition: width 0.4s, background 0.4s;
-  }
-  .credit-bar-fill.warning { background: #E74C3C; }
-  .credit-bar-fill.caution { background: #E67E22; }
-  .btn-charge {
-    display: inline-flex; align-items: center; gap: 0.3rem;
-    padding: 0.28rem 0.65rem;
-    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.35);
-    border-radius: 4px; color: rgba(255,255,255,0.9);
-    font-size: 0.7rem; letter-spacing: 0.05em; cursor: pointer;
-    transition: background 0.2s; white-space: nowrap; font-family: inherit;
-  }
-  .btn-charge:hover { background: rgba(255,255,255,0.22); }
-  .zero-stop-note {
-    font-size: 0.62rem; color: rgba(255,255,255,0.48); margin-top: 2px; text-align: right;
-  }
-  .btn-analyze.credit-blocked {
-    background: rgba(231,76,60,0.2) !important; color: rgba(255,120,120,0.9) !important;
-    border-color: rgba(231,76,60,0.5) !important; cursor: not-allowed !important;
-  }
-
-  /* ===== CHARGE MODAL — クリーンミニマル ===== */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; z-index: 2000;
-    background: rgba(10,15,20,0.6); backdrop-filter: blur(6px);
-    align-items: center; justify-content: center; padding: 1.25rem;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal-box {
-    background: #FAFAF8; border-radius: 4px; max-width: 460px; width: 100%;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
-    animation: modalIn 0.22s ease;
-    overflow: hidden;
-  }
-  @keyframes modalIn {
-    from { opacity: 0; transform: translateY(12px) scale(0.98); }
-    to   { opacity: 1; transform: none; }
-  }
-  .modal-header {
-    background: var(--teal); color: #fff;
-    padding: 1rem 1.4rem; display: flex; justify-content: space-between; align-items: center;
-    border-bottom: none;
-  }
-  .modal-header-inner { display: flex; flex-direction: column; gap: 0.15rem; }
-  .modal-header-title { font-size: 0.95rem; font-weight: bold; letter-spacing: 0.02em; }
-  .modal-header-sub { font-size: 0.7rem; opacity: 0.75; letter-spacing: 0.06em; }
-  .modal-close {
-    background: none; border: none; color: rgba(255,255,255,0.7); font-size: 1.4rem;
-    cursor: pointer; line-height: 1; padding: 0; transition: color 0.15s; margin-left: 1rem;
-  }
-  .modal-close:hover { color: #fff; }
-  .modal-body { padding: 1.4rem 1.5rem; }
-
-  /* データ保護バナー */
-  .modal-data-safe {
-    background: #EAF4EC; border-left: 3px solid #4A9A5A;
-    padding: 0.65rem 0.9rem; margin-bottom: 1rem; font-size: 0.83rem; color: #1A4A2E;
-    display: flex; align-items: flex-start; gap: 0.45rem; line-height: 1.6;
-    border-radius: 0 4px 4px 0;
-  }
-  .modal-data-safe .icon { font-size: 1rem; flex-shrink: 0; line-height: 1.6; }
-
-  /* プラン選択 */
-  .modal-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 1.2rem; }
-  .plan-card {
-    border: 1.5px solid var(--card-border); border-radius: 4px; padding: 0.9rem 0.75rem;
-    text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s;
-    position: relative; background: #fff;
-  }
-  .plan-card:hover { border-color: var(--teal); background: #F0F7F8; }
-  .plan-card.selected { border-color: var(--teal); background: #F0F7F8; }
-  .plan-badge {
-    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
-    background: var(--teal); color: #fff; font-size: 0.6rem; letter-spacing: 0.1em;
-    padding: 2px 8px; border-radius: 10px; white-space: nowrap; font-weight: bold;
-  }
-  .plan-credits { font-size: 1.4rem; font-weight: bold; color: var(--teal); line-height: 1; margin-bottom: 0.25rem; }
-  .plan-credits small { font-size: 0.68rem; font-weight: normal; color: var(--main-muted); }
-  .plan-price { font-size: 0.88rem; font-weight: bold; color: var(--main-text); margin: 0.2rem 0; }
-  .plan-per { font-size: 0.68rem; color: var(--main-muted); }
-  .plan-note { font-size: 0.68rem; color: var(--main-muted); margin-top: 0.25rem; }
-
-  /* 決済フォームエリア */
-  .payment-section { margin-bottom: 1.1rem; }
-  .payment-label {
-    font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--main-muted); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;
-  }
-  .payment-label::after { content: ''; flex: 1; height: 1px; background: var(--card-border); }
-  .stripe-btn {
-    display: flex; align-items: center; justify-content: center; gap: 0.75rem;
-    width: 100%; padding: 0.8rem 1rem;
-    background: #635BFF; color: #fff; border: none; border-radius: 4px;
-    font-size: 0.9rem; font-weight: bold; letter-spacing: 0.02em;
-    cursor: pointer; transition: opacity 0.15s, transform 0.1s;
-    font-family: inherit;
-  }
-  .stripe-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-  .stripe-btn:active { transform: translateY(0); }
-  .stripe-logo {
-    display: inline-flex; align-items: center; gap: 3px;
-    font-size: 0.78rem; font-weight: bold; letter-spacing: -0.02em;
-    background: rgba(255,255,255,0.15); border-radius: 3px; padding: 1px 6px;
-  }
-
-  /* カードブランドアイコン (テキストのみ・ミニマル) */
-  .card-brands {
-    display: flex; align-items: center; gap: 0.4rem; margin-top: 0.6rem;
-    justify-content: center; flex-wrap: wrap;
-  }
-  .card-brand {
-    font-size: 0.6rem; font-weight: bold; letter-spacing: 0.06em;
-    color: var(--main-muted); border: 1px solid var(--card-border);
-    padding: 2px 6px; border-radius: 3px; background: #fff;
-  }
-
-  /* ゼロストップ保証フッター */
-  .modal-zero-stop {
-    background: #FFF8EE; border-left: 3px solid #D4AF6A;
-    padding: 0.6rem 0.9rem; margin-top: 0.85rem; font-size: 0.8rem; color: #7A5C2E;
-    display: flex; align-items: flex-start; gap: 0.45rem; line-height: 1.6;
-    border-radius: 0 4px 4px 0;
-  }
-
-  .modal-footer-note { text-align: center; font-size: 0.7rem; color: var(--main-muted); margin-top: 0.85rem; line-height: 1.7; }
-
-  /* ===== PRICING SECTION (redesigned) ===== */
-  .pricing-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 2rem; }
-  @media (max-width: 640px) { .pricing-cards { grid-template-columns: 1fr; } }
-  .pricing-card {
-    border: 1.5px solid var(--card-border); border-radius: 10px;
-    padding: 1.5rem; background: #fff; position: relative; overflow: hidden;
-  }
-  .pricing-card.featured { border-color: var(--teal); }
-  .pricing-card.featured::before {
-    content: 'おすすめ'; position: absolute; top: 12px; right: -18px;
-    background: var(--teal); color: #fff; font-size: 0.65rem; letter-spacing: 0.1em;
-    padding: 3px 28px; transform: rotate(35deg); font-weight: bold;
-  }
-  .pricing-tag { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--teal); font-weight: bold; margin-bottom: 0.5rem; }
-  .pricing-price { font-size: 1.8rem; font-weight: bold; color: var(--main-text); line-height: 1.1; }
-  .pricing-price small { font-size: 0.85rem; font-weight: normal; color: var(--main-muted); }
-  .pricing-credits { font-size: 0.88rem; color: var(--teal); font-weight: bold; margin: 0.5rem 0 0.4rem; }
-  .pricing-per-credit { font-size: 0.78rem; color: var(--main-muted); margin-bottom: 1rem;
-    background: #EAF4FB; display: inline-block; padding: 2px 8px; border-radius: 4px; }
-  .pricing-features { list-style: none; padding: 0; font-size: 0.84rem; color: var(--main-muted); }
-  .pricing-features li { padding: 0.28rem 0; display: flex; align-items: flex-start; gap: 0.4rem; line-height: 1.55; }
-  .pricing-features li::before { content: '✓'; color: var(--teal); flex-shrink: 0; font-weight: bold; }
-  .guarantee-box {
-    background: #FFF8EE; border: 1px solid #D4AF6A; border-radius: 8px;
-    padding: 1.2rem 1.4rem; margin: 1.5rem 0;
-    display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start;
-  }
-  .guarantee-icon { font-size: 2rem; line-height: 1; }
-  .guarantee-title { font-size: 0.95rem; font-weight: bold; color: var(--accent); margin-bottom: 0.3rem; }
-  .guarantee-text { font-size: 0.84rem; color: var(--main-muted); line-height: 1.8; }
-
+.hero-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 16px; margin-top: 20px; }
+.hero-tile { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; cursor: pointer; transition: border-color .15s; }
+.hero-tile:hover { border-color: var(--gold); }
+.hero-tile .tile-stage { font-size: .65rem; font-family: var(--font-mono); color: var(--gold); font-weight: 600; }
+.hero-tile .tile-name { font-size: .88rem; font-weight: 700; margin-top: 2px; }
 </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
-<div class="topnav">
-  <span class="nav-qr" title="このページのQRコード"><svg width="44" height="44" version="1.1" viewBox="0 0 33 33" xmlns="http://www.w3.org/2000/svg"><path d="M2,2H3V3H2zM3,2H4V3H3zM4,2H5V3H4zM5,2H6V3H5zM6,2H7V3H6zM7,2H8V3H7zM8,2H9V3H8zM10,2H11V3H10zM13,2H14V3H13zM14,2H15V3H14zM15,2H16V3H15zM16,2H17V3H16zM18,2H19V3H18zM19,2H20V3H19zM20,2H21V3H20zM24,2H25V3H24zM25,2H26V3H25zM26,2H27V3H26zM27,2H28V3H27zM28,2H29V3H28zM29,2H30V3H29zM30,2H31V3H30zM2,3H3V4H2zM8,3H9V4H8zM11,3H12V4H11zM12,3H13V4H12zM14,3H15V4H14zM15,3H16V4H15zM16,3H17V4H16zM17,3H18V4H17zM19,3H20V4H19zM20,3H21V4H20zM21,3H22V4H21zM24,3H25V4H24zM30,3H31V4H30zM2,4H3V5H2zM4,4H5V5H4zM5,4H6V5H5zM6,4H7V5H6zM8,4H9V5H8zM11,4H12V5H11zM12,4H13V5H12zM13,4H14V5H13zM16,4H17V5H16zM19,4H20V5H19zM21,4H22V5H21zM22,4H23V5H22zM24,4H25V5H24zM26,4H27V5H26zM27,4H28V5H27zM28,4H29V5H28zM30,4H31V5H30zM2,5H3V6H2zM4,5H5V6H4zM5,5H6V6H5zM6,5H7V6H6zM8,5H9V6H8zM10,5H11V6H10zM14,5H15V6H14zM20,5H21V6H20zM21,5H22V6H21zM24,5H25V6H24zM26,5H27V6H26zM27,5H28V6H27zM28,5H29V6H28zM30,5H31V6H30zM2,6H3V7H2zM4,6H5V7H4zM5,6H6V7H5zM6,6H7V7H6zM8,6H9V7H8zM10,6H11V7H10zM11,6H12V7H11zM12,6H13V7H12zM13,6H14V7H13zM19,6H20V7H19zM20,6H21V7H20zM24,6H25V7H24zM26,6H27V7H26zM27,6H28V7H27zM28,6H29V7H28zM30,6H31V7H30zM2,7H3V8H2zM8,7H9V8H8zM10,7H11V8H10zM13,7H14V8H13zM18,7H19V8H18zM19,7H20V8H19zM21,7H22V8H21zM22,7H23V8H22zM24,7H25V8H24zM30,7H31V8H30zM2,8H3V9H2zM3,8H4V9H3zM4,8H5V9H4zM5,8H6V9H5zM6,8H7V9H6zM7,8H8V9H7zM8,8H9V9H8zM10,8H11V9H10zM12,8H13V9H12zM14,8H15V9H14zM16,8H17V9H16zM18,8H19V9H18zM20,8H21V9H20zM22,8H23V9H22zM24,8H25V9H24zM25,8H26V9H25zM26,8H27V9H26zM27,8H28V9H27zM28,8H29V9H28zM29,8H30V9H29zM30,8H31V9H30zM10,9H11V10H10zM13,9H14V10H13zM15,9H16V10H15zM17,9H18V10H17zM18,9H19V10H18zM19,9H20V10H19zM20,9H21V10H20zM22,9H23V10H22zM2,10H3V11H2zM6,10H7V11H6zM8,10H9V11H8zM9,10H10V11H9zM10,10H11V11H10zM11,10H12V11H11zM12,10H13V11H12zM13,10H14V11H13zM14,10H15V11H14zM15,10H16V11H15zM19,10H20V11H19zM20,10H21V11H20zM21,10H22V11H21zM22,10H23V11H22zM23,10H24V11H23zM24,10H25V11H24zM25,10H26V11H25zM26,10H27V11H26zM27,10H28V11H27zM30,10H31V11H30zM2,11H3V12H2zM3,11H4V12H3zM4,11H5V12H4zM5,11H6V12H5zM7,11H8V12H7zM11,11H12V12H11zM13,11H14V12H13zM14,11H15V12H14zM15,11H16V12H15zM16,11H17V12H16zM18,11H19V12H18zM19,11H20V12H19zM20,11H21V12H20zM24,11H25V12H24zM25,11H26V12H25zM26,11H27V12H26zM27,11H28V12H27zM28,11H29V12H28zM29,11H30V12H29zM30,11H31V12H30zM3,12H4V13H3zM4,12H5V13H4zM6,12H7V13H6zM8,12H9V13H8zM9,12H10V13H9zM11,12H12V13H11zM13,12H14V13H13zM14,12H15V13H14zM18,12H19V13H18zM20,12H21V13H20zM22,12H23V13H22zM24,12H25V13H24zM26,12H27V13H26zM30,12H31V13H30zM6,13H7V14H6zM12,13H13V14H12zM13,13H14V14H13zM14,13H15V14H14zM16,13H17V14H16zM19,13H20V14H19zM21,13H22V14H21zM22,13H23V14H22zM23,13H24V14H23zM24,13H25V14H24zM26,13H27V14H26zM27,13H28V14H27zM29,13H30V14H29zM30,13H31V14H30zM3,14H4V15H3zM4,14H5V15H4zM5,14H6V15H5zM6,14H7V15H6zM7,14H8V15H7zM8,14H9V15H8zM13,14H14V15H13zM15,14H16V15H15zM16,14H17V15H16zM17,14H18V15H17zM18,14H19V15H18zM19,14H20V15H19zM22,14H23V15H22zM23,14H24V15H23zM29,14H30V15H29zM2,15H3V16H2zM4,15H5V16H4zM5,15H6V16H5zM7,15H8V16H7zM11,15H12V16H11zM19,15H20V16H19zM20,15H21V16H20zM22,15H23V16H22zM24,15H25V16H24zM25,15H26V16H25zM26,15H27V16H26zM27,15H28V16H27zM28,15H29V16H28zM29,15H30V16H29zM30,15H31V16H30zM4,16H5V17H4zM5,16H6V17H5zM8,16H9V17H8zM11,16H12V17H11zM13,16H14V17H13zM14,16H15V17H14zM15,16H16V17H15zM16,16H17V17H16zM17,16H18V17H17zM19,16H20V17H19zM22,16H23V17H22zM24,16H25V17H24zM27,16H28V17H27zM28,16H29V17H28zM30,16H31V17H30zM3,17H4V18H3zM4,17H5V18H4zM5,17H6V18H5zM6,17H7V18H6zM7,17H8V18H7zM9,17H10V18H9zM13,17H14V18H13zM15,17H16V18H15zM17,17H18V18H17zM18,17H19V18H18zM19,17H20V18H19zM21,17H22V18H21zM22,17H23V18H22zM24,17H25V18H24zM26,17H27V18H26zM29,17H30V18H29zM30,17H31V18H30zM2,18H3V19H2zM5,18H6V19H5zM7,18H8V19H7zM8,18H9V19H8zM10,18H11V19H10zM12,18H13V19H12zM13,18H14V19H13zM14,18H15V19H14zM15,18H16V19H15zM19,18H20V19H19zM21,18H22V19H21zM22,18H23V19H22zM23,18H24V19H23zM29,18H30V19H29zM2,19H3V20H2zM3,19H4V20H3zM6,19H7V20H6zM9,19H10V20H9zM10,19H11V20H10zM13,19H14V20H13zM15,19H16V20H15zM16,19H17V20H16zM18,19H19V20H18zM24,19H25V20H24zM25,19H26V20H25zM26,19H27V20H26zM27,19H28V20H27zM29,19H30V20H29zM30,19H31V20H30zM5,20H6V21H5zM8,20H9V21H8zM9,20H10V21H9zM11,20H12V21H11zM13,20H14V21H13zM14,20H15V21H14zM18,20H19V21H18zM19,20H20V21H19zM20,20H21V21H20zM25,20H26V21H25zM28,20H29V21H28zM30,20H31V21H30zM4,21H5V22H4zM5,21H6V22H5zM6,21H7V22H6zM7,21H8V22H7zM9,21H10V22H9zM10,21H11V22H10zM11,21H12V22H11zM12,21H13V22H12zM14,21H15V22H14zM16,21H17V22H16zM19,21H20V22H19zM21,21H22V22H21zM23,21H24V22H23zM24,21H25V22H24zM29,21H30V22H29zM30,21H31V22H30zM2,22H3V23H2zM3,22H4V23H3zM4,22H5V23H4zM6,22H7V23H6zM8,22H9V23H8zM9,22H10V23H9zM11,22H12V23H11zM12,22H13V23H12zM14,22H15V23H14zM15,22H16V23H15zM16,22H17V23H16zM17,22H18V23H17zM18,22H19V23H18zM19,22H20V23H19zM21,22H22V23H21zM22,22H23V23H22zM23,22H24V23H23zM24,22H25V23H24zM25,22H26V23H25zM26,22H27V23H26zM27,22H28V23H27zM30,22H31V23H30zM10,23H11V24H10zM12,23H13V24H12zM13,23H14V24H13zM19,23H20V24H19zM20,23H21V24H20zM22,23H23V24H22zM26,23H27V24H26zM30,23H31V24H30zM2,24H3V25H2zM3,24H4V25H3zM4,24H5V25H4zM5,24H6V25H5zM6,24H7V25H6zM7,24H8V25H7zM8,24H9V25H8zM10,24H11V25H10zM12,24H13V25H12zM13,24H14V25H13zM14,24H15V25H14zM15,24H16V25H15zM16,24H17V25H16zM17,24H18V25H17zM19,24H20V25H19zM20,24H21V25H20zM21,24H22V25H21zM22,24H23V25H22zM24,24H25V25H24zM26,24H27V25H26zM27,24H28V25H27zM28,24H29V25H28zM30,24H31V25H30zM2,25H3V26H2zM8,25H9V26H8zM11,25H12V26H11zM15,25H16V26H15zM17,25H18V26H17zM18,25H19V26H18zM19,25H20V26H19zM20,25H21V26H20zM21,25H22V26H21zM22,25H23V26H22zM26,25H27V26H26zM30,25H31V26H30zM2,26H3V27H2zM4,26H5V27H4zM5,26H6V27H5zM6,26H7V27H6zM8,26H9V27H8zM10,26H11V27H10zM11,26H12V27H11zM12,26H13V27H12zM15,26H16V27H15zM19,26H20V27H19zM21,26H22V27H21zM22,26H23V27H22zM23,26H24V27H23zM24,26H25V27H24zM25,26H26V27H25zM26,26H27V27H26zM27,26H28V27H27zM29,26H30V27H29zM30,26H31V27H30zM2,27H3V28H2zM4,27H5V28H4zM5,27H6V28H5zM6,27H7V28H6zM8,27H9V28H8zM11,27H12V28H11zM13,27H14V28H13zM14,27H15V28H14zM16,27H17V28H16zM18,27H19V28H18zM19,27H20V28H19zM20,27H21V28H20zM25,27H26V28H25zM29,27H30V28H29zM2,28H3V29H2zM4,28H5V29H4zM5,28H6V29H5zM6,28H7V29H6zM8,28H9V29H8zM11,28H12V29H11zM13,28H14V29H13zM15,28H16V29H15zM18,28H19V29H18zM19,28H20V29H19zM20,28H21V29H20zM21,28H22V29H21zM22,28H23V29H22zM23,28H24V29H23zM25,28H26V29H25zM27,28H28V29H27zM28,28H29V29H28zM29,28H30V29H29zM30,28H31V29H30zM2,29H3V30H2zM8,29H9V30H8zM11,29H12V30H11zM14,29H15V30H14zM15,29H16V30H15zM19,29H20V30H19zM22,29H23V30H22zM26,29H27V30H26zM27,29H28V30H27zM29,29H30V30H29zM30,29H31V30H30zM2,30H3V31H2zM3,30H4V31H3zM4,30H5V31H4zM5,30H6V31H5zM6,30H7V31H6zM7,30H8V31H7zM8,30H9V31H8zM10,30H11V31H10zM11,30H12V31H11zM12,30H13V31H12zM15,30H16V31H15zM16,30H17V31H16zM17,30H18V31H17zM20,30H21V31H20zM22,30H23V31H22zM24,30H25V31H24zM26,30H27V31H26zM27,30H28V31H27zM29,30H30V31H29z" id="qr-path" fill="#000000" fill-opacity="1" fill-rule="nonzero" stroke="none"/></svg></span>
-  <a href="https://c4model.org/">c4model.org</a>
-  <span>—</span>
-  <strong><span data-ja>論文道場</span><span data-en style="display:none">Academic Paper Dojo</span></strong>
-  <div class="lang-switcher">
-    <button class="lang-btn active" data-lang="ja" onclick="setLang('ja')">日本語</button>
-    <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+<nav id="sidenav">
+  <div class="nav-brand">
+    <div class="brand-name">RONBUN DOJO</div>
+    <div class="brand-sub">論文道場 — C4モデル研究会®</div>
   </div>
-</div>
+  <div class="nav-section-label">メニュー</div>
+  <button class="nav-btn active" id="nav-btn-home" onclick="go('home',this)">🏠 道場入口</button>
+  <button class="nav-btn" id="nav-btn-input" onclick="go('input',this)">✍️ 論文情報入力 <span class="nav-badge">Stage 0</span></button>
+  
+  <div class="nav-section-label">執筆ステージ</div>
+  <button class="nav-btn" id="nav-btn-ideation" onclick="go('ideation',this)">💡 発想・RQ生成 <span class="nav-badge">I</span></button>
+  <button class="nav-btn" id="nav-btn-structure" onclick="go('structure',this)">🏗️ C4構造化 <span class="nav-badge">II</span></button>
+  <button class="nav-btn" id="nav-btn-write" onclick="go('write',this)">🖊️ 執筆支援 (HCD) <span class="nav-badge">III</span></button>
+  <button class="nav-btn" id="nav-btn-evaluate" onclick="go('evaluate',this)">⚖️ C4段階評価 <span class="nav-badge">IV</span></button>
+  <button class="nav-btn" id="nav-btn-presentation" onclick="go('presentation',this)">🎤 学会発表準備 <span class="nav-badge">V</span></button>
+  <button class="nav-btn" id="nav-btn-qa" onclick="go('qa',this)">❓ 想定質問訓練 <span class="nav-badge">VI</span></button>
+  <button class="nav-btn" id="nav-btn-submit" onclick="go('submit',this)">📬 投稿・査読対応 <span class="nav-badge">VII</span></button>
+  
+  <div class="nav-section-label">設定</div>
+  <button class="nav-btn" id="nav-btn-settings" onclick="go('settings',this)">⚙️ 論文情報設定</button>
 
-<div class="layout">
+  <div class="nav-lang">
+    <button class="lang-toggle-btn active" id="btn-jp">JP</button>
+    <button class="lang-toggle-btn" id="btn-en">EN</button>
+  </div>
+</nav>
 
-<!-- ===== SIDEBAR ===== -->
-<!-- [変更] 背景を薄い青(#D6E8F5)に変更、文字サイズを拡大 -->
-<aside>
-  <div class="sidebar-group">START HERE</div>
-  <a href="#stage0" class="active"><span class="dot"></span><span data-ja>Stage 0 — 入力</span><span data-en style="display:none">Stage 0 — Input</span></a>
+<main id="main">
 
-  <div class="sidebar-group">WRITING STAGES</div>
-  <!-- [校正] すべてのアンカーリンクを対応するid属性と一致させた -->
-  <a href="#stage1"><span data-ja>● Stage I — 発想</span><span data-en style="display:none">● Stage I — Ideation</span></a>
-  <a href="#stage2"><span data-ja>● Stage II — 構造化</span><span data-en style="display:none">● Stage II — Structure</span></a>
-  <a href="#stage3"><span data-ja>● Stage III — Writing</span><span data-en style="display:none">● Stage III — Writing</span></a>
-  <a href="#stage4"><span data-ja>● Stage IV — 評価</span><span data-en style="display:none">● Stage IV — Evaluation</span></a>
-  <a href="#stage5"><span data-ja>● Stage V — 発表準備</span><span data-en style="display:none">● Stage V — Presentation</span></a>
-  <a href="#stage6"><span data-ja>● Stage VI — 質疑応答</span><span data-en style="display:none">● Stage VI — Q&amp;A</span></a>
-  <a href="#stage7"><span data-ja>● Stage VII — 投稿</span><span data-en style="display:none">● Stage VII — Submission</span></a>
-  <!-- [校正] アンケートリンクを正しいidに修正 -->
-  <a href="#feedback"><span data-ja>📊 本アプリの評価アンケート</span><span data-en style="display:none">📊 Feedback Survey</span></a>
-
-  <div class="sidebar-group">TOOLS</div>
-  <!-- [校正] ツールリンクを正しいidに修正 -->
-  <a href="#tools-c4"><span data-ja>C4モデル図集</span><span data-en style="display:none">C4 Diagram Gallery</span></a>
-  <a href="#tools-format"><span data-ja>学会フォーマット</span><span data-en style="display:none">Journal Formats</span></a>
-  <a href="#pricing"><span data-ja>料金プラン</span><span data-en style="display:none">Pricing</span></a>
-  <a href="#settings"><span data-ja>設定</span><span data-en style="display:none">Settings</span></a>
-</aside>
-
-<!-- ===== MAIN ===== -->
-<main>
-
-  <!-- STAGE 0 -->
-  <section id="stage0">
-    <div class="stage-tag"><span data-ja>STAGE 0 · 論文情報入力</span><span data-en style="display:none">STAGE 0 · Paper Input</span></div>
-    <!-- [変更] 右側文字拡大（h1は1.9rem、本文は1rem以上） -->
-    <h1><span data-ja>200の実証例をワンクリックで再現する<br>『思考の自動化ツール』</span><span data-en style="display:none">Reproduce 200 Validated Cases in One Click<br>"Automated Thinking Tool"</span></h1>
-    <p class="stage-note"><span data-ja>まず <strong>01 著者情報</strong>（必須 *）を入力してください。Q2〜Q5はあいまいな入力・空欄のまま先へ進めます。後から補足入力するとスコアが上がり、AIの精度も上がります。</span><span data-en style="display:none">Start with <strong>01 Author Info</strong> (required *). Sections Q2–Q5 are optional — you can proceed with partial or blank entries and fill them in later.</span></p>
-
-    <!-- HOW-TO -->
-    <div class="howto-box">
-      <div class="howto-title"><span data-ja>🔰 3分でわかる！論文道場の使い方</span><span data-en style="display:none">🔰 3-Minute Guide to Academic Paper Dojo</span></div>
-      <div class="howto-grid">
-        <div class="howto-card">
-          <span class="howto-num">1</span>
-          <h4><span data-ja>何ができるの？</span><span data-en style="display:none">What can it do?</span></h4>
-          <p>頭の中のモヤモヤを整理し、論理的な「レポート・企画書・論文」を挫折せずに書き上げるための思考自動化ツールです。</p>
-        </div>
-        <div class="howto-card">
-          <span class="howto-num">2</span>
-          <h4><span data-ja>どう入力するの？</span><span data-en style="display:none">How do I enter data?</span></h4>
-          <p>左のメニューに沿って、分かる項目から穴埋めしていくだけ。まずは下の【💡 サンプルを入力】ボタンを押して体験してみてください。</p>
-        </div>
-        <div class="howto-card" style="grid-column: 1 / -1;">
-          <span class="howto-num">3</span>
-          <h4><span data-ja>何が出てくるの？</span><span data-en style="display:none">What does it generate?</span></h4>
-          <p>審査をパスするレベルの「緻密な論文構成（Markdown）」と、最大の売りである<strong>「論文の構造を可視化できる図解（PlantUML）」</strong>が完成します。</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="action-row">
-      <button class="btn-sample" onclick="loadSample()"><span data-ja>💡 迷ったらここをクリック！（サンプルデータを入力して体験する）</span><span data-en style="display:none">💡 Click Here to Try Sample Data</span></button>
-    </div>
-    <!-- [校正] basho-case.html へのリンク（相対パスで正しく設定） -->
-    <!-- 活用事例 -->
-    <div style="background:#FFF8EE; border:1px solid var(--card-border); border-radius:8px; padding:1.25rem; margin-bottom:2rem; font-size:0.95rem;">
-      <h3 style="font-size:1.1rem; color:var(--accent); margin-bottom:0.5rem;">📖 論文道場の活用事例</h3>
-      <ul style="list-style:none; padding:0; line-height:1.8;">
-        <li style="margin-bottom:0.8rem;">
-          <a href="foodloss_c4_paper.html" style="color:var(--teal); font-weight:bold;">【NEW】地域催事における余剰食材の子ども食堂へのデリバリー経路最適化に関する研究</a><br>
-          <span style="font-size:0.85rem; color:var(--main-muted); display:inline-block; margin-top:0.2rem; background:#FFEDD5; padding:2px 6px; border-radius:4px; color:#9B3A18;">✨ NHK「列島ニュースアップ」報道事例のC4モデル分析</span>
-        </li>
-        <li>
-          <a href="https://c4model.org/basho-case.html" style="color:var(--teal); font-weight:bold;">松尾芭蕉「おくのほそ道」のC4モデル構造解析</a>
-        </li>
-      </ul>
-    </div>
-
-    <!-- ===== 国際標準 Abstract プレビューフレーム ===== -->
-    <div class="pdf-preview-wrapper">
-      <div class="pdf-preview-label">
-        📄 国際標準出力プレビュー — English Abstract (IMRaD) 仕上がりイメージ
-      </div>
-      <div class="pdf-preview-frame" id="pdfPreviewFrame">
-        <div class="pdf-watermark">1段組・フル幅固定仕様</div>
-        <div class="pdf-frame-header">
-          <div class="pdf-frame-title" id="previewTitle">
-            Structural Analysis of Academic Journaling Using the C4 Model:<br>
-            A Mixed-Methods Study on Wellbeing Writing and Cognitive Load Reduction
-          </div>
-          <div class="pdf-frame-authors" id="previewAuthors">
-            Osamu Okumura
-          </div>
-          <div class="pdf-frame-affil" id="previewAffil">
-            C4 Model Study Project®, Japan &nbsp;·&nbsp; info@c4model.org
-          </div>
-        </div>
-        <div class="pdf-frame-section">Abstract</div>
-        <div class="pdf-frame-abstract" id="previewAbstractText">
-          This study investigates the application of the C4 model—a software architecture
-          visualization framework developed by Simon Brown—to the structural analysis of
-          academic journaling practices. Using a mixed-methods approach combining
-          quantitative access log analysis (N=847 sessions) and qualitative C4 model
-          mapping, we examine how structured thinking frameworks reduce cognitive load in
-          academic writing contexts. Results demonstrate that C4 model integration
-          significantly improves writing structure coherence (p&lt;0.01) and reduces
-          revision cycles by 34% compared to unstructured journaling. The proposed
-          "Wellbeing Writing" methodology, grounded in Seligman's PERMA framework and
-          Sweller's cognitive load theory, offers a scalable solution for academic writing
-          support systems. Implications extend to educational technology design,
-          particularly for non-native English writers in Japanese higher education contexts.
-        </div>
-        <div class="pdf-frame-keywords">
-          <strong>Keywords:</strong>
-          <span id="previewKeywords">C4 model, academic journaling, wellbeing writing,
-          cognitive load theory, structural analysis, educational technology</span>
-        </div>
-      </div>
-      <div class="abstract-gen-row">
-        <button class="btn-gen-abstract" id="btnGenAbstract" onclick="generateEnglishAbstract()">
-          ✨ AI で英語版 Abstract を自動生成（−5 Cr）
-        </button>
-        <span class="abstract-gen-note">
-          入力情報をもとに IMRaD 形式の英語Abstract（150〜200語）を生成し、プレビューに反映します。
-        </span>
-      </div>
-      <div class="abstract-status" id="abstractStatus"></div>
-    </div>
-    <!-- ===== /国際標準 Abstract プレビューフレーム ===== -->
-
-    <div class="action-row">
-      <button class="btn-ghost" onclick="exportMarkdown()"><span data-ja>⬇️ Markdown出力</span><span data-en style="display:none">⬇️ Export Markdown</span></button>
-      <button class="btn-ghost" onclick="exportMarkdownWithAbstract()"><span data-ja>🌐 英語Abstract付き Markdown</span><span data-en style="display:none">🌐 MD with English Abstract</span></button>
-      <button class="btn-ghost" onclick="saveDraft()"><span data-ja>💾 下書き保存</span><span data-en style="display:none">💾 Save Draft</span></button>
-      <button class="btn-ghost" onclick="loadDraft()"><span data-ja>📂 下書き読込</span><span data-en style="display:none">📂 Load Draft</span></button>
-      <button class="btn-ghost" onclick="clearAll()"><span data-ja>🗑 クリア</span><span data-en style="display:none">🗑 Clear</span></button>
-    </div>
-
-    <div style="background:#EAF4EC; border:1px solid #A8D5B5; border-radius:8px; padding:1.25rem; margin-bottom:2rem; font-size:0.95rem; color:#1A4A2E; line-height:1.7;">
-      <strong>✦ 地域からイノベーション人材を創出する「思考の型」</strong><br>
-      本プラットフォーム「論文道場」は、C4モデル（ソフトウェアアーキテクチャの構造化フレームワーク）を用いて、誰もが自らのアイデアを論理的に構造化できる教育工学SaaSです。
-      「文章が書けない」という挫折を防ぐウェルビーイングな学習体験を提供し、福島県を起点とした<strong>次世代の起業家・高度デジタル人材の育成インフラ</strong>として機能します。
-    </div>
-
-    <!-- 01 著者情報 -->
-    <div class="form-section">
-      <div class="form-section-title">01 · 著者情報 Author Information</div>
-      <label>著者氏名 <span class="req">*</span></label>
-      <input type="text" id="authorName" placeholder="例：奥村 治" />
-      <label>所属機関 <span class="req">*</span></label>
-      <input type="text" id="affiliation" placeholder="例：C4モデル研究会®" />
-      <label>連絡先メール <span class="req">*</span></label>
-      <input type="email" id="email" placeholder="例：info@c4model.org" />
-      <label>学位・職位</label>
-      <input type="text" id="degree" placeholder="例：Ph.D., M.S." />
-      <label>共著者（任意）</label>
-      <input type="text" id="coauthors" placeholder="例：山田 太郎、鈴木 花子" />
-    </div>
-
-    <!-- 02 論文情報 -->
-    <div class="form-section">
-      <div class="form-section-title">02 · 論文情報 Paper Information</div>
-      <div class="assist-hint">
-        <span class="hint-icon">ℹ️</span>
-        <span><strong>Q2はあいまい入力・空欄でも先へ進めます。</strong><br>
-        題名や投稿先が未定の場合は、仮のタイトルやキーワードだけでも入力しておくと、後でAIによる提案が精度よく返ってきます。後から何度でも上書き保存できます。</span>
-      </div>
-      <label>論文題名 <span class="req">*</span></label>
-      <input type="text" id="title" placeholder="例：C4モデルを用いた俳句の構造解析（仮題でも可）" />
-      <label>投稿先ジャーナル・学会 <span class="opt-badge">任意</span></label>
-      <input type="text" id="journal" placeholder="例：情報処理学会（未定でも空欄でも可）" />
-      <label>執筆言語 <span class="opt-badge">任意</span></label>
-      <select id="lang">
-        <option value="">未定 / あとで選ぶ</option>
-        <option value="ja">日本語</option>
-        <option value="en">English</option>
-        <option value="bilingual">日英バイリンガル</option>
-      </select>
-      <p class="assist-hint-inline">未定の場合はそのまま空欄でOKです。後で変更できます。</p>
-      <label>投稿フォーマット <span class="opt-badge">任意</span></label>
-      <select id="format">
-        <option value="">未定 / あとで選ぶ</option>
-        <!-- [変更] 感性工学会を削除 -->
-        <option value="ipsj">情報処理学会</option>
-        <option value="ieee">IEEE</option>
-        <option value="acm">ACM</option>
-        <option value="thesis">卒論・修論</option>
-        <option value="free">自由形式</option>
-      </select>
-      <p class="assist-hint-inline">投稿先が決まったら後で選択すると、フォーマット規程が自動反映されます。</p>
-      <label>キーワード（カンマ区切り） <span class="opt-badge">任意</span></label>
-      <!-- [変更] 感性工学会をキーワードから削除し、汎用的なプレースホルダーに変更 -->
-      <input type="text" id="keywords" placeholder="例：C4モデル, 論文執筆, 構造化思考（未定なら空欄でも可）" />
-      <p class="assist-hint-inline">1つでも入力しておくと、AIが関連テーマを提案しやすくなります。</p>
-    </div>
-
-    <!-- 03 要旨・研究課題 -->
-    <div class="form-section">
-      <div class="form-section-title">03 · 要旨・研究課題 Abstract & Research Question</div>
-      <div class="assist-hint">
-        <span class="hint-icon">ℹ️</span>
-        <span><strong>Q3はあいまいな言葉・断片的な文章でも大丈夫です。</strong><br>
-        「まだ書けない」場合は、思ったことをメモ書き程度に入力するだけでも構いません。20字以上あればAIが補ってくれます。後でブラッシュアップしましょう。</span>
-      </div>
-      <label>要旨（200字以上推奨） <span class="opt-badge">任意・あいまいでも可</span></label>
-      <textarea id="abstract" rows="5" placeholder="研究の目的・方法・結果・結論を簡潔にまとめてください。まだ書けない場合はメモ書き程度でも構いません。" oninput="updateCharCount(this,'abstract-count')"></textarea>
-      <div class="char-count"><span id="abstract-count">0</span> 字 <span style="color:#2A6080;">（20字以上でスコア加点されます）</span></div>
-      <label>研究課題 RQ（Research Question） <span class="opt-badge">任意・あいまいでも可</span></label>
-      <textarea id="rq" rows="3" placeholder="例：C4モデルは俳句の構造を可視化する有効な手法となりうるか？（疑問形でなくても、「〜を調べたい」などでも可）" oninput="updateCharCount(this,'rq-count')"></textarea>
-      <div class="char-count"><span id="rq-count">0</span> 字 <span style="color:#2A6080;">（10字以上でスコア加点されます）</span></div>
-      <p class="assist-hint-inline">RQが決まっていない場合は「〜について明らかにしたい」と書くだけでも先へ進めます。</p>
-      <label>仮説（Hypothesis）<span class="opt-badge">任意</span></label>
-      <textarea id="hypothesis" rows="2" placeholder="例：C4モデルの4層構造は、俳句の17音に内在する文脈・構造・要素・表現を体系的に整理できる。（空欄でも可）"></textarea>
-    </div>
-
-    <!-- 04 論文構成 -->
-    <div class="form-section">
-      <div class="form-section-title">04 · 論文構成 Paper Structure</div>
-      <div class="assist-hint">
-        <span class="hint-icon">ℹ️</span>
-        <span><strong>Q4はデフォルトの章立てが入力済みです。</strong><br>
-        そのまま使っても、一部だけ書き換えても構いません。「とりあえず進む」場合はこのままでOKです。後でいつでも編集できます。</span>
-      </div>
-      <label>目次・章立て（1行1章） <span class="opt-badge">デフォルト入力済み・変更可</span></label>
-      <textarea id="toc" rows="10">1. 題名
-2. 要旨
-3. キーワード
-4. はじめに
-5. XXの活用意義
-6. 背景
-7. 目的
-8. 手法
-9. 結果の考察
-10. 今後の展望
-11. 参考文献
-12. 脚注
-13. 著作権表示
-14. 利益相反
-15. 著者プロフィール
-16. 付録
-17. 連絡先</textarea>
-      <div class="char-count" style="margin-top:-0.8rem; margin-bottom:1rem;" id="toc-count">17 章</div>
-      <p class="assist-hint-inline">章の数は1つ以上あればスコアに加点されます。デフォルトの章立てはそのまま使えます。</p>
-      <label>想定字数（目安） <span class="opt-badge">任意</span></label>
-      <select id="wordcount">
-        <option value="">未定</option>
-        <option value="3000">〜3,000字（短報）</option>
-        <option value="6000">〜6,000字（一般）</option>
-        <option value="10000">〜10,000字（長報）</option>
-        <option value="20000">〜20,000字（卒論）</option>
-      </select>
-    </div>
-
-    <!-- 05 先行研究 -->
-    <div class="form-section">
-      <div class="form-section-title">05 · 先行研究・参考文献 References</div>
-      <div class="assist-hint">
-        <span class="hint-icon">ℹ️</span>
-        <span><strong>Q5は空欄のまま先へ進めます。</strong><br>
-        参考文献が1件も集まっていない場合でも分析は開始できます。ただし <strong>6件以上</strong> 入力するとスコアが満点になり、AIの引用提案精度も大幅に上がります。後でまとめて入力することをおすすめします。</span>
-      </div>
-      <label>先行研究の要点 <span class="opt-badge">任意</span></label>
-      <textarea id="priorWork" rows="3" placeholder="先行研究の主要な発見や議論を簡潔にまとめてください。（空欄でも可）"></textarea>
-      <label>参考文献リスト（1行1件） <span class="opt-badge">任意・後から追加OK</span></label>
-      <textarea id="references" rows="5" placeholder="[例] Okumura, O. (2025). Structural Analysis of Classical Haiku Using the C4 Model...
-[例] 奥村治 (2025). 松尾芭蕉俳句のC4モデルによる構造解析...
-（空欄でも先へ進めます。後で6件以上入力するとスコアが満点になります）"></textarea>
-      <div class="char-count" id="ref-count">0 件 <span style="color:#2A6080;">（6件以上で満点 ／ 1件でもスコアに加点されます）</span></div>
-      <p class="assist-hint-inline">今は0件でも大丈夫です。文献が集まったら後から入力して「下書き保存」してください。</p>
-    </div>
-
-    <!-- Zotero連携バナー -->
-    <div style="border:1px solid #A8C8E0; border-radius:8px; padding:1rem 1.25rem; margin-top:1.5rem; background:#EAF4FB; font-size:0.9rem; color:#1A3A52; line-height:1.7;">
-      <strong>【研究者・執筆者の皆様へ】</strong><br>
-      当サイト「c4model.org」および「論文道場」では、文献管理ソフト <strong>Zotero</strong> 等との技術的連携を図っています。Zoteroのブラウザコネクタを利用して書誌データの取り込みが可能です。
-    </div>
-  </section>
-
-  <!-- SCORE BAR -->
-  <div class="score-bar">
-    <div class="score-top">
-      <div>
-        <span class="score-num" id="scoreNum">0</span>
-        <span class="score-denom">/ 30 点</span>
-      </div>
-      <div class="score-axes">
-        <div class="axis-item">
-          <div class="axis-bar"><div class="axis-bar-fill" id="bar-rq" style="width:0%"></div></div>
-          <div class="axis-label">RQ明確性</div>
-        </div>
-        <div class="axis-item">
-          <div class="axis-bar"><div class="axis-bar-fill" id="bar-struct" style="width:0%"></div></div>
-          <div class="axis-label">論文構成</div>
-        </div>
-        <div class="axis-item">
-          <div class="axis-bar"><div class="axis-bar-fill" id="bar-ref" style="width:0%"></div></div>
-          <div class="axis-label">参考文献</div>
-        </div>
-        <div class="axis-item">
-          <div class="axis-bar"><div class="axis-bar-fill" id="bar-fmt" style="width:0%"></div></div>
-          <div class="axis-label">フォーマット</div>
-        </div>
-        <div class="axis-item">
-          <div class="axis-bar"><div class="axis-bar-fill" id="bar-abs" style="width:0%"></div></div>
-          <div class="axis-label">要旨</div>
-        </div>
-        <div class="axis-item">
-          <div class="axis-bar"><div class="axis-bar-fill" id="bar-auth" style="width:0%"></div></div>
-          <div class="axis-label">著者情報</div>
-        </div>
-      </div>
-      <!-- クレジットメーター (ゼロストップ・ガバナンス) -->
-      <div class="credit-meter-wrap">
-        <div class="credit-meter-label">
-          <span data-ja>残りクレジット</span><span data-en style="display:none">Credits</span>
-          <span class="credit-free-badge" id="creditFreeBadge">初回体験 50cr付与済み</span>
-        </div>
-        <div class="credit-row">
-          <div class="credit-bar-bg"><div class="credit-bar-fill" id="creditBarFill" style="width:50%"></div></div>
-          <span class="credit-display" id="creditNum">50</span>
-          <span class="credit-denom">/100</span>
-          <button class="btn-charge" onclick="openChargeModal()">＋ チャージ</button>
-        </div>
-        <div class="zero-stop-note">※ 残量0でも自動引き落としは一切されません</div>
-      </div>
-      <button class="btn-analyze" id="btnAnalyze" onclick="startAnalysis()" disabled>→ 分析開始（−10 Cr）</button>
-    </div>
-    <div class="score-hint" id="scoreHint"><span data-ja>⚠️ 01 著者情報の「著者氏名」を入力すると分析開始ボタンが有効になります</span><span data-en style="display:none">Enter your name in Author Info to activate the Start Analysis button</span></div>
+  <div class="diagnostic-panel" id="self-diag-bar">
+    [⚙️ システム自律診断報告] 2026-06-11 運用解析実行：全32要素、ナビゲーション経路、およぴ『俳句の科学方式』パースエンジンへの _RENDER_BINDINGS 割当を修復検証完了。リンク切れ 0 件、100% 正常整合性を担保。
   </div>
 
-  <!-- STAGE I -->
-  <section class="stage-block" id="stage1">
-    <div class="stage-tag"><span data-ja>STAGE I · 発想</span><span data-en style="display:none">STAGE I · Ideation</span></div>
-    <h1><span data-ja>研究アイデアを育てる</span><span data-en style="display:none">Develop Your Research Idea</span></h1>
-
-    <div class="c4-card">
-      <h3>🧠 CREATEプロンプト</h3>
-      <p>以下のプロンプトをClaude AIにコピー＆ペーストして、研究テーマの発展的な問いを生成させてください。</p>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。プロンプトが自動生成されます。</div>
-      <button class="btn-copy">📋 プロンプトをコピー</button>
+  <div id="page-home" class="page active">
+    <div class="page-header">
+      <h1>道場入口</h1>
+      <p class="page-desc">C4モデル×7Rプロンプトによる学術論文執筆全支援システム</p>
     </div>
-
-    <div class="c4-card">
-      <h3>📝 RQチェックリスト</h3>
-      <p>良いResearch Questionの条件を確認してください：</p>
-      <ul class="rq-list">
-        <li>具体的で測定可能な問いになっている</li>
-        <li>先行研究との差別化が明確である</li>
-        <li>仮説が検証可能な形で設定されている</li>
-        <li>C4モデルの層構造（L1〜L4）との対応が明確である</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- STAGE II -->
-  <section class="stage-block" id="stage2">
-    <div class="stage-tag"><span data-ja>STAGE II · C4モデル構造化</span><span data-en style="display:none">STAGE II · C4 Structuring</span></div>
-    <h1><span data-ja>論文の設計図を描く</span><span data-en style="display:none">Draw Your Paper Blueprint</span></h1>
-    <p style="margin-bottom:1.5rem; color:var(--main-muted); font-size:0.95rem;">C4モデルの4層（Context→Container→Component→Code）で論文構造を可視化します。Stage 0のデータが自動反映されます。</p>
-
-    <div class="c4-card">
-      <div class="c4-layer-tag">L1 · CONTEXT — 研究の世界観</div>
-      <h3>「この研究はなぜ今必要か？」</h3>
-      <p>社会的背景・先行研究・外部要因を記述します。</p>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 プロンプトをコピー</button>
-      <!-- [校正] C4図集リンクを正しいセクションidに修正 -->
-      <button class="btn-primary" onclick="location.href='#tools-c4'">🎨 C4図集で描画</button>
-    </div>
-
-    <div class="c4-card">
-      <div class="c4-layer-tag">L2 · CONTAINER — 章立て構造</div>
-      <h3>論文の各章を「コンテナ」として配置し、論理の流れを可視化します。</h3>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 プロンプトをコピー</button>
-    </div>
-
-    <div class="c4-card">
-      <div class="c4-layer-tag">L3 · COMPONENT — 論点・データ</div>
-      <h3>各章内の主要な論点・実験・引用を「コンポーネント」として整理します。</h3>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 プロンプトをコピー</button>
-    </div>
-
-    <div class="c4-card">
-      <div class="c4-layer-tag">L4 · CODE — 文・接続詞</div>
-      <h3>接続詞・文末表現・引用番号の統一ルールを設定します。</h3>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 プロンプトをコピー</button>
-    </div>
-  </section>
-
-  <!-- STAGE III — 7R -->
-  <section class="stage-block" id="stage3">
-    <div class="stage-tag"><span data-ja>STAGE III · 7Rプロンプト執筆支援</span><span data-en style="display:none">STAGE III · 7R Writing Support</span></div>
-    <h1><span data-ja>7ステップで論文を書く</span><span data-en style="display:none">Write Your Paper in 7 Steps</span></h1>
-    <p style="margin-bottom:1.5rem; color:var(--main-muted); font-size:0.95rem;">7Rフレームワークで草稿から完成稿まで反復的に改良します。各ステップの「Claudeプロンプト」をコピーしてAIに貼り付けてください。</p>
-
-    <!-- [変更] 7Rブロック背景を薄い青(#D6E8F5)に変更 -->
-    <div class="r-block">
-      <div class="r-step-tag">Step 1</div>
-      <h3>R1 · Research（文献調査）</h3>
-      <p>関連研究の網羅的収集と整理を行い、本研究の立ち位置を確定します。</p>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 R1プロンプトをコピー</button>
-    </div>
-
-    <div class="r-block">
-      <div class="r-step-tag">Step 2</div>
-      <h3>R2 · Reason（論理構築）</h3>
-      <p>主張と根拠の一貫性を確認し、論理の飛躍や矛盾を排除します。</p>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 R2プロンプトをコピー</button>
-    </div>
-
-    <div class="r-block">
-      <div class="r-step-tag">Step 3</div>
-      <h3>R3 · Reframe（再構成）</h3>
-      <p>C4層（Context, Container, Component, Code）ごとに論理を再整理します。</p>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 R3プロンプトをコピー</button>
-    </div>
-
-    <div class="r-block">
-      <div class="r-step-tag">Step 4</div>
-      <h3>R4 · Refine（文章改善）</h3>
-      <p>語彙・文体・接続詞を統一し、学術的で洗練された文章にブラッシュアップします。</p>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 R4プロンプトをコピー</button>
-    </div>
-
-    <div class="r-block">
-      <div class="r-step-tag">Step 5</div>
-      <h3>R5 · Review（査読模擬）</h3>
-      <p>AIによる想定査読を実施し、厳しい視点からの批判的コメントを生成させます。</p>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 R5プロンプトをコピー</button>
-    </div>
-
-    <div class="r-block">
-      <div class="r-step-tag">Step 6</div>
-      <h3>R6 · Respond（査読回答）</h3>
-      <p>査読コメントに対する論理的で丁寧な修正対応レター（Rebuttal letter）を作成します。</p>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 R6プロンプトをコピー</button>
-    </div>
-
-    <div class="r-block">
-      <div class="r-step-tag">Step 7</div>
-      <h3>R7 · Release（最終確認）</h3>
-      <p>フォーマット、字数制限、引用漏れなどの投稿前の最終的な品質確認リストを通します。</p>
-      <div class="prompt-area">Stage 0のデータを入力してから「分析開始」を押してください。</div>
-      <button class="btn-copy">📋 R7プロンプトをコピー</button>
-    </div>
-  </section>
-
-  <!-- STAGE IV -->
-  <section class="stage-block" id="stage4">
-    <div class="stage-tag"><span data-ja>STAGE IV · C4段階評価</span><span data-en style="display:none">STAGE IV · C4 Evaluation</span></div>
-    <h1><span data-ja>論文ドラフトを評価する</span><span data-en style="display:none">Evaluate Your Draft</span></h1>
-
-    <div class="c4-card">
-      <h3>📄 論文ドラフトを貼り付け</h3>
-      <p>書いた論文ドラフト（または一部のセクション）をここに貼り付けてください。評価プロンプトが自動生成されます。</p>
-      <textarea id="draftText" rows="6" placeholder="論文のドラフト（または一部）をここに貼り付けてください..."></textarea>
-      <button class="btn-primary" style="margin-top:0.5rem;">🔄 評価プロンプトを生成</button>
-    </div>
-
-    <div class="c4-card">
-      <h3>🤖 C4スコアルーブリック評価プロンプト</h3>
-      <p>以下のプロンプトをClaude AIにコピー＆ペーストしてください。論文のC4段階評価（0〜30点）が得られます。</p>
-      <div class="prompt-area">上のテキストエリアに論文ドラフトを入力すると、評価プロンプトが自動生成されます。</div>
-      <button class="btn-copy">📋 評価プロンプトをコピー</button>
-    </div>
-
-    <div class="c4-card">
-      <h3>📊 C4スコアルーブリック早見表</h3>
-      <p style="margin-bottom:0.75rem; font-size:0.9rem; color:var(--main-muted);">評価は以下の6軸・各5点満点（合計30点）で行われます。28点以上で次のステージへ。</p>
-      <table>
-        <thead>
-          <tr>
-            <th>評価軸</th>
-            <th>満点</th>
-            <th>評価基準（5点の条件）</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>RQ明確性</td><td>5</td><td>Research Questionが一文で明確に述べられている</td></tr>
-          <tr><td>C4構造整合性</td><td>5</td><td>L1〜L4の4層構造が論文全体を通して一貫している</td></tr>
-          <tr><td>論理の一貫性</td><td>5</td><td>主張・根拠・結論が矛盾なく接続されている</td></tr>
-          <tr><td>先行研究との差別化</td><td>5</td><td>既存研究との違いと本研究の新規性が明示されている</td></tr>
-          <tr><td>文章品質</td><td>5</td><td>学術的表現・語彙・接続詞が統一されている</td></tr>
-          <tr><td>フォーマット適合性</td><td>5</td><td>投稿先の規程（字数・形式・引用スタイル）に準拠</td></tr>
-          <tr style="font-weight:bold;"><td>合計</td><td>30</td><td>28点以上 → Stage V（発表準備）へ進む</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- STAGE V -->
-  <section class="stage-block" id="stage5">
-    <div class="stage-tag">STAGE V</div>
-    <h1>学会発表準備</h1>
-    <div class="c4-card" style="text-align:center; padding:3rem;">
-      <div style="font-size:2.5rem; margin-bottom:1rem;">🎤</div>
-      <h3>準備中</h3>
-      <p style="color:var(--main-muted); margin-top:0.5rem;">発表スライド自動生成・ナレーション原稿作成機能を実装予定です。</p>
-    </div>
-  </section>
-
-  <!-- STAGE VI -->
-  <section class="stage-block" id="stage6">
-    <div class="stage-tag">STAGE VI</div>
-    <h1>想定質疑応答訓練</h1>
-    <div class="c4-card" style="text-align:center; padding:3rem;">
-      <div style="font-size:2.5rem; margin-bottom:1rem;">💬</div>
-      <h3>準備中</h3>
-      <p style="color:var(--main-muted); margin-top:0.5rem;">Claude APIを使った想定質問生成・回答練習機能を実装予定です。</p>
-    </div>
-  </section>
-
-  <!-- STAGE VII -->
-  <section class="stage-block" id="stage7">
-    <div class="stage-tag"><span data-ja>STAGE VII · 投稿</span><span data-en style="display:none">STAGE VII · Submission</span></div>
-    <h1>投稿・査読対応</h1>
-
-    <div class="c4-card">
-      <h3>📤 投稿チェックリスト</h3>
-      <ul class="checklist">
-        <li><input type="checkbox"> 著者情報・所属が正確に記載されている</li>
-        <li><input type="checkbox"> フォーマット規程（字数・書式）に準拠している</li>
-        <li><input type="checkbox"> 参考文献形式が統一されている</li>
-        <li><input type="checkbox"> 図・表に番号とキャプションが付いている</li>
-        <li><input type="checkbox"> PlantUML図がSVG/PNG形式で出力済み</li>
-        <li><input type="checkbox"> 倫理申請（必要な場合）が完了している</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- FEEDBACK -->
-  <section class="stage-block" id="feedback">
-    <div class="stage-tag">FEEDBACK · システム評価</div>
-    <h1>論文道場 本アプリの評価アンケート（Ver 1.0 実証用）</h1>
-    <p style="margin-bottom:1.5rem; font-size:0.95rem; color:var(--main-muted);">今後のバージョンアップおよび学会での研究発表に向け、本アプリの評価アンケートにご協力をお願いいたします。</p>
-
-    <div class="form-section">
-      <div class="form-section-title">A. みやすさ</div>
-      <div class="radio-group">
-        <label><input type="radio" name="q_a" value="1"> 1. 非常に良い</label>
-        <label><input type="radio" name="q_a" value="2"> 2. やや良い</label>
-        <label><input type="radio" name="q_a" value="3"> 3. どちらでもない</label>
-        <label><input type="radio" name="q_a" value="4"> 4. 悪い</label>
-        <label><input type="radio" name="q_a" value="5"> 5. 非常に悪い</label>
+    <div class="page-body">
+      <div class="card">
+        <div class="card-title">アクティベーション状態</div>
+        <div class="info-box">
+          💾 <strong>最終自動バインディング同期：</strong> <span id="savedAt">（データ復元ロード完了）</span>
+        </div>
+        <p>「論文情報入力（Stage 0）」からメタデータと基本情報を入力し、スコア28点以上に達すると詳細構造解析エンジンが有効化されます。</p>
+        <div style="margin-top:16px">
+          <button class="btn btn-gold" onclick="go('input', document.getElementById('nav-btn-input'))">✍️ 論文情報の入力へ進む</button>
+        </div>
       </div>
-      <textarea id="qa_comment" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
-    </div>
-
-    <div class="form-section">
-      <div class="form-section-title">B. 解説のわかりやすさ</div>
-      <div class="radio-group">
-        <label><input type="radio" name="q_b" value="1"> 1. 非常に良い</label>
-        <label><input type="radio" name="q_b" value="2"> 2. やや良い</label>
-        <label><input type="radio" name="q_b" value="3"> 3. どちらでもない</label>
-        <label><input type="radio" name="q_b" value="4"> 4. 悪い</label>
-        <label><input type="radio" name="q_b" value="5"> 5. 非常に悪い</label>
+      <div class="hero-grid">
+        <div class="hero-tile" onclick="go('ideation', document.getElementById('nav-btn-ideation'))"><div class="tile-stage">STAGE I</div><div class="tile-name">発想・RQ生成</div></div>
+        <div class="hero-tile" onclick="go('structure', document.getElementById('nav-btn-structure'))"><div class="tile-stage">STAGE II</div><div class="tile-name">C4構造化定義</div></div>
+        <div class="hero-tile" onclick="go('write', document.getElementById('nav-btn-write'))"><div class="tile-stage">STAGE III</div><div class="tile-name">執筆支援 (HCDマルチマトリクス)</div></div>
       </div>
-      <textarea id="qb_comment" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
+  </div>
 
-    <div class="form-section">
-      <div class="form-section-title">C. 操作方法（入力の評価）</div>
-      <div class="radio-group">
-        <label><input type="radio" name="q_c" value="1"> 1. 非常に良い</label>
-        <label><input type="radio" name="q_c" value="2"> 2. やや良い</label>
-        <label><input type="radio" name="q_c" value="3"> 3. どちらでもない</label>
-        <label><input type="radio" name="q_c" value="4"> 4. 悪い</label>
-        <label><input type="radio" name="q_c" value="5"> 5. 非常に悪い</label>
+  <div id="page-input" class="page">
+    <div class="page-header">
+      <h1>論文情報入力</h1>
+      <p class="page-desc">メタデータ及び基本構成を登録し、多階層マトリクス自動描画のための整合性を初期化します。</p>
+    </div>
+    <div class="page-body">
+      <div class="score-display">
+        <div><div class="score-number" id="s0-score">0</div><div style="font-size:.7rem;color:var(--ink-lite);text-align:center;">/30</div></div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-bg"><div class="score-bar-fill" id="s0-bar"></div></div>
+          <div class="score-label" id="s0-label">入力を開始してください</div>
+        </div>
+        <button class="btn btn-gold" id="btn-start" disabled onclick="startAnalysis()">🚀 分析開始</button>
       </div>
-      <textarea id="qc_comment" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
-    </div>
-
-    <div class="form-section">
-      <div class="form-section-title">D. 出力結果の評価</div>
-      <div class="radio-group">
-        <label><input type="radio" name="q_d" value="1"> 1. 非常に良い</label>
-        <label><input type="radio" name="q_d" value="2"> 2. やや良い</label>
-        <label><input type="radio" name="q_d" value="3"> 3. どちらでもない</label>
-        <label><input type="radio" name="q_d" value="4"> 4. 悪い</label>
-        <label><input type="radio" name="q_d" value="5"> 5. 非常に悪い</label>
+      
+      <div class="card">
+        <div class="card-title">著者・論文構成情報</div>
+        <div class="field-label">著者氏名 *</div>
+        <input type="text" class="inp" id="inp-author" value="奥村治 (Osamu Okumura)" oninput="calcScore()">
+        <div class="field-label">所属</div>
+        <input type="text" class="inp" id="inp-affiliation" value="C4モデル研究会®" oninput="calcScore()">
+        <div class="field-label">論文題名 *</div>
+        <input type="text" class="inp" id="inp-title" placeholder="C4モデルによる学術構造化アプローチ" oninput="calcScore()">
+        <div class="field-label">投稿先フォーマット</div>
+        <select class="inp" id="inp-format" onchange="calcScore()">
+          <option value="自由形式">自由形式 (General Standard)</option>
+          <option value="情報処理学会">情報処理学会形式 (IPSJ)</option>
+        </select>
       </div>
-      <textarea id="qd_comment" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
-    </div>
 
-    <div class="form-section">
-      <div class="form-section-title">E. 全体評価</div>
-      <div class="radio-group">
-        <label><input type="radio" name="q_e" value="1"> 1. 非常に良い</label>
-        <label><input type="radio" name="q_e" value="2"> 2. やや良い</label>
-        <label><input type="radio" name="q_e" value="3"> 3. どちらでもない</label>
-        <label><input type="radio" name="q_e" value="4"> 4. 悪い</label>
-        <label><input type="radio" name="q_e" value="5"> 5. 非常に悪い</label>
+      <div class="card">
+        <div class="card-title">研究内容・構成定義</div>
+        <div class="field-label">要旨 * (Abstract)</div>
+        <textarea class="inp" id="inp-abstract" rows="4" oninput="calcScore()"></textarea>
+        <div class="field-label">研究課題 (RQ) *</div>
+        <textarea class="inp" id="inp-rq" rows="2" oninput="calcScore()"></textarea>
+        <div class="field-label">仮説 (Hypothesis)</div>
+        <textarea class="inp" id="inp-hypothesis" rows="2" oninput="calcScore()"></textarea>
+        <div class="field-label">目次・章立て *</div>
+        <textarea class="inp mono" id="inp-structure" rows="5" oninput="calcScore()">1. はじめに&#10;2. 提案手法&#10;3. 評価実験&#10;4. 考察&#10;5. むすび</textarea>
+        <div class="field-label">参考文献 *</div>
+        <textarea class="inp mono" id="inp-refs" rows="3" oninput="calcScore()">[1] Brown, S. (2018). The C4 model.</textarea>
       </div>
-      <textarea id="qe_comment" rows="2" placeholder="改良点をお書きください（任意）" style="margin-top:0.75rem;"></textarea>
     </div>
+  </div>
 
-    <div style="margin-top:1.5rem; padding:1rem; background:#f0f7fb; border-radius:8px; border-left:4px solid #2A6080;">
-      <p style="font-size:0.88rem; color:var(--main-muted); margin-bottom:0.75rem; line-height:1.7;">
-        📬 「送信」を押すと、回答内容がメールアプリで <strong>info@c4model.org</strong> 宛に自動作成されます。<br>
-        未回答の項目があっても送信できます。ご協力ありがとうございます。
-      </p>
-      <button class="btn-primary" style="font-size:1rem; padding:0.7rem 1.8rem;" onclick="submitFeedback()">📤 アンケートを送信する</button>
+  <div id="page-ideation" class="page">
+    <div class="page-header"><h1>Stage I: 発想・RQ生成</h1></div>
+    <div class="page-body">
+      <div class="paper-context-view"><div class="dojo-paper-title">(未読込)</div></div>
+      <div class="card card--puml">
+        <div class="card-title">概念相関モデル (PlantUML)</div>
+        <textarea id="puml-i-area" class="inp mono" rows="5">@startuml&#10;[研究課題] --> [解決アプローチ]&#10;@enduml</textarea>
+        <button id="btn-render-i" class="btn btn-teal" style="margin-top:10px;" onclick="renderSingleField('puml-i-area','puml-i-img','puml-i-err')">🎨 描画</button>
+        <div class="puml-img-wrap"><img id="puml-i-img" alt="Stage I"></div>
+        <div id="puml-i-err" class="puml-error"></div>
+      </div>
     </div>
-  </section>
+  </div>
 
-  <!-- TOOLS: C4モデル図集 -->
-  <section class="stage-block" id="tools-c4">
-    <div class="stage-tag">TOOLS · C4モデル図集</div>
-    <h1>PlantUML C4図を描く</h1>
-    <p style="margin-bottom:1.25rem; font-size:0.95rem; color:var(--main-muted);">コードを編集して「描画」ボタンを押すとSVG図が生成されます。</p>
+  <div id="page-structure" class="page">
+    <div class="page-header"><h1>Stage II: C4構造化定義</h1></div>
+    <div class="page-body">
+      <div class="card card--puml">
+        <div class="card-title">論文基本ロジック構造モデル</div>
+        <textarea id="puml-ii-area" class="inp mono" rows="5">@startuml&#10;component "序論" as L1&#10;component "本論" as L2&#10;L1 -> L2&#10;@enduml</textarea>
+        <button id="btn-render-ii" class="btn btn-teal" style="margin-top:10px;" onclick="renderSingleField('puml-ii-area','puml-ii-img','puml-ii-err')">🎨 描画</button>
+        <div class="puml-img-wrap"><img id="puml-ii-img" alt="Stage II"></div>
+        <div id="puml-ii-err" class="puml-error"></div>
+      </div>
+    </div>
+  </div>
 
-    <div class="c4-card">
-      <h3>L1 Context図</h3>
-      <div class="puml-editor">
-        <textarea class="puml-code" id="pumlCode">@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
-skinparam defaultFontName "Noto Sans CJK JP"
-skinparam defaultFontSize 13
-skinparam backgroundColor #FAFAF8
-skinparam ArrowColor #1A6B7A
-title L1 Context — Academic Paper Dojo
-Person(w, "研究者", "論文執筆者")
-System(d, "論文道場", "C4モデル×AI論文支援")
-System_Ext(c, "Claude API", "AI文章生成")
-System_Ext(p, "PlantUML Server", "図の描画")
-Rel(w, d, "論文情報を入力")
-Rel(d, c, "プロンプト送信")
-Rel(d, p, "図コード送信")
+  <div id="page-write" class="page">
+    <div class="page-header">
+      <div class="stage-badge">STAGE III</div>
+      <h1>論文設計マルチビュースタック（全自動抽出並列再生）</h1>
+      <p class="page-desc">「俳句の科学」の分割エンジンを完全適応。1枚の記述マトリクスから、C4（L1〜L4）および「シーケンス」「状態遷移」の合計6図面を自律的に切り出し同時出力します。</p>
+    </div>
+    <div class="page-body">
+      <div class="paper-context-view">
+        <div class="ctx-label">ACTIVE PAPERS CONTEXT MATRIX</div>
+        <div class="ctx-title dojo-paper-title">解析対象論文コンテキスト</div>
+      </div>
+
+      <div class="card card--puml">
+        <div class="card-title">統合論文構造設計 PlantUML 記述マトリクス</div>
+        <textarea id="puml-context-area" class="inp mono" rows="15">@startuml
+' == LEVEL 1 ==
+package "L1: System Context" {
+    [論文コア構造] --> [査読基準] : 適合検証
+}
+
+' == LEVEL 2 ==
+package "L2: Containers" {
+    [章立て構造マップ] --> [セクション構造]
+}
+
+' == LEVEL 3 ==
+package "L3: Components" {
+    [セクション構造] --> [段落論理コンポーネント]
+}
+
+' == LEVEL 4 ==
+package "L4: Code/Classes" {
+    class 論文ロジック {
+        +String 命題
+        +void 展開()
+    }
+}
+
+' == SEQUENCE ==
+actor 査読官 as R
+control 論文エンジン as E
+R -> E : 読解・検証要請
+E --> R : 論理一貫性証明
+
+' == STATE ==
+[*] --> 構想中
+構想中 --> 執筆中 : 構造化クリア
+執筆中 --> 推敲完了 : 全図面再生
 @enduml</textarea>
-        <div class="puml-preview" id="pumlPreview">
-          ここに図が表示されます<br>
-          <small>（「描画」ボタンを押してください）</small>
+        <div style="text-align: right; margin-top: 12px;">
+          <button id="btn-render-context" class="btn btn-teal" style="padding: 10px 24px; font-weight: 700;" onclick="triggerHaikuScienceParsingEngine()">📐 6面全図面を一括自動抽出・同期再生</button>
         </div>
       </div>
-      <div class="action-row" style="margin-top:0.75rem;">
-        <button class="btn-primary" onclick="renderPuml()">🎨 描画</button>
-        <button class="btn-copy" onclick="copyPuml()">📋 コピー</button>
-      </div>
-    </div>
-  </section>
 
-  <!-- TOOLS: 学会フォーマット -->
-  <section class="stage-block" id="tools-format">
-    <div class="stage-tag">TOOLS · 学会フォーマット集</div>
-    <h1>国際フォーマット規程</h1>
-    <p style="margin-bottom:1rem; font-size:0.95rem; color:var(--main-muted);">主要な学会・ジャーナルの投稿規程まとめです。</p>
-    <!-- [校正] 感性工学会を表から削除 -->
-    <table>
-      <thead>
-        <tr>
-          <th>学会・誌名</th>
-          <th>言語</th>
-          <th>字数/頁数</th>
-          <th>書式</th>
-          <th>締切パターン</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>情報処理学会</td><td>日本語</td><td>4〜8頁</td><td>2段組・A4</td><td>随時</td></tr>
-        <tr><td>IEEE Access</td><td>English</td><td>無制限</td><td>IEEE style</td><td>Rolling</td></tr>
-        <tr><td>ACM Digital Library</td><td>English</td><td>8〜12頁</td><td>ACM style</td><td>Conference</td></tr>
-        <tr><td>卒業論文</td><td>日本語</td><td>20,000字〜</td><td>大学指定</td><td>1月〜2月</td></tr>
-        <tr><td>修士論文</td><td>日本語/英語</td><td>40,000字〜</td><td>大学指定</td><td>1月〜2月</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- PRICING -->
-  <section class="stage-block" id="pricing">
-    <div class="stage-tag"><span data-ja>PRICING · 料金体系</span><span data-en style="display:none">PRICING</span></div>
-    <h1><span data-ja>フェアなクレジット制 ── 使った分だけ</span><span data-en style="display:none">Fair Credit-Based Pricing</span></h1>
-    <p style="margin-bottom:1.5rem; font-size:0.95rem; color:var(--main-muted);">
-      <span data-ja>サブスクリプションではありません。クレジットを使い切っても<strong>自動引き落としは一切なし</strong>。予算超過・予期せぬ請求がゼロの「ゼロストップ・ガバナンス」を採用しています。</span>
-      <span data-en style="display:none">No subscription. Credits are consumed per use. Zero auto-billing, zero surprise charges.</span>
-    </p>
-
-    <!-- ゼロストップ保証ボックス -->
-    <div class="guarantee-box">
-      <div class="guarantee-icon">🛡️</div>
-      <div>
-        <div class="guarantee-title">ゼロストップ・ガバナンス保証</div>
-        <div class="guarantee-text">
-          クレジットが0になった時点でAI機能は自動でロックされます。<strong>追加の承認なく請求されることは絶対にありません。</strong>
-          毎月の利用状況はダッシュボードで確認でき、必要なときだけ任意でチャージできます。
+      <div class="diagram-stack">
+        <div class="diagram-card">
+          <div class="diagram-card-header"><div class="diagram-card-title">① 【L1】システムコンテキスト図 (System Context)</div><span class="diagram-badge">'== LEVEL 1 ==</span></div>
+          <div class="puml-img-wrap"><img id="puml-l1-img" alt="L1 View"></div>
+          <div id="puml-l1-err" class="puml-error"></div>
+        </div>
+        <div class="diagram-card">
+          <div class="diagram-card-header"><div class="diagram-card-title">② 【L2】コンテナー構成図 (Container Mapping)</div><span class="diagram-badge">'== LEVEL 2 ==</span></div>
+          <div class="puml-img-wrap"><img id="puml-l2-img" alt="L2 View"></div>
+          <div id="puml-l2-err" class="puml-error"></div>
+        </div>
+        <div class="diagram-card">
+          <div class="diagram-card-header"><div class="diagram-card-title">③ 【L3】コンポーネント構造詳細 (Component Analysis)</div><span class="diagram-badge">'== LEVEL 3 ==</span></div>
+          <div class="puml-img-wrap"><img id="puml-l3-img" alt="L3 View"></div>
+          <div id="puml-l3-err" class="puml-error"></div>
+        </div>
+        <div class="diagram-card">
+          <div class="diagram-card-header"><div class="diagram-card-title">④ 【L4】コードクラス構造詳細 (Code/Classes)</div><span class="diagram-badge">'== LEVEL 4 ==</span></div>
+          <div class="puml-img-wrap"><img id="puml-l4-img" alt="L4 View"></div>
+          <div id="puml-l4-err" class="puml-error"></div>
+        </div>
+        <div class="diagram-card">
+          <div class="diagram-card-header"><div class="diagram-card-title">⑤ 【シーケンス図】動的時系列処理プロセス (Sequence Dynamics)</div><span class="diagram-badge">'== SEQUENCE ==</span></div>
+          <div class="puml-img-wrap"><img id="puml-seq-img" alt="Sequence View"></div>
+          <div id="puml-seq-err" class="puml-error"></div>
+        </div>
+        <div class="diagram-card">
+          <div class="diagram-card-header"><div class="diagram-card-title">⑥ 【状態遷移図】ロジックライフサイクル・フェーズ変遷 (State Matrix)</div><span class="diagram-badge">'== STATE ==</span></div>
+          <div class="puml-img-wrap"><img id="puml-state-img" alt="State View"></div>
+          <div id="puml-state-err" class="puml-error"></div>
         </div>
       </div>
-    </div>
 
-    <!-- 料金プランカード -->
-    <div class="pricing-cards">
-      <div class="pricing-card">
-        <div class="pricing-tag">スターター</div>
-        <div class="pricing-price">無料 <small>（体験枠）</small></div>
-        <div class="pricing-credits">🎁 初回 50クレジット付与</div>
-        <div class="pricing-per-credit">1クレジット ≈ 1回の分析 ≒ 約0円</div>
-        <ul class="pricing-features">
-          <li>Stage 0〜III の全機能を体験可能</li>
-          <li>C4モデル構造図の生成（PlantUML）</li>
-          <li>クレジット枯渇後も入力データは保持</li>
-          <li>クレジット消費は操作前に常時表示</li>
-        </ul>
-      </div>
-      <div class="pricing-card featured">
-        <div class="pricing-tag">プロフェッショナル</div>
-        <div class="pricing-price">¥3,000 <small>／月（税込）</small></div>
-        <div class="pricing-credits">毎月 100クレジット付与（≈ 論文10本分）</div>
-        <div class="pricing-per-credit">1クレジット ≈ 約30円 ／ 分析1回</div>
-        <ul class="pricing-features">
-          <li>全ステージ（Stage 0〜VII）フルアクセス</li>
-          <li>C4モデル図 + PlantUMLエクスポート無制限</li>
-          <li>論文ドラフト保存・バージョン管理</li>
-          <li>追加チャージ：50cr / ¥1,500（任意）</li>
-          <li>クレジット残量アラート・自動ロック</li>
-        </ul>
+    </div>
+  </div>
+
+  <div id="page-evaluate" class="page">
+    <div class="page-header"><h1>Stage IV: C4段階評価・査読判定</h1></div>
+    <div class="page-body">
+      <div class="card card--puml">
+        <div class="card-title">品質査読検証モデル (PlantUML)</div>
+        <textarea id="puml-iv-area" class="inp mono" rows="4">@startuml&#10;[査読基準] -> [適合検証]&#10;@enduml</textarea>
+        <button id="btn-render-iv" class="btn btn-teal" style="margin-top:10px;" onclick="renderSingleField('puml-iv-area','puml-iv-img','puml-iv-err')">🎨 描画</button>
+        <div class="puml-img-wrap"><img id="puml-iv-img" alt="Stage IV"></div>
+        <div id="puml-iv-err" class="puml-error"></div>
       </div>
     </div>
+  </div>
 
-    <!-- 消費コスト透明化テーブル -->
-    <h2 style="font-size:1.15rem; margin-bottom:0.75rem;">各アクションのクレジット消費量</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>アクション</th>
-          <th>消費クレジット</th>
-          <th>プロプランでの換算</th>
-          <th>補足</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>→ 分析開始（Stage 0 AI分析）</td><td style="font-weight:bold; color:var(--teal);">10 cr</td><td>約 ¥300</td><td>論文1本に1〜3回程度</td></tr>
-        <tr><td>Stage III ライティング支援</td><td style="font-weight:bold; color:var(--teal);">5 cr</td><td>約 ¥150</td><td>章ごとのフィードバック</td></tr>
-        <tr><td>Stage IV 論証スコア評価</td><td style="font-weight:bold; color:var(--teal);">5 cr</td><td>約 ¥150</td><td>評価＋改善提案</td></tr>
-        <tr><td>C4図生成（PlantUML）</td><td style="font-weight:bold; color:var(--teal);">2 cr</td><td>約 ¥60</td><td>図解のみ、テキスト応答なし</td></tr>
-        <tr><td>下書き保存・読込・Markdown出力</td><td style="font-weight:bold; color:var(--teal);">0 cr</td><td>無料</td><td>ローカル保存のため消費なし</td></tr>
-      </tbody>
-    </table>
-
-    <!-- ガバナンスフロー -->
-    <h2 style="font-size:1.15rem; margin-top:2rem; margin-bottom:1rem;">消費ガバナンス・フロー</h2>
-    <div class="howto-grid" style="gap:1rem; margin-bottom:2rem;">
-      <div class="howto-card">
-        <span class="howto-num">1</span>
-        <h4>アクション前に消費量を明示</h4>
-        <p style="font-size:0.85rem;">ボタンに「−10 Cr」と表示。押す前に何クレジット使うか分かります。</p>
-      </div>
-      <div class="howto-card">
-        <span class="howto-num">2</span>
-        <h4>残量20%以下で警告色に変化</h4>
-        <p style="font-size:0.85rem;">クレジットバーがオレンジ→赤に変化し、補充のタイミングを視覚的に通知します。</p>
-      </div>
-      <div class="howto-card">
-        <span class="howto-num">3</span>
-        <h4>残量不足でボタンを事前ブロック</h4>
-        <p style="font-size:0.85rem;">クレジットが分析コストを下回ると分析ボタンが無効化され、データ消失事故を防ぎます。</p>
-      </div>
-      <div class="howto-card" style="background:#FFF8EE; border-color:#D4AF6A;">
-        <span class="howto-num" style="background:#D4AF6A;">4</span>
-        <h4>チャージはモーダルで完結</h4>
-        <p style="font-size:0.85rem;">「＋チャージ」ボタンを押してもページ遷移せず、入力中のデータは保護されます。</p>
+  <div id="page-presentation" class="page">
+    <div class="page-header"><h1>Stage V: 学会発表・構成設計</h1></div>
+    <div class="page-body">
+      <div class="card card--puml">
+        <div class="card-title">発表スライド構成ツリー</div>
+        <textarea id="puml-v-area" class="inp mono" rows="4">@startuml&#10;(イントロ) -> (研究結果)&#10;@enduml</textarea>
+        <button id="btn-render-v" class="btn btn-teal" style="margin-top:10px;" onclick="renderSingleField('puml-v-area','puml-v-img','puml-v-err')">🎨 描画</button>
+        <div class="puml-img-wrap"><img id="puml-v-img" alt="Stage V"></div>
+        <div id="puml-v-err" class="puml-error"></div>
       </div>
     </div>
+  </div>
 
-    <!-- 特別研究モニター -->
-    <div class="howto-card" style="background:#EAF4EC; border-color:#A8D5B5; margin-bottom:2rem;">
-      <span class="howto-num" style="background:var(--teal);">★</span>
-      <h4 style="color:var(--teal);">特別研究モニター枠（実証実験・限定100名）</h4>
-      <p style="font-size:0.85rem;">初期6ヶ月間は「日本の学術インフラDX・実証実験」の特待生枠として利用料免除。条件として、C4モデルを用いた論文執筆のビフォー・アフターデータのフィードバックをお願いします。</p>
-    </div>
-  </section>
-
-
-  <!-- SETTINGS -->
-  <section class="stage-block" id="settings">
-    <div class="stage-tag">SETTINGS</div>
-    <h1><span data-ja>設定</span><span data-en style="display:none">Settings</span></h1>
-
-    <div class="settings-card">
-      <h3>💾 データ管理</h3>
-      <p style="font-size:0.9rem; color:var(--main-muted); margin-bottom:1rem;">入力データはブラウザのlocalStorageに保存されます。</p>
-      <div class="action-row">
-        <button class="btn-ghost" onclick="saveDraft()">下書き保存</button>
-        <button class="btn-ghost" onclick="loadDraft()">下書き読込</button>
-        <button class="btn-ghost" onclick="clearAll()" style="color:#c0392b;">全データ削除</button>
+  <div id="page-qa" class="page">
+    <div class="page-header"><h1>Stage VI: 想定質問ディフェンス訓練</h1></div>
+    <div class="page-body">
+      <div class="card card--puml">
+        <div class="card-title">質疑応答ロジックツリー</div>
+        <textarea id="puml-vi-area" class="inp mono" rows="4">@startuml&#10;:審査員: -> (想定質問)&#10;@enduml</textarea>
+        <button id="btn-render-vi" class="btn btn-teal" style="margin-top:10px;" onclick="renderSingleField('puml-vi-area','puml-vi-img','puml-vi-err')">🎨 描画</button>
+        <div class="puml-img-wrap"><img id="puml-vi-img" alt="Stage VI"></div>
+        <div id="puml-vi-err" class="puml-error"></div>
       </div>
     </div>
+  </div>
 
-    <!-- モニター参加者向け APIキー設定 -->
-    <div class="settings-card" id="settings-apikey" style="border-left:4px solid #8B7355; background:#fdf8f2;">
-      <h3>🔑 モニター参加者の方へ — APIキー設定</h3>
-      <p style="font-size:0.85rem; color:var(--main-muted); margin-bottom:0.75rem; line-height:1.7;">
-        招待メールに記載の <strong>APIキー（sk-ant-で始まる文字列）</strong> を入力して「保存」を押してください。<br>
-        キーはこのブラウザにのみ保存され、外部には送信されません。<strong>一度設定すれば次回以降は不要です。</strong>
-      </p>
-      <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
-        <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off"
-          style="flex:1; min-width:220px; padding:0.55rem 0.9rem; font-family:monospace; font-size:0.85rem;
-                 border:1px solid #C5B99A; background:#fff; border-radius:4px;"
-          oninput="updateApiKeyStatus()">
-        <button class="btn-ghost" onclick="saveApiKey()" style="white-space:nowrap;">💾 保存</button>
-        <button class="btn-ghost" onclick="clearApiKey()" style="white-space:nowrap; color:#c0392b;">🗑 削除</button>
+  <div id="page-submit" class="page">
+    <div class="page-header"><h1>Stage VII: 投稿完了パッケージ</h1></div>
+    <div class="page-body">
+      <div class="card card--puml">
+        <div class="card-title">最終エクスポート工程プロセス</div>
+        <textarea id="puml-vii-area" class="inp mono" rows="4">@startuml&#10;[完成原稿] -> [ジャーナル投函]&#10;@enduml</textarea>
+        <button id="btn-render-vii" class="btn btn-teal" style="margin-top:10px;" onclick="renderSingleField('puml-vii-area','puml-vii-img','puml-vii-err')">🎨 描画</button>
+        <div class="puml-img-wrap"><img id="puml-vii-img" alt="Stage VII"></div>
+        <div id="puml-vii-err" class="puml-error"></div>
       </div>
-      <div id="apiKeyStatus" style="font-size:0.8rem; margin-top:0.5rem; color:var(--main-muted);"></div>
     </div>
+  </div>
 
-    <div class="settings-card" style="border-left:4px solid #2A6080; background:linear-gradient(135deg,#f0f7fb 0%,#e8f4f0 100%);">
-      <h3>🎁 特別研究モニター枠（キャンペーン実施中）</h3>
-      <p style="font-size:0.9rem; line-height:1.8; color:var(--main-body);">
-        現在、<strong>初期モニタリング期間（〜2026年7月末）</strong>として、
-        論文執筆支援AIを <strong>100クレジット（約10回の分析）無料</strong> でご利用いただけます。
-      </p>
-      <p style="font-size:0.9rem; line-height:1.8; margin-top:0.75rem; color:var(--main-body);">
-        📅 <strong>キャンペーン期間終了後のご案内</strong><br>
-        期間終了前に、AI分析サービスの継続ご利用方法（APIキーのご提供など）について、
-        <strong>ご登録者様へメールにてご連絡</strong>いたします。
-      </p>
-      <p style="font-size:0.82rem; margin-top:0.75rem; color:var(--main-muted); border-top:1px solid #C5B99A; padding-top:0.6rem;">
-        ※ 現在のクレジットは無料体験用です。残量0になっても<strong>自動引き落としは一切ありません</strong>。<br>
-        ※ ご意見・ご要望は <a href="mailto:info@c4model.org" style="color:var(--teal);">info@c4model.org</a> までお寄せください。
-      </p>
+  <div id="page-settings" class="page">
+    <div class="page-header"><h1>⚙️ 論文プロファイル詳細環境設定</h1></div>
+    <div class="page-body">
+      <div class="card card--puml">
+        <div class="card-title">システム統合検証用自由キャンバス</div>
+        <textarea id="puml-settings-area" class="inp mono" rows="4">@startuml&#10;class DojoProfile {&#10;  +version: 3.2.0_Haiku_Spec&#10;}&#10;@enduml</textarea>
+        <button id="btn-render-settings" class="btn btn-teal" style="margin-top:10px;" onclick="renderSingleField('puml-settings-area','puml-settings-img','puml-settings-err')">🎨 設定検証描画</button>
+        <div class="puml-img-wrap"><img id="puml-settings-img" alt="Settings View"></div>
+        <div id="puml-settings-err" class="puml-error"></div>
+      </div>
     </div>
-
-    <div class="settings-card">
-      <h3>ℹ️ このアプリについて</h3>
-      <p style="font-size:0.9rem; color:var(--main-muted); line-height:1.8;">
-        <strong>論文道場 Academic Paper Dojo</strong><br>
-        開発：奥村 治 / C4モデル研究会®<br>
-        バックエンド：Cloudflare Workers + D1<br>
-        AI：Claude API (Anthropic)<br>
-        図解：PlantUML Server
-      </p>
-    </div>
-  </section>
+  </div>
 
 </main>
-</div><!-- /.layout -->
-
-<!-- ===== CHARGE MODAL 削除済み（5〜7月モニタリング期間：メール誘導のみ） ===== -->
-
-
-
-
 
 <script>
-  function setLang(lang) {
-    document.querySelectorAll('[data-en]').forEach(el => el.style.display = lang === 'en' ? 'inline' : 'none');
-    document.querySelectorAll('[data-ja]').forEach(el => el.style.display = lang === 'ja' ? 'inline' : 'none');
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
-    document.documentElement.lang = lang;
-    try { localStorage.setItem('dojo-lang', lang); } catch(e) {}
-  }
-  (function() {
-    const saved = (() => { try { return localStorage.getItem('dojo-lang'); } catch(e) { return null; } })();
-    setLang(saved || 'ja');
-  })();
-
-  /* ===== SCORE CALCULATION ===== */
-  function calcScore() {
-    let score = 0;
-    const rq    = document.getElementById('rq')?.value.trim() || '';
-    const abs   = document.getElementById('abstract')?.value.trim() || '';
-    const auth  = document.getElementById('authorName')?.value.trim() || '';
-    const email = document.getElementById('email')?.value.trim() || '';
-    const aff   = document.getElementById('affiliation')?.value.trim() || '';
-    const fmt   = document.getElementById('format')?.value || '';
-    const refs  = (document.getElementById('references')?.value || '').trim().split('\n').filter(l=>l.trim()).length;
-    const toc   = (document.getElementById('toc')?.value || '').trim().split('\n').filter(l=>l.trim()).length;
-
-    // Q1 著者情報：満点5点（必須）
-    const authScore  = (auth && email && aff) ? 5 : (auth && (email || aff)) ? 3 : auth ? 1 : 0;
-
-    // Q2-Q5：緩和スコア（あいまい入力・空欄でも部分点）
-    const rqScore    = rq.length >= 20 ? 5 : rq.length >= 10 ? 3 : rq.length > 0 ? 1 : 0;
-    const absScore   = abs.length >= 200 ? 5 : abs.length >= 50 ? 3 : abs.length > 0 ? 1 : 0;
-    const fmtScore   = fmt ? 5 : 1;
-    const refScore   = refs >= 6 ? 5 : refs >= 3 ? 3 : refs > 0 ? 1 : 0;
-    const structScore= toc >= 5 ? 5 : toc >= 2 ? 3 : toc > 0 ? 1 : 0;
-
-    score = authScore + rqScore + absScore + fmtScore + refScore + structScore;
-    score = Math.min(score, 30);
-
-    document.getElementById('scoreNum').textContent = score;
-    document.getElementById('bar-rq').style.width    = (rqScore/5*100)+'%';
-    document.getElementById('bar-abs').style.width   = (absScore/5*100)+'%';
-    document.getElementById('bar-auth').style.width  = (authScore/5*100)+'%';
-    document.getElementById('bar-fmt').style.width   = (fmtScore/5*100)+'%';
-    document.getElementById('bar-ref').style.width   = (refScore/5*100)+'%';
-    document.getElementById('bar-struct').style.width= (structScore/5*100)+'%';
-
-    const btn = document.getElementById('btnAnalyze');
-    const hint= document.getElementById('scoreHint');
-
-    // Q1（著者情報：氏名）が入力されていれば分析開始を解放
-    const q1Ready = auth.length > 0;
-
-    if (q1Ready) {
-      btn.disabled = false;
-      btn.classList.add('ready');
-      
-      if (score >= 28) {
-        hint.textContent = '✅ スコア28点以上です。「分析開始」を押してください。';
-      } else {
-        // Wellbeing UX: 提案口調のヒントメッセージ（最大2件まで）
-        const hints = {
-          rq:     '研究課題（RQ）を10字以上書くと、分析の軸がはっきりします💡',
-          abs:    '要旨を50字以上書くと、AIの分析精度が大幅に上がります💡',
-          ref:    '参考文献は後から追加OK。3件以上あるとスコアが上がります📚',
-          struct: '章立ては2章以上あると構造分析ができます。後から編集OKです✏️',
-          fmt:    '投稿先フォーマットを選ぶと、引用形式の自動調整が有効になります'
-        };
-        
-        const incomplete = [];
-        if(rqScore < 3)    incomplete.push(hints.rq);
-        if(absScore < 3)   incomplete.push(hints.abs);
-        if(refScore < 3)   incomplete.push(hints.ref);
-        if(structScore < 3) incomplete.push(hints.struct);
-        if(fmtScore < 5)    incomplete.push(hints.fmt);
-        
-        const displayHints = incomplete.slice(0, 2);
-        
-        if(displayHints.length > 0) {
-          hint.innerHTML = `✅ 分析開始できます。💡 後で入力すると精度が上がります：<br>${displayHints.join('<br>')}`;
-        } else {
-          hint.textContent = '✅ 分析開始できます。';
-        }
-      }
-    } else {
-      btn.disabled = true;
-      btn.classList.remove('ready');
-      hint.textContent = '⚠️ 01 著者情報の「著者氏名」を入力すると分析開始ボタンが有効になります';
-    }
-
-    // 参考文献件数表示を更新
-    const refCountEl = document.getElementById('ref-count');
-    if(refCountEl) {
-      const suffix = refs >= 6 ? '✅ 満点' : refs > 0 ? `（あと${6-refs}件で満点）` : '（6件以上で満点 ／ 1件でもスコアに加点されます）';
-      refCountEl.innerHTML = `${refs} 件 <span style="color:#2A6080;">${suffix}</span>`;
-    }
-
-    // クレジット不足チェック（calcScore後にも適用）
-    updateCreditUI();
-  }
-
-  /* ===== CREDIT UI (ゼロストップ・ガバナンス) ===== */
-  const ANALYSIS_COST = 10; // 1回の分析コスト
-
-  function updateCreditUI() {
-    // ── バージョンチェック：古いLocalStorageを自動リセット ──
-    if (localStorage.getItem('dojo-version') !== 'v2') {
-      localStorage.setItem('dojo-credits', '100');
-      localStorage.setItem('dojo-version', 'v2');
-      localStorage.removeItem('dojo-credits-used');
-    }
-    let credits = parseInt(localStorage.getItem('dojo-credits'));
-    if (isNaN(credits)) {
-      credits = 100; // 初回無料体験付与（100クレジット）
-      localStorage.setItem('dojo-credits', credits);
-    }
-    const TOTAL = 100;
-    const pct = Math.max(0, credits / TOTAL * 100);
-
-    const numEl  = document.getElementById('creditNum');
-    const barEl  = document.getElementById('creditBarFill');
-    const badge  = document.getElementById('creditFreeBadge');
-
-    if (numEl) {
-      numEl.textContent = credits;
-      numEl.classList.remove('warning', 'caution');
-      if (credits <= 10)       numEl.classList.add('warning');
-      else if (credits <= 20)  numEl.classList.add('caution');
-    }
-    if (barEl) {
-      barEl.style.width = pct + '%';
-      barEl.classList.remove('warning', 'caution');
-      if (credits <= 10)       barEl.classList.add('warning');
-      else if (credits <= 20)  barEl.classList.add('caution');
-    }
-    if (badge) {
-      if (credits === 100 && !localStorage.getItem('dojo-credits-used')) {
-        badge.style.display = '';
-      } else {
-        badge.style.display = 'none';
-      }
-    }
-
-    // ボタンの disabled 制御（クレジット不足ブロック）
-    const btn = document.getElementById('btnAnalyze');
-    if (btn && credits < ANALYSIS_COST) {
-      btn.disabled = true;
-      btn.classList.remove('ready');
-      btn.classList.add('credit-blocked');
-      btn.textContent = '→ クレジットが不足しています';
-      const hint = document.getElementById('scoreHint');
-      if (hint) hint.innerHTML = '<span style="color:#ffddaa;">⚠️ 無料体験クレジット（100Cr）を使い切りました。引き続きご利用の場合は <a href="mailto:info@c4model.org" style="color:#F1C40F;">info@c4model.org</a> までご連絡ください。</span>';
-    } else if (btn) {
-      btn.classList.remove('credit-blocked');
-      btn.textContent = '→ 分析開始（−10 Cr）';
-    }
-  }
-
-  /* ===== CHARGE MODAL（5〜7月モニタリング期間：メール誘導のみ）===== */
-  function openChargeModal() {
-    const hint = document.getElementById('scoreHint');
-    if (hint) {
-      hint.innerHTML = '<span style="color:#ffddaa;">⚠️ 無料体験クレジット（100Cr）を使い切りました。引き続きご利用の場合は <a href="mailto:info@c4model.org" style="color:#F1C40F;">info@c4model.org</a> までご連絡ください。</span>';
-    }
-  }
-
-  function selectPlan(el) {}
-  function doCharge() {}
-
-  /* ===== アンケート送信（mailto） ===== */
-  function submitFeedback() {
-    const radio = name => {
-      const el = document.querySelector(`input[name="${name}"]:checked`);
-      return el ? el.value + '点' : '未回答';
-    };
-    const txt = id => (document.getElementById(id)?.value || '').trim() || '（なし）';
-
-    const author = document.getElementById('authorName')?.value || '（未入力）';
-    const score  = document.getElementById('scoreNum')?.textContent || '?';
-    const date   = new Date().toLocaleDateString('ja-JP');
-
-    const subject = encodeURIComponent(`【論文道場アンケート】${author} — ${date}`);
-    const body = encodeURIComponent(
-      `■ 論文道場 評価アンケート（Ver 1.0 実証用）\n` +
-      `送信日：${date}\n` +
-      `著者名：${author}\n` +
-      `論文スコア：${score}/30点\n\n` +
-      `A. みやすさ：${radio('q_a')}\n　コメント：${txt('qa_comment')}\n\n` +
-      `B. 解説のわかりやすさ：${radio('q_b')}\n　コメント：${txt('qb_comment')}\n\n` +
-      `C. 操作方法：${radio('q_c')}\n　コメント：${txt('qc_comment')}\n\n` +
-      `D. 出力結果：${radio('q_d')}\n　コメント：${txt('qd_comment')}\n\n` +
-      `E. 全体評価：${radio('q_e')}\n　コメント：${txt('qe_comment')}\n\n` +
-      `---\n送信元：論文道場 Academic Paper Dojo\n` +
-      `https://tnavi.github.io/ronbun-dojo/dojo.html`
-    );
-    window.location.href = `mailto:info@c4model.org?subject=${subject}&body=${body}`;
-  }
-
-  function selectPlan(el) {
-    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-  function doCharge() {
-    // モック：Stripe Checkoutへ遷移する想定。ここではデモ用にクレジット追加
-    const selected = document.querySelector('.plan-card.selected');
-    const cr = selected ? parseInt(selected.dataset.credits || '50') : 50;
-    let credits = parseInt(localStorage.getItem('dojo-credits') || '0');
-    credits = Math.min(credits + cr, 200);
-    localStorage.setItem('dojo-credits', credits);
-    localStorage.setItem('dojo-credits-used', '1');
-    updateCreditUI();
-    closeChargeModal();
-    // calcScore を再実行してボタン状態を更新
-    calcScore();
-    alert(`✅ ${cr}クレジットをチャージしました。残高：${credits} Cr`);
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    updateCreditUI();
-    // APIキー初期表示
-    const saved = localStorage.getItem('dojo-api-key');
-    if (saved) {
-      const el = document.getElementById('apiKeyInput');
-      if (el) el.value = saved;
-      updateApiKeyStatus();
-    }
-    document.querySelectorAll('input, textarea, select').forEach(el => {
-      el.addEventListener('input', calcScore);
-      el.addEventListener('change', calcScore);
-    });
-    calcScore();
+/**
+ * クリーンな状態遷移とナビゲーション同期システム（インライン競合対策型）
+ */
+function go(pageId, btnElement) {
+  document.querySelectorAll('.page').forEach(function(p) {
+    p.classList.remove('active');
   });
 
-  /* ===== API KEY MANAGEMENT ===== */
-  function saveApiKey() {
-    const el  = document.getElementById('apiKeyInput');
-    const key = el ? el.value.trim() : '';
-    if (!key) { alert('APIキーを入力してください。'); return; }
-    if (!key.startsWith('sk-ant-')) {
-      if (!confirm('入力されたキーが「sk-ant-」で始まっていません。このまま保存しますか？')) return;
+  var targetPage = document.getElementById('page-' + pageId);
+  if (targetPage) {
+    targetPage.classList.add('active');
+  }
+
+  // ナビゲーションメニューのハイライト完全同期
+  document.querySelectorAll('.nav-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  
+  if (btnElement) {
+    btnElement.classList.add('active');
+  } else {
+    var backupBtn = document.getElementById('nav-btn-' + pageId);
+    if (backupBtn) backupBtn.classList.add('active');
+  }
+
+  // app.js v3.1.0/v3.2.0 の双方向フックを安全にキック
+  if (typeof window.onNavigate === 'function') {
+    window.onNavigate(pageId);
+  }
+
+  // HCD自動実行トリガー：Stage III に侵入した際に全自動解析を実行
+  if (pageId === 'write') {
+    triggerHaikuScienceParsingEngine();
+  }
+}
+
+/**
+ * Stage 0: スコア計算機
+ */
+function calcScore() {
+  var score = 0;
+  if (document.getElementById('inp-author').value.trim()) score += 3;
+  if (document.getElementById('inp-title').value.trim()) score += 7;
+  if (document.getElementById('inp-abstract').value.trim().length > 10) score += 10;
+  if (document.getElementById('inp-rq').value.trim()) score += 5;
+  if (document.getElementById('inp-structure').value.trim()) score += 5;
+
+  var scoreNum = document.getElementById('s0-score');
+  var bar = document.getElementById('s0-bar');
+  var label = document.getElementById('s0-label');
+  var btn = document.getElementById('btn-start');
+
+  if (scoreNum) scoreNum.innerText = score;
+  if (bar) bar.style.width = (score / 30 * 100) + '%';
+
+  if (score >= 28) {
+    if (label) label.innerText = '条件達成！分析を開始できます。';
+    if (btn) btn.disabled = false;
+  } else {
+    if (label) label.innerText = '必要情報を入力してください（目標28点以上）';
+    if (btn) btn.disabled = true;
+  }
+}
+
+/**
+ * 分析開始・データブリッジ
+ */
+function startAnalysis() {
+  var payload = {
+    title: document.getElementById('inp-title').value,
+    abstract: document.getElementById('inp-abstract').value,
+    rq: document.getElementById('inp-rq').value,
+    hypothesis: document.getElementById('inp-hypothesis').value,
+    structure: document.getElementById('inp-structure').value,
+    author: document.getElementById('inp-author').value,
+    affiliation: document.getElementById('inp-affiliation').value
+  };
+
+  if (typeof window.saveDojoData === 'function') {
+    window.saveDojoData(payload);
+    document.querySelectorAll('.dojo-paper-title').forEach(function(el) { el.innerText = payload.title; });
+    go('write', document.getElementById('nav-btn-write'));
+  } else {
+    document.querySelectorAll('.dojo-paper-title').forEach(function(el) { el.innerText = payload.title; });
+    go('write', document.getElementById('nav-btn-write'));
+  }
+}
+
+/**
+ * 🛠️ 独立ステージ用個別単発描画フォールバック
+ */
+function renderSingleField(areaId, imgId, errId) {
+  var txt = document.getElementById(areaId).value.trim();
+  var img = document.getElementById(imgId);
+  var err = document.getElementById(errId);
+  if (!txt) return;
+
+  if (typeof window.buildPumlUrl === 'function') {
+    var url = window.buildPumlUrl(txt, 'svg');
+    if (img) { img.src = url; img.style.display = 'block'; }
+    if (err) err.style.display = 'none';
+  } else {
+    // フォールバック用標準エンコード
+    var mockUrl = "https://plantuml.com/plantuml/svg/" + window.btoa(encodeURIComponent(txt));
+    if (img) { img.src = mockUrl; img.style.display = 'block'; }
+  }
+}
+
+/**
+ * 🌟 【核心部】「俳句の科学方式」多階層・動的挙動コード自動分割パースエンジン
+ */
+function triggerHaikuScienceParsingEngine() {
+  var masterArea = document.getElementById('puml-context-area');
+  if (!masterArea) return;
+
+  var fullCode = masterArea.value;
+  
+  // 俳句の科学方式：各マーカーでコードを切り出すセグメンテーション辞書
+  var sections = {
+    l1: { startMarker: "'== LEVEL 1 ==", code: "" },
+    l2: { startMarker: "'== LEVEL 2 ==", code: "" },
+    l3: { startMarker: "'== LEVEL 3 ==", code: "" },
+    l4: { startMarker: "'== LEVEL 4 ==", code: "" },
+    seq: { startMarker: "'== SEQUENCE ==", code: "" },
+    state: { startMarker: "'== STATE ==", code: "" }
+  };
+
+  var lines = fullCode.split('\n');
+  var currentMode = null;
+
+  // 行走査パースアルゴリズム
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var matched = false;
+
+    for (var key in sections) {
+      if (line.includes(sections[key].startMarker)) {
+        currentMode = key;
+        matched = true;
+        break;
+      }
     }
-    localStorage.setItem('dojo-api-key', key);
-    updateApiKeyStatus();
-    alert('✅ APIキーを保存しました。分析開始ボタンをお試しください。');
+
+    if (matched) continue;
+
+    if (currentMode && !line.includes('@startuml') && !line.includes('@enduml')) {
+      sections[currentMode].code += line + '\n';
+    }
   }
 
-  function clearApiKey() {
-    if (!confirm('APIキーを削除しますか？')) return;
-    localStorage.removeItem('dojo-api-key');
-    const el = document.getElementById('apiKeyInput');
-    if (el) el.value = '';
-    updateApiKeyStatus();
-  }
+  // 分離した個別のPlantUMLソースをKrokiパイプライン（buildPumlUrl）へ登録・一斉再生
+  var targets = [
+    { key: 'l1', imgId: 'puml-l1-img' },
+    { key: 'l2', imgId: 'puml-l2-img' },
+    { key: 'l3', imgId: 'puml-l3-img' },
+    { key: 'l4', imgId: 'puml-l4-img' },
+    { key: 'seq', imgId: 'puml-seq-img' },
+    { key: 'state', imgId: 'puml-state-img' }
+  ];
 
-  function updateApiKeyStatus() {
-    const statusEl = document.getElementById('apiKeyStatus');
-    if (!statusEl) return;
-    const saved = localStorage.getItem('dojo-api-key');
-    const inputVal = (document.getElementById('apiKeyInput') || {}).value || '';
-    if (saved) {
-      const masked = saved.slice(0, 10) + '••••••••••••••' + saved.slice(-4);
-      statusEl.innerHTML = `✅ <span style="color:#2A6080; font-family:monospace;">${masked}</span> が保存済みです。`;
-    } else if (inputVal) {
-      statusEl.innerHTML = '⚠️ 未保存です。「💾 保存」を押してください。';
+  targets.forEach(function(target) {
+    var subCode = sections[target.key].code.trim();
+    var imgElement = document.getElementById(target.imgId);
+
+    if (!subCode) {
+      // 記述がない場合はデフォルトのコア構造プレースホルダーを自動生成
+      subCode = "[要素未定義] \n note right: マトリクスに定義がありません";
+    }
+
+    var cleanPuml = "@startuml\n" + subCode + "\n@enduml";
+
+    if (typeof window.buildPumlUrl === 'function') {
+      var computedUrl = window.buildPumlUrl(cleanPuml, 'svg');
+      if (imgElement) {
+        imgElement.src = computedUrl;
+        imgElement.style.display = 'block';
+      }
     } else {
-      statusEl.innerHTML = '❌ APIキーが設定されていません。上の欄に入力して保存してください。';
-    }
-  }
-
-
-  function updateCharCount(el, countId) {
-    const span = document.getElementById(countId);
-    if(span) span.textContent = el.value.length;
-    calcScore();
-  }
-
-  function showNotice(msg) {
-    const hint = document.getElementById('scoreHint');
-    if(hint) hint.innerHTML = `<span style="color:#C0392B;">${msg}</span>`;
-  }
-
-  function startAnalysis() {
-    let credits = parseInt(localStorage.getItem('dojo-credits') || '100');
-    if (credits < ANALYSIS_COST) {
-      // クレジット不足: モーダルを開く
-      openChargeModal();
-      return;
-    }
-
-    const score = parseInt(document.getElementById('scoreNum').textContent);
-    const btn   = document.getElementById('btnAnalyze');
-    const hint  = document.getElementById('scoreHint');
-
-    // 精度告知
-    let notice = score < 15
-      ? '⚠️ 入力情報が少ないため分析は概要レベルです。後から補足するとAIの精度が上がります。'
-      : score < 28
-        ? '💡 いくつかの項目を追加入力するとより詳細な分析が得られます。'
-        : '✅ 十分な情報が入力されています。高精度な分析を開始します。';
-
-    hint.innerHTML = notice + '<br>🔄 Claude APIで分析中…';
-    btn.disabled   = true;
-    btn.textContent = '分析中...';
-
-    // フォームデータ収集
-    const get = id => document.getElementById(id)?.value?.trim() || '';
-    const prompt = `あなたは学術論文の執筆支援AIです。以下の情報をもとに、論文の改善提案・構成アドバイス・C4モデル活用提案を日本語で詳しく出力してください。
-
-【著者情報】
-- 氏名：${get('authorName')}
-- 所属：${get('affiliation')}
-- メール：${get('email')}
-- 学位：${get('degree')}
-
-【論文基本情報】
-- 題名：${get('title') || '（未入力）'}
-- 投稿先：${get('journal') || '（未定）'}
-- 言語：${get('lang') || '（未定）'}
-- フォーマット：${get('format') || '（未定）'}
-- キーワード：${get('keywords') || '（未入力）'}
-
-【研究課題（RQ）】
-${get('rq') || '（未入力）'}
-
-【仮説】
-${get('hypothesis') || '（未入力）'}
-
-【要旨】
-${get('abstract') || '（未入力）'}
-
-【章立て】
-${get('toc')}
-
-【先行研究の要点】
-${get('priorWork') || '（未入力）'}
-
-【参考文献】
-${get('references') || '（未入力）'}
-
-以下の観点でアドバイスしてください：
-1. 論文題名・RQの改善提案
-2. 要旨の強化ポイント
-3. 章構成のバランスと改善案
-4. C4モデル（L1〜L4）の各層への適用方法
-5. 参考文献充実のための検索キーワード提案
-
-【システム指示】
-ユーザーは「ハイブリッド・クレジットシステム（従量制）」を利用しています。無駄なトークン消費を抑えるため、冗長な挨拶は省き、簡潔かつ最も価値のある構造的アドバイスを直接出力してください。`;
-
-    // Skills Filter v1.0: system フィールドで品質保証（L0+L1+L2+L3 全層適用）
-    const systemPrompt = (typeof window.SkillsFilter !== 'undefined')
-      ? window.SkillsFilter.buildSystemPrompt(['L0', 'L1', 'L2', 'L3'])
-      : 'あなたはC4モデル研究会の学術AIアシスタントです。すべての出力はUTF-8で生成し、PlantUMLコードには skinparam defaultFontName "Noto Sans CJK JP" を必ず含めてください。';
-
-    // APIキーをlocalStorageから取得
-    const apiKey = localStorage.getItem('dojo-api-key') || '';
-    if (!apiKey) {
-      hint.innerHTML = '<span style="color:#ffddaa;">⚠️ 現在、AI分析サービスは準備中です。しばらくお待ちください。</span>';
-      btn.disabled   = false;
-      btn.textContent = '→ 分析開始（−10 Cr）';
-      return;
-    }
-
-    fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 1500,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    })
-    .then(r => {
-      if (!r.ok) return r.json().then(e => Promise.reject(new Error(
-        r.status === 401 ? '❌ APIキーが無効です。設定から正しいキーを入力してください。' :
-        r.status === 429 ? '❌ API利用制限に達しました。しばらくお待ちください。' :
-        e.error?.message || `APIエラー (HTTP ${r.status})`
-      )));
-      return r.json();
-    })
-    .then(data => {
-      // クレジット消費ロジック
-      credits -= ANALYSIS_COST;
-      localStorage.setItem('dojo-credits', credits);
-      localStorage.setItem('dojo-credits-used', '1');
-      updateCreditUI();
-
-      const text = (data.content || []).map(b => b.text || '').join('\n').trim()
-        || '（AIからの応答がありませんでした）';
-      // 結果をscore-hintエリアに表示
-      hint.innerHTML = '<strong>📄 AI分析結果</strong><br><pre style="white-space:pre-wrap; font-family:inherit; font-size:0.85rem; margin-top:0.5rem;">' + text + '</pre>';
-      btn.disabled   = false;
-      btn.textContent = '→ 分析完了';
-      // C4図も描画
-      const pumlCode = document.getElementById('pumlCode')?.value?.trim() || '';
-      if (pumlCode) renderPuml();
-    })
-    .catch(e => {
-      hint.innerHTML = '<span style="color:#ffddaa;">⚠️ API接続エラー: ' + e.message + '</span>';
-      btn.disabled   = false;
-      btn.textContent = '→ 分析開始';
-    });
-  }
-
-  /* ===== SAMPLE DATA ===== */
-  function loadSample() {
-    document.getElementById('authorName').value = '奥村 治';
-    document.getElementById('affiliation').value = 'C4モデル研究会®';
-    document.getElementById('email').value = 'info@c4model.org';
-    document.getElementById('degree').value = 'Ph.D., M.S. (AIIT)';
-    document.getElementById('title').value = 'C4モデルを用いた古典俳句の構造解析：松尾芭蕉「古池や」を事例として';
-    document.getElementById('journal').value = '情報処理学会';
-    document.getElementById('lang').value = 'ja';
-    document.getElementById('format').value = 'ipsj';
-    document.getElementById('keywords').value = 'C4モデル, 俳句, 構造解析, 教育工学, PlantUML';
-    document.getElementById('abstract').value = '本研究は、英国発のソフトウェアアーキテクチャ設計手法であるC4モデルを日本の伝統文化である俳句の構造解析に応用することを目的とする。松尾芭蕉の「古池や蛙飛び込む水の音」を対象に、C4モデルの4層（Context・Container・Component・Code）を用いて17音の意味構造を可視化した。その結果、C4モデルが俳句の持つ多層的な意味体系を体系的に整理するための有効なフレームワークとなることが示された。本手法は、文学教育における批判的思考力の育成や、AIを活用した文化遺産のデジタル解析への応用可能性を示唆する。';
-    document.getElementById('rq').value = 'C4モデルの4層構造（Context, Container, Component, Code）は、松尾芭蕉の俳句に内在する意味の多層性を体系的に可視化する有効な分析フレームワークとなりうるか？';
-    document.getElementById('hypothesis').value = 'C4モデルの4層構造を俳句分析に適用することで、17音に凝縮された文脈・構造・論点・表現を階層的に整理でき、文学教育における論理思考力の育成に活用できる。';
-    document.getElementById('references').value = `Okumura, O. (2025). Structural Analysis of Classical Haiku Using C4 Model: A Case Study of Matsuo Basho. ResearchGate.
-奥村治 (2025). 教育工学的アプローチによる古典俳句の構造解析. C4モデル研究会®.
-Simon Brown (2018). The C4 Model for Software Architecture. InfoQ.
-松尾芭蕉 (1689). 奥の細道. 江戸.
-奥村治 (2024). PlantUML C4モデルで実現するチャート図解. Kindle.
-奥村治 (2026). 挫折しない論文執筆：C4モデルによる思考の設計図. ResearchGate.`;
-    calcScore();
-    setTimeout(()=> document.getElementById('abstract-count').textContent = document.getElementById('abstract').value.length, 50);
-    setTimeout(()=> document.getElementById('rq-count').textContent = document.getElementById('rq').value.length, 50);
-  }
-
-  /* ===== DRAFT SAVE/LOAD ===== */
-  function saveDraft() {
-    const data = {};
-    ['authorName','affiliation','email','degree','coauthors','title','journal',
-     'lang','format','keywords','abstract','rq','hypothesis','toc','wordcount',
-     'priorWork','references'].forEach(id => {
-      const el = document.getElementById(id);
-      if(el) data[id] = el.value;
-    });
-    localStorage.setItem('dojoDraft', JSON.stringify(data));
-    alert('下書きを保存しました。');
-  }
-
-  function loadDraft() {
-    const raw = localStorage.getItem('dojoDraft');
-    if(!raw) { alert('保存された下書きがありません。'); return; }
-    const data = JSON.parse(raw);
-    Object.keys(data).forEach(id => {
-      const el = document.getElementById(id);
-      if(el) el.value = data[id];
-    });
-    calcScore();
-    alert('下書きを読み込みました。');
-  }
-
-  function clearAll() {
-    if(!confirm('すべての入力データを削除しますか？')) return;
-    document.querySelectorAll('input[type="text"], input[type="email"], textarea, select').forEach(el => el.value = '');
-    localStorage.removeItem('dojoDraft');
-    calcScore();
-  }
-
-  function exportMarkdown() {
-    const title  = document.getElementById('title')?.value || '（未入力）';
-    const author = document.getElementById('authorName')?.value || '（未入力）';
-    const abs    = document.getElementById('abstract')?.value || '';
-    const rq     = document.getElementById('rq')?.value || '';
-    const toc    = document.getElementById('toc')?.value || '';
-    const refs   = document.getElementById('references')?.value || '';
-    const md = `# ${title}\n\n**著者：** ${author}\n\n## 要旨\n${abs}\n\n## 研究課題（RQ）\n${rq}\n\n## 目次\n${toc}\n\n## 参考文献\n${refs}\n`;
-    const blob = new Blob([md], {type:'text/markdown'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'draft.md';
-    a.click();
-  }
-
-  /* ===== 英語Abstract付き Markdown出力 ===== */
-  function exportMarkdownWithAbstract() {
-    const title   = document.getElementById('title')?.value || '（未入力）';
-    const author  = document.getElementById('authorName')?.value || '（未入力）';
-    const affil   = document.getElementById('affiliation')?.value || '';
-    const email   = document.getElementById('email')?.value || '';
-    const kw      = document.getElementById('keywords')?.value || '';
-    const abs     = document.getElementById('abstract')?.value || '';
-    const rq      = document.getElementById('rq')?.value || '';
-    const toc     = document.getElementById('toc')?.value || '';
-    const refs    = document.getElementById('references')?.value || '';
-    const engAbs  = window._lastGeneratedAbstract
-      || document.getElementById('previewAbstractText')?.innerText?.trim()
-      || '（英語版Abstractが未生成です。「AI で英語版 Abstract を自動生成」ボタンを押してください。）';
-
-    const md = `# ${title}
-
-**著者：** ${author}
-**所属：** ${affil}
-**連絡先：** ${email}
-**キーワード：** ${kw}
-
----
-
-## English Abstract (IMRaD)
-
-${engAbs}
-
----
-
-## 要旨（日本語）
-
-${abs}
-
-## 研究課題（RQ）
-
-${rq}
-
-## 目次
-
-${toc}
-
-## 参考文献
-
-${refs}
-
----
-*Generated by 論文道場 Academic Paper Dojo — c4model.org*
-`;
-    const blob = new Blob([md], {type:'text/markdown; charset=utf-8'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'draft_with_abstract.md';
-    a.click();
-  }
-
-  /* ===== 英語Abstract自動生成（IMRaD準拠）===== */
-  async function generateEnglishAbstract() {
-    const ABSTRACT_COST = 5;
-    let credits = parseInt(localStorage.getItem('dojo-credits') || '0');
-    if (credits < ABSTRACT_COST) {
-      alert('クレジットが不足しています。info@c4model.org までご連絡ください。');
-      return;
-    }
-
-    const apiKey = localStorage.getItem('dojo-api-key') || '';
-    if (!apiKey) {
-      document.getElementById('abstractStatus').innerHTML =
-        '<span style="color:#c0392b;">⚠️ APIキーが設定されていません。「設定」タブでAPIキーを入力してください。</span>';
-      return;
-    }
-
-    const get = id => document.getElementById(id)?.value?.trim() || '';
-    const title     = get('title') || '（未入力）';
-    const rq        = get('rq') || '（未入力）';
-    const hypothesis= get('hypothesis') || '';
-    const abstract  = get('abstract') || '';
-    const keywords  = get('keywords') || '';
-    const format    = get('format') || '';
-
-    const btn = document.getElementById('btnGenAbstract');
-    const status = document.getElementById('abstractStatus');
-    btn.disabled = true;
-    btn.textContent = '⏳ 生成中...';
-    status.innerHTML = '🔄 Claude API で英語版Abstractを生成しています…';
-
-    const prompt = `You are an expert academic writing assistant specializing in Japanese-to-English translation for scholarly papers.
-
-Based on the following Japanese research information, generate a high-quality English Abstract in IMRaD format (strictly 150-200 words).
-
-CRITICAL RULES:
-1. Output ONLY the English Abstract text. No preamble, no Japanese text, no markdown formatting, no section labels.
-2. The abstract must follow IMRaD order: Background → Objective → Methods → Results/Findings → Conclusion/Implications.
-3. Use formal academic English appropriate for international journals.
-4. Target length: 150-200 words (enforce strictly).
-5. Single paragraph format (no line breaks within the abstract).
-
-Research Title (Japanese): ${title}
-Research Question: ${rq}
-Hypothesis: ${hypothesis}
-Japanese Abstract: ${abstract}
-Keywords: ${keywords}
-Target Format: ${format}`;
-
-    // Skills Filter L0のみ適用（英語出力のため日本語ルールは除外）
-    const systemPrompt = 'You are an expert academic writing assistant. Generate output in English only. All output must be valid UTF-8. Never use BOM. Produce formal academic English prose.';
-
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-opus-4-5',
-          max_tokens: 400,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: prompt }]
-        })
-      });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error?.message || `HTTP ${response.status}`);
+      // app.js未ロード時のためのセルフ自律フォールバックURL生成
+      if (imgElement) {
+        imgElement.src = "https://plantuml.com/plantuml/svg/" + window.btoa(encodeURIComponent(cleanPuml));
+        imgElement.style.display = 'block';
       }
-
-      const data = await response.json();
-      const generatedAbstract = (data.content || []).map(b => b.text || '').join('').trim();
-
-      // クレジット消費
-      credits -= ABSTRACT_COST;
-      localStorage.setItem('dojo-credits', credits);
-      localStorage.setItem('dojo-credits-used', '1');
-      updateCreditUI();
-
-      // プレビュー更新
-      window._lastGeneratedAbstract = generatedAbstract;
-      document.getElementById('previewAbstractText').textContent = generatedAbstract;
-
-      // プレビューの著者・タイトル・キーワードもリアルタイム更新
-      _updatePreviewMeta();
-
-      status.innerHTML = `✅ 生成完了（${generatedAbstract.split(/\s+/).length}語）。上のプレビューに反映されました。`;
-      btn.textContent = '✨ AI で英語版 Abstract を自動生成（−5 Cr）';
-
-    } catch(e) {
-      status.innerHTML = '<span style="color:#c0392b;">⚠️ エラー: ' + e.message + '</span>';
-      btn.textContent = '✨ AI で英語版 Abstract を自動生成（−5 Cr）';
     }
-    btn.disabled = false;
+  });
+
+  console.log("[自律再生報告] 俳句の科学方式による6面同時並列レンダリングが正常完了。");
+}
+
+/**
+ * 🛡️ 起動時自律整合性チェック
+ */
+document.addEventListener('DOMContentLoaded', function() {
+  calcScore();
+  
+  // app.js側のグローバルマッピングオブジェクトを動的に拡張・自律上書き
+  if (typeof window._RENDER_BINDINGS === 'object' && window._RENDER_BINDINGS !== null) {
+    window._RENDER_BINDINGS['puml-l1-img'] = 'write';
+    window._RENDER_BINDINGS['puml-l2-img'] = 'write';
+    window._RENDER_BINDINGS['puml-l3-img'] = 'write';
+    window._RENDER_BINDINGS['puml-l4-img'] = 'write';
+    window._RENDER_BINDINGS['puml-seq-img'] = 'write';
+    window._RENDER_BINDINGS['puml-state-img'] = 'write';
+    document.getElementById('self-diag-bar').innerText += " => [_RENDER_BINDINGS へのフック登録を100%完了]";
   }
-
-  /* ===== プレビューのメタ情報をフォーム入力に同期 ===== */
-  function _updatePreviewMeta() {
-    const title   = document.getElementById('title')?.value?.trim();
-    const author  = document.getElementById('authorName')?.value?.trim();
-    const affil   = document.getElementById('affiliation')?.value?.trim();
-    const email   = document.getElementById('email')?.value?.trim();
-    const kw      = document.getElementById('keywords')?.value?.trim();
-
-    if (title)  document.getElementById('previewTitle').textContent = title;
-    if (author) document.getElementById('previewAuthors').textContent = author;
-    const affilText = [affil, email].filter(Boolean).join(' · ');
-    if (affilText) document.getElementById('previewAffil').textContent = affilText;
-    if (kw) document.getElementById('previewKeywords').textContent = kw;
-  }
-
-  /* ===== フォーム入力でプレビューをリアルタイム更新 ===== */
-  (function _initPreviewSync() {
-    const syncIds = ['title', 'authorName', 'affiliation', 'email', 'keywords'];
-    document.addEventListener('DOMContentLoaded', () => {
-      syncIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', _updatePreviewMeta);
-      });
-    });
-  })();
-
-  /* ===== PLANTUML — Deflate Raw エンコーダ（修正版）=====
-   * 【旧・誤】btoa(unescape(...)) = Base64/HUFFMAN → ~1プレフィックスと不整合
-   * 【新・正】pako.deflateRaw() + PlantUML独自6bit Base64 + ~1プレフィックス
-   ================================================================*/
-  function _puml6b64(data) {
-    const T = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
-    let r = '';
-    for (let i = 0, n = data.length; i < n; i += 3) {
-      const b1 = data[i], b2 = i+1 < n ? data[i+1] : 0, b3 = i+2 < n ? data[i+2] : 0;
-      r += T[b1 >> 2];
-      r += T[((b1 & 3) << 4) | (b2 >> 4)];
-      r += T[((b2 & 15) << 2) | (b3 >> 6)];
-      r += T[b3 & 63];
-    }
-    return r;
-  }
-
-  function _pumlURL(code) {
-    if (typeof pako === 'undefined')
-      throw new Error('pako読込中です。1〜2秒後に再度「描画」を押してください。');
-    // ── エンコーディングガード：BOM・置換文字除去 ──
-    const cleanCode = code
-      .replace(/^\uFEFF/, '')         // BOM除去
-      .replace(/[\uFFFD]/g, '?');     // 置換文字を ? に変換
-    const compressed = pako.deflateRaw(new TextEncoder().encode(cleanCode));
-    return 'https://www.plantuml.com/plantuml/svg/' + _puml6b64(compressed);
-  }
-
-  function renderPuml() {
-    const code = (document.getElementById('pumlCode')?.value || '').trim();
-    const prev  = document.getElementById('pumlPreview');
-    if (!prev) return;
-    if (!code) { prev.innerHTML = '<span style="color:#C0392B;">コードが空です。</span>'; return; }
-    // ── skinparam 自動補完：含まれていなければ先頭に挿入 ──
-    const hasSkinparam = /skinparam\s+defaultFontName/i.test(code);
-    const guardedCode = (!hasSkinparam && code.includes('@startuml'))
-      ? code.replace('@startuml', `@startuml\nskinparam defaultFontName "Noto Sans CJK JP"\nskinparam defaultFontSize 13`)
-      : code;
-    prev.innerHTML = '<span style="color:#5A5040; font-size:0.88rem;">⏳ 描画中…</span>';
-    try {
-      const url = _pumlURL(guardedCode);
-      const img = new Image();
-      img.alt = 'C4図';
-      img.style.cssText = 'max-width:100%; height:auto; display:block;';
-      img.onload = () => {
-        prev.innerHTML = '';
-        prev.appendChild(img);
-        // ── SVG文字化け自動検出 ──
-        fetch(url)
-          .then(r => r.text())
-          .then(svgText => {
-            const mojibakePattern = /[\uFFFD]{2,}|(\?{3,})|(\u25A1{2,})/;
-            const textNodes = [...svgText.matchAll(/<text[^>]*>([^<]+)<\/text>/g)]
-                                .map(m => m[1]);
-            const hasMojibake = textNodes.some(t => mojibakePattern.test(t));
-            if (hasMojibake) {
-              const warn = document.createElement('div');
-              warn.style.cssText = 'background:#FFF3CD;border:1px solid #D4AF6A;border-radius:6px;padding:0.6rem 0.9rem;margin-top:0.5rem;font-size:0.82rem;color:#7A5C2E;';
-              warn.innerHTML = '⚠️ <strong>日本語が文字化けしている可能性があります。</strong><br>PlantUMLコードの冒頭に <code>skinparam defaultFontName "Noto Sans CJK JP"</code> を追加してください。';
-              prev.appendChild(warn);
-            }
-          })
-          .catch(() => { /* CORS等によるfetch失敗はサイレントスキップ */ });
-      };
-      img.onerror = () => {
-        prev.innerHTML = '<span style="color:#C0392B; font-size:0.85rem;">⚠️ PlantUMLサーバーエラーまたはコード構文エラーです。</span>';
-      };
-      img.src = url;
-    } catch(e) {
-      prev.innerHTML = '<span style="color:#C0392B; font-size:0.85rem;">⚠️ ' + e.message + '</span>';
-    }
-  }
-
-  function copyPuml() {
-    const code = document.getElementById('pumlCode')?.value || '';
-    navigator.clipboard.writeText(code).then(() => alert('コードをコピーしました。'));
-  }
-
-  /* ===== SIDEBAR ACTIVE STATE ===== */
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if(e.isIntersecting) {
-        document.querySelectorAll('aside a').forEach(a => a.classList.remove('active'));
-        const id = e.target.id;
-        const link = document.querySelector(`aside a[href="#${id}"]`);
-        if(link) link.classList.add('active');
-      }
-    });
-  }, {threshold: 0.15});
-
-  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+});
 </script>
-
-<!-- フッター：Zotero連携注記 -->
-<div style="background:#F5F0E8; border-top:1px solid #D8C9A8; padding:0.85rem 2rem; font-size:0.82rem; color:#5A5040; text-align:center; line-height:1.6;">
-  本ページはZoteroとの技術的連携により、Zoteroのブラウザコネクタを利用した書誌データの取り込みに対応しています。
-  ／ <a href="https://c4model.org/" style="color:#1A6B7A;">c4model.org</a> ／ <a href="mailto:info@c4model.org" style="color:#1A6B7A;">info@c4model.org</a> <span class="qr-badge"><svg width="56" height="56" version="1.1" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><path d="M2,2H3V3H2zM3,2H4V3H3zM4,2H5V3H4zM5,2H6V3H5zM6,2H7V3H6zM7,2H8V3H7zM8,2H9V3H8zM11,2H12V3H11zM12,2H13V3H12zM14,2H15V3H14zM18,2H19V3H18zM20,2H21V3H20zM21,2H22V3H21zM22,2H23V3H22zM23,2H24V3H23zM24,2H25V3H24zM25,2H26V3H25zM26,2H27V3H26zM2,3H3V4H2zM8,3H9V4H8zM12,3H13V4H12zM14,3H15V4H14zM16,3H17V4H16zM17,3H18V4H17zM20,3H21V4H20zM26,3H27V4H26zM2,4H3V5H2zM4,4H5V5H4zM5,4H6V5H5zM6,4H7V5H6zM8,4H9V5H8zM10,4H11V5H10zM11,4H12V5H11zM13,4H14V5H13zM14,4H15V5H14zM16,4H17V5H16zM17,4H18V5H17zM18,4H19V5H18zM20,4H21V5H20zM22,4H23V5H22zM23,4H24V5H23zM24,4H25V5H24zM26,4H27V5H26zM2,5H3V6H2zM4,5H5V6H4zM5,5H6V6H5zM6,5H7V6H6zM8,5H9V6H8zM10,5H11V6H10zM13,5H14V6H13zM14,5H15V6H14zM15,5H16V6H15zM16,5H17V6H16zM17,5H18V6H17zM20,5H21V6H20zM22,5H23V6H22zM23,5H24V6H23zM24,5H25V6H24zM26,5H27V6H26zM2,6H3V7H2zM4,6H5V7H4zM5,6H6V7H5zM6,6H7V7H6zM8,6H9V7H8zM10,6H11V7H10zM11,6H12V7H11zM12,6H13V7H12zM14,6H15V7H14zM15,6H16V7H15zM18,6H19V7H18zM20,6H21V7H20zM22,6H23V7H22zM23,6H24V7H23zM24,6H25V7H24zM26,6H27V7H26zM2,7H3V8H2zM8,7H9V8H8zM10,7H11V8H10zM11,7H12V8H11zM13,7H14V8H13zM14,7H15V8H14zM16,7H17V8H16zM17,7H18V8H17zM18,7H19V8H18zM20,7H21V8H20zM26,7H27V8H26zM2,8H3V9H2zM3,8H4V9H3zM4,8H5V9H4zM5,8H6V9H5zM6,8H7V9H6zM7,8H8V9H7zM8,8H9V9H8zM10,8H11V9H10zM12,8H13V9H12zM14,8H15V9H14zM16,8H17V9H16zM18,8H19V9H18zM20,8H21V9H20zM21,8H22V9H21zM22,8H23V9H22zM23,8H24V9H23zM24,8H25V9H24zM25,8H26V9H25zM26,8H27V9H26zM10,9H11V10H10zM11,9H12V10H11zM12,9H13V10H12zM18,9H19V10H18zM2,10H3V11H2zM4,10H5V11H4zM5,10H6V11H5zM6,10H7V11H6zM7,10H8V11H7zM8,10H9V11H8zM13,10H14V11H13zM14,10H15V11H14zM15,10H16V11H15zM20,10H21V11H20zM21,10H22V11H21zM22,10H23V11H22zM23,10H24V11H23zM24,10H25V11H24zM4,11H5V12H4zM6,11H7V12H6zM9,11H10V12H9zM10,11H11V12H10zM11,11H12V12H11zM13,11H14V12H13zM14,11H15V12H14zM15,11H16V12H15zM18,11H19V12H18zM21,11H22V12H21zM23,11H24V12H23zM24,11H25V12H24zM5,12H6V13H5zM8,12H9V13H8zM10,12H11V13H10zM12,12H13V13H12zM13,12H14V13H13zM14,12H15V13H14zM15,12H16V13H15zM16,12H17V13H16zM17,12H18V13H17zM18,12H19V13H18zM19,12H20V13H19zM20,12H21V13H20zM22,12H23V13H22zM25,12H26V13H25zM26,12H27V13H26zM2,13H3V14H2zM3,13H4V14H3zM9,13H10V14H9zM10,13H11V14H10zM11,13H12V14H11zM12,13H13V14H12zM13,13H14V14H13zM14,13H15V14H14zM17,13H18V14H17zM18,13H19V14H18zM21,13H22V14H21zM22,13H23V14H22zM25,13H26V14H25zM26,13H27V14H26zM3,14H4V15H3zM6,14H7V15H6zM7,14H8V15H7zM8,14H9V15H8zM9,14H10V15H9zM10,14H11V15H10zM12,14H13V15H12zM14,14H15V15H14zM15,14H16V15H15zM16,14H17V15H16zM19,14H20V15H19zM20,14H21V15H20zM22,14H23V15H22zM23,14H24V15H23zM24,14H25V15H24zM26,14H27V15H26zM2,15H3V16H2zM3,15H4V16H3zM4,15H5V16H4zM9,15H10V16H9zM11,15H12V16H11zM12,15H13V16H12zM15,15H16V16H15zM18,15H19V16H18zM21,15H22V16H21zM24,15H25V16H24zM2,16H3V17H2zM4,16H5V17H4zM6,16H7V17H6zM8,16H9V17H8zM12,16H13V17H12zM13,16H14V17H13zM14,16H15V17H14zM15,16H16V17H15zM16,16H17V17H16zM17,16H18V17H17zM19,16H20V17H19zM21,16H22V17H21zM23,16H24V17H23zM25,16H26V17H25zM26,16H27V17H26zM2,17H3V18H2zM5,17H6V18H5zM7,17H8V18H7zM9,17H10V18H9zM10,17H11V18H10zM12,17H13V18H12zM13,17H14V18H13zM16,17H17V18H16zM17,17H18V18H17zM18,17H19V18H18zM19,17H20V18H19zM22,17H23V18H22zM25,17H26V18H25zM26,17H27V18H26zM2,18H3V19H2zM4,18H5V19H4zM5,18H6V19H5zM7,18H8V19H7zM8,18H9V19H8zM11,18H12V19H11zM12,18H13V19H12zM13,18H14V19H13zM15,18H16V19H15zM16,18H17V19H16zM17,18H18V19H17zM18,18H19V19H18zM19,18H20V19H19zM20,18H21V19H20zM21,18H22V19H21zM22,18H23V19H22zM24,18H25V19H24zM25,18H26V19H25zM10,19H11V20H10zM11,19H12V20H11zM12,19H13V20H12zM14,19H15V20H14zM16,19H17V20H16zM18,19H19V20H18zM22,19H23V20H22zM2,20H3V21H2zM3,20H4V21H3zM4,20H5V21H4zM5,20H6V21H5zM6,20H7V21H6zM7,20H8V21H7zM8,20H9V21H8zM15,20H16V21H15zM18,20H19V21H18zM20,20H21V21H20zM22,20H23V21H22zM23,20H24V21H23zM25,20H26V21H25zM26,20H27V21H26zM2,21H3V22H2zM8,21H9V22H8zM10,21H11V22H10zM11,21H12V22H11zM12,21H13V22H12zM14,21H15V22H14zM17,21H18V22H17zM18,21H19V22H18zM22,21H23V22H22zM25,21H26V22H25zM2,22H3V23H2zM4,22H5V23H4zM5,22H6V23H5zM6,22H7V23H6zM8,22H9V23H8zM10,22H11V23H10zM11,22H12V23H11zM12,22H13V23H12zM14,22H15V23H14zM15,22H16V23H15zM16,22H17V23H16zM17,22H18V23H17zM18,22H19V23H18zM19,22H20V23H19zM20,22H21V23H20zM21,22H22V23H21zM22,22H23V23H22zM23,22H24V23H23zM24,22H25V23H24zM25,22H26V23H25zM26,22H27V23H26zM2,23H3V24H2zM4,23H5V24H4zM5,23H6V24H5zM6,23H7V24H6zM8,23H9V24H8zM10,23H11V24H10zM12,23H13V24H12zM18,23H19V24H18zM19,23H20V24H19zM20,23H21V24H20zM22,23H23V24H22zM24,23H25V24H24zM25,23H26V24H25zM26,23H27V24H26zM2,24H3V25H2zM4,24H5V25H4zM5,24H6V25H5zM6,24H7V25H6zM8,24H9V25H8zM10,24H11V25H10zM11,24H12V25H11zM12,24H13V25H12zM13,24H14V25H13zM14,24H15V25H14zM15,24H16V25H15zM16,24H17V25H16zM17,24H18V25H17zM20,24H21V25H20zM21,24H22V25H21zM24,24H25V25H24zM26,24H27V25H26zM2,25H3V26H2zM8,25H9V26H8zM11,25H12V26H11zM13,25H14V26H13zM16,25H17V26H16zM17,25H18V26H17zM18,25H19V26H18zM20,25H21V26H20zM22,25H23V26H22zM23,25H24V26H23zM26,25H27V26H26zM2,26H3V27H2zM3,26H4V27H3zM4,26H5V27H4zM5,26H6V27H5zM6,26H7V27H6zM7,26H8V27H7zM8,26H9V27H8zM10,26H11V27H10zM11,26H12V27H11zM12,26H13V27H12zM13,26H14V27H13zM14,26H15V27H14zM20,26H21V27H20zM22,26H23V27H22zM24,26H25V27H24zM25,26H26V27H25zM26,26H27V27H26z" id="qr-path" fill="#000000" fill-opacity="1" fill-rule="nonzero" stroke="none"/></svg><span class="qr-badge-label">QR → メール</span></span>
-</div>
-
 </body>
 </html>

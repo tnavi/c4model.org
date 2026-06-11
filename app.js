@@ -38,65 +38,90 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   ====== 論文道場 (Ronbun Dojo) コア・データパイプライン連動システム ======
+   ====== 論文道場 (Ronbun Dojo) 本格データパイプライン連動ロジック ======
    ========================================================================== */
 
-/** [グローバル関数①] dojo.html の Stage 0 からデータを受け取って保存 */
+/** [連動フック①] 画面側からデータを受け取ってローカルストレージへ保存 */
 window.saveDojoData = function(data) {
     localStorage.setItem('ronbun_dojo_data', JSON.stringify(data));
-    // 保存された瞬間に現在のステージに応じた図・プロンプトを全リフレッシュ
     window.refreshDojoOutputs();
 };
 
-/** [グローバル関数②] dojo.html のスクロール・ナビゲーションと連動 */
+/** [連動フック②] スクロールやナビゲーションによるステージ切り替えを検知 */
 window.onNavigate = function(stageId) {
-    console.log("現在のステージ:", stageId);
+    console.log("現在アクティブなステージ:", stageId);
     window.refreshDojoOutputs(stageId);
 };
 
-/** データをもとに画面上の各種テキスト（PlantUML / プロンプト）を動的生成 */
+/** 【コアエンジン】蓄積された論文構造データから、L2〜L4のPlantUMLとプロンプトを自動生成 */
 window.refreshDojoOutputs = function(currentStageId = 'stage0') {
     const rawData = localStorage.getItem('ronbun_dojo_data');
     if (!rawData) return;
     const d = JSON.parse(rawData);
 
-    // --- 【L1~L4 C4モデル図の動的書き換えロジック】 ---
-    const pumlContext = document.getElementById('puml-context-area'); // L1のテキストエリア
-    const pumlContainer = document.getElementById('puml-container-area'); // L2のテキストエリア
-    
-    // 例: L2 Container図のコードを研究テーマ(d.title)などから自動組み立て
+    // ── ① L2 Container（コンテナ）図の動的組み立て ──
+    const pumlContainer = document.getElementById('puml-container-area');
     if (pumlContainer) {
         pumlContainer.value = `@startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 title L2 Container - ${d.title || '研究テーマ未定'}
 
-Person(researcher, "研究者", "論文執筆者")
-System_Boundary(c1, "論文道場アーキテクチャ") {
-    Container(web_app, "次世代SPA画面 (dojo.html)", "HTML/JS/Tailwind", "構造化入力・C4モデルビューア")
-    Container(brain_hub, "データコア (app.js)", "JavaScript (Local)", "状態管理とプロンプトエンジニアリング・パイプライン")
-}
-System_Ext(ai_api, "生成AIモデル (Claude/Gemini)", "プロンプト推論エンジン")
+Person(researcher, "${d.author || '研究者'}", "論文執筆者（所属: ${d.affiliation || '未設定'}）")
 
-Rel(researcher, web_app, "研究データ・構成案の入力")
-Rel(web_app, brain_hub, "データ連携フック (onNavigate)")
-Rel(brain_hub, ai_api, "最適化プロンプトの送信")
+System_Boundary(dojo_hub, "論文道場 (Ronbun Dojo) システム内部構造") {
+    Container(ui, "フロントエンド画面 (dojo.html)", "Tailwind / HTML5", "構造化データ入力、スコール監視、C4モデル・多階層ビューア")
+    Container(engine, "コア・データパイプライン (app.js)", "JavaScript (Local)", "状態管理、ローカルストレージ同期、学術プロンプト自動生成エンジン")
+}
+
+System_Ext(ai_model, "生成AI API (Gemini / Claude)", "プロンプト推論・推敲バックエンド")
+System_Ext(puml_server, "PlantUMLレンダラー", "SVG/PNG動的描画エンジン")
+
+Rel(researcher, ui, "研究メタデータ、RQ、章立て構成、参考文献の入力")
+Rel(ui, engine, "スクロール・イベント検知による連動通知 (onNavigate)")
+Rel(engine, ai_model, "洗練された7Rプロンプト（構造化コンテキスト付き）の送信")
+Rel(ui, puml_server, "動的PlantUMLコードの送信・描画リクエスト")
 @enduml`;
-        // もしPlantUMLの再描画関数があればトリガー
         if (typeof renderPlantUML === 'function') { renderPlantUML('puml-container-area'); }
     }
 
-    // --- 【Stage III: 7Rプロンプト（R1~R7）の自動生成ロジック】 ---
+    // ── ② L3 Component（コンポーネント）図の動的組み立て ──
+    const pumlComponent = document.getElementById('puml-component-area');
+    if (pumlComponent) {
+        pumlComponent.value = `@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+title L3 Component - ${d.title || '研究テーマ未定'}
+
+Container(ui, "フロントエンド画面 (dojo.html)", "Tailwind / HTML5")
+System_Ext(ai_model, "生成AI API", "Gemini / Claude")
+
+Container__Boundary(engine_box, "コア・データパイプライン (app.js)") {
+    Component(save_hook, "saveDojoData フック", "JavaScript", "Stage 0 の全入力をバリデーションしてlocalStorageへ保存")
+    Component(nav_hook, "onNavigate フック", "JavaScript", "IntersectionObserverの交差をトリガーにステージIDを捕捉")
+    Component(generator, "refreshDojoOutputs エンジン", "JavaScript", "保存された学術データを読み込み、L1-L4コード・7Rプロンプトへ一括変換")
+}
+
+Rel(ui, save_hook, "「分析開始」クリック時のデータ送信")
+Rel(ui, nav_hook, "特定セクションへのスクロール検知")
+Rel(nav_hook, generator, "ステージ切り替えイベントの伝播")
+Rel(save_hook, generator, "データ更新トリガーの引火")
+Rel(generator, ai_model, "埋め込みテキストの射出")
+@enduml`;
+        if (typeof renderPlantUML === 'function') { renderPlantUML('puml-component-area'); }
+    }
+
+    // ── ③ Stage III: 7Rプロンプト群の動的組み立て ──
     const r1Area = document.getElementById('prompt-r1');
     if (r1Area) {
         r1Area.value = `【R1: Research Question最適化プロンプト】
-あなたは最高峰の学術メンターです。以下の研究情報をベースに、学術的問い（RQ）を徹底的に洗練させてください。
+あなたは最高峰の学術メンター（AI Nesan特製エンジン）です。以下の構造化情報をベースに、学術的問い（RQ）の整合性を徹底的に検証し、洗練させてください。
 
+■ 執筆者: ${d.author} (${d.affiliation})
 ■ 研究題目: ${d.title}
-■ 現在のRQ: ${d.rq}
-■ 仮説: ${d.hypothesis}
+■ 学術的問い (RQ): ${d.rq}
+■ 立てた仮説: ${d.hypothesis}
 
-上記に対する構造的欠陥を指摘し、C4モデル L1レベルに準拠した一貫性のあるRQの修正案を3つ提示してください。`;
+【指示】
+1. 現在のRQと仮説の間に「論理的跳躍」や「構造的破綻」がないか、C4モデルのL1/L2コンテキストに準拠してクロスチェックしてください。
+2. 矛盾点を厳しく指摘した上で、より堅牢で検証可能な修正RQ案を3つ対比構造で提示してください。`;
     }
-    
-    // (必要に応じて R2 ~ R7 も同様に id に応じて生成)
 };

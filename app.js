@@ -243,53 +243,50 @@ function renderSinglePlantUML(areaId, imgId, errId) {
         return;
     }
 
-    // ── 描画開始 ────────────────────────────────────────────────────
+    // ── 描画開始（probe廃止・img.src直接代入でCORS問題を回避）──────
     _clearRenderError(errId);
-    img.style.display = 'none';
-    img.style.opacity = '0';
     _showRenderLoading(imgId);
 
     var primaryUrl  = buildPumlUrl(pumlText, 'svg');
     var fallbackUrl = buildKrokiUrl(pumlText);
 
-    // 一時 Image でプリロード（FOUC 防止のため src を確認してから差し替え）
-    var probe = new Image();
+    img.style.opacity = '0';
+    img.style.display = 'block';
 
-    probe.onload = function () {
+    img.onload = function () {
+        img.onload  = null;
+        img.onerror = null;
         _hideRenderLoading(imgId);
-        img.src           = primaryUrl;
-        img.style.display = 'block';
         img.style.opacity = '1';
         console.info('[DojoRender] 描画成功（公式サーバー）:', areaId);
     };
 
-    probe.onerror = function () {
-        console.warn('[DojoRender] 公式サーバー失敗 → Kroki フォールバック:', areaId);
+    img.onerror = function () {
+        img.onerror = null;
+        img.onload  = null;
+        console.warn('[DojoRender] 公式サーバー失敗 → Kroki:', areaId);
         if (!fallbackUrl) {
             _hideRenderLoading(imgId);
-            _setRenderError(imgId, errId,
-                '⚠ 図の読み込みに失敗しました。PlantUML コードを確認してください。');
+            _setRenderError(imgId, errId, '⚠ 描画失敗。PlantUMLコードを確認してください。');
             return;
         }
-
-        var probe2 = new Image();
-        probe2.onload = function () {
+        img.onload = function () {
+            img.onload  = null;
+            img.onerror = null;
             _hideRenderLoading(imgId);
-            img.src           = fallbackUrl;
-            img.style.display = 'block';
             img.style.opacity = '1';
+            img.style.display = 'block';
             console.info('[DojoRender] 描画成功（Kroki）:', areaId);
         };
-        probe2.onerror = function () {
+        img.onerror = function () {
+            img.onerror = null;
             _hideRenderLoading(imgId);
-            _setRenderError(imgId, errId,
-                '⚠ 公式サーバー・Kroki ともに失敗しました。'
-              + 'ネットワーク確認またはコードを見直してください。');
+            _setRenderError(imgId, errId, '⚠ 公式・Kroki ともに失敗。コードを確認してください。');
         };
-        probe2.src = fallbackUrl;
+        img.src = fallbackUrl;
     };
 
-    probe.src = primaryUrl;
+    img.src = primaryUrl;
 }
 
 /**
@@ -696,47 +693,60 @@ function renderStageIIIParallel(areaId) {
 
 /**
  * PlantUMLテキストをエンコードして <img> に配信する内部ユーティリティ。
- * renderSinglePlantUML と同じエンコードパスを共有する。
+ *
+ * ★ probe = new Image() 方式を廃止。
+ *    理由: PlantUML公式サーバーのSVGはCORSヘッダーを持たないため
+ *          new Image().onload がブラウザで発火しないケースが頻発する。
+ * ★ img.src を直接代入し、img.onerror のみで Kroki へフォールバックする。
+ *
+ * @param {string}          pumlText  PlantUML ソースコード
+ * @param {HTMLImageElement} img      描画先 <img> 要素
+ * @param {HTMLElement}     [errEl]   エラー表示 <div>（省略可）
  * @private
  */
 function _deliverPumlToImg(pumlText, img, errEl) {
     if (!pumlText || !img) return;
 
+    /* エラー表示リセット */
+    if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
+
     var primaryUrl  = buildPumlUrl(pumlText, 'svg');
     var fallbackUrl = buildKrokiUrl(pumlText);
 
-    img.style.display = 'none';
+    /* ── 直接 src 代入（probe 廃止） ── */
     img.style.opacity = '0';
+    img.style.display = 'block';   /* display:block にしてからsrcをセット */
 
-    var probe = new Image();
-    probe.onload = function () {
-        img.src           = primaryUrl;
-        img.style.display = 'block';
-        img.style.opacity = '1';
-    };
-    probe.onerror = function () {
-        if (!fallbackUrl) {
-            if (errEl) {
-                errEl.textContent = '⚠ 図の読み込みに失敗しました。コードを確認してください。';
-                errEl.style.display = 'block';
-            }
-            return;
-        }
-        var probe2 = new Image();
-        probe2.onload = function () {
-            img.src           = fallbackUrl;
-            img.style.display = 'block';
+    img.onerror = function () {
+        img.onerror = null;        /* 2重発火防止 */
+        if (fallbackUrl) {
+            img.onerror = function () {
+                img.onerror = null;
+                img.style.display = 'none';
+                if (errEl) {
+                    errEl.textContent = '⚠ 描画失敗。PlantUMLコードを確認してください。';
+                    errEl.style.display = 'block';
+                }
+            };
+            img.src = fallbackUrl;
             img.style.opacity = '1';
-        };
-        probe2.onerror = function () {
+        } else {
+            img.style.display = 'none';
             if (errEl) {
-                errEl.textContent = '⚠ 公式サーバー・Kroki ともに失敗しました。';
+                errEl.textContent = '⚠ 描画失敗。PlantUMLコードを確認してください。';
                 errEl.style.display = 'block';
             }
-        };
-        probe2.src = fallbackUrl;
+        }
     };
-    probe.src = primaryUrl;
+
+    img.onload = function () {
+        img.onload  = null;
+        img.onerror = null;
+        img.style.opacity = '1';
+        img.style.display = 'block';
+    };
+
+    img.src = primaryUrl;
 }
 
 /* window に公開（dojo.html インライン JS から呼び出し可） */
@@ -929,10 +939,86 @@ document.addEventListener('DOMContentLoaded', function () {
        ────────────────────────────────────────────────────────────────── */
     _bindAllRenderButtons();
 
-   /* ──────────────────────────────────────────────────────────────────
+    /* ──────────────────────────────────────────────────────────────────
        F-4  DojoData 初回ページ読み込み時の自動復元
             localStorage にデータが存在すれば、現在表示中の Stage に即座に反映。
        ────────────────────────────────────────────────────────────────── */
     restoreDojoData();
 
-}); // ⭕ ここで綺麗に終わるようにします
+    /* ──────────────────────────────────────────────────────────────────
+       F-5  Stage III 自動描画エンジン — window に公開
+            dojo.html の go('write') から window.initStageIII() を呼ぶ。
+            app.js の DOMContentLoaded 内で定義するため、
+            インラインJSより必ず後に実行され読み込み順問題を根治する。
+       ────────────────────────────────────────────────────────────────── */
+
+    /**
+     * Stage III の6図を独立テキストエリアの初期コードで自動一括描画する。
+     * go('write') → setTimeout(window.initStageIII, 0) から呼ばれる。
+     * 各図を 300ms ずらして描画しサーバー負荷を分散する。
+     */
+    window.initStageIII = function () {
+        var maps = [
+            { areaId: 'puml-context-area',  imgId: 'puml-context-img',  errId: 'puml-context-err'  },
+            { areaId: 'puml-iii-l2-area',   imgId: 'puml-iii-l2-img',   errId: 'puml-iii-l2-err'   },
+            { areaId: 'puml-iii-l3-area',   imgId: 'puml-iii-l3-img',   errId: 'puml-iii-l3-err'   },
+            { areaId: 'puml-iii-l4-area',   imgId: 'puml-iii-l4-img',   errId: 'puml-iii-l4-err'   },
+            { areaId: 'puml-iii-seq-area',  imgId: 'puml-iii-seq-img',  errId: 'puml-iii-seq-err'  },
+            { areaId: 'puml-iii-sta-area',  imgId: 'puml-iii-sta-img',  errId: 'puml-iii-sta-err'  }
+        ];
+        maps.forEach(function (m, i) {
+            var area = document.getElementById(m.areaId);
+            var img  = document.getElementById(m.imgId);
+            var err  = document.getElementById(m.errId);
+            if (!area || !img) return;
+            var code = area.value.trim();
+            if (!code) return;
+            setTimeout(function () {
+                _deliverPumlToImg(code, img, err);
+            }, i * 300);
+        });
+    };
+
+    /**
+     * oninput デバウンス付き自動描画。
+     * 各テキストエリアの oninput="window.stageIIIAutoRender(this,...)" から呼ばれる。
+     * 入力停止 800ms 後に描画を発火する。
+     */
+    window.stageIIIAutoRender = function (textarea, imgId, errId) {
+        var timers = window._stageIIITimers || (window._stageIIITimers = {});
+        clearTimeout(timers[imgId]);
+        timers[imgId] = setTimeout(function () {
+            var code = textarea.value.trim();
+            if (!code) return;
+            var img = document.getElementById(imgId);
+            var err = document.getElementById(errId);
+            _deliverPumlToImg(code, img, err);
+        }, 800);
+    };
+
+    /**
+     * C4モデル図集ページ（c4uml）の6図を自動初期描画する。
+     * go('c4uml') → setTimeout(window.initC4UmlPage, 0) から呼ばれる。
+     * L1〜L4・シーケンス・状態遷移図を 300ms ずつずらして描画する。
+     */
+    window.initC4UmlPage = function () {
+        var maps = [
+            { areaId: 'puml-c4-ctx', imgId: 'puml-c4-ctx-img', errId: 'puml-c4-ctx-err' },
+            { areaId: 'puml-c4-ctn', imgId: 'puml-c4-ctn-img', errId: 'puml-c4-ctn-err' },
+            { areaId: 'puml-c4-cmp', imgId: 'puml-c4-cmp-img', errId: 'puml-c4-cmp-err' },
+            { areaId: 'puml-c4-dyn', imgId: 'puml-c4-dyn-img', errId: 'puml-c4-dyn-err' },
+            { areaId: 'puml-c4-seq', imgId: 'puml-c4-seq-img', errId: 'puml-c4-seq-err' },
+            { areaId: 'puml-c4-sta', imgId: 'puml-c4-sta-img', errId: 'puml-c4-sta-err' }
+        ];
+        maps.forEach(function (m, i) {
+            var area = document.getElementById(m.areaId);
+            var img  = document.getElementById(m.imgId);
+            var err  = document.getElementById(m.errId);
+            if (!area || !img) return;
+            var code = area.value.trim();
+            if (!code) return;
+            setTimeout(function () { _deliverPumlToImg(code, img, err); }, i * 300);
+        });
+    };
+
+});

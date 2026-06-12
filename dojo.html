@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -1616,47 +1615,265 @@ title 論文執筆 状態遷移図
 
 
 <!-- ─────────────────────────────────────────────────────
-     PAGE: c4uml — C4モデル図集
+     PAGE: c4uml — C4モデル図集（全6図・自動描画・説明コメント付き）
      ───────────────────────────────────────────────────── -->
 <div id="page-c4uml" class="page">
   <div class="page-header">
     <div class="stage-badge lang-jp">ツール</div>
     <div class="stage-badge lang-en hidden">Tool</div>
-    <h1 class="lang-jp">C4モデル図集</h1>
-    <h1 class="lang-en hidden">C4 Model Diagrams</h1>
-    <p class="page-desc lang-jp">Context / Container / Component の C4 図をその場で生成</p>
-    <p class="page-desc lang-en hidden">Generate C4 Context / Container / Component diagrams on the fly</p>
+    <h1 class="lang-jp">C4モデル図集 — 全図自動生成</h1>
+    <h1 class="lang-en hidden">C4 Model Diagrams — Auto Render</h1>
+    <p class="page-desc lang-jp">テキストエリアを編集すると図が即時自動描画されます。各図に解説コメントを添付しています。</p>
+    <p class="page-desc lang-en hidden">Diagrams render automatically as you edit. Each diagram includes explanatory comments.</p>
   </div>
   <div class="page-body">
 
-    <div class="card tornado-item">
-      <div class="card-title">L1 Context 図</div>
+    <!-- ── L1 Context ───────────────────────────────────── -->
+    <div class="card card--puml tornado-item">
+      <div class="card-title lang-jp">① L1 — システムコンテキスト図（Context Diagram）</div>
+      <div class="card-title lang-en hidden">① L1 — System Context Diagram</div>
+      <div class="info-box lang-jp">
+        <strong>📐 L1 の役割：</strong>
+        研究・論文システム全体を「1つの箱」として捉え、外部の利用者（査読者・社会・他研究者）との関係を俯瞰します。
+        C4モデルの最上位レイヤー。「このシステムは誰のために何をするか」を一言で示します。
+      </div>
       <textarea class="inp mono" id="puml-c4-ctx" rows="12"
-        placeholder="@startuml&#10;!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml&#10;title L1 Context&#10;Person(user, &quot;利用者&quot;)&#10;System(sys, &quot;対象システム&quot;)&#10;Rel(user, sys, &quot;使う&quot;)&#10;@enduml"></textarea>
-      <div class="puml-btn-row">
-        <button class="btn btn-gold" onclick="renderSinglePlantUML('puml-c4-ctx','puml-c4-ctx-img','puml-c4-ctx-err')">🎨 描画</button>
+        oninput="window.stageIIIAutoRender && window.stageIIIAutoRender(this,'puml-c4-ctx-img','puml-c4-ctx-err')"
+>@startuml
+skinparam defaultFontName "Noto Sans CJK JP"
+skinparam defaultFontSize 13
+skinparam backgroundColor #FAFAF8
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title L1 Context — 論文システム全体像
+
+Person(researcher, "研究者", "論文を執筆する")
+Person(reviewer,   "査読者", "論文を審査する")
+Person(reader,     "読者・社会", "研究成果を受け取る")
+
+System(thesis, "論文システム", "研究成果を論理的に構造化・発信するシステム")
+System_Ext(journal, "学術誌・学会", "掲載・発表の場")
+System_Ext(db, "文献データベース", "先行研究・参考文献")
+
+Rel(researcher, thesis,   "執筆・構造化する")
+Rel(thesis,     reviewer, "査読依頼")
+Rel(reviewer,   thesis,   "査読コメント返却")
+Rel(thesis,     journal,  "投稿・掲載")
+Rel(thesis,     reader,   "知識・価値を提供")
+Rel(researcher, db,       "先行研究を参照")
+@enduml</textarea>
+      <div class="puml-img-wrap" style="margin-top:10px">
+        <img id="puml-c4-ctx-img" alt="L1 Context">
       </div>
-      <div class="puml-img-wrap"><img id="puml-c4-ctx-img" alt="L1"><div id="puml-c4-ctx-err" class="puml-error"></div></div>
+      <div id="puml-c4-ctx-err" class="puml-error"></div>
     </div>
 
-    <div class="card tornado-item">
-      <div class="card-title">L2 Container 図</div>
-      <textarea class="inp mono" id="puml-c4-ctn" rows="12"
-        placeholder="@startuml&#10;!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml&#10;title L2 Container&#10;@enduml"></textarea>
-      <div class="puml-btn-row">
-        <button class="btn btn-gold" onclick="renderSinglePlantUML('puml-c4-ctn','puml-c4-ctn-img','puml-c4-ctn-err')">🎨 描画</button>
+    <!-- ── L2 Container ─────────────────────────────────── -->
+    <div class="card card--puml tornado-item">
+      <div class="card-title lang-jp">② L2 — コンテナー構成図（Container Diagram）</div>
+      <div class="card-title lang-en hidden">② L2 — Container Diagram</div>
+      <div class="info-box lang-jp">
+        <strong>📐 L2 の役割：</strong>
+        論文システムを「章」や「サブシステム」単位に分解し、各コンテナ間のデータフローと役割分担を可視化します。
+        「序論・本論・結論」などの章構成が、どう互いに依存しているかを示します。
       </div>
-      <div class="puml-img-wrap"><img id="puml-c4-ctn-img" alt="L2"><div id="puml-c4-ctn-err" class="puml-error"></div></div>
+      <textarea class="inp mono" id="puml-c4-ctn" rows="14"
+        oninput="window.stageIIIAutoRender && window.stageIIIAutoRender(this,'puml-c4-ctn-img','puml-c4-ctn-err')"
+>@startuml
+skinparam defaultFontName "Noto Sans CJK JP"
+skinparam defaultFontSize 13
+skinparam backgroundColor #FAFAF8
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title L2 Container — 論文の章構成
+
+Person(researcher, "研究者")
+
+System_Boundary(thesis, "論文システム") {
+    Container(intro,    "第1章 序論",     "章", "研究背景・目的・RQを提示")
+    Container(review,   "第2章 先行研究", "章", "関連研究を整理・差別化を明示")
+    Container(method,   "第3章 研究手法", "章", "C4モデル適用手法を定義")
+    Container(eval,     "第4章 評価実験", "章", "実験設計・結果・分析")
+    Container(discuss,  "第5章 考察",     "章", "結果の意義・限界・貢献")
+    Container(conclude, "第6章 結論",     "章", "まとめ・今後の課題")
+}
+
+Rel(researcher, intro,   "執筆開始")
+Rel(intro,   review,   "→")
+Rel(review,  method,   "→")
+Rel(method,  eval,     "→")
+Rel(eval,    discuss,  "→")
+Rel(discuss, conclude, "→")
+@enduml</textarea>
+      <div class="puml-img-wrap" style="margin-top:10px">
+        <img id="puml-c4-ctn-img" alt="L2 Container">
+      </div>
+      <div id="puml-c4-ctn-err" class="puml-error"></div>
     </div>
 
-    <div class="card tornado-item">
-      <div class="card-title">L3 Component 図</div>
-      <textarea class="inp mono" id="puml-c4-cmp" rows="12"
-        placeholder="@startuml&#10;!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml&#10;title L3 Component&#10;@enduml"></textarea>
-      <div class="puml-btn-row">
-        <button class="btn btn-gold" onclick="renderSinglePlantUML('puml-c4-cmp','puml-c4-cmp-img','puml-c4-cmp-err')">🎨 描画</button>
+    <!-- ── L3 Component ─────────────────────────────────── -->
+    <div class="card card--puml tornado-item">
+      <div class="card-title lang-jp">③ L3 — コンポーネント構造図（Component Diagram）</div>
+      <div class="card-title lang-en hidden">③ L3 — Component Diagram</div>
+      <div class="info-box lang-jp">
+        <strong>📐 L3 の役割：</strong>
+        各章（コンテナ）の内部を「節・段落・論理ブロック」単位まで分解します。
+        「第3章 研究手法」の中に何があり、どう依存しているかを詳細に示します。
       </div>
-      <div class="puml-img-wrap"><img id="puml-c4-cmp-img" alt="L3"><div id="puml-c4-cmp-err" class="puml-error"></div></div>
+      <textarea class="inp mono" id="puml-c4-cmp" rows="14"
+        oninput="window.stageIIIAutoRender && window.stageIIIAutoRender(this,'puml-c4-cmp-img','puml-c4-cmp-err')"
+>@startuml
+skinparam defaultFontName "Noto Sans CJK JP"
+skinparam defaultFontSize 13
+skinparam backgroundColor #FAFAF8
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title L3 Component — 第3章「研究手法」の内部構造
+
+Container_Boundary(method, "第3章 研究手法") {
+    Component(rq,      "3.1 RQ定義",       "節", "研究課題を明確化")
+    Component(c4apply, "3.2 C4モデル適用",  "節", "C4フレームワークの論文への適用方針")
+    Component(puml,    "3.3 PlantUML変換",  "節", "PlantUMLコードの生成ルール")
+    Component(valid,   "3.4 整合性検証",    "節", "論理的一貫性のチェック手法")
+}
+
+Rel(rq,      c4apply, "RQをC4に落とし込む")
+Rel(c4apply, puml,    "モデルをコード化")
+Rel(puml,    valid,   "図面を検証")
+@enduml</textarea>
+      <div class="puml-img-wrap" style="margin-top:10px">
+        <img id="puml-c4-cmp-img" alt="L3 Component">
+      </div>
+      <div id="puml-c4-cmp-err" class="puml-error"></div>
+    </div>
+
+    <!-- ── L4 Dynamic / Code ────────────────────────────── -->
+    <div class="card card--puml tornado-item">
+      <div class="card-title lang-jp">④ L4 — ダイナミクス図（Dynamic / Code Diagram）</div>
+      <div class="card-title lang-en hidden">④ L4 — Dynamic / Code Diagram</div>
+      <div class="info-box lang-jp">
+        <strong>📐 L4 の役割：</strong>
+        コンポーネント（節・段落）の内部動作・実装詳細を記述します。
+        「整合性検証エンジン」が実際にどうデータを処理し判定を下すかを示します。
+      </div>
+      <textarea class="inp mono" id="puml-c4-dyn" rows="12"
+        oninput="window.stageIIIAutoRender && window.stageIIIAutoRender(this,'puml-c4-dyn-img','puml-c4-dyn-err')"
+>@startuml
+skinparam defaultFontName "Noto Sans CJK JP"
+skinparam defaultFontSize 13
+skinparam backgroundColor #FAFAF8
+title L4 Dynamic — 整合性検証エンジンの動作
+
+[仮説入力] --> [RQ照合エンジン]   : 検証リクエスト
+[RQ照合エンジン] --> [C4構造マッパー] : 構造マッピング
+[C4構造マッパー] --> [論理矛盾検出器] : マップ済み構造
+[論理矛盾検出器] --> [判定出力: Valid]   : 矛盾なし
+[論理矛盾検出器] --> [判定出力: Invalid] : 矛盾検出
+[判定出力: Invalid] --> [修正プロンプト生成器] : 修正指示
+[修正プロンプト生成器] --> [仮説入力] : 修正後再試行
+@enduml</textarea>
+      <div class="puml-img-wrap" style="margin-top:10px">
+        <img id="puml-c4-dyn-img" alt="L4 Dynamic">
+      </div>
+      <div id="puml-c4-dyn-err" class="puml-error"></div>
+    </div>
+
+    <!-- ── Sequence Diagram ─────────────────────────────── -->
+    <div class="card card--puml tornado-item">
+      <div class="card-title lang-jp">⑤ シーケンス図 — 研究・投稿プロセスの時系列フロー</div>
+      <div class="card-title lang-en hidden">⑤ Sequence Diagram — Research & Submission Flow</div>
+      <div class="info-box lang-jp">
+        <strong>📐 シーケンス図の役割：</strong>
+        研究者・論文道場・PlantUMLサーバー・査読者間のやり取りを時間軸で可視化します。
+        「誰が・いつ・何を・誰に渡すか」の動的フローを一目で把握できます。
+      </div>
+      <textarea class="inp mono" id="puml-c4-seq" rows="16"
+        oninput="window.stageIIIAutoRender && window.stageIIIAutoRender(this,'puml-c4-seq-img','puml-c4-seq-err')"
+>@startuml
+skinparam defaultFontName "Noto Sans CJK JP"
+skinparam defaultFontSize 13
+skinparam backgroundColor #FAFAF8
+title 研究・投稿プロセス シーケンス図
+
+actor       "研究者"     as R
+participant "論文道場"   as D
+participant "PlantUML\nサーバー" as P
+participant "査読者"     as Rev
+participant "学術誌"     as J
+
+R   ->  D   : 論文データ入力・RQ登録
+D   ->  D   : C4構造を自動生成
+D   ->  P   : PlantUMLコード送信（Hexエンコード）
+P   --> D   : SVG図返却
+D   --> R   : 構造図・スコア表示
+
+R   ->  D   : 7Rプロンプトで執筆支援要求
+D   --> R   : 執筆支援テキスト生成
+
+R   ->  J   : 論文投稿
+J   ->  Rev : 査読依頼
+Rev --> J   : 査読コメント
+J   --> R   : 修正要求
+
+R   ->  D   : 修正箇所を再分析
+D   --> R   : 修正プロンプト生成
+R   ->  J   : 修正稿再投稿
+J   --> R   : 採択通知
+@enduml</textarea>
+      <div class="puml-img-wrap" style="margin-top:10px">
+        <img id="puml-c4-seq-img" alt="シーケンス図">
+      </div>
+      <div id="puml-c4-seq-err" class="puml-error"></div>
+    </div>
+
+    <!-- ── State Transition Diagram ─────────────────────── -->
+    <div class="card card--puml tornado-item">
+      <div class="card-title lang-jp">⑥ 状態遷移図 — 論文ライフサイクルの状態モデル</div>
+      <div class="card-title lang-en hidden">⑥ State Diagram — Paper Lifecycle State Model</div>
+      <div class="info-box lang-jp">
+        <strong>📐 状態遷移図の役割：</strong>
+        論文が「草稿」から「掲載完了」に至るまでの全状態と遷移条件を網羅します。
+        どの状態で何が起きれば次のフェーズへ進めるかを、研究者・編集者双方が共有できます。
+      </div>
+      <textarea class="inp mono" id="puml-c4-sta" rows="18"
+        oninput="window.stageIIIAutoRender && window.stageIIIAutoRender(this,'puml-c4-sta-img','puml-c4-sta-err')"
+>@startuml
+skinparam defaultFontName "Noto Sans CJK JP"
+skinparam defaultFontSize 13
+skinparam backgroundColor #FAFAF8
+title 論文ライフサイクル 状態遷移図
+
+[*]          --> 構想中      : 研究テーマ設定
+
+構想中       --> RQ策定中    : 研究課題が明確化
+RQ策定中     --> 執筆中      : C4構造化完了・分析開始
+執筆中       --> 自己査読中  : 初稿完成
+自己査読中   --> 執筆中      : 修正箇所発見
+自己査読中   --> 投稿準備中  : 自己査読合格（スコア28点以上）
+投稿準備中   --> 投稿済み    : フォーマット整形・投稿完了
+投稿済み     --> 査読中      : 受付・査読者割当
+査読中       --> 軽微修正中  : Minor Revision
+査読中       --> 大幅修正中  : Major Revision
+査読中       --> 採択決定    : Accept（修正なし）
+査読中       --> 不採択      : Reject
+軽微修正中   --> 投稿済み    : 修正稿再投稿
+大幅修正中   --> 執筆中      : 大幅書き直し
+大幅修正中   --> 投稿済み    : 修正稿再投稿
+不採択       --> 執筆中      : 改稿・別誌投稿
+採択決定     --> 校正中      : 校正ゲラ確認
+校正中       --> 掲載完了    : 校正承認
+掲載完了     --> [*]
+
+note right of 査読中
+  論文道場のStage VI
+  「想定質問訓練」で
+  この段階を事前準備
+end note
+@enduml</textarea>
+      <div class="puml-img-wrap" style="margin-top:10px">
+        <img id="puml-c4-sta-img" alt="状態遷移図">
+      </div>
+      <div id="puml-c4-sta-err" class="puml-error"></div>
     </div>
 
   </div>
@@ -1845,10 +2062,16 @@ function go(pageId, btn) {
     /* ★ 5. app.js v3.1.0 DojoData Hub フック（必須・削除禁止） */
     if (typeof window.onNavigate === 'function') { window.onNavigate(pageId); }
 
-    /* ★ 6. Stage III に遷移した時、全6図を自動初期描画 */
+    /* ★ 6. Stage III / c4uml: ページ表示時に全図を自動初期描画 */
     if (pageId === 'write') {
-        /* app.js のロードを待ってから描画（defer対応） */
-        setTimeout(function () { initStageIII(); }, 100);
+        setTimeout(function () {
+            if (typeof window.initStageIII === 'function') { window.initStageIII(); }
+        }, 0);
+    }
+    if (pageId === 'c4uml') {
+        setTimeout(function () {
+            if (typeof window.initC4UmlPage === 'function') { window.initC4UmlPage(); }
+        }, 0);
     }
 }
 
@@ -2074,13 +2297,9 @@ function copyArea(areaId) {
     });
 }
 
-/* renderSinglePlantUML の inline呼び出し用ラッパー
-   c4uml / genuml ページのインライン onclick から使用 */
-function renderSinglePlantUML(areaId, imgId, errId) {
-    if (typeof window.renderSinglePlantUML === 'function') {
-        window.renderSinglePlantUML(areaId, imgId, errId);
-    }
-}
+/* renderSinglePlantUML は app.js で window.renderSinglePlantUML として定義済み。
+   インライン onclick="renderSinglePlantUML(...)" は window 経由で自動解決される。
+   ここでの再定義は不要（削除済み）。*/
 </script>
 
 <!-- ══════════════════════════════════════════════════════

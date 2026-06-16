@@ -381,7 +381,7 @@ section { padding: 5rem 2.5rem; }
 #videos { background: var(--bg-alt); }
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0;
   border: 1px solid var(--border);
 }
@@ -2131,7 +2131,7 @@ async function callClaude(prompt) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 1000,
       messages: [{ role: 'user', content: prompt }]
     })
@@ -2604,6 +2604,114 @@ async function exportPDF() {
     btn.textContent = origText;
     btn.disabled = false;
   }
+}
+
+/* ════════════════════════════════════════════════
+   欠落関数補完ブロック (2026-06-17 修復)
+   根本原因: LS_KEY / loadHistory / renderOutput / switchPdfTab が
+   参照されていたが定義が存在しなかった。
+   全クリック・生成・PDF出力・履歴機能が完全停止していた。
+════════════════════════════════════════════════ */
+
+/* ── LocalStorage キー ── */
+const LS_KEY = 'haiku_facesheet_history_v1';
+
+/* ── 履歴ロード ── */
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+  } catch(e) {
+    return [];
+  }
+}
+
+/* ── PDFタブ切り替え ── */
+function switchPdfTab(key, btn) {
+  document.querySelectorAll('.pdf-c4-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pdf-ctab').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('pdf-panel-' + key);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+  // まだ描画されていなければ描画
+  const img  = document.getElementById('pdf-img-' + key);
+  const load = document.getElementById('pdf-load-' + key);
+  if (img && img.src === '' && window._currentPuml && window._currentPuml[key]) {
+    renderPuml(window._currentPuml[key], img, load);
+  }
+}
+
+/* ── メイン出力レンダリング ── */
+function renderOutput(res) {
+  if (!res) return;
+  const { d, puml, ev } = res;
+  const haiku = getHaikuFull(d);
+
+  /* タイトル */
+  document.getElementById('fs-output-title').textContent = haiku || '—';
+  document.getElementById('pdf-haiku-display').textContent = haiku || '—';
+  document.getElementById('out-haiku-disp').textContent = haiku || '—';
+
+  /* メタ */
+  document.getElementById('pdf-name').textContent    = d.name   || '—';
+  document.getElementById('pdf-org').textContent     = d.org    || '';
+  document.getElementById('pdf-period').textContent  = d.period || '';
+  document.getElementById('pdf-place').textContent   = d.place  || '';
+  document.getElementById('pdf-gendate').textContent =
+    new Date(res.ts).toLocaleDateString('ja-JP') + (res.fallback ? ' · テンプレート生成' : ' · AI生成');
+
+  /* 背景 */
+  document.getElementById('pdf-background').textContent = d.bg || '—';
+
+  /* 総合評価 */
+  const overallEl = document.getElementById('out-overall');
+  if (overallEl) overallEl.textContent = ev.overall || '';
+
+  /* 評価テキスト */
+  const setText = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val || '—';
+  };
+  setText('pdf-c4-desc',   ev.c4desc);
+  setText('ev-kigo-body',  ev.kigo_body);
+  setText('ev-kansha',     ev.kansha);
+  setText('ev-t-kigo',     ev.t_kigo);
+  setText('ev-t-kigo-c',   ev.t_kigo_c);
+  setText('ev-t-photo',    ev.t_photo);
+  setText('ev-t-photo-c',  ev.t_photo_c);
+  setText('ev-t-ma',       ev.t_ma);
+  setText('ev-t-ma-c',     ev.t_ma_c);
+  setText('ev-t-rhythm',   ev.t_rhythm);
+  setText('ev-t-rhythm-c', ev.t_rhythm_c);
+  setText('ev-summary',    ev.summary);
+  setText('pdf-advice',    ev.advice);
+
+  /* スコアバー */
+  const setBar = (scoreId, barId, val) => {
+    const n = parseFloat(val) || 0;
+    setText(scoreId, val || '—');
+    const bar = document.getElementById(barId);
+    if (bar) bar.style.width = Math.min(n * 10, 100) + '%';
+  };
+  setBar('ev-kigo',  'ev-kigo-bar',   ev.kigo);
+  setBar('ev-sound', 'ev-sound-bar',  ev.sound);
+  setBar('ev-ma',    'ev-ma-bar',     ev.ma);
+  setBar('ev-scene', 'ev-scene-bar',  ev.scene);
+
+  /* PlantUMLソースコード（L1表示） */
+  const pumlCodeEl = document.getElementById('pdf-puml-code');
+  if (pumlCodeEl) pumlCodeEl.textContent = puml.ctx || '';
+
+  /* C4図レンダリング（全5種） */
+  window._currentPuml = puml;
+  ['ctx','ctr','cmp','seq','sta'].forEach(key => {
+    const img  = document.getElementById('pdf-img-'  + key);
+    const load = document.getElementById('pdf-load-' + key);
+    if (img && puml[key]) renderPuml(puml[key], img, load);
+  });
+
+  /* 出力エリアを表示 */
+  document.getElementById('fs-output-wrap').classList.add('active');
+  document.getElementById('fs-output-wrap').scrollIntoView({ behavior: 'smooth' });
 }
 
 /* ── 初期化 ── */

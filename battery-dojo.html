@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>賢いスマホ充電道場,</title>
+<style>
+:root{
+  --ink:#14100a;--fire:#e85518;--gold:#e8a010;--cream:#faf8f4;
+  --green:#1a7a4a;--red:#b83028;--blue:#1450a0;
+  --border:#e0d4c0;--muted:#7a6040;--panel:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--cream);font-family:'Hiragino Sans','Noto Sans JP','Segoe UI',sans-serif;color:var(--ink);}
+
+/* ── NAV ── */
+nav{background:var(--ink);position:sticky;top:0;z-index:200;border-bottom:6px solid var(--fire);}
+.nav-i{max-width:860px;margin:0 auto;padding:0 18px;display:flex;align-items:stretch;}
+.nav-logo{color:#fff;font-weight:900;font-size:30px;padding:16px 0;margin-right:auto;letter-spacing:-.3px;}
+.nav-logo em{color:var(--gold);font-style:normal;}
+.ntab{color:#999;font-size:24px;font-weight:700;padding:0 16px;cursor:pointer;transition:color .15s;border-bottom:4px solid transparent;margin-bottom:-4px;display:flex;align-items:center;}
+.ntab:hover{color:#fff;}
+.ntab.on{color:var(--fire);border-bottom-color:var(--fire);}
+
+/* ── PAGES ── */
+.page{display:none;}.page.on{display:block;}
+.wrap{max-width:860px;margin:0 auto;padding:40px 24px;}
+
+/* ── HERO ── */
+.hero{background:var(--ink);padding:54px 24px 44px;text-align:center;position:relative;overflow:hidden;}
+.hero-glow{position:absolute;width:320px;height:480px;border-radius:50%;background:var(--fire);opacity:.07;top:-80px;left:50%;transform:translateX(-50%);}
+.hero-eye{font-size:21px;letter-spacing:4px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:14px;position:relative;}
+.hero-h{font-size:clamp(54px,7vw,90px);font-weight:900;line-height:1.05;letter-spacing:-1.5px;color:#fff;margin-bottom:12px;position:relative;}
+.hero-h em{color:var(--fire);font-style:normal;}
+.hero-sub{font-size:27px;color:#999;max-width:420px;margin:0 auto;position:relative;line-height:1.6;}
+.belt{height:6px;background:linear-gradient(90deg,var(--fire),var(--gold),var(--fire));}
+
+/* ── BIG COMMAND (hero-level) ── */
+.big-cmd{text-align:center;padding:38px 24px 32px;background:var(--panel);border-bottom:1px solid var(--border);}
+.cmd-rule{font-size:clamp(81px,11vw,135px);font-weight:900;color:var(--ink);letter-spacing:-2px;line-height:1;}
+.cmd-rule em{color:var(--fire);}
+.cmd-rule .and{font-size:clamp(42px,5vw,66px);color:var(--muted);font-weight:700;margin:0 12px;}
+.cmd-hint{font-size:24px;color:var(--muted);margin-top:12px;}
+
+/* ── SLIDER HERO ── */
+.sl-hero{padding:32px 22px 28px;}
+.sl-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+.sl-title{font-size:26px;font-weight:700;color:var(--muted);}
+.sl-big{font-size:111px;font-weight:900;color:var(--ink);letter-spacing:-2px;line-height:1;}
+.sl-pct{font-size:45px;font-weight:700;color:var(--muted);}
+input.bat-range{width:100%;height:21px;border-radius:7px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;margin-bottom:8px;}
+input.bat-range::-webkit-slider-thumb{-webkit-appearance:none;width:36px;height:54px;background:var(--ink);border-radius:50%;border:4px solid var(--gold);cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.sl-marks{display:flex;justify-content:space-between;font-size:21px;color:#bbb;}
+.sl-marks .lo{color:var(--gold);}.sl-marks .hi{color:var(--fire);}
+
+/* ── ZONE BAR ── */
+.zone-bar{display:flex;height:24px;border-radius:8px;overflow:hidden;margin:14px 0 4px;}
+.zb-lo{background:var(--gold);flex:20;}
+.zb-ok{background:var(--green);flex:60;}
+.zb-hi{background:var(--fire);flex:20;}
+.zone-labels{display:flex;font-size:21px;font-weight:700;color:var(--muted);margin-bottom:18px;}
+.zone-labels .z1{flex:20;}.zone-labels .z2{flex:60;text-align:center;color:var(--green);}
+.zone-labels .z3{flex:20;text-align:right;color:var(--fire);}
+
+/* ── HABIT ── */
+.habit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.hcard{border:2px solid var(--border);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .15s;text-align:center;}
+.hcard:hover,.hcard.on{border-color:var(--fire);background:#fff7f3;}
+.hcard .hem{font-size:57px;display:block;margin-bottom:8px;}
+.hcard .hlb{font-size:24px;font-weight:700;color:var(--ink);}
+.hcard .hsu{font-size:21px;color:var(--muted);margin-top:3px;}
+
+/* ── CTA ── */
+.cta{display:block;width:100%;padding:16px;background:var(--ink);color:#fff;border:none;border-radius:14px;font-size:30px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .15s;}
+.cta:hover{background:#241808;}
+.cta-fire{background:var(--fire);}
+.cta-fire:hover{background:#cc4a14;}
+.cta-out{background:transparent;color:var(--ink);border:2px solid var(--ink);margin-top:10px;}
+.cta-out:hover{background:var(--ink);color:#fff;}
+
+/* ── RESULT ── */
+.res-hidden{display:none;}
+.res-hero{border-radius:20px;overflow:hidden;margin-bottom:16px;}
+.res-top{padding:24px 22px;display:flex;gap:16px;align-items:flex-start;}
+.gauge-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.gauge-label{font-size:22px;font-weight:700;letter-spacing:1px;}
+.res-body{flex:1;}
+.res-rank{font-size:21px;font-weight:700;letter-spacing:2px;opacity:.7;margin-bottom:5px;}
+.res-name{font-size:39px;font-weight:900;line-height:1.1;margin-bottom:12px;}
+.katsup{font-size:24px;line-height:1.75;padding:14px 16px;border-radius:10px;border-left:3px solid;font-style:italic;}
+.res-metrics{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.met{padding:14px 18px;text-align:center;}
+.met .ml{font-size:21px;font-weight:700;opacity:.65;margin-bottom:5px;}
+.met .mv{font-size:51px;font-weight:900;}
+
+/* ── GAUGE SVG ── */
+.gauge-svg{display:block;}
+
+/* ── FORMATION CARDS ── */
+.fm-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-bottom:20px;}
+.fm-row::-webkit-scrollbar{height:4px;}
+.fm-row::-webkit-scrollbar-thumb{background:var(--border);}
+.fmc{flex-shrink:0;width:150px;border:2px solid var(--border);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .15s;text-align:center;}
+.fmc:hover{border-color:var(--fire);}
+.fmc.on{border-color:var(--fire);background:#fff7f3;}
+.fmc .fem{font-size:60px;display:block;margin-bottom:7px;}
+.fmc .fnm{font-size:24px;font-weight:800;color:var(--ink);}
+.fmc .fhs{font-size:21px;color:var(--muted);margin-top:3px;}
+
+/* ── WAVE CHART ── */
+.wave-wrap{background:var(--ink);border-radius:16px;padding:16px 14px;margin-bottom:20px;}
+.wave-label{font-size:21px;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:4px;text-transform:uppercase;}
+.wave-note{font-size:16px;color:#999;margin-bottom:12px;}
+canvas.wave{display:block;width:100%;height:180px;}
+.wave-legend{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap;}
+.wl-item{display:flex;align-items:center;gap:5px;font-size:21px;color:#888;}
+.wl-dot{width:10px;height:15px;border-radius:50%;}
+
+/* ── TIMELINE ── */
+.tl-card{background:var(--panel);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;}
+.tl-hd{background:var(--ink);color:#fff;padding:13px 18px;}
+.tl-ht{font-size:27px;font-weight:800;}
+.tl-hs{font-size:21px;color:#888;margin-top:3px;}
+.tl-body{padding:4px 0;}
+.tl-row{display:grid;grid-template-columns:52px 20px 1fr;gap:0 10px;padding:2px 14px 2px 12px;}
+.tl-t{font-size:21px;font-weight:700;color:var(--muted);padding-top:12px;text-align:right;}
+.tl-dc{display:flex;flex-direction:column;align-items:center;}
+.tl-d{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:900;flex-shrink:0;}
+.tl-ln{width:1.5px;background:var(--border);flex:1;}
+.tl-cv{padding:7px 0;}
+.tl-ev{font-size:24px;font-weight:700;}
+.tl-bt{font-size:21px;color:var(--muted);margin-top:2px;}
+.tl-tag{display:inline-block;font-size:21px;font-weight:700;padding:4px 12px;border-radius:20px;margin-top:4px;}
+
+/* ── BATTERY DEMO ── */
+.bat-demo{background:var(--ink);border-radius:18px;padding:22px 18px;margin-bottom:20px;}
+.bd-eye{font-size:21px;letter-spacing:3px;color:var(--gold);font-weight:700;margin-bottom:6px;text-transform:uppercase;}
+.bd-sub{font-size:24px;color:#777;margin-bottom:18px;}
+.bat-track{height:78px;background:#222;border-radius:10px;position:relative;overflow:hidden;margin-bottom:6px;}
+.bat-fill{height:100%;border-radius:10px;transition:width .35s cubic-bezier(.34,1.56,.64,1);position:relative;}
+.bat-fill::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0,rgba(255,255,255,.07) 4px,transparent 4px,transparent 14px);}
+.bat-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:33px;font-weight:900;color:#fff;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,.6);}
+.bat-mkl{display:flex;justify-content:space-between;font-size:21px;color:#555;margin-bottom:16px;}
+.bat-mkl .lo{color:var(--gold);}.bat-mkl .hi{color:var(--fire);}
+input.drng{width:100%;margin-bottom:14px;height:18px;border-radius:6px;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;}
+input.drng::-webkit-slider-thumb{-webkit-appearance:none;width:32px;height:48px;background:#fff;border-radius:50%;border:4px solid var(--fire);cursor:grab;}
+.ins-box{border-radius:12px;padding:12px 16px;font-size:27px;font-weight:800;color:#fff;transition:all .25s;text-align:center;}
+.onom{display:none;text-align:center;padding:10px 0;animation:opop .45s cubic-bezier(.17,.89,.32,1.28);}
+@keyframes opop{from{transform:scale(.2) rotate(-12deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.onom .ob{font-size:72px;font-weight:900;}
+.onom .os{font-size:26px;font-weight:700;margin-top:6px;}
+
+/* ── FIREWORK ── */
+.fw-wrap{border-radius:18px;overflow:hidden;position:relative;margin-bottom:16px;background:var(--ink);}
+canvas#fwc{display:block;width:100%;}
+.fw-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+.fw-big{font-size:clamp(78px,9vw,120px);font-weight:900;color:#fff;line-height:1;letter-spacing:-2px;}
+.fw-onom{font-size:clamp(39px,5vw,66px);font-weight:900;color:var(--fire);margin:6px 0 4px;}
+.fw-txt{font-size:27px;color:var(--gold);font-weight:700;}
+.fw-sub{font-size:22px;color:#888;margin-top:4px;}
+
+/* ── SCIENCE (collapsible) ── */
+.sci-toggle{width:100%;background:var(--panel);border:1.5px solid var(--border);border-radius:14px;padding:13px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:26px;font-weight:700;color:var(--ink);margin-bottom:4px;font-family:inherit;}
+.sci-toggle .arr{font-size:24px;transition:transform .2s;color:var(--muted);}
+.sci-body{display:none;background:var(--panel);border:1.5px solid var(--border);border-top:none;border-radius:0 0 14px 14px;overflow:hidden;margin-bottom:16px;}
+.sci-body.open{display:block;}
+.sci-inner{padding:0 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.sb{border-radius:10px;padding:12px;}
+.sb .sl{font-size:21px;font-weight:800;margin-bottom:6px;}
+.sb .st{font-size:22px;line-height:1.7;}
+
+/* ── FOOTER ── */
+footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 32px;text-align:center;}
+.ft-i{max-width:860px;margin:0 auto;color:#888;font-size:18px;line-height:1.9;}
+.ft-i strong{color:var(--gold);}
+.ft-i a{color:#aac4ff;text-decoration:none;}
+.ft-i a:hover{text-decoration:underline;}
+
+/* ── BADGES ── */
+.bdg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:22px;}
+.bdg{border-radius:12px;padding:12px 8px;text-align:center;border:1.5px solid var(--border);cursor:pointer;position:relative;transition:all .15s;}
+.bdg.earned{border-color:var(--gold);background:#fffbec;}
+.bdg.locked{opacity:.35;filter:grayscale(.9);}
+.bdg .be{font-size:51px;margin-bottom:6px;}
+.bdg .bn{font-size:21px;font-weight:700;color:var(--ink);}
+.bdg .bc{font-size:18px;color:var(--muted);margin-top:2px;}
+.bdg.earned::after{content:'✓';position:absolute;top:5px;right:7px;font-size:18px;color:var(--gold);font-weight:900;}
+
+/* ── STREAK ── */
+.streak{display:flex;gap:5px;margin-bottom:14px;}
+.sdy{width:38px;height:69px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.sdy .sd{font-size:18px;}.sdy .si{font-size:27px;font-weight:700;}
+.sdy.done{background:#edf7f2;border:1px solid #7ac4a0;}
+.sdy.done .sd{color:var(--green);}.sdy.done .si{color:var(--green);}
+.sdy.today{background:var(--fire);}
+.sdy.today .sd{color:rgba(255,255,255,.7);}.sdy.today .si{color:#fff;}
+.sdy.miss{background:#f5f0e8;border:1px dashed var(--border);}
+.sdy.miss .sd{color:#ccc;}.sdy.miss .si{color:#ddd;}
+
+/* ── CHECKIN ── */
+.ck-box{background:var(--ink);border-radius:18px;padding:22px 18px;color:#fff;margin-bottom:20px;}
+.ck-eye{font-size:21px;letter-spacing:3px;color:var(--gold);font-weight:700;margin-bottom:7px;}
+.ck-t{font-size:33px;font-weight:900;margin-bottom:7px;}
+.ck-s{font-size:24px;color:#888;margin-bottom:18px;line-height:1.6;}
+.ck-row{display:flex;gap:8px;}
+.ck-in{padding:11px 14px;border-radius:10px;border:none;font-size:27px;font-weight:700;font-family:inherit;text-align:center;width:100px;background:#fff;}
+.ck-btn{flex:1;padding:11px;background:var(--fire);color:#fff;border:none;border-radius:10px;font-size:27px;font-weight:900;cursor:pointer;font-family:inherit;}
+.ck-res{margin-top:12px;font-size:24px;font-weight:700;padding:12px 16px;background:rgba(255,255,255,.1);border-radius:8px;display:none;}
+
+/* ── SECTION HEADER (minimal) ── */
+.sh{margin-bottom:18px;}
+.sh-eye{font-size:21px;letter-spacing:3px;color:var(--fire);font-weight:700;text-transform:uppercase;margin-bottom:6px;}
+.sh-t{font-size:clamp(33px,4vw,45px);font-weight:900;color:var(--ink);line-height:1.1;}
+.sh-s{font-size:24px;color:var(--muted);margin-top:6px;}
+
+/* ── TIPS (icon-first) ── */
+.tips{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.tip{border:1.5px solid var(--border);border-radius:14px;padding:14px 12px;}
+.tip .te{font-size:48px;margin-bottom:8px;}
+.tip .tt{font-size:24px;font-weight:700;margin-bottom:5px;}
+.tip .tb{font-size:21px;color:var(--muted);line-height:1.6;}
+
+
+
+
+
+
+/* ── INPUT WARNING ── */
+.input-warn{display:none;background:#fff0ee;border:2.5px solid var(--red);border-radius:14px;padding:14px 18px;margin-top:12px;text-align:center;animation:warnpop .4s cubic-bezier(.17,.89,.32,1.28);}
+@keyframes warnpop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.input-warn .wem{font-size:32px;margin-bottom:4px;}
+.input-warn .wtxt{font-size:17px;font-weight:800;color:var(--red);margin-bottom:3px;}
+.input-warn .wsub{font-size:14px;color:#a04030;}
+.num-input-field.error{border-color:var(--red);background:#fff5f4;animation:shake .4s cubic-bezier(.36,.07,.19,.97);}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+/* ── BUBBLE ── */
+.bubble-wrap{position:relative;display:inline-block;margin-left:16px;vertical-align:middle;}
+.bubble{background:var(--ink);color:#fff;border-radius:16px;padding:10px 16px;font-size:15px;font-weight:700;line-height:1.5;min-width:160px;max-width:220px;position:relative;display:inline-block;transition:all .3s;}
+.bubble::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);border:8px solid transparent;border-right-color:var(--ink);transition:border-right-color .3s;}
+.bubble.green{background:var(--green);}
+.bubble.green::before{border-right-color:var(--green);}
+.bubble.gold{background:#a06010;}
+.bubble.gold::before{border-right-color:#a06010;}
+.bubble.red{background:var(--red);}
+.bubble.red::before{border-right-color:var(--red);}
+.bubble .bub-em{font-size:20px;display:block;margin-bottom:3px;}
+.bubble .bub-txt{display:block;font-size:13px;opacity:.9;}
+
+/* ── NUMBER INPUT BOX ── */
+.num-input-wrap{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:22px 20px;margin-bottom:18px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.num-input-label{font-size:22px;font-weight:900;color:var(--ink);text-align:center;}
+.num-input-label em{color:var(--fire);font-style:normal;}
+.num-input-row{display:flex;align-items:center;gap:12px;}
+.num-input-field{width:160px;height:90px;font-size:60px;font-weight:900;text-align:center;border:3px solid var(--border);border-radius:16px;font-family:inherit;color:var(--ink);background:#fafaf8;outline:none;transition:border-color .15s;}
+.num-input-field:focus{border-color:var(--fire);background:#fff;}
+.num-input-pct{font-size:42px;font-weight:900;color:var(--muted);}
+.num-input-hint{font-size:15px;color:var(--muted);text-align:center;}
+.num-input-hint strong{color:var(--fire);}
+
+/* ── QUICK SELECT ── */
+.quick-sel{margin-bottom:20px;}
+.qs-label{font-size:15px;font-weight:700;color:var(--muted);margin-bottom:10px;}
+.qs-row{display:flex;gap:8px;flex-wrap:wrap;}
+.qs-btn{border:none;border-radius:12px;padding:10px 12px;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:60px;transition:all .15s;}
+.qs-btn span{font-size:10px;font-weight:700;opacity:.8;}
+.qs-btn.green{background:#edf7f2;color:var(--green);}
+.qs-btn.green:hover{background:var(--green);color:#fff;}
+.qs-btn.orange{background:#fff8e1;color:#a06010;}
+.qs-btn.orange:hover{background:#a06010;color:#fff;}
+.qs-btn.red{background:#fff0e0;color:#c06000;}
+.qs-btn.red:hover{background:#c06000;color:#fff;}
+.qs-btn.danger{background:#fdf0ef;color:var(--red);}
+.qs-btn.danger:hover{background:var(--red);color:#fff;}
+
+/* ── INPUT BANNER ── */
+.input-banner{background:#fff7f0;border-bottom:3px solid var(--fire);}
+.ib-inner{max-width:860px;margin:0 auto;padding:24px 20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+.ib-arrow{font-size:42px;flex-shrink:0;}
+.ib-text{flex:1;min-width:180px;}
+.ib-title{font-size:22px;font-weight:900;color:var(--ink);margin-bottom:5px;}
+.ib-sub{font-size:15px;color:var(--muted);line-height:1.6;}
+.ib-demo{flex-shrink:0;}
+.ib-phone{width:160px;background:#111;border-radius:16px;overflow:hidden;border:2px solid #333;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.ib-sb{background:#000;padding:8px 12px 6px;display:flex;align-items:center;justify-content:space-between;}
+.ib-time{color:#fff;font-size:14px;font-weight:700;}
+.ib-bat-wrap{display:flex;align-items:center;gap:5px;}
+.ib-bat-box{width:32px;height:16px;border:2px solid rgba(255,255,255,.7);border-radius:3px;position:relative;padding:2px;display:flex;align-items:center;}
+.ib-bat-box::after{content:'';width:3px;height:7px;background:rgba(255,255,255,.6);position:absolute;right:-5px;top:50%;transform:translateY(-50%);border-radius:0 2px 2px 0;}
+.ib-bat-fill{height:100%;border-radius:1px;background:#34c759;transition:width .3s;}
+.ib-pct{color:#fff;font-size:16px;font-weight:900;}
+.ib-screen-body{background:linear-gradient(160deg,#1a3a2a,#0a1a10);height:80px;display:flex;align-items:center;justify-content:center;}
+.ib-arrow-point{color:rgba(255,255,255,.9);font-size:13px;font-weight:700;text-align:center;}
+
+/* ── responsive ── */
+@media(max-width:480px){
+  .habit-grid,.tips,.sci-inner{grid-template-columns:1fr;}
+  .cmd-rule{font-size:clamp(54px,8vw,84px);}
+  .fm-row .fmc{width:130px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav><div class="nav-i">
+  <div class="nav-logo">⚔ 賢い<em>スマホ充電</em>道場，</div>
+  <div class="ntab on" onclick="go(0,this)">入門診断</div>
+  <div class="ntab" onclick="go(1,this)">奥義</div>
+  <div class="ntab" onclick="go(2,this)">バッジ</div>
+</div></nav>
+
+<!-- ════ P0: DIAGNOSIS ════ -->
+<div id="p0" class="page on">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-eye">入門診断 — 今すぐ数値を入力せよ</div>
+    <div class="hero-h">今朝の<em>バッテリー</em>を<br>見せよ</div>
+    <div class="hero-sub">今すぐスマホの右上を見てください。何%ですか？その数字を入力するだけ！</div>
+  </div>
+  <div class="belt"></div>
+
+  <!-- THE ONE RULE -->
+  <div class="big-cmd">
+    <div class="cmd-rule"><em>20</em><span class="and">〜</span><em>80</em><span style="font-size:clamp(36px,4vw,54px);color:var(--muted);font-weight:700;margin-left:8px;">%の法則</span></div>
+    <div class="cmd-hint">充電を始める目安 20% ／ 充電を止める目安 80%。これだけでいい。</div>
+  </div>
+
+  <div class="input-banner">
+    <div class="ib-inner">
+      <div class="ib-arrow">👆</div>
+      <div class="ib-text">
+        <div class="ib-title">今すぐ右上を見る</div>
+        <div class="ib-sub">スマホの画面右上に今この瞬間、数字が見えています。それを入力するだけ。それだけです。</div>
+      </div>
+      <div class="ib-demo">
+        <div class="ib-phone">
+          <div class="ib-sb">
+            <span class="ib-time">9:41</span>
+            <div class="ib-bat-wrap">
+              <div class="ib-bat-box">
+                <div class="ib-bat-fill" id="ib-fill" style="width:72%;"></div>
+              </div>
+              <span class="ib-pct" id="ib-pct">72%</span>
+            </div>
+          </div>
+          <div class="ib-screen-body">
+            <div class="ib-arrow-point">← <strong>この数字！</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- SLIDER -->
+    <div style="background:var(--panel);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:20px;">
+      <div class="sl-hero" id="sl-zone" style="border-bottom:4px solid var(--green);">
+        <!-- NUMBER INPUT -->
+        <div class="num-input-wrap">
+          <div class="num-input-label">📱 今すぐ右上の数字を入力！</div>
+          <div class="num-input-row" style="flex-wrap:wrap;justify-content:center;gap:16px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input class="num-input-field" type="number" id="num-direct" min="1" max="100" placeholder="??" oninput="applyNumInput(this.value)" inputmode="numeric" pattern="[0-9]*">
+              <span class="num-input-pct">%</span>
+            </div>
+            <div class="bubble-wrap">
+              <div class="bubble green" id="num-bubble">
+                <span class="bub-em" id="bub-em">✅</span>
+                <span id="bub-main">GREEN帯域！</span>
+                <span class="bub-txt" id="bub-sub">充電不要。この調子で！</span>
+              </div>
+            </div>
+          </div>
+          <div class="num-input-hint">スマホ右上の <strong>数字をそのまま入力</strong> してください</div>
+          <div class="input-warn" id="input-warn">
+            <div class="wem">🚫</div>
+            <div class="wtxt" id="warn-txt">数値が正しくありません！</div>
+            <div class="wsub" id="warn-sub">1〜100の数字を入力してください</div>
+          </div>
+        </div>
+
+        <!-- QUICK SELECT -->
+        <div class="quick-sel">
+          <div class="qs-label">よくある数値をタップ：</div>
+          <div class="qs-row">
+            <button class="qs-btn red" onclick="useSample(15)">15%<span>⚡要充電</span></button>
+            <button class="qs-btn orange" onclick="useSample(25)">25%<span>⚡そろそろ</span></button>
+            <button class="qs-btn green" onclick="useSample(50)">50%<span>✅余裕</span></button>
+            <button class="qs-btn green" onclick="useSample(72)">72%<span>✅良好</span></button>
+            <button class="qs-btn danger" onclick="useSample(95)">95%<span>⚠️危険</span></button>
+            <button class="qs-btn danger" onclick="useSample(100)">100%<span>💀満タン</span></button>
+          </div>
+        </div>
+        <div class="sl-top">
+          <div class="sl-title">📱 今の画面右上の数字は？</div>
+          <div><span class="sl-big" id="bat-num">72</span><span class="sl-pct">%</span></div>
+        </div>
+        <input class="bat-range" type="range" id="bsl" min="1" max="100" step="1" value="72" oninput="slUp(+this.value)">
+        <div class="sl-marks"><span class="lo">20% 充電開始</span><span></span><span class="hi">80% 停止！</span></div>
+        <div class="zone-bar" style="margin-top:12px;">
+          <div class="zb-lo"></div><div class="zb-ok"></div><div class="zb-hi"></div>
+        </div>
+        <div class="zone-labels"><div class="z1">危険</div><div class="z2">✅ ここを保て</div><div class="z3">危険</div></div>
+      </div>
+      <!-- HABIT -->
+      <div style="padding:16px 18px 20px;">
+        <div style="font-size:24px;font-weight:700;color:var(--muted);margin-bottom:12px;">普段の習慣は？</div>
+        <div class="habit-grid">
+          <div class="hcard on" onclick="pH(this,'iwt')"><span class="hem">🥷</span><div class="hlb">20〜80%修行</div><div class="hsu">目覚めた侍</div></div>
+          <div class="hcard" onclick="pH(this,'mod')"><span class="hem">🧑‍💼</span><div class="hlb">減ったら充電</div><div class="hsu">一般的</div></div>
+          <div class="hcard" onclick="pH(this,'full')"><span class="hem">🛋️</span><div class="hlb">常に満タン</div><div class="hsu">ぐうたら派</div></div>
+          <div class="hcard" onclick="pH(this,'sleep')"><span class="hem">😴</span><div class="hlb">寝落ち充電</div><div class="hsu">電極の大敵</div></div>
+        </div>
+        <button class="cta" onclick="diag()">⚔ 道場判定を受ける！</button>
+      </div>
+    </div>
+
+    <!-- RESULT (hidden until diagnose) -->
+    <div class="res-hidden" id="res">
+      <div class="res-hero" id="res-card">
+        <div class="res-top">
+          <div class="gauge-wrap">
+            <svg class="gauge-svg" id="gauge-svg" width="140" height="140" viewBox="0 0 100 100"></svg>
+            <div class="gauge-label" id="gauge-lbl" style="color:var(--green);">達人</div>
+          </div>
+          <div class="res-body">
+            <div class="res-rank" id="r-rank"></div>
+            <div class="res-name" id="r-name"></div>
+            <div class="katsup" id="r-kata"></div>
+          </div>
+        </div>
+        <div class="res-metrics" id="r-mets"></div>
+      </div>
+      <button class="cta" onclick="shr()" style="margin-bottom:10px;">📤 「修行中！」とSNSシェア</button>
+      <button class="cta cta-out" onclick="go(1,document.querySelectorAll('.ntab')[1])">📜 修行の奥義へ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ P1: DOJO ════ -->
+<div id="p1" class="page">
+  <div class="hero" style="padding-bottom:28px;">
+    <div class="hero-glow"></div>
+    <div class="hero-eye">修行の奥義</div>
+    <div class="hero-h"><em>小分け4回</em>が<br>電極を救う</div>
+    <div class="hero-sub">満タン一発より分散充電。好きな流派を選べ。</div>
+  </div>
+  <div class="belt"></div>
+
+  <div class="wrap">
+    <!-- FORMATION -->
+    <div class="sh"><div class="sh-eye">流派を選べ</div><div class="sh-t">フォーメーション選択</div></div>
+    <div class="fm-row" id="fm-row">
+      <div class="fmc on" onclick="pFm(this,'bb')"><span class="fem">⚾</span><div class="fnm">侍ジャパン打順</div><div class="fhs">4打席 分散充電</div></div>
+      <div class="fmc" onclick="pFm(this,'sc')"><span class="fem">⚽</span><div class="fnm">FIFA 4-4-2</div><div class="fhs">ポジション充電</div></div>
+      <div class="fmc" onclick="pFm(this,'sm')"><span class="fem">🏆</span><div class="fnm">相撲四本柱</div><div class="fhs">四隅を守れ</div></div>
+    </div>
+
+    <!-- WAVE CHART -->
+    <div class="wave-wrap">
+      <div class="wave-label">1日バッテリー推移</div>
+      <div class="wave-note">※実際の時刻とは連動しません。理想的な1日のモデル例です</div>
+      <canvas class="wave" id="wvc" height="200"></canvas>
+      <div class="wave-legend">
+        <div class="wl-item"><div class="wl-dot" style="background:var(--green);"></div>推奨ゾーン</div>
+        <div class="wl-item"><div class="wl-dot" style="background:var(--fire);"></div>危険ゾーン</div>
+        <div class="wl-item"><div class="wl-dot" style="background:#4a90e2;"></div>バッテリー残量</div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="tl-card" id="tl-card"></div>
+
+    <!-- BATTERY DEMO -->
+    <div class="sh" style="margin-top:8px;"><div class="sh-eye">体感デモ</div><div class="sh-t">3つのゾーンを触って覚える</div></div>
+    <div class="bat-demo">
+      <div class="bd-eye">リアルタイム充電デモ</div>
+      <div class="bd-sub">スライダーを動かすと指示が変わる</div>
+      <div class="bat-track">
+        <div class="bat-fill" id="df" style="width:50%;background:var(--green);"></div>
+        <div class="bat-num" id="dpct">50%</div>
+      </div>
+      <div class="bat-mkl"><span class="lo">▲20% 充電開始ライン</span><span class="hi">▲80% 充電停止ライン</span></div>
+      <input class="drng" id="drng" type="range" min="1" max="100" step="1" value="50" oninput="dUp(+this.value)">
+      <div class="ins-box" id="dins" style="background:var(--green);">✅ GREEN帯域 — 最適ゾーンじゃ！この調子で！</div>
+      <div class="onom" id="o80"><div class="ob" style="color:var(--fire);">ドン！バリバリ！⚡</div><div class="os" style="color:var(--gold);">80%到達！充電器を今すぐ引き抜け！</div></div>
+      <div class="onom" id="o20"><div class="ob" style="color:var(--gold);">ギリギリ！修行開始じゃ！</div><div class="os" style="color:#aaa;">20%以下 — 充電器を接続せよ！</div></div>
+    </div>
+
+    <!-- FIREWORK -->
+    <div class="sh"><div class="sh-eye">80%到達演出</div><div class="sh-t">打ち上げ花火でドーパミン</div></div>
+    <div class="fw-wrap">
+      <canvas id="fwc" height="260"></canvas>
+      <div class="fw-msg">
+        <div class="fw-big">80%</div>
+        <div class="fw-onom">ドン！バリバリ！</div>
+        <div class="fw-txt">充電器を外せ！これが奥義じゃ！</div>
+        <div class="fw-sub">電極ストレス 40%削減 達成</div>
+      </div>
+    </div>
+    <button class="cta cta-fire" onclick="fwLaunch()" style="margin-bottom:24px;">🎆 花火をもう一度！</button>
+
+    <!-- SCIENCE collapsible -->
+    <button class="sci-toggle" onclick="togSci(this)">
+      📖 なぜ80%で止めるのか？（科学的根拠）
+      <span class="arr">▼</span>
+    </button>
+    <div class="sci-body" id="sci-body">
+      <div class="sci-inner">
+        <div class="sb" style="background:#edf7f2;"><div class="sl" style="color:var(--green);">✅ 20〜80%帯域</div><div class="st" style="color:#1a2a2a;">リチウムイオンが均一に移動。電極劣化が最小。<strong>電池寿命3〜4年</strong>を実現。</div></div>
+        <div class="sb" style="background:#fdf0ef;"><div class="sl" style="color:var(--red);">❌ 常時90〜100%</div><div class="st" style="color:#1a2a2a;">電極に慢性的な過圧。微細なひびが毎夜蓄積。<strong>1年で容量60%以下</strong>に。</div></div>
+      </div>
+    </div>
+
+    <!-- TIPS (icon-first, 2-column) -->
+    <div class="sh" style="margin-top:8px;"><div class="sh-eye">習慣化の仕掛け</div><div class="sh-t">毎朝チェックをルーティンにする</div></div>
+    <div class="tips">
+      <div class="tip"><div class="te">⏰</div><div class="tt">毎朝7:00 通知</div><div class="tb">「今朝のバッテリーは何%？」で起床後すぐに数値確認を習慣化。</div></div>
+      <div class="tip"><div class="te">🔥</div><div class="tt">ストリーク炎</div><div class="tb">途切れると悔しい。損失回避心理が翌朝の再起動を促す。</div></div>
+      <div class="tip"><div class="te">📤</div><div class="tt">SNS公言ループ</div><div class="tb">「修行中！」シェアが外部コミットメントになり習慣を強制する。</div></div>
+      <div class="tip"><div class="te">🎆</div><div class="tt">80%花火強化</div><div class="tb">充電停止に花火でドーパミン。オペラント条件付けで「外す」が快感になる。</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ P2: BADGES ════ -->
+<div id="p2" class="page">
+  <div class="hero" style="padding-bottom:28px;">
+    <div class="hero-glow"></div>
+    <div class="hero-eye">道場バッジ — 修行記録</div>
+    <div class="hero-h">続ければ<br><em>強くなれる</em></div>
+    <div class="hero-sub">毎朝チェックインでバッジ獲得。7日で「朝の門」、30日で「皆勤賞」。</div>
+  </div>
+  <div class="belt"></div>
+
+  <div class="wrap">
+    <div class="sh"><div class="sh-eye">今週の修行記録</div><div class="sh-t" id="sk-msg"></div></div>
+    <div class="streak" id="streak"></div>
+
+    <div class="ck-box">
+      <div class="ck-eye">TODAY'S MORNING RITUAL</div>
+      <div class="ck-t">今朝のバッテリーチェックイン</div>
+      <div class="ck-s">残量を入力して「チェックイン！」。7日連続で「朝の門」バッジ獲得！</div>
+      <div class="ck-row">
+        <input class="ck-in" type="number" id="ckv" min="1" max="100" placeholder="%">
+        <button class="ck-btn" onclick="doCk()">⚔ チェックイン！</button>
+      </div>
+      <div class="ck-res" id="ck-res"></div>
+    </div>
+
+    <div class="sh"><div class="sh-eye">獲得バッジ</div><div class="sh-t">道場の勲章</div></div>
+    <div class="bdg-grid" id="bdg-grid"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-i">
+    アプリ開発：Ver.1 2026/06/21<br>
+    <strong>C4モデル研究会</strong><br>
+    <a href="mailto:info@c4model.org">info@c4model.org</a>　
+    <a href="https://c4model.org" target="_blank" rel="noopener">🔗 公式HPへ</a>
+  </div>
+</footer>
+
+<script>
+/* ═══ STATE ═══ */
+var hab='iwt', fm='bb', diagDone=false;
+var fwAF=null, fwPts=[];
+var LS_CK='dch_ck', LS_BD='dch_bd';
+function lG(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;}}
+function lS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* ═══ PAGES ═══ */
+function go(i,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('p'+i).classList.add('on');
+  btn.classList.add('on'); window.scrollTo(0,0);
+  if(i===1){initDojo();}
+  if(i===2){initBdg();}
+}
+
+/* ═══ SLIDER ═══ */
+function slUp(v){
+  document.getElementById('bat-num').textContent=v;
+  hideWarn();
+  var nf=document.getElementById('num-direct'); if(nf&&nf!=document.activeElement) nf.value=v;
+  updateBubble(v);
+  var c=v<20?'var(--gold)':v>80?'var(--fire)':'var(--green)';
+  var s=document.getElementById('bsl');
+  s.style.background='linear-gradient(90deg,'+c+' '+v+'%,#ddd '+v+'%)';
+  document.getElementById('sl-zone').style.borderBottomColor=(v<20?'#e8a010':v>80?'#e85518':'#1a7a4a');
+}
+
+/* ─ 数値直接入力／クイック選択／吹き出し／警告 ─ */
+function showWarn(msg,sub){
+  var nf=document.getElementById('num-direct');
+  if(nf)nf.classList.add('error');
+  var w=document.getElementById('input-warn');
+  if(!w)return;
+  if(msg)document.getElementById('warn-txt').textContent=msg;
+  if(sub)document.getElementById('warn-sub').textContent=sub;
+  w.style.display='block';
+}
+function hideWarn(){
+  var nf=document.getElementById('num-direct');
+  if(nf)nf.classList.remove('error');
+  var w=document.getElementById('input-warn');
+  if(w)w.style.display='none';
+}
+function updateBubble(v){
+  var b=document.getElementById('num-bubble');
+  if(!b)return;
+  b.classList.remove('green','gold','red');
+  var em=document.getElementById('bub-em'),main=document.getElementById('bub-main'),sub=document.getElementById('bub-sub');
+  if(v<20){
+    b.classList.add('gold');em.textContent='⚡';main.textContent='要充電ゾーン！';sub.textContent='20%以下。今すぐ充電開始！';
+  }else if(v>80){
+    b.classList.add('red');em.textContent='⚠️';main.textContent='過充電ゾーン！';sub.textContent='80%超。今すぐ引き抜け！';
+  }else{
+    b.classList.add('green');em.textContent='✅';main.textContent='GREEN帯域！';sub.textContent='充電不要。この調子で！';
+  }
+}
+function applyNumInput(val){
+  if(val===''){hideWarn();return;}
+  var n=parseInt(val,10);
+  if(isNaN(n)||n<1||n>100){showWarn('数値が正しくありません！','1〜100の数字を入力してください');return;}
+  var s=document.getElementById('bsl'); if(s)s.value=n;
+  slUp(n);
+}
+function useSample(v){
+  var s=document.getElementById('bsl'); if(s)s.value=v;
+  slUp(v);
+}
+
+slUp(72);
+
+function pH(el,h){document.querySelectorAll('.hcard').forEach(c=>c.classList.remove('on'));el.classList.add('on');hab=h;}
+
+/* ═══ GAUGE SVG ═══ */
+function drawGauge(svg, pct, color){
+  var r=38,cx=50,cy=50,sw=10;
+  var full=2*Math.PI*r, arc=full*(pct/100);
+  var start=-Math.PI/2;
+  var ex=cx+r*Math.cos(start+arc), ey=cy+r*Math.sin(start+arc);
+  var lg=arc>Math.PI?1:0;
+  var sx=cx+r*Math.cos(start), sy=cy+r*Math.sin(start);
+  svg.innerHTML=`
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#eee" stroke-width="${sw}"/>
+    <path d="M${sx},${sy} A${r},${r} 0 ${lg},1 ${ex},${ey}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>
+    <text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="16" font-weight="900" fill="${color}" font-family="sans-serif">${Math.round(pct)}</text>`;
+}
+
+/* ═══ CHARS ═══ */
+var CH={
+  master:{rank:'段位：免許皆伝',name:'電池侍 〜 達人格〜',color:'#1a7a4a',bg:'#edf7f2',
+    kata:'見事じゃ！IWT充電を体得しておる。20〜80%の帯域を守り電極を慈しむ姿勢、これぞ真の侍道！電池は3〜4年以上もつであろう。',
+    qol:93.7,life:'3〜4年',fat:0},
+  blue:{rank:'段位：初伝',name:'見習い充電士',color:'#1450a0',bg:'#e8f0fc',
+    kata:'悪くはないが、まだ甘い！今日から「20%で開始、80%で即停止」の2本柱を守れ。3ヶ月で段位が上がる。明日の数値が楽しみじゃ！',
+    qol:78.2,life:'2〜3年',fat:1},
+  metabo:{rank:'段位：見習い',name:'メタボ充電士 🍜',color:'#a06010',bg:'#fff8e1',
+    kata:'また満タン近くで寝ておったか！電極がズキズキ言うとるぞ。今夜は80%になったら引き抜け。それだけでいい。悔しかったら明日また来い！',
+    qol:54.1,life:'1.5〜2年',fat:2},
+  bad:{rank:'段位：入門前',name:'寝落ち問題児 😴',color:'#b83028',bg:'#fdf0ef',
+    kata:'喝！！毎夜100%で就寝とはッ！電極が悲鳴を上げておるぞ！今夜1つだけ：80%にして充電器を引き抜いて眠れ。それだけで電池は3倍長生きする。',
+    qol:33.2,life:'1年以下',fat:3}
+};
+
+function ck(bat,h){
+  if(h==='iwt'&&bat>=15&&bat<=85)return'master';
+  if(h==='sleep'||bat>=95)return'bad';
+  if(h==='full'||bat>=85)return'metabo';
+  return'blue';
+}
+
+function makeSVG(fat){
+  var c=['#1a7a4a','#1450a0','#a06010','#b83028'][fat];
+  var ac=['#2e7d32','#1565c0','#c79020','#c0392b'][fat];
+  var f='#f5c89a'; var cx=50;
+  var tw=26+fat*12, hd=28+fat*2, leg=9+fat*2, belly=fat>=2?fat*12:0;
+  return`<svg viewBox="0 0 100 180" width="90" height="135">
+    <rect x="${cx-leg-3}" y="135" width="${leg}" height="34" rx="5" fill="${c}" opacity=".85"/>
+    <rect x="${cx+3}" y="135" width="${leg}" height="34" rx="5" fill="${c}" opacity=".85"/>
+    <rect x="${cx-leg-6}" y="165" width="${leg+5}" height="8" rx="4" fill="#333"/>
+    <rect x="${cx-1}" y="165" width="${leg+5}" height="8" rx="4" fill="#333"/>
+    <rect x="${cx-tw/2}" y="86" width="${tw}" height="32" rx="8" fill="${ac}"/>
+    <rect x="${cx-tw/2-2}" y="110" width="${tw+4}" height="7" rx="3" fill="#5a3a10"/>
+    <rect x="${cx-tw/2-12}" y="89" width="12" height="${24+fat*2}" rx="6" fill="${ac}"/>
+    <rect x="${cx+tw/2}" y="89" width="12" height="${24+fat*2}" rx="6" fill="${ac}"/>
+    <line x1="${cx+tw/2+6}" y1="${113+fat*2}" x2="${cx+tw/2+22}" y2="${79}" stroke="#888" stroke-width="2.5" stroke-linecap="round"/>
+    <rect x="${cx-7}" y="72" width="14" height="17" rx="4" fill="${f}"/>
+    <ellipse cx="${cx}" cy="${58}" rx="${hd}" ry="${hd-2}" fill="${f}"/>
+    <ellipse cx="${cx}" cy="${49}" rx="${hd}" ry="${hd*.68}" fill="${c}"/>
+    <rect x="${cx-hd+5}" y="50" width="${(hd-5)*2}" height="10" rx="2" fill="${c}"/>
+    <polygon points="${cx-4},40 ${cx+4},40 ${cx},27" fill="${ac}"/>
+    <ellipse cx="${cx-8}" cy="${59}" rx="2.4" ry="2.4" fill="#333"/>
+    <ellipse cx="${cx+8}" cy="${59}" rx="2.4" ry="2.4" fill="#333"/>
+    <path d="M${cx-5},${68+fat} Q${cx},${72+fat*2} ${cx+5},${68+fat}" stroke="#555" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    ${belly?`<ellipse cx="${cx}" cy="106" rx="${belly/2+6}" ry="${belly/3+4}" fill="${ac}" opacity=".6"/>`:''}
+    <text x="${cx}" y="119" text-anchor="middle" font-size="7" font-weight="700" fill="#fff" font-family="sans-serif">${['達人','修行','メタボ','危険'][fat]}</text>
+  </svg>`;
+}
+
+function diag(){
+  var bat=+document.getElementById('bsl').value;
+  var key=ck(bat,hab), ch=CH[key];
+  var rc=document.getElementById('res-card');
+  rc.style.background=ch.bg;
+  rc.style.borderLeft='5px solid '+ch.color;
+  document.getElementById('r-rank').textContent=ch.rank;
+  var rn=document.getElementById('r-name');rn.textContent=ch.name;rn.style.color=ch.color;
+  var rk=document.getElementById('r-kata');
+  rk.textContent=ch.kata;rk.style.borderLeftColor=ch.color;rk.style.background=ch.color+'18';
+  var svg=document.getElementById('gauge-svg');
+  drawGauge(svg,ch.qol,ch.color);
+  document.getElementById('gauge-lbl').textContent=['達人','修行中','メタボ','危険'][ch.fat];
+  document.getElementById('gauge-lbl').style.color=ch.color;
+  document.getElementById('r-mets').innerHTML=`
+    <div class="met" style="border-right:1px solid var(--border);border-top:1px solid var(--border);">
+      <div class="ml">QoLスコア</div><div class="mv" style="color:${ch.color};">${ch.qol}点</div></div>
+    <div class="met" style="border-top:1px solid var(--border);">
+      <div class="ml">推定電池寿命</div><div class="mv" style="color:${ch.color};">${ch.life}</div></div>`;
+  document.getElementById('res').classList.remove('res-hidden');
+  document.getElementById('res').scrollIntoView({behavior:'smooth',block:'nearest'});
+  diagDone=true; curKey=key;
+  var bd=lG(LS_BD,{});bd.first=true;if(key==='master')bd.perfect=true;lS(LS_BD,bd);
+}
+var curKey='blue';
+function shr(){
+  if(!diagDone)return;
+  var ch=CH[curKey];
+  var t='【賢いスマホ充電道場】充電タイプ「'+ch.name+'」QoL'+ch.qol+'点！IWT充電修行を始めます！ #賢い充電道場 #電池長寿命';
+  if(navigator.share)navigator.share({title:'賢いスマホ充電道場',text:t}).catch(()=>{});
+  else navigator.clipboard.writeText(t).then(()=>alert('コピーしました！'));
+  var bd=lG(LS_BD,{});bd.share1=true;lS(LS_BD,bd);
+}
+
+/* ═══ DOJO ═══ */
+var FMS={
+  bb:{t:'⚾ 侍ジャパン打順方式 — 4打席分散充電',s:'1〜4番打者の出番に合わせて充電リズムを刻む',
+    pts:[[6,90],[7,82],[8,70],[9,58],[10,46],[11,34],[11.5,25,'c'],[12.5,55,'c'],[13,80,'s'],[15,65],[17,50],[17.5,34],[17.8,28,'c'],[18.8,60,'c'],[19,80,'s'],[21,64],[22,48],[22.5,36,'c'],[23.2,68,'c'],[23.5,80,'s']],
+    ev:[
+      {t:'7:00',b:20,a:'c',em:'⚾',ev:'1番打者：朝の始動',ins:'20%！充電開始',ic:'#1a7a4a',ib:'#edf7f2'},
+      {t:'8:30',b:80,a:'s',em:'✂️',ev:'1番 得点圏離脱',ins:'80%！充電器を外せ！ドン！',ic:'#b83028',ib:'#fdf0ef'},
+      {t:'12:00',b:28,a:'c',em:'⚾',ev:'2番打者：昼のヒットエンドラン',ins:'28%。昼休み2打席目！',ic:'#1450a0',ib:'#e8f0fc'},
+      {t:'13:00',b:80,a:'s',em:'✂️',ev:'2番 80%でベースカバー',ins:'80%！外すのがプロの習慣',ic:'#b83028',ib:'#fdf0ef'},
+      {t:'17:30',b:25,a:'c',em:'⚾',ev:'3番打者：帰宅前ラストチャンス',ins:'25%。3打席目スタート！',ic:'#1a7a4a',ib:'#edf7f2'},
+      {t:'18:30',b:80,a:'s',em:'✂️',ev:'3番 得点で80%アウト',ins:'80%！夕食前に外せ！',ic:'#b83028',ib:'#fdf0ef'},
+      {t:'22:00',b:32,a:'c',em:'⚾',ev:'4番打者：就寝前クリーンアップ',ins:'32%。最終打席。80%で止まれ！',ic:'#a06010',ib:'#fff8e1'},
+      {t:'23:00',b:80,a:'s',em:'😴',ev:'4番 サヨナラ打 試合終了',ins:'80%！外して就寝。完璧な一日じゃ！',ic:'#0f6e56',ib:'#e1f5ee'},
+    ]},
+  sc:{t:'⚽ FIFA 4-4-2 — ポジション別充電システム',s:'DF→MF→FW→GKの守備ラインで充電タイミングを配置',
+    pts:[[6,18,'c'],[7,50,'c'],[8,80,'s'],[11,55],[12,28,'c'],[13,68,'c'],[14,80,'s'],[17,50],[17.5,22,'c'],[18.5,60,'c'],[19,80,'s'],[22,50],[22.5,30,'c'],[23.5,78,'c'],[23.8,80,'s']],
+    ev:[
+      {t:'7:00',b:18,a:'c',em:'🛡️',ev:'DF第一防衛線：起床時',ins:'18%！DFが上がる前に充電！',ic:'#1a7a4a',ib:'#edf7f2'},
+      {t:'8:00',b:80,a:'s',em:'✂️',ev:'DFライン 守備固め完了',ins:'80%！DFは無理に攻め上がらない',ic:'#b83028',ib:'#fdf0ef'},
+      {t:'12:00',b:28,a:'c',em:'⚙️',ev:'MF中盤：昼休みインターセプト',ins:'28%。MFが中盤を制す！',ic:'#1450a0',ib:'#e8f0fc'},
+      {t:'13:00',b:80,a:'s',em:'✂️',ev:'MF 中盤制圧 80%完了',ins:'80%！午後の試合に備えよ！',ic:'#b83028',ib:'#fdf0ef'},
+      {t:'17:30',b:22,a:'c',em:'⚡',ev:'FW前線：アディショナルタイム',ins:'22%！FWが決める時間！',ic:'#a06010',ib:'#fff8e1'},
+      {t:'18:30',b:80,a:'s',em:'✂️',ev:'FW 決定機 80%終了',ins:'80%！シュートを打ったら引き上げる！',ic:'#b83028',ib:'#fdf0ef'},
+      {t:'22:30',b:30,a:'c',em:'🥅',ev:'GK最後の砦：就寝前',ins:'30%。GKが守り切る最終チャージ！',ic:'#1a7a4a',ib:'#edf7f2'},
+      {t:'23:30',b:80,a:'s',em:'😴',ev:'GK 無失点完封 試合終了',ins:'80%！外して熟睡！',ic:'#0f6e56',ib:'#e1f5ee'},
+    ]},
+  sm:{t:'🏆 相撲四本柱 — 土俵の四隅を守れ',s:'東西南北の四本柱に見立てた揺るぎない充電の守り方',
+    pts:[[6.5,15,'c'],[7.5,80,'s'],[10,55],[11,25,'c'],[12.25,80,'s'],[15,55],[16,20,'c'],[17.5,80,'s'],[21,50],[22,28,'c'],[23.25,80,'s']],
+    ev:[
+      {t:'6:30',b:15,a:'c',em:'🔵',ev:'東柱（青房）：夜明けの立ち合い',ins:'15%！立ち合い前に充電！',ic:'#1450a0',ib:'#e8f0fc'},
+      {t:'7:30',b:80,a:'s',em:'✂️',ev:'東柱 押し出し成功！',ins:'80%！仕切り直し！外せ！',ic:'#b83028',ib:'#fdf0ef'},
+      {t:'11:00',b:25,a:'c',em:'⬛',ev:'西柱（黒房）：昼前の割',ins:'25%。落ち着いて充電開始！',ic:'#333',ib:'#f0f0f0'},
+      {t:'12:15',b:80,a:'s',em:'✂️',ev:'西柱 寄り切り成功',ins:'80%！土俵を降りよ！',ic:'#b83028',ib:'#fdf0ef'},
+      {t:'16:00',b:20,a:'c',em:'🔴',ev:'南柱（赤房）：夕刻の本場所',ins:'20%！本日最大の一番！',ic:'#b83028',ib:'#fdf0ef'},
+      {t:'17:30',b:80,a:'s',em:'✂️',ev:'南柱 上手投げ一発！',ins:'80%！一礼して外せ！',ic:'#b83028',ib:'#fdf0ef'},
+      {t:'22:00',b:28,a:'c',em:'🟢',ev:'北柱（緑房）：千秋楽',ins:'28%。千秋楽の踏ん張り！',ic:'#1a7a4a',ib:'#edf7f2'},
+      {t:'23:15',b:80,a:'s',em:'😴',ev:'北柱 全勝優勝！',ins:'80%！優勝！外して熟睡せよ！',ic:'#0f6e56',ib:'#e1f5ee'},
+    ]}
+};
+
+function pFm(el,f){
+  document.querySelectorAll('.fmc').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on'); fm=f;
+  drawWave(f); renderTL(f);
+}
+
+function drawWave(f){
+  var fmData=FMS[f];
+  var canvas=document.getElementById('wvc');
+  var W=canvas.parentElement.offsetWidth||700;
+  canvas.width=W; canvas.height=140;
+  var ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,140);
+  var pad={l:52,r:10,t:12,b:22};
+  var cW=W-pad.l-pad.r, cH=140-pad.t-pad.b;
+  var pts=fmData.pts;
+  var minT=pts[0][0], maxT=pts[pts.length-1][0];
+
+  function tx(t){return pad.l+(t-minT)/(maxT-minT)*cW;}
+  function ty(v){return pad.t+(1-v/100)*cH;}
+
+  // Green zone fill (20-80)
+  ctx.fillStyle='rgba(26,122,74,.12)';
+  ctx.fillRect(pad.l,ty(80),cW,ty(20)-ty(80));
+
+  // Zone boundaries
+  ctx.setLineDash([4,3]);
+  ctx.strokeStyle='rgba(26,122,74,.5)';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(pad.l,ty(80));ctx.lineTo(pad.l+cW,ty(80));ctx.stroke();
+  ctx.strokeStyle='rgba(232,160,16,.6)';
+  ctx.beginPath();ctx.moveTo(pad.l,ty(20));ctx.lineTo(pad.l+cW,ty(20));ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Line
+  ctx.strokeStyle='#4a90e2';ctx.lineWidth=8;ctx.lineJoin='round';
+  ctx.beginPath();
+  pts.forEach((p,i)=>{i===0?ctx.moveTo(tx(p[0]),ty(p[1])):ctx.lineTo(tx(p[0]),ty(p[1]));});
+  ctx.stroke();
+
+  // Fill under
+  ctx.beginPath();
+  pts.forEach((p,i)=>{i===0?ctx.moveTo(tx(p[0]),ty(p[1])):ctx.lineTo(tx(p[0]),ty(p[1]));});
+  ctx.lineTo(tx(pts[pts.length-1][0]),pad.t+cH);ctx.lineTo(pad.l,pad.t+cH);ctx.closePath();
+  ctx.fillStyle='rgba(74,144,226,.1)';ctx.fill();
+
+  // Charge/stop markers
+  pts.forEach(p=>{
+    if(p[2]){
+      var dc=p[2]==='c'?'#1a7a4a':'#e85518';
+      ctx.beginPath();ctx.arc(tx(p[0]),ty(p[1]),12,0,Math.PI*2);
+      ctx.fillStyle=dc;ctx.fill();
+      ctx.strokeStyle='#111';ctx.lineWidth=3;ctx.stroke();
+    }
+  });
+
+  // Y axis labels
+  ctx.fillStyle='#b5b5b5';ctx.font='bold 16px sans-serif';ctx.textAlign='right';
+  [0,20,40,60,80,100].forEach(v=>{
+    ctx.fillText(v+'%',pad.l-6,ty(v)+3);
+  });
+  // Time labels
+  ctx.textAlign='center';ctx.fillStyle='#999';
+  [6,9,12,15,18,21,24].forEach(h=>{
+    if(h>=minT&&h<=maxT) ctx.fillText(h+':00',tx(h),140-4);
+  });
+}
+
+function renderTL(f){
+  var fmD=FMS[f];
+  var rows=fmD.ev.map((e,i,arr)=>{
+    var dc=e.a==='c'?'#1a7a4a':e.a==='s'?'#b83028':'#1450a0';
+    var di=e.a==='c'?'⚡':'✕';
+    var line=i<arr.length-1?'<div class="tl-ln"></div>':'';
+    return`<div class="tl-row">
+      <div class="tl-t">${e.t}</div>
+      <div class="tl-dc"><div class="tl-d" style="background:${dc};">${di}</div>${line}</div>
+      <div class="tl-cv"><div class="tl-ev">${e.em} ${e.ev}</div><div class="tl-bt">残量 ${e.b}%</div>
+      <div class="tl-tag" style="background:${e.ib};color:${e.ic};">${e.ins}</div></div></div>`;
+  }).join('');
+  document.getElementById('tl-card').innerHTML=`
+    <div class="tl-hd"><div class="tl-ht">${fmD.t}</div><div class="tl-hs">${fmD.s}</div></div>
+    <div class="tl-body">${rows}</div>`;
+}
+
+/* ═══ DEMO ═══ */
+var p80=false,p20=false;
+function dUp(v){
+  document.getElementById('df').style.width=v+'%';
+  document.getElementById('dpct').textContent=v+'%';
+  var ins=document.getElementById('dins');
+  var o80=document.getElementById('o80'),o20=document.getElementById('o20');
+  o80.style.display='none';o20.style.display='none';
+  if(v>=80){
+    document.getElementById('df').style.background='var(--fire)';
+    ins.style.background='var(--red)';ins.textContent='⚠️ 過充電ゾーン！今すぐ引き抜け！ ドン！バリバリ！';
+    if(!p80){o80.style.display='block';pop(o80);}p80=true;
+  }else if(v<=20){
+    document.getElementById('df').style.background='var(--gold)';
+    ins.style.background='#a06010';ins.textContent='⚡ 要充電！20%以下 — 今すぐ接続せよ！';
+    if(!p20){o20.style.display='block';pop(o20);}p20=true;
+  }else{
+    document.getElementById('df').style.background='var(--green)';
+    ins.style.background='var(--green)';ins.textContent='✅ GREEN帯域 — 最適ゾーンじゃ！この調子で！';
+    p80=false;p20=false;
+  }
+}
+function pop(el){el.classList.remove('onom');void el.offsetWidth;el.classList.add('onom');}
+
+function initDojo(){drawWave(fm);renderTL(fm);dUp(50);fwLaunch();}
+
+/* ═══ FIREWORKS ═══ */
+var fwC=['#e85518','#e8a010','#fff','#ff3300','#ffd700','#00e5ff','#ff4081'];
+function fwLaunch(){
+  var canvas=document.getElementById('fwc');
+  canvas.width=canvas.parentElement.offsetWidth||800;
+  var ctx=canvas.getContext('2d');
+  fwPts=[];
+  for(var b=0;b<10;b++){
+    var ox=60+Math.random()*(canvas.width-120), oy=20+Math.random()*90;
+    for(var i=0;i<65;i++){
+      var a=(i/65)*Math.PI*2, sp=3+Math.random()*10;
+      fwPts.push({x:ox,y:oy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,
+        life:1,dec:.013+Math.random()*.02,sz:2+Math.random()*4,
+        col:fwC[Math.floor(Math.random()*fwC.length)],g:.1});
+    }
+  }
+  if(fwAF)cancelAnimationFrame(fwAF);
+  function loop(){
+    ctx.fillStyle='rgba(0,0,0,.17)';ctx.fillRect(0,0,canvas.width,canvas.height);
+    fwPts=fwPts.filter(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.vx*=.98;p.life-=p.dec;
+      if(p.life<=0)return false;
+      ctx.globalAlpha=p.life;ctx.fillStyle=p.col;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.sz*p.life,0,Math.PI*2);ctx.fill();
+      return true;
+    });
+    ctx.globalAlpha=1;
+    if(fwPts.length>0)fwAF=requestAnimationFrame(loop);
+  }
+  fwAF=requestAnimationFrame(loop);
+}
+
+/* ═══ SCIENCE TOGGLE ═══ */
+function togSci(btn){
+  var bd=document.getElementById('sci-body');
+  bd.classList.toggle('open');
+  btn.querySelector('.arr').style.transform=bd.classList.contains('open')?'rotate(180deg)':'';
+}
+
+/* ═══ BADGES ═══ */
+var BDEFS=[
+  {id:'first',  em:'🎌',nm:'入門！',   cond:'初回診断完了',     ok:b=>b.first},
+  {id:'m7',     em:'🌅',nm:'朝の門',   cond:'7日連続',          ok:b=>(lG(LS_CK,[]).length>=7)},
+  {id:'m30',    em:'🌄',nm:'皆勤賞',   cond:'30日連続',         ok:b=>(lG(LS_CK,[]).length>=30)},
+  {id:'perfect',em:'⚔️',nm:'達人認定', cond:'診断で免許皆伝',   ok:b=>b.perfect},
+  {id:'g7',     em:'🟢',nm:'GREEN番人',cond:'7日GREEN帯域',     ok:b=>b.g7},
+  {id:'share1', em:'📣',nm:'修行公言', cond:'SNSシェア達成',    ok:b=>b.share1},
+  {id:'iwt14',  em:'🥷',nm:'IWT侍',    cond:'14日チェックイン', ok:b=>(lG(LS_CK,[]).length>=14)},
+  {id:'fw',     em:'🎆',nm:'80%道場',  cond:'花火演出を体験',   ok:b=>b.fw},
+];
+
+function initBdg(){
+  var ck=lG(LS_CK,[]);
+  var days=['月','火','水','木','金','土','日'];
+  var today=new Date().getDay(); var ti=today===0?6:today-1;
+  document.getElementById('streak').innerHTML=days.map((d,i)=>{
+    var cl=i<ti?(ck.includes(i)?'done':'miss'):i===ti?'today':'miss';
+    var ic=cl==='done'?'✓':cl==='today'?'今':'—';
+    return`<div class="sdy ${cl}"><div class="sd">${d}</div><div class="si">${ic}</div></div>`;
+  }).join('');
+  var n=ck.length;
+  var msgs=['修行を始めよ','2日目！','3日目！良いぞ！','4日目！あと3日で「朝の門」！'];
+  document.getElementById('sk-msg').textContent='連続修行 '+n+'日 — '+(msgs[Math.min(n,3)]||'継続中！もう習慣じゃ！');
+  var bd=lG(LS_BD,{});
+  document.getElementById('bdg-grid').innerHTML=BDEFS.map(b=>{
+    var e=b.ok(bd);
+    return`<div class="bdg ${e?'earned':'locked'}"><div class="be">${b.em}</div><div class="bn">${b.nm}</div><div class="bc">${b.cond}</div></div>`;
+  }).join('');
+}
+
+function doCk(){
+  var v=parseInt(document.getElementById('ckv').value);
+  if(!v||v<1||v>100){alert('1〜100の数値を入力してください');return;}
+  var ck=lG(LS_CK,[]);
+  var today=new Date().getDay();var ti=today===0?6:today-1;
+  if(!ck.includes(ti))ck.push(ti);lS(LS_CK,ck);
+  var bd=lG(LS_BD,{});
+  bd.fw=true;bd.first=true;
+  if(ck.length>=7)bd.m7=true;if(ck.length>=14)bd.iwt14=true;
+  if(v>=20&&v<=80){bd._g=(bd._g||0)+1;if(bd._g>=7)bd.g7=true;}
+  lS(LS_BD,bd);
+  var msg=v>=80?`⚠️ ${v}%！過充電ゾーン。今日から80%で止める練習を！`
+         :v<=20?`🔋 ${v}%！ギリギリじゃ。今日中に充電開始せよ！`
+         :`✅ ${v}%！GREEN帯域。今朝は合格点じゃ！`;
+  var rd=document.getElementById('ck-res');rd.textContent=msg;rd.style.display='block';
+  initBdg();
+}
+
+
+updateBubble(72);
+/* ═══ INIT ═══ */
+var bd0=lG(LS_BD,{});bd0.first=true;lS(LS_BD,bd0);
+</script>
+</body>
+</html>

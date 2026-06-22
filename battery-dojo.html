@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>賢いスマホ充電道場,</title>
+<title id="page-title">賢いスマホ充電道場</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{
   --ink:#14100a;--fire:#e85518;--gold:#e8a010;--cream:#faf8f4;
@@ -299,16 +300,41 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
   .cmd-rule{font-size:clamp(54px,8vw,84px);}
   .fm-row .fmc{width:130px;}
 }
+
+/* ── LANG TOGGLE ── */
+.lang-btn{background:#333;color:#fff;border:2px solid var(--gold);border-radius:20px;padding:6px 14px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.5px;transition:all .15s;margin-left:10px;white-space:nowrap;}
+.lang-btn:hover{background:var(--gold);color:var(--ink);}
+
+/* ── QR BANNER ── */
+.qr-banner{background:var(--ink);border-bottom:4px solid var(--gold);padding:10px 0;}
+.qr-inner{max-width:860px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:center;gap:16px;}
+.qr-canvas{border-radius:8px;background:#fff;padding:4px;display:block;}
+.qr-text{color:#fff;font-size:14px;line-height:1.6;}
+.qr-text strong{color:var(--gold);font-size:16px;display:block;margin-bottom:2px;}
+.qr-text a{color:#aac4ff;font-size:13px;}
+.qr-footer-inner{max-width:860px;margin:0 auto;padding:16px 20px 0;display:flex;align-items:center;justify-content:center;gap:16px;}
 </style>
 </head>
 <body>
 
+<!-- QR HEADER BANNER -->
+<div class="qr-banner" id="qr-header-banner">
+  <div class="qr-inner">
+    <div id="qr-header" style="width:72px;height:72px;"></div>
+    <div class="qr-text">
+      <strong id="qr-label-h">📱 このアプリをスキャン</strong>
+      <a href="https://c4model.org/battery-dojo.html" target="_blank">https://c4model.org/battery-dojo.html</a>
+    </div>
+  </div>
+</div>
+
 <!-- NAV -->
 <nav><div class="nav-i">
   <div class="nav-logo">⚔ 賢い<em>スマホ充電</em>道場，</div>
-  <div class="ntab on" onclick="go(0,this)">入門診断</div>
-  <div class="ntab" onclick="go(1,this)">奥義</div>
-  <div class="ntab" onclick="go(2,this)">バッジ</div>
+  <div class="ntab on" onclick="go(0,this)" id="tab0">入門診断</div>
+  <div class="ntab" onclick="go(1,this)" id="tab1">奥義</div>
+  <div class="ntab" onclick="go(2,this)" id="tab2">バッジ</div>
+  <button class="lang-btn" onclick="toggleLang()" id="lang-btn">EN</button>
 </div></nav>
 
 <!-- ════ P0: DIAGNOSIS ════ -->
@@ -317,24 +343,24 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
   <!-- HERO -->
   <div class="hero">
     <div class="hero-glow"></div>
-    <div class="hero-eye">入門診断 — 今すぐ数値を入力せよ</div>
-    <div class="hero-h">今朝の<em>バッテリー</em>を<br>見せよ</div>
-    <div class="hero-sub">今すぐスマホの右上を見てください。何%ですか？その数字を入力するだけ！</div>
+    <div class="hero-eye" id="p0-hero-eye">入門診断 — 今すぐ数値を入力せよ</div>
+    <div class="hero-h" id="p0-hero-h">今朝の<em>バッテリー</em>を<br>見せよ</div>
+    <div class="hero-sub" id="p0-hero-sub">今すぐスマホの右上を見てください。何%ですか？その数字を入力するだけ！</div>
   </div>
   <div class="belt"></div>
 
   <!-- THE ONE RULE -->
   <div class="big-cmd">
     <div class="cmd-rule"><em>20</em><span class="and">〜</span><em>80</em><span style="font-size:clamp(36px,4vw,54px);color:var(--muted);font-weight:700;margin-left:8px;">%の法則</span></div>
-    <div class="cmd-hint">充電を始める目安 20% ／ 充電を止める目安 80%。これだけでいい。</div>
+    <div class="cmd-hint" id="p0-cmd-hint">充電を始める目安 20% ／ 充電を止める目安 80%。これだけでいい。</div>
   </div>
 
   <div class="input-banner">
     <div class="ib-inner">
       <div class="ib-arrow">👆</div>
       <div class="ib-text">
-        <div class="ib-title">今すぐ右上を見る</div>
-        <div class="ib-sub">スマホの画面右上に今この瞬間、数字が見えています。それを入力するだけ。それだけです。</div>
+        <div class="ib-title" id="ib-title">今すぐ右上を見る</div>
+        <div class="ib-sub" id="ib-sub">スマホの画面右上に今この瞬間、数字が見えています。それを入力するだけ。それだけです。</div>
       </div>
       <div class="ib-demo">
         <div class="ib-phone">
@@ -348,7 +374,7 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
             </div>
           </div>
           <div class="ib-screen-body">
-            <div class="ib-arrow-point">← <strong>この数字！</strong></div>
+            <div class="ib-arrow-point" id="ib-arrow-point">← <strong>この数字！</strong></div>
           </div>
         </div>
       </div>
@@ -362,7 +388,7 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
       <div class="sl-hero" id="sl-zone" style="border-bottom:4px solid var(--green);">
         <!-- NUMBER INPUT -->
         <div class="num-input-wrap">
-          <div class="num-input-label">📱 今すぐ右上の数字を入力！</div>
+          <div class="num-input-label" id="num-input-label">📱 今すぐ右上の数字を入力！</div>
           <div class="num-input-row" style="flex-wrap:wrap;justify-content:center;gap:16px;">
             <div style="display:flex;align-items:center;gap:10px;">
               <input class="num-input-field" type="number" id="num-direct" min="1" max="100" placeholder="??" oninput="applyNumInput(this.value)" inputmode="numeric" pattern="[0-9]*">
@@ -376,7 +402,7 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
               </div>
             </div>
           </div>
-          <div class="num-input-hint">スマホ右上の <strong>数字をそのまま入力</strong> してください</div>
+          <div class="num-input-hint" id="num-input-hint">スマホ右上の <strong>数字をそのまま入力</strong> してください</div>
           <div class="input-warn" id="input-warn">
             <div class="wem">🚫</div>
             <div class="wtxt" id="warn-txt">数値が正しくありません！</div>
@@ -386,7 +412,7 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
 
         <!-- QUICK SELECT -->
         <div class="quick-sel">
-          <div class="qs-label">よくある数値をタップ：</div>
+          <div class="qs-label" id="qs-label">よくある数値をタップ：</div>
           <div class="qs-row">
             <button class="qs-btn red" onclick="useSample(15)">15%<span>⚡要充電</span></button>
             <button class="qs-btn orange" onclick="useSample(25)">25%<span>⚡そろそろ</span></button>
@@ -397,26 +423,26 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
           </div>
         </div>
         <div class="sl-top">
-          <div class="sl-title">📱 今の画面右上の数字は？</div>
+          <div class="sl-title" id="sl-title-el">📱 今の画面右上の数字は？</div>
           <div><span class="sl-big" id="bat-num">72</span><span class="sl-pct">%</span></div>
         </div>
         <input class="bat-range" type="range" id="bsl" min="1" max="100" step="1" value="72" oninput="slUp(+this.value)">
-        <div class="sl-marks"><span class="lo">20% 充電開始</span><span></span><span class="hi">80% 停止！</span></div>
+        <div class="sl-marks"><span class="lo" id="sl-mark-lo">20% 充電開始</span><span></span><span class="hi" id="sl-mark-hi">80% 停止！</span></div>
         <div class="zone-bar" style="margin-top:12px;">
           <div class="zb-lo"></div><div class="zb-ok"></div><div class="zb-hi"></div>
         </div>
-        <div class="zone-labels"><div class="z1">危険</div><div class="z2">✅ ここを保て</div><div class="z3">危険</div></div>
+        <div class="zone-labels"><div class="z1" id="zone-z1">危険</div><div class="z2" id="zone-z2">✅ ここを保て</div><div class="z3" id="zone-z3">危険</div></div>
       </div>
       <!-- HABIT -->
       <div style="padding:16px 18px 20px;">
-        <div style="font-size:24px;font-weight:700;color:var(--muted);margin-bottom:12px;">普段の習慣は？</div>
+        <div style="font-size:24px;font-weight:700;color:var(--muted);margin-bottom:12px;" id="habit-label">普段の習慣は？</div>
         <div class="habit-grid">
-          <div class="hcard on" onclick="pH(this,'iwt')"><span class="hem">🥷</span><div class="hlb">20〜80%修行</div><div class="hsu">目覚めた侍</div></div>
-          <div class="hcard" onclick="pH(this,'mod')"><span class="hem">🧑‍💼</span><div class="hlb">減ったら充電</div><div class="hsu">一般的</div></div>
-          <div class="hcard" onclick="pH(this,'full')"><span class="hem">🛋️</span><div class="hlb">常に満タン</div><div class="hsu">ぐうたら派</div></div>
-          <div class="hcard" onclick="pH(this,'sleep')"><span class="hem">😴</span><div class="hlb">寝落ち充電</div><div class="hsu">電極の大敵</div></div>
+          <div class="hcard on" onclick="pH(this,'iwt')"><span class="hem">🥷</span><div class="hlb" id="hcard-iwt-lb">20〜80%修行</div><div class="hsu" id="hcard-iwt-su">目覚めた侍</div></div>
+          <div class="hcard" onclick="pH(this,'mod')"><span class="hem">🧑‍💼</span><div class="hlb" id="hcard-mod-lb">減ったら充電</div><div class="hsu" id="hcard-mod-su">一般的</div></div>
+          <div class="hcard" onclick="pH(this,'full')"><span class="hem">🛋️</span><div class="hlb" id="hcard-full-lb">常に満タン</div><div class="hsu" id="hcard-full-su">ぐうたら派</div></div>
+          <div class="hcard" onclick="pH(this,'sleep')"><span class="hem">😴</span><div class="hlb" id="hcard-sleep-lb">寝落ち充電</div><div class="hsu" id="hcard-sleep-su">電極の大敵</div></div>
         </div>
-        <button class="cta" onclick="diag()">⚔ 道場判定を受ける！</button>
+        <button class="cta" id="cta-diag" onclick="diag()">⚔ 道場判定を受ける！</button>
       </div>
     </div>
 
@@ -436,8 +462,8 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
         </div>
         <div class="res-metrics" id="r-mets"></div>
       </div>
-      <button class="cta" onclick="shr()" style="margin-bottom:10px;">📤 「修行中！」とSNSシェア</button>
-      <button class="cta cta-out" onclick="go(1,document.querySelectorAll('.ntab')[1])">📜 修行の奥義へ →</button>
+      <button class="cta" id="cta-share" onclick="shr()" style="margin-bottom:10px;">📤 「修行中！」とSNSシェア</button>
+      <button class="cta cta-out" id="cta-to-mastery" onclick="go(1,document.querySelectorAll('.ntab')[1])">📜 修行の奥義へ →</button>
     </div>
   </div>
 </div>
@@ -446,30 +472,30 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
 <div id="p1" class="page">
   <div class="hero" style="padding-bottom:28px;">
     <div class="hero-glow"></div>
-    <div class="hero-eye">修行の奥義</div>
-    <div class="hero-h"><em>小分け4回</em>が<br>電極を救う</div>
-    <div class="hero-sub">満タン一発より分散充電。好きな流派を選べ。</div>
+    <div class="hero-eye" id="p1-hero-eye">修行の奥義</div>
+    <div class="hero-h" id="p1-hero-h"><em>小分け4回</em>が<br>電極を救う</div>
+    <div class="hero-sub" id="p1-hero-sub">満タン一発より分散充電。好きな流派を選べ。</div>
   </div>
   <div class="belt"></div>
 
   <div class="wrap">
     <!-- FORMATION -->
-    <div class="sh"><div class="sh-eye">流派を選べ</div><div class="sh-t">フォーメーション選択</div></div>
+    <div class="sh"><div class="sh-eye" id="sh-fm-eye">流派を選べ</div><div class="sh-t" id="sh-fm-t">フォーメーション選択</div></div>
     <div class="fm-row" id="fm-row">
-      <div class="fmc on" onclick="pFm(this,'bb')"><span class="fem">⚾</span><div class="fnm">侍ジャパン打順</div><div class="fhs">4打席 分散充電</div></div>
-      <div class="fmc" onclick="pFm(this,'sc')"><span class="fem">⚽</span><div class="fnm">FIFA 4-4-2</div><div class="fhs">ポジション充電</div></div>
-      <div class="fmc" onclick="pFm(this,'sm')"><span class="fem">🏆</span><div class="fnm">相撲四本柱</div><div class="fhs">四隅を守れ</div></div>
+      <div class="fmc on" onclick="pFm(this,'bb')"><span class="fem">⚾</span><div class="fnm" id="fmc-bb-nm">侍ジャパン打順</div><div class="fhs" id="fmc-bb-hs">4打席 分散充電</div></div>
+      <div class="fmc" onclick="pFm(this,'sc')"><span class="fem">⚽</span><div class="fnm" id="fmc-sc-nm">FIFA 4-4-2</div><div class="fhs" id="fmc-sc-hs">ポジション充電</div></div>
+      <div class="fmc" onclick="pFm(this,'sm')"><span class="fem">🏆</span><div class="fnm" id="fmc-sm-nm">相撲四本柱</div><div class="fhs" id="fmc-sm-hs">四隅を守れ</div></div>
     </div>
 
     <!-- WAVE CHART -->
     <div class="wave-wrap">
-      <div class="wave-label">1日バッテリー推移</div>
-      <div class="wave-note">※実際の時刻とは連動しません。理想的な1日のモデル例です</div>
+      <div class="wave-label" id="wave-label">1日バッテリー推移</div>
+      <div class="wave-note" id="wave-note">※実際の時刻とは連動しません。理想的な1日のモデル例です</div>
       <canvas class="wave" id="wvc" height="200"></canvas>
       <div class="wave-legend">
-        <div class="wl-item"><div class="wl-dot" style="background:var(--green);"></div>推奨ゾーン</div>
-        <div class="wl-item"><div class="wl-dot" style="background:var(--fire);"></div>危険ゾーン</div>
-        <div class="wl-item"><div class="wl-dot" style="background:#4a90e2;"></div>バッテリー残量</div>
+        <div class="wl-item"><div class="wl-dot" style="background:var(--green);"></div><span id="wl-green">推奨ゾーン</span></div>
+        <div class="wl-item"><div class="wl-dot" style="background:var(--fire);"></div><span id="wl-fire">危険ゾーン</span></div>
+        <div class="wl-item"><div class="wl-dot" style="background:#4a90e2;"></div><span id="wl-blue">バッテリー残量</span></div>
       </div>
     </div>
 
@@ -477,53 +503,53 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
     <div class="tl-card" id="tl-card"></div>
 
     <!-- BATTERY DEMO -->
-    <div class="sh" style="margin-top:8px;"><div class="sh-eye">体感デモ</div><div class="sh-t">3つのゾーンを触って覚える</div></div>
+    <div class="sh" style="margin-top:8px;"><div class="sh-eye" id="sh-demo-eye">体感デモ</div><div class="sh-t" id="sh-demo-t">3つのゾーンを触って覚える</div></div>
     <div class="bat-demo">
-      <div class="bd-eye">リアルタイム充電デモ</div>
-      <div class="bd-sub">スライダーを動かすと指示が変わる</div>
+      <div class="bd-eye" id="bd-eye">リアルタイム充電デモ</div>
+      <div class="bd-sub" id="bd-sub">スライダーを動かすと指示が変わる</div>
       <div class="bat-track">
         <div class="bat-fill" id="df" style="width:50%;background:var(--green);"></div>
         <div class="bat-num" id="dpct">50%</div>
       </div>
-      <div class="bat-mkl"><span class="lo">▲20% 充電開始ライン</span><span class="hi">▲80% 充電停止ライン</span></div>
+      <div class="bat-mkl"><span class="lo" id="bat-mkl-lo">▲20% 充電開始ライン</span><span class="hi" id="bat-mkl-hi">▲80% 充電停止ライン</span></div>
       <input class="drng" id="drng" type="range" min="1" max="100" step="1" value="50" oninput="dUp(+this.value)">
       <div class="ins-box" id="dins" style="background:var(--green);">✅ GREEN帯域 — 最適ゾーンじゃ！この調子で！</div>
-      <div class="onom" id="o80"><div class="ob" style="color:var(--fire);">ドン！バリバリ！⚡</div><div class="os" style="color:var(--gold);">80%到達！充電器を今すぐ引き抜け！</div></div>
-      <div class="onom" id="o20"><div class="ob" style="color:var(--gold);">ギリギリ！修行開始じゃ！</div><div class="os" style="color:#aaa;">20%以下 — 充電器を接続せよ！</div></div>
+      <div class="onom" id="o80"><div class="ob" style="color:var(--fire);" id="o80-ob">ドン！バリバリ！⚡</div><div class="os" style="color:var(--gold);" id="o80-os">80%到達！充電器を今すぐ引き抜け！</div></div>
+      <div class="onom" id="o20"><div class="ob" style="color:var(--gold);" id="o20-ob">ギリギリ！修行開始じゃ！</div><div class="os" style="color:#aaa;" id="o20-os">20%以下 — 充電器を接続せよ！</div></div>
     </div>
 
     <!-- FIREWORK -->
-    <div class="sh"><div class="sh-eye">80%到達演出</div><div class="sh-t">打ち上げ花火でドーパミン</div></div>
+    <div class="sh"><div class="sh-eye" id="sh-fw-eye">80%到達演出</div><div class="sh-t" id="sh-fw-t">打ち上げ花火でドーパミン</div></div>
     <div class="fw-wrap">
       <canvas id="fwc" height="260"></canvas>
       <div class="fw-msg">
         <div class="fw-big">80%</div>
-        <div class="fw-onom">ドン！バリバリ！</div>
-        <div class="fw-txt">充電器を外せ！これが奥義じゃ！</div>
-        <div class="fw-sub">電極ストレス 40%削減 達成</div>
+        <div class="fw-onom" id="fw-onom">ドン！バリバリ！</div>
+        <div class="fw-txt" id="fw-txt">充電器を外せ！これが奥義じゃ！</div>
+        <div class="fw-sub" id="fw-sub">電極ストレス 40%削減 達成</div>
       </div>
     </div>
-    <button class="cta cta-fire" onclick="fwLaunch()" style="margin-bottom:24px;">🎆 花火をもう一度！</button>
+    <button class="cta cta-fire" id="cta-fw" onclick="fwLaunch()" style="margin-bottom:24px;">🎆 花火をもう一度！</button>
 
     <!-- SCIENCE collapsible -->
     <button class="sci-toggle" onclick="togSci(this)">
-      📖 なぜ80%で止めるのか？（科学的根拠）
+      <span id="sci-toggle-txt">📖 なぜ80%で止めるのか？（科学的根拠）</span>
       <span class="arr">▼</span>
     </button>
     <div class="sci-body" id="sci-body">
       <div class="sci-inner">
-        <div class="sb" style="background:#edf7f2;"><div class="sl" style="color:var(--green);">✅ 20〜80%帯域</div><div class="st" style="color:#1a2a2a;">リチウムイオンが均一に移動。電極劣化が最小。<strong>電池寿命3〜4年</strong>を実現。</div></div>
-        <div class="sb" style="background:#fdf0ef;"><div class="sl" style="color:var(--red);">❌ 常時90〜100%</div><div class="st" style="color:#1a2a2a;">電極に慢性的な過圧。微細なひびが毎夜蓄積。<strong>1年で容量60%以下</strong>に。</div></div>
+        <div class="sb" style="background:#edf7f2;"><div class="sl" id="sci-good-lb" style="color:var(--green);">✅ 20〜80%帯域</div><div class="st" id="sci-good-st" style="color:#1a2a2a;">リチウムイオンが均一に移動。電極劣化が最小。<strong>電池寿命3〜4年</strong>を実現。</div></div>
+        <div class="sb" style="background:#fdf0ef;"><div class="sl" id="sci-bad-lb" style="color:var(--red);">❌ 常時90〜100%</div><div class="st" id="sci-bad-st" style="color:#1a2a2a;">電極に慢性的な過圧。微細なひびが毎夜蓄積。<strong>1年で容量60%以下</strong>に。</div></div>
       </div>
     </div>
 
     <!-- TIPS (icon-first, 2-column) -->
-    <div class="sh" style="margin-top:8px;"><div class="sh-eye">習慣化の仕掛け</div><div class="sh-t">毎朝チェックをルーティンにする</div></div>
+    <div class="sh" style="margin-top:8px;"><div class="sh-eye" id="sh-tips-eye">習慣化の仕掛け</div><div class="sh-t" id="sh-tips-t">毎朝チェックをルーティンにする</div></div>
     <div class="tips">
-      <div class="tip"><div class="te">⏰</div><div class="tt">毎朝7:00 通知</div><div class="tb">「今朝のバッテリーは何%？」で起床後すぐに数値確認を習慣化。</div></div>
-      <div class="tip"><div class="te">🔥</div><div class="tt">ストリーク炎</div><div class="tb">途切れると悔しい。損失回避心理が翌朝の再起動を促す。</div></div>
-      <div class="tip"><div class="te">📤</div><div class="tt">SNS公言ループ</div><div class="tb">「修行中！」シェアが外部コミットメントになり習慣を強制する。</div></div>
-      <div class="tip"><div class="te">🎆</div><div class="tt">80%花火強化</div><div class="tb">充電停止に花火でドーパミン。オペラント条件付けで「外す」が快感になる。</div></div>
+      <div class="tip"><div class="te">⏰</div><div class="tt" id="tip1-tt">毎朝7:00 通知</div><div class="tb" id="tip1-tb">「今朝のバッテリーは何%？」で起床後すぐに数値確認を習慣化。</div></div>
+      <div class="tip"><div class="te">🔥</div><div class="tt" id="tip2-tt">ストリーク炎</div><div class="tb" id="tip2-tb">途切れると悔しい。損失回避心理が翌朝の再起動を促す。</div></div>
+      <div class="tip"><div class="te">📤</div><div class="tt" id="tip3-tt">SNS公言ループ</div><div class="tb" id="tip3-tb">「修行中！」シェアが外部コミットメントになり習慣を強制する。</div></div>
+      <div class="tip"><div class="te">🎆</div><div class="tt" id="tip4-tt">80%花火強化</div><div class="tb" id="tip4-tb">充電停止に花火でドーパミン。オペラント条件付けで「外す」が快感になる。</div></div>
     </div>
   </div>
 </div>
@@ -532,38 +558,45 @@ footer{background:var(--ink);border-top:4px solid var(--fire);padding:26px 24px 
 <div id="p2" class="page">
   <div class="hero" style="padding-bottom:28px;">
     <div class="hero-glow"></div>
-    <div class="hero-eye">道場バッジ — 修行記録</div>
-    <div class="hero-h">続ければ<br><em>強くなれる</em></div>
-    <div class="hero-sub">毎朝チェックインでバッジ獲得。7日で「朝の門」、30日で「皆勤賞」。</div>
+    <div class="hero-eye" id="p2-hero-eye">道場バッジ — 修行記録</div>
+    <div class="hero-h" id="p2-hero-h">続ければ<br><em>強くなれる</em></div>
+    <div class="hero-sub" id="p2-hero-sub">毎朝チェックインでバッジ獲得。7日で「朝の門」、30日で「皆勤賞」。</div>
   </div>
   <div class="belt"></div>
 
   <div class="wrap">
-    <div class="sh"><div class="sh-eye">今週の修行記録</div><div class="sh-t" id="sk-msg"></div></div>
+    <div class="sh"><div class="sh-eye" id="sh-streak-eye">今週の修行記録</div><div class="sh-t" id="sk-msg"></div></div>
     <div class="streak" id="streak"></div>
 
     <div class="ck-box">
-      <div class="ck-eye">TODAY'S MORNING RITUAL</div>
-      <div class="ck-t">今朝のバッテリーチェックイン</div>
-      <div class="ck-s">残量を入力して「チェックイン！」。7日連続で「朝の門」バッジ獲得！</div>
+      <div class="ck-eye" id="ck-eye">TODAY'S MORNING RITUAL</div>
+      <div class="ck-t" id="ck-t">今朝のバッテリーチェックイン</div>
+      <div class="ck-s" id="ck-s">残量を入力して「チェックイン！」。7日連続で「朝の門」バッジ獲得！</div>
       <div class="ck-row">
         <input class="ck-in" type="number" id="ckv" min="1" max="100" placeholder="%">
-        <button class="ck-btn" onclick="doCk()">⚔ チェックイン！</button>
+        <button class="ck-btn" id="ck-btn" onclick="doCk()">⚔ チェックイン！</button>
       </div>
       <div class="ck-res" id="ck-res"></div>
     </div>
 
-    <div class="sh"><div class="sh-eye">獲得バッジ</div><div class="sh-t">道場の勲章</div></div>
+    <div class="sh"><div class="sh-eye" id="sh-bdg-eye">獲得バッジ</div><div class="sh-t" id="sh-bdg-t">道場の勲章</div></div>
     <div class="bdg-grid" id="bdg-grid"></div>
   </div>
 </div>
 
 <footer>
-  <div class="ft-i">
-    アプリ開発：Ver.1 2026/06/21<br>
+  <div class="qr-footer-inner">
+    <div id="qr-footer" style="width:72px;height:72px;"></div>
+    <div class="qr-text">
+      <strong id="qr-label-f">📱 友達にシェア — スキャンで即アクセス</strong>
+      <a href="https://c4model.org/battery-dojo.html" target="_blank">https://c4model.org/battery-dojo.html</a>
+    </div>
+  </div>
+  <div class="ft-i" style="margin-top:16px;">
+    <span id="ft-ver">アプリ開発：Ver.1 2026/06/21</span><br>
     <strong>C4モデル研究会</strong><br>
     <a href="mailto:info@c4model.org">info@c4model.org</a>　
-    <a href="https://c4model.org" target="_blank" rel="noopener">🔗 公式HPへ</a>
+    <a href="https://c4model.org" target="_blank" rel="noopener">🔗 <span id="ft-link">公式HPへ</span></a>
   </div>
 </footer>
 
@@ -983,6 +1016,379 @@ function doCk(){
 updateBubble(72);
 /* ═══ INIT ═══ */
 var bd0=lG(LS_BD,{});bd0.first=true;lS(LS_BD,bd0);
+
+/* ═══════════════════════════════════════
+   QR CODE INIT
+═══════════════════════════════════════ */
+var QR_URL='https://c4model.org/battery-dojo.html';
+function makeQR(id){
+  var el=document.getElementById(id);
+  if(!el||el._qrDone)return;
+  el._qrDone=true;
+  new QRCode(el,{text:QR_URL,width:72,height:72,colorDark:'#14100a',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+}
+/* ═══════════════════════════════════════
+   I18N — LANGUAGE TOGGLE
+═══════════════════════════════════════ */
+var LANG='ja';
+
+var T={
+  /* ── NAV ── */
+  'page-title':     {ja:'賢いスマホ充電道場',en:'Smart Phone Charging Dojo'},
+  'nav-logo-text':  {ja:'⚔ 賢い<em>スマホ充電</em>道場，',en:'⚔ Smart <em>Charging</em> Dojo，'},
+  'tab0':           {ja:'入門診断',en:'Diagnosis'},
+  'tab1':           {ja:'奥義',en:'Mastery'},
+  'tab2':           {ja:'バッジ',en:'Badges'},
+  'lang-btn':       {ja:'EN',en:'日本語'},
+
+  /* ── QR ── */
+  'qr-label-h':     {ja:'📱 このアプリをスキャン',en:'📱 Scan to open this app'},
+  'qr-label-f':     {ja:'📱 友達にシェア — スキャンで即アクセス',en:'📱 Share with friends — instant access by scan'},
+
+  /* ── FOOTER ── */
+  'ft-ver':         {ja:'アプリ開発：Ver.1 2026/06/21',en:'App Build: Ver.1 2026/06/21'},
+  'ft-link':        {ja:'公式HPへ',en:'Official Website'},
+
+  /* ── P0 HERO ── */
+  'p0-hero-eye':    {ja:'入門診断 — 今すぐ数値を入力せよ',en:'Admission Test — Enter Your Battery Level Now'},
+  'p0-hero-h':      {ja:'今朝の<em>バッテリー</em>を<br>見せよ',en:'Show Me Your<br><em>Battery</em> Level'},
+  'p0-hero-sub':    {ja:'今すぐスマホの右上を見てください。何%ですか？その数字を入力するだけ！',en:'Look at the top-right corner of your phone right now. What % is it? Just enter that number!'},
+  'p0-cmd-hint':    {ja:'充電を始める目安 20% ／ 充電を止める目安 80%。これだけでいい。',en:'Start charging at 20% · Stop charging at 80%. That\'s the whole rule.'},
+
+  /* ── INPUT BANNER ── */
+  'ib-title':       {ja:'今すぐ右上を見る',en:'Look at the Top-Right Corner Now'},
+  'ib-sub':         {ja:'スマホの画面右上に今この瞬間、数字が見えています。それを入力するだけ。それだけです。',en:'Right now, in the top-right corner of your phone screen, there\'s a number. Just enter that number. That\'s all.'},
+  'ib-arrow-point': {ja:'← <strong>この数字！</strong>',en:'← <strong>That number!</strong>'},
+
+  /* ── NUMBER INPUT ── */
+  'num-input-label':{ja:'📱 今すぐ右上の数字を入力！',en:'📱 Enter the number from top-right now!'},
+  'num-input-hint': {ja:'スマホ右上の <strong>数字をそのまま入力</strong> してください',en:'Enter the <strong>exact number</strong> from your phone\'s top-right'},
+  'warn-txt-default':{ja:'数値が正しくありません！',en:'Invalid number!'},
+  'warn-sub-default':{ja:'1〜100の数字を入力してください',en:'Please enter a number between 1 and 100'},
+  'qs-label':       {ja:'よくある数値をタップ：',en:'Tap a common value:'},
+  'sl-title':       {ja:'📱 今の画面右上の数字は？',en:'📱 What does your top-right show?'},
+  'sl-mark-lo':     {ja:'20% 充電開始',en:'20% Start charging'},
+  'sl-mark-hi':     {ja:'80% 停止！',en:'80% Stop!'},
+  'zone-z1':        {ja:'危険',en:'Danger'},
+  'zone-z2':        {ja:'✅ ここを保て',en:'✅ Stay Here'},
+  'zone-z3':        {ja:'危険',en:'Danger'},
+
+  /* ── HABIT ── */
+  'habit-label':    {ja:'普段の習慣は？',en:'What\'s your usual charging habit?'},
+  'hcard-iwt-lb':   {ja:'20〜80%修行',en:'20–80% Rule'},
+  'hcard-iwt-su':   {ja:'目覚めた侍',en:'The Awakened Samurai'},
+  'hcard-mod-lb':   {ja:'減ったら充電',en:'Charge When Low'},
+  'hcard-mod-su':   {ja:'一般的',en:'Average'},
+  'hcard-full-lb':  {ja:'常に満タン',en:'Always Full'},
+  'hcard-full-su':  {ja:'ぐうたら派',en:'Lazy Charger'},
+  'hcard-sleep-lb': {ja:'寝落ち充電',en:'Sleep-Charging'},
+  'hcard-sleep-su': {ja:'電極の大敵',en:'Battery Enemy #1'},
+  'cta-diag':       {ja:'⚔ 道場判定を受ける！',en:'⚔ Run Dojo Diagnosis!'},
+
+  /* ── RESULT ── */
+  'cta-share':      {ja:'📤 「修行中！」とSNSシェア',en:'📤 Share "I\'m Training!" on SNS'},
+  'cta-to-mastery': {ja:'📜 修行の奥義へ →',en:'📜 Go to Mastery →'},
+
+  /* ── BUBBLE ── */
+  'bub-green-main': {ja:'GREEN帯域！',en:'GREEN Zone!'},
+  'bub-green-sub':  {ja:'充電不要。この調子で！',en:'No charging needed. Keep it up!'},
+  'bub-gold-main':  {ja:'要充電ゾーン！',en:'Needs Charging!'},
+  'bub-gold-sub':   {ja:'20%以下。今すぐ充電開始！',en:'Under 20%. Plug in now!'},
+  'bub-red-main':   {ja:'過充電ゾーン！',en:'Overcharge Zone!'},
+  'bub-red-sub':    {ja:'80%超。今すぐ引き抜け！',en:'Over 80%. Unplug now!'},
+
+  /* ── P1 HERO ── */
+  'p1-hero-eye':    {ja:'修行の奥義',en:'The Mastery Secrets'},
+  'p1-hero-h':      {ja:'<em>小分け4回</em>が<br>電極を救う',en:'<em>4 Small Sessions</em><br>Save Your Battery'},
+  'p1-hero-sub':    {ja:'満タン一発より分散充電。好きな流派を選べ。',en:'Split charging beats one full charge. Choose your style.'},
+
+  /* ── P1 FORMATION ── */
+  'sh-fm-eye':      {ja:'流派を選べ',en:'Choose Your Style'},
+  'sh-fm-t':        {ja:'フォーメーション選択',en:'Formation Selection'},
+  'wave-label':     {ja:'1日バッテリー推移',en:'Daily Battery Trend'},
+  'wave-note':      {ja:'※実際の時刻とは連動しません。理想的な1日のモデル例です',en:'※Not linked to real-time. This is an idealized daily model.'},
+  'wl-green':       {ja:'推奨ゾーン',en:'Safe Zone'},
+  'wl-fire':        {ja:'危険ゾーン',en:'Danger Zone'},
+  'wl-blue':        {ja:'バッテリー残量',en:'Battery Level'},
+
+  /* ── P1 DEMO ── */
+  'sh-demo-eye':    {ja:'体感デモ',en:'Live Demo'},
+  'sh-demo-t':      {ja:'3つのゾーンを触って覚える',en:'Touch to Feel the 3 Zones'},
+  'bd-eye':         {ja:'リアルタイム充電デモ',en:'Real-Time Charging Demo'},
+  'bd-sub':         {ja:'スライダーを動かすと指示が変わる',en:'Move the slider to see instructions change'},
+  'bat-mkl-lo':     {ja:'▲20% 充電開始ライン',en:'▲20% Start charging line'},
+  'bat-mkl-hi':     {ja:'▲80% 充電停止ライン',en:'▲80% Stop charging line'},
+  'dins-green':     {ja:'✅ GREEN帯域 — 最適ゾーンじゃ！この調子で！',en:'✅ GREEN Zone — Optimal! Keep it up!'},
+  'dins-red':       {ja:'⚠️ 過充電ゾーン！今すぐ引き抜け！ ドン！バリバリ！',en:'⚠️ Overcharge Zone! Unplug NOW! BANG!'},
+  'dins-gold':      {ja:'⚡ 要充電！20%以下 — 今すぐ接続せよ！',en:'⚡ Needs Charging! Under 20% — Plug in now!'},
+  'o80-ob':         {ja:'ドン！バリバリ！⚡',en:'BANG! CRACK! ⚡'},
+  'o80-os':         {ja:'80%到達！充電器を今すぐ引き抜け！',en:'80% reached! Unplug the charger NOW!'},
+  'o20-ob':         {ja:'ギリギリ！修行開始じゃ！',en:'Barely alive! Start charging!'},
+  'o20-os':         {ja:'20%以下 — 充電器を接続せよ！',en:'Under 20% — Connect charger now!'},
+
+  /* ── P1 FIREWORK ── */
+  'sh-fw-eye':      {ja:'80%到達演出',en:'80% Achievement Effect'},
+  'sh-fw-t':        {ja:'打ち上げ花火でドーパミン',en:'Dopamine via Fireworks'},
+  'fw-onom':        {ja:'ドン！バリバリ！',en:'BANG! CRACK!'},
+  'fw-txt':         {ja:'充電器を外せ！これが奥義じゃ！',en:'Unplug! This is the secret!'},
+  'fw-sub':         {ja:'電極ストレス 40%削減 達成',en:'Battery stress reduced by 40%'},
+  'cta-fw':         {ja:'🎆 花火をもう一度！',en:'🎆 Fireworks Again!'},
+
+  /* ── P1 SCIENCE ── */
+  'sci-toggle-txt': {ja:'📖 なぜ80%で止めるのか？（科学的根拠）',en:'📖 Why Stop at 80%? (The Science)'},
+  'sci-good-lb':    {ja:'✅ 20〜80%帯域',en:'✅ 20–80% Range'},
+  'sci-good-st':    {ja:'リチウムイオンが均一に移動。電極劣化が最小。<strong>電池寿命3〜4年</strong>を実現。',en:'Lithium ions move uniformly. Electrode degradation minimal. <strong>3–4 years of battery life</strong> achieved.'},
+  'sci-bad-lb':     {ja:'❌ 常時90〜100%',en:'❌ Always 90–100%'},
+  'sci-bad-st':     {ja:'電極に慢性的な過圧。微細なひびが毎夜蓄積。<strong>1年で容量60%以下</strong>に。',en:'Chronic overpressure on electrodes. Micro-cracks accumulate nightly. <strong>Capacity drops below 60% within a year.</strong>'},
+
+  /* ── P1 TIPS ── */
+  'sh-tips-eye':    {ja:'習慣化の仕掛け',en:'Habit-Building Tricks'},
+  'sh-tips-t':      {ja:'毎朝チェックをルーティンにする',en:'Make the Morning Check a Routine'},
+  'tip1-tt':        {ja:'毎朝7:00 通知',en:'7:00 AM Notification'},
+  'tip1-tb':        {ja:'「今朝のバッテリーは何%？」で起床後すぐに数値確認を習慣化。',en:'"What\'s your battery this morning?" builds an instant wake-up habit.'},
+  'tip2-tt':        {ja:'ストリーク炎',en:'Streak Flame'},
+  'tip2-tb':        {ja:'途切れると悔しい。損失回避心理が翌朝の再起動を促す。',en:'Breaking it hurts. Loss-aversion psychology drives you back the next morning.'},
+  'tip3-tt':        {ja:'SNS公言ループ',en:'Public Commitment Loop'},
+  'tip3-tb':        {ja:'「修行中！」シェアが外部コミットメントになり習慣を強制する。',en:'"I\'m Training!" shares create external commitment and enforce the habit.'},
+  'tip4-tt':        {ja:'80%花火強化',en:'80% Fireworks Reward'},
+  'tip4-tb':        {ja:'充電停止に花火でドーパミン。オペラント条件付けで「外す」が快感になる。',en:'Dopamine hit for stopping at 80%. Operant conditioning makes "unplugging" feel great.'},
+
+  /* ── P2 HERO ── */
+  'p2-hero-eye':    {ja:'道場バッジ — 修行記録',en:'Dojo Badges — Training Record'},
+  'p2-hero-h':      {ja:'続ければ<br><em>強くなれる</em>',en:'Keep Going,<br><em>Grow Stronger</em>'},
+  'p2-hero-sub':    {ja:'毎朝チェックインでバッジ獲得。7日で「朝の門」、30日で「皆勤賞」。',en:'Check in every morning to earn badges. 7 days → "Morning Gate", 30 days → "Perfect Attendance".'},
+
+  /* ── P2 STREAK / CHECK-IN ── */
+  'sh-streak-eye':  {ja:'今週の修行記録',en:"This Week's Training"},
+  'ck-eye':         {ja:'TODAY\'S MORNING RITUAL',en:'TODAY\'S MORNING RITUAL'},
+  'ck-t':           {ja:'今朝のバッテリーチェックイン',en:'Morning Battery Check-In'},
+  'ck-s':           {ja:'残量を入力して「チェックイン！」。7日連続で「朝の門」バッジ獲得！',en:'Enter your level and tap "Check In!". 7 days in a row earns the "Morning Gate" badge!'},
+  'ck-btn':         {ja:'⚔ チェックイン！',en:'⚔ Check In!'},
+
+  /* ── P2 BADGES ── */
+  'sh-bdg-eye':     {ja:'獲得バッジ',en:'Earned Badges'},
+  'sh-bdg-t':       {ja:'道場の勲章',en:'Dojo Medals'},
+};
+
+/* Bilingual character data */
+var CH_EN={
+  master:{rank:'Rank: Grand Master',name:'Battery Samurai — Grand Master',
+    kata:'Excellent! You have mastered IWT charging. Maintaining the 20–80% zone and caring for your electrodes — this is the true samurai way! Your battery should last 3–4+ years.',
+    qol:93.7,life:'3–4 years',fat:0},
+  blue:{rank:'Rank: Beginner',name:'Apprentice Charger',
+    kata:'Not bad, but room to improve! From today, follow the two pillars: "start at 20%, stop at 80%." Your rank will rise within 3 months. Looking forward to tomorrow\'s numbers!',
+    qol:78.2,life:'2–3 years',fat:1},
+  metabo:{rank:'Rank: Novice',name:'Overcharged Warrior 🍜',
+    kata:'Sleeping near full again?! Your electrodes are crying. Tonight: unplug at 80%. That\'s all you need to do. Come back tomorrow if you dare!',
+    qol:54.1,life:'1.5–2 years',fat:2},
+  bad:{rank:'Rank: Pre-Beginner',name:'Sleep-Charger Problem Child 😴',
+    kata:'Shame!! Sleeping at 100% every night?! Your electrodes are screaming! Tonight, just one thing: unplug at 80% before sleep. That one change triples your battery lifespan.',
+    qol:33.2,life:'Under 1 year',fat:3}
+};
+
+/* Formation bilingual */
+var FMS_EN={
+  bb:{t:'⚾ Samurai Japan Batting Order — 4-Split Charging',s:'Charge rhythm aligned with 4 batters\' turns'},
+  sc:{t:'⚽ FIFA 4-4-2 — Position-Based Charging System',s:'Charge timing placed at DF→MF→FW→GK defensive lines'},
+  sm:{t:'🏆 Sumo Four Pillars — Guard the Four Corners',s:'Unshakeable charging defense modeled on four sumo ring pillars'}
+};
+
+/* Badge bilingual */
+var BDEFS_EN=[
+  {id:'first',  em:'🎌',nm:'Enrolled!',    cond:'First diagnosis done'},
+  {id:'m7',     em:'🌅',nm:'Morning Gate', cond:'7 consecutive days'},
+  {id:'m30',    em:'🌄',nm:'Perfect Att.', cond:'30 consecutive days'},
+  {id:'perfect',em:'⚔️',nm:'Grand Master', cond:'Achieved in diagnosis'},
+  {id:'g7',     em:'🟢',nm:'GREEN Guard',  cond:'7 days in GREEN zone'},
+  {id:'share1', em:'📣',nm:'Declared',     cond:'SNS share achieved'},
+  {id:'iwt14',  em:'🥷',nm:'IWT Samurai',  cond:'14-day check-in'},
+  {id:'fw',     em:'🎆',nm:'80% Dojo',     cond:'Experienced fireworks'},
+];
+
+var DAYS_EN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function t(key){return (T[key]&&T[key][LANG])||'';}
+
+function applyLang(){
+  /* title */
+  document.title=t('page-title');
+  document.getElementById('page-title').textContent=t('page-title');
+
+  /* NAV */
+  document.querySelector('.nav-logo').innerHTML=t('nav-logo-text');
+  document.getElementById('tab0').textContent=t('tab0');
+  document.getElementById('tab1').textContent=t('tab1');
+  document.getElementById('tab2').textContent=t('tab2');
+  document.getElementById('lang-btn').textContent=t('lang-btn');
+
+  /* QR */
+  document.getElementById('qr-label-h').textContent=t('qr-label-h');
+  document.getElementById('qr-label-f').textContent=t('qr-label-f');
+
+  /* Footer */
+  document.getElementById('ft-ver').textContent=t('ft-ver');
+  document.getElementById('ft-link').textContent=t('ft-link');
+
+  /* --- P0 --- */
+  setTxt('p0-hero-eye',t('p0-hero-eye'));
+  setHTML('p0-hero-h',t('p0-hero-h'));
+  setTxt('p0-hero-sub',t('p0-hero-sub'));
+  setTxt('p0-cmd-hint',t('p0-cmd-hint'));
+  setTxt('ib-title',t('ib-title'));
+  setTxt('ib-sub',t('ib-sub'));
+  setHTML('ib-arrow-point',t('ib-arrow-point'));
+  setHTML('num-input-label',t('num-input-label'));
+  setHTML('num-input-hint',t('num-input-hint'));
+  setTxt('qs-label',t('qs-label'));
+  setTxt('sl-title-el',t('sl-title'));
+  setTxt('sl-mark-lo',t('sl-mark-lo'));
+  setTxt('sl-mark-hi',t('sl-mark-hi'));
+  setTxt('zone-z1',t('zone-z1'));
+  setTxt('zone-z2',t('zone-z2'));
+  setTxt('zone-z3',t('zone-z3'));
+  setTxt('habit-label',t('habit-label'));
+  setTxt('hcard-iwt-lb',t('hcard-iwt-lb'));setTxt('hcard-iwt-su',t('hcard-iwt-su'));
+  setTxt('hcard-mod-lb',t('hcard-mod-lb'));setTxt('hcard-mod-su',t('hcard-mod-su'));
+  setTxt('hcard-full-lb',t('hcard-full-lb'));setTxt('hcard-full-su',t('hcard-full-su'));
+  setTxt('hcard-sleep-lb',t('hcard-sleep-lb'));setTxt('hcard-sleep-su',t('hcard-sleep-su'));
+  setTxt('cta-diag',t('cta-diag'));
+  setTxt('cta-share',t('cta-share'));
+  setTxt('cta-to-mastery',t('cta-to-mastery'));
+
+  /* bubble */
+  updateBubble(+document.getElementById('bsl').value);
+
+  /* --- P1 --- */
+  setTxt('sh-fm-eye',t('sh-fm-eye'));setTxt('sh-fm-t',t('sh-fm-t'));
+  setTxt('wave-label',t('wave-label'));setTxt('wave-note',t('wave-note'));
+  setTxt('wl-green',t('wl-green'));setTxt('wl-fire',t('wl-fire'));setTxt('wl-blue',t('wl-blue'));
+  setTxt('sh-demo-eye',t('sh-demo-eye'));setTxt('sh-demo-t',t('sh-demo-t'));
+  setTxt('bd-eye',t('bd-eye'));setTxt('bd-sub',t('bd-sub'));
+  setTxt('bat-mkl-lo',t('bat-mkl-lo'));setTxt('bat-mkl-hi',t('bat-mkl-hi'));
+  setTxt('sh-fw-eye',t('sh-fw-eye'));setTxt('sh-fw-t',t('sh-fw-t'));
+  setTxt('fw-onom',t('fw-onom'));setTxt('fw-txt',t('fw-txt'));setTxt('fw-sub',t('fw-sub'));
+  setTxt('cta-fw',t('cta-fw'));
+  setTxt('sci-toggle-txt',t('sci-toggle-txt'));
+  setTxt('sci-good-lb',t('sci-good-lb'));setHTML('sci-good-st',t('sci-good-st'));
+  setTxt('sci-bad-lb',t('sci-bad-lb'));setHTML('sci-bad-st',t('sci-bad-st'));
+  setTxt('sh-tips-eye',t('sh-tips-eye'));setTxt('sh-tips-t',t('sh-tips-t'));
+  setTxt('tip1-tt',t('tip1-tt'));setTxt('tip1-tb',t('tip1-tb'));
+  setTxt('tip2-tt',t('tip2-tt'));setTxt('tip2-tb',t('tip2-tb'));
+  setTxt('tip3-tt',t('tip3-tt'));setTxt('tip3-tb',t('tip3-tb'));
+  setTxt('tip4-tt',t('tip4-tt'));setTxt('tip4-tb',t('tip4-tb'));
+  /* formation cards */
+  setTxt('fmc-bb-nm',t('fmc-bb-nm'));setTxt('fmc-bb-hs',t('fmc-bb-hs'));
+  setTxt('fmc-sc-nm',t('fmc-sc-nm'));setTxt('fmc-sc-hs',t('fmc-sc-hs'));
+  setTxt('fmc-sm-nm',t('fmc-sm-nm'));setTxt('fmc-sm-hs',t('fmc-sm-hs'));
+  /* demo indicator */
+  dUp(+document.getElementById('drng').value);
+
+  /* --- P2 --- */
+  setTxt('p2-hero-eye',t('p2-hero-eye'));
+  setHTML('p2-hero-h',t('p2-hero-h'));setTxt('p2-hero-sub',t('p2-hero-sub'));
+  setTxt('sh-streak-eye',t('sh-streak-eye'));
+  setTxt('ck-eye',t('ck-eye'));setTxt('ck-t',t('ck-t'));setTxt('ck-s',t('ck-s'));
+  setTxt('ck-btn',t('ck-btn'));
+  setTxt('sh-bdg-eye',t('sh-bdg-eye'));setTxt('sh-bdg-t',t('sh-bdg-t'));
+  /* re-render streak + badges */
+  initBdg();
+}
+
+/* Add missing EN keys for formation cards */
+T['fmc-bb-nm']={ja:'侍ジャパン打順',en:'Samurai Japan Order'};
+T['fmc-bb-hs']={ja:'4打席 分散充電',en:'4-at-bat split charge'};
+T['fmc-sc-nm']={ja:'FIFA 4-4-2',en:'FIFA 4-4-2'};
+T['fmc-sc-hs']={ja:'ポジション充電',en:'Position charging'};
+T['fmc-sm-nm']={ja:'相撲四本柱',en:'Sumo Four Pillars'};
+T['fmc-sm-hs']={ja:'四隅を守れ',en:'Guard the corners'};
+
+function setTxt(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function setHTML(id,v){var e=document.getElementById(id);if(e)e.innerHTML=v;}
+
+function toggleLang(){
+  LANG=LANG==='ja'?'en':'ja';
+  applyLang();
+}
+
+/* Patch diag() to support bilingual output */
+var _diagOrig=diag;
+diag=function(){
+  _diagOrig();
+  var bat=+document.getElementById('bsl').value;
+  var key=ck(bat,hab);
+  var ch=LANG==='en'?CH_EN[key]:CH[key];
+  document.getElementById('r-rank').textContent=ch.rank;
+  var rn=document.getElementById('r-name');rn.textContent=ch.name;
+  document.getElementById('r-kata').textContent=ch.kata;
+  var glbls=LANG==='en'?['Master','Training','Overcharged','Danger']:['達人','修行中','メタボ','危険'];
+  document.getElementById('gauge-lbl').textContent=glbls[ch.fat];
+  document.getElementById('r-mets').innerHTML=`
+    <div class="met" style="border-right:1px solid var(--border);border-top:1px solid var(--border);">
+      <div class="ml">QoL Score</div><div class="mv" style="color:${ch.color};">${ch.qol}</div></div>
+    <div class="met" style="border-top:1px solid var(--border);">
+      <div class="ml">${LANG==='en'?'Est. Battery Life':'推定電池寿命'}</div><div class="mv" style="color:${ch.color};">${ch.life}</div></div>`;
+};
+
+/* Patch initBdg() to support bilingual badges and day labels */
+var _initBdgOrig=initBdg;
+initBdg=function(){
+  _initBdgOrig();
+  if(LANG==='en'){
+    var ck2=lG(LS_CK,[]);
+    var days=DAYS_EN;
+    var today=new Date().getDay(); var ti=today===0?6:today-1;
+    document.getElementById('streak').innerHTML=days.map(function(d,i){
+      var cl=i<ti?(ck2.includes(i)?'done':'miss'):i===ti?'today':'miss';
+      var ic=cl==='done'?'✓':cl==='today'?'Now':'—';
+      return'<div class="sdy '+cl+'"><div class="sd">'+d+'</div><div class="si">'+ic+'</div></div>';
+    }).join('');
+    var n=ck2.length;
+    var msgs=['Start training','Day 2!','Day 3! Great!','Day 4! 3 more for Morning Gate!'];
+    document.getElementById('sk-msg').textContent='Streak: '+n+' days — '+(msgs[Math.min(n,3)]||'Ongoing! It\'s a habit now!');
+    var bd2=lG(LS_BD,{});
+    document.getElementById('bdg-grid').innerHTML=BDEFS_EN.map(function(b){
+      var bj=BDEFS.find(function(x){return x.id===b.id;});
+      var e=bj?bj.ok(bd2):false;
+      return'<div class="bdg '+(e?'earned':'locked')+'"><div class="be">'+b.em+'</div><div class="bn">'+b.nm+'</div><div class="bc">'+b.cond+'</div></div>';
+    }).join('');
+  }
+};
+
+/* Patch dUp to use bilingual demo messages */
+var _dUpOrig=dUp;
+dUp=function(v){
+  _dUpOrig(v);
+  var ins=document.getElementById('dins');
+  if(ins){
+    if(v>=80) ins.textContent=t('dins-red');
+    else if(v<=20) ins.textContent=t('dins-gold');
+    else ins.textContent=t('dins-green');
+  }
+  var o80=document.getElementById('o80'),o20=document.getElementById('o20');
+  if(o80){
+    var ob80=o80.querySelector('.ob'),os80=o80.querySelector('.os');
+    if(ob80)ob80.textContent=t('o80-ob');if(os80)os80.textContent=t('o80-os');
+  }
+  if(o20){
+    var ob20=o20.querySelector('.ob'),os20=o20.querySelector('.os');
+    if(ob20)ob20.textContent=t('o20-ob');if(os20)os20.textContent=t('o20-os');
+  }
+};
+
+/* Patch updateBubble for bilingual */
+var _ubOrig=updateBubble;
+updateBubble=function(v){
+  _ubOrig(v);
+  var main=document.getElementById('bub-main'),sub=document.getElementById('bub-sub');
+  if(!main)return;
+  if(v<20){main.textContent=t('bub-gold-main');sub.textContent=t('bub-gold-sub');}
+  else if(v>80){main.textContent=t('bub-red-main');sub.textContent=t('bub-red-sub');}
+  else{main.textContent=t('bub-green-main');sub.textContent=t('bub-green-sub');}
+};
+
+window.addEventListener('load',function(){
+  makeQR('qr-header');makeQR('qr-footer');
+});
 </script>
 </body>
 </html>

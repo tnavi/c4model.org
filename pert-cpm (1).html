@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>かんたん工程表（PERT/CPM）</title>
+<style>
+:root{--bg:#ffffff;--card:#ffffff;--ink:#000000;--sub:#1a1a1a;--line:#b8c4c9;--pri:#0f766e;--priL:#d9f0ed;--crit:#d13b3b;--critL:#fde8e8;--free:#e9eef0;box-sizing:border-box}
+*,*:before,*:after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 "Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;padding:0 12px 40px}
+header{max-width:1100px;margin:0 auto;padding:16px 0 8px}
+h1{font-size:1.35rem;margin:0}
+header p{margin:2px 0 0;color:var(--sub);font-size:.9rem}
+main{max-width:1100px;margin:0 auto}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.box b{display:block;font-size:.8rem;color:var(--sub);font-weight:600}
+.box span{font-size:1.5rem;font-weight:700}
+.box .path{font-size:1rem;color:#000;word-break:break-all}
+nav{display:flex;gap:6px;margin:14px 0 10px;overflow-x:auto}
+nav button{flex:1;min-width:88px;padding:10px 8px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+nav button[aria-selected=true]{background:var(--priL);border:2px solid var(--pri);color:#000}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--pri);outline-offset:1px}
+.pane{display:none}.pane.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.btn{padding:9px 14px;border:2px solid var(--pri);background:var(--priL);color:#000;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+.btn.o{background:#fff;color:#000;border:1px solid var(--pri)}
+.btn.d{border:1px solid var(--crit);background:#fff;color:#000;padding:6px 10px}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+th{font-size:.82rem;color:#000;font-weight:700}
+td.l,th.l{text-align:left}
+input,select{font:inherit;color:var(--ink);background:#fff;border:1px solid var(--sub);border-radius:6px;padding:7px 8px;width:100%}
+input.n{width:70px;text-align:center}
+input.nm{min-width:150px}
+input.pr{width:110px}
+.crit td{background:var(--critL)}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;background:#fff;border:1px solid var(--crit);color:#000;font-size:.78rem}
+.msg{color:#000;font-weight:700;margin:8px 0}.msg:not(:empty){border-left:4px solid var(--crit);padding-left:8px}
+.hint{color:var(--sub);font-size:.85rem;margin:8px 0 0}
+.g{display:grid;grid-template-columns:110px 1fr;gap:6px 8px;align-items:center;min-width:520px}
+.g .lb{font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr{position:relative;height:24px;background:#f1f4f5;border-radius:5px}
+.tr i{position:absolute;top:0;height:100%;border-radius:5px}
+.tr .f{background:var(--free);border:1px dashed var(--sub)}
+.tr .b{background:#5fbcb2}.tr .b.c{background:#f08a8a}
+.tr em{position:absolute;top:0;font-style:normal;font-size:.75rem;line-height:24px;padding-left:6px;color:#fff;white-space:nowrap}
+.axis{display:flex;justify-content:space-between;font-size:.75rem;color:var(--sub)}
+svg text{fill:var(--ink);font-family:inherit}
+
+#p1,[data-p=p1]{--c:#2563eb;--cl:#e3edff;--cm:#b5cdfb}
+#p2,[data-p=p2]{--c:#15803d;--cl:#dff3e6;--cm:#a8dbb9}
+#p3,[data-p=p3]{--c:#c2620a;--cl:#ffebd6;--cm:#fbc999}
+#p4,[data-p=p4]{--c:#7e3fbf;--cl:#f0e3fc;--cm:#d5b5f3}
+nav button{border:2px solid var(--c);background:var(--cl);color:#000}
+nav button[aria-selected=true]{background:var(--cm);border:3px solid var(--c);color:#000;font-weight:700}
+.pane .card{border-top:6px solid var(--c)}
+h2.pt{margin:0 0 10px;padding:6px 10px;background:var(--cl);border-left:6px solid var(--c);font-size:1.05rem;color:#000}
+.pane th{background:var(--cl);border-bottom:2px solid var(--c)}
+.pane .btn{border-color:var(--c);background:var(--cl)}
+.pane .btn.o{background:#fff;border:1px solid var(--c)}
+.pane .btn.d{border:1px solid var(--crit);background:#fff}
+#p1 .bar label{padding:4px 8px;background:var(--cl);border-left:6px solid var(--c);border-radius:4px;font-weight:700}
+.vg{display:flex;gap:4px}
+.vax{width:42px;flex:none}
+.vc{flex:1;min-width:48px;display:flex;flex-direction:column}
+.vh{height:58px;font-size:.7rem;line-height:1.25;text-align:center;overflow:hidden;word-break:break-all;padding:0 1px}
+.vh b{display:block;font-size:.95rem}
+.vt{position:relative;height:400px;background:#f1f4f5;border-radius:5px}
+.vt i{position:absolute;left:0;right:0;border-radius:4px}
+.vt i.f{background:var(--free);border:1px dashed #1a1a1a}
+.vt i.b{background:#5fbcb2}.vt i.b.c{background:#f08a8a}
+@media print{nav,.bar,.btn,.hint{display:none}.pane{display:block!important;margin-bottom:16px}body{background:#fff}}
+</style>
+</head>
+<body>
+<header>
+  <h1>かんたん工程表（PERT/CPM）</h1>
+  <p>作業と「先に終わらせる作業」を入れるだけで、全体の日数と“遅らせられない作業”が分かります。</p>
+</header>
+<main>
+  <div class="sum" id="sum"></div>
+  <nav role="tablist" id="tabs">
+    <button role="tab" data-p="p1" aria-selected="true">① 入力</button>
+    <button role="tab" data-p="p2" aria-selected="false">② 結果表</button>
+    <button role="tab" data-p="p3" aria-selected="false">③ ネットワーク図</button>
+    <button role="tab" data-p="p4" aria-selected="false">④ ガント図</button>
+  </nav>
+
+  <section class="pane on" id="p1">
+    <div class="card"><h2 class="pt">① 入力</h2>
+      <div class="bar">
+        <label>見積り方法
+          <select id="mode" style="width:auto">
+            <option value="s">かんたん（日数1つ）</option>
+            <option value="p">3点見積り（PERT）</option>
+          </select>
+        </label>
+        <button class="btn" id="add">＋ 作業を追加</button>
+        <button class="btn o" id="sample">サンプル</button>
+        <button class="btn o" id="clear">全部消す</button>
+        <button class="btn o" id="print">印刷</button>
+      </div>
+      <div class="wrap"><table id="tbl"></table></div>
+      <div class="msg" id="err" role="alert"></div>
+      <p class="hint">先行作業は、記号をカンマで区切って入力します（例：A,B）。最初の作業は空欄でOK。データはこの端末のブラウザに自動保存されます。</p>
+      <p class="hint" id="pertHint" style="display:none">3点見積り：楽観（うまくいく日数）・最頻（普通の日数）・悲観（遅れた場合の日数）を入れると、期待日数＝（楽観＋最頻×4＋悲観）÷6 で計算します。</p>
+    </div>
+  </section>
+
+  <section class="pane" id="p2"><div class="card"><h2 class="pt">② 結果表</h2><div class="wrap" id="res"></div>
+    <p class="hint">余裕＝その作業を遅らせても全体に影響しない日数。余裕が0の作業（赤）が“遅らせられない作業”です。</p></div></section>
+
+  <section class="pane" id="p3"><div class="card"><h2 class="pt">③ ネットワーク図</h2><div class="wrap" id="net"></div>
+    <p class="hint">各ボックス：上段＝最早開始／最早終了、下段＝最遅開始／最遅終了。赤い線と枠がクリティカルパスです。作業の順番は上から下へ進みます。</p></div></section>
+
+  <section class="pane" id="p4"><div class="card"><h2 class="pt">④ ガント図</h2><div class="wrap" id="gantt"></div>
+    <p class="hint">時間は上から下へ進みます。色つきの棒＝作業期間、点線の枠＝遅らせても大丈夫な余裕の範囲。</p></div></section>
+</main>
+
+<script>
+(function(){
+var KEY="pertcpm.v1",S={mode:"s",tasks:[]},R=null;
+var SAMPLE=[["A","要件を決める",3,3,3,""],["B","デザイン作成",4,5,8,"A"],["C","システム開発",6,8,12,"A"],["D","文章・素材の準備",2,3,4,"A"],["E","テスト",2,3,5,"B,C"],["F","公開",1,1,1,"D,E"]];
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function f(x){return Math.round(x*10)/10}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&d.tasks){S=d;return true}}catch(e){}return false}
+function loadSample(){S.tasks=SAMPLE.map(function(r){return{id:r[0],name:r[1],o:r[2],m:r[3],p:r[4],pre:r[5]}})}
+function nextId(){var u={};S.tasks.forEach(function(t){u[t.id]=1});for(var i=0;i<702;i++){var id=i<26?String.fromCharCode(65+i):String.fromCharCode(65+(i-26)/26|0)+String.fromCharCode(65+(i-26)%26);if(!u[id])return id}}
+function dur(t){var o=+t.o||0,m=+t.m||0,p=+t.p||0;return S.mode==="p"?(o+4*m+p)/6:m}
+
+/* ---- 計算 ---- */
+function calc(){
+  var T=S.tasks,map={},err="";
+  if(!T.length)return{err:"",list:[],T:0};
+  T.forEach(function(t){map[t.id]=t});
+  var ids=T.map(function(t){return t.id}),seen={};
+  for(var i=0;i<ids.length;i++){if(!ids[i]||seen[ids[i]])return{err:"記号「"+ids[i]+"」が重複しています。",list:[],T:0};seen[ids[i]]=1}
+  T.forEach(function(t){t.pl=String(t.pre||"").split(/[,、，\s]+/).map(function(s){return s.trim().toUpperCase()}).filter(Boolean)});
+  for(var a=0;a<T.length;a++){for(var b=0;b<T[a].pl.length;b++){var p=T[a].pl[b];
+    if(p===T[a].id)return{err:"作業"+T[a].id+"が自分自身を先行にしています。",list:[],T:0};
+    if(!map[p])return{err:"作業"+T[a].id+"の先行「"+p+"」が見つかりません。",list:[],T:0}}}
+  var indeg={},succ={},q=[],ord=[];
+  T.forEach(function(t){indeg[t.id]=t.pl.length;succ[t.id]=[]});
+  T.forEach(function(t){t.pl.forEach(function(p){succ[p].push(t.id)})});
+  T.forEach(function(t){if(!indeg[t.id])q.push(t.id)});
+  while(q.length){var x=q.shift();ord.push(x);succ[x].forEach(function(s){if(--indeg[s]===0)q.push(s)})}
+  if(ord.length<T.length)return{err:"先行の関係がぐるぐる回っています（循環）。見直してください。",list:[],T:0};
+  var d={};
+  ord.forEach(function(id){var t=map[id];t.d=Math.max(0,dur(t));t.es=0;t.layer=0;
+    t.pl.forEach(function(p){t.es=Math.max(t.es,map[p].ef);t.layer=Math.max(t.layer,map[p].layer+1)});t.ef=t.es+t.d});
+  var end=0;ord.forEach(function(id){end=Math.max(end,map[id].ef)});
+  for(var k=ord.length-1;k>=0;k--){var t=map[ord[k]];t.lf=end;succ[t.id].forEach(function(s){t.lf=Math.min(t.lf,map[s].ls)});t.ls=t.lf-t.d;t.fl=t.ls-t.es;t.cr=t.fl<0.05}
+  var crit=ord.map(function(i){return map[i]}).filter(function(t){return t.cr}).sort(function(a,b){return a.es-b.es});
+  var v=0;crit.forEach(function(t){var s=(+t.p-+t.o)/6;v+=s*s});
+  return{err:"",list:ord.map(function(i){return map[i]}),T:end,crit:crit,sd:Math.sqrt(v),map:map,succ:succ}
+}
+
+/* ---- 描画 ---- */
+function drawInput(){
+  var pm=S.mode==="p",h="<tr><th>記号</th><th class='l'>作業名</th>"+(pm?"<th>楽観</th><th>最頻</th><th>悲観</th>":"<th>日数</th>")+"<th>先行作業</th><th></th></tr>";
+  S.tasks.forEach(function(t,i){
+    h+="<tr><td><input class='n' data-i='"+i+"' data-k='id' value='"+esc(t.id)+"' aria-label='記号'></td>"+
+    "<td><input class='nm' data-i='"+i+"' data-k='name' value='"+esc(t.name)+"' placeholder='作業名' aria-label='作業名'></td>"+
+    (pm?"<td><input class='n' type='number' min='0' step='any' inputmode='decimal' data-i='"+i+"' data-k='o' value='"+t.o+"'></td><td><input class='n' type='number' min='0' step='any' inputmode='decimal' data-i='"+i+"' data-k='m' value='"+t.m+"'></td><td><input class='n' type='number' min='0' step='any' inputmode='decimal' data-i='"+i+"' data-k='p' value='"+t.p+"'></td>"
+      :"<td><input class='n' type='number' min='0' step='any' inputmode='decimal' data-i='"+i+"' data-k='m' value='"+t.m+"' aria-label='日数'></td>")+
+    "<td><input class='pr' data-i='"+i+"' data-k='pre' value='"+esc(t.pre||"")+"' placeholder='例 A,B' aria-label='先行作業'></td>"+
+    "<td><button class='btn d' data-del='"+i+"' aria-label='削除'>削除</button></td></tr>"});
+  if(!S.tasks.length)h+="<tr><td colspan='7' class='l'>まだ作業がありません。「＋ 作業を追加」か「サンプル」を押してください。</td></tr>";
+  $("tbl").innerHTML=h;$("mode").value=S.mode;$("pertHint").style.display=pm?"block":"none"
+}
+function drawResults(){
+  R=calc();$("err").textContent=R.err;
+  var s="";
+  if(R.err||!R.list.length){s="<div class='box'><b>総所要期間</b><span>—</span></div>";$("sum").innerHTML=s;["res","net","gantt"].forEach(function(i){$(i).innerHTML="<p class='hint'>"+(R.err?"入力を直すと表示されます。":"作業を入力してください。")+"</p>"});return}
+  s="<div class='box'><b>全体の所要期間</b><span>"+f(R.T)+" 日</span></div>"+
+    "<div class='box'><b>遅らせられない作業の流れ</b><span class='path'>"+R.crit.map(function(t){return esc(t.id)}).join(" → ")+"</span></div>";
+  if(S.mode==="p")s+="<div class='box'><b>ばらつき（目安）</b><span>±"+f(R.sd)+" 日</span><div class='hint'>約95%の確率で "+f(Math.max(0,R.T-2*R.sd))+"〜"+f(R.T+2*R.sd)+" 日</div></div>";
+  $("sum").innerHTML=s;
+  var h="<table><tr><th>記号</th><th class='l'>作業名</th><th>日数</th><th>最早開始</th><th>最早終了</th><th>最遅開始</th><th>最遅終了</th><th>余裕</th><th></th></tr>";
+  R.list.slice().sort(function(a,b){return a.es-b.es||a.layer-b.layer}).forEach(function(t){
+    h+="<tr class='"+(t.cr?"crit":"")+"'><td>"+esc(t.id)+"</td><td class='l'>"+esc(t.name)+"</td><td>"+f(t.d)+"</td><td>"+f(t.es)+"</td><td>"+f(t.ef)+"</td><td>"+f(t.ls)+"</td><td>"+f(t.lf)+"</td><td>"+f(Math.max(0,t.fl))+"</td><td>"+(t.cr?"<span class='tag'>要注意</span>":"")+"</td></tr>"});
+  $("res").innerHTML=h+"</table>";
+  drawNet();drawGantt()
+}
+function drawNet(){
+  var W=140,H=64,GX=16,GY=40,L={},maxL=0,pos={};
+  R.list.forEach(function(t){(L[t.layer]=L[t.layer]||[]).push(t);maxL=Math.max(maxL,t.layer)});
+  var cols=0;for(var k in L)cols=Math.max(cols,L[k].length);
+  var w=cols*(W+GX)+GX,h=(maxL+1)*(H+GY)+GY/2;
+  for(var l in L)L[l].forEach(function(t,i){pos[t.id]={x:GX+i*(W+GX)+(cols-L[l].length)*(W+GX)/2,y:GY/4+l*(H+GY)}});
+  var e="",n="";
+  R.list.forEach(function(t){t.pl.forEach(function(p){var a=pos[p],b=pos[t.id],c=R.map[p].cr&&t.cr&&Math.abs(R.map[p].ef-t.es)<0.05,x1=a.x+W/2,y1=a.y+H,x2=b.x+W/2,y2=b.y,m=(y1+y2)/2;
+    e+="<path d='M"+x1+","+y1+" C"+x1+","+m+" "+x2+","+m+" "+x2+","+y2+"' fill='none' stroke='"+(c?"var(--crit)":"var(--sub)")+"' stroke-width='"+(c?2.5:1.3)+"'/><circle cx='"+x2+"' cy='"+y2+"' r='3.5' fill='"+(c?"var(--crit)":"var(--sub)")+"'/>"})});
+  R.list.forEach(function(t){var p=pos[t.id],nm=t.name.length>9?t.name.slice(0,9)+"…":t.name,col=t.cr?"var(--crit)":"var(--pri)";
+    n+="<g><rect x='"+p.x+"' y='"+p.y+"' width='"+W+"' height='"+H+"' rx='8' fill='var(--card)' stroke='"+col+"' stroke-width='"+(t.cr?2.5:1.5)+"'/>"+
+    "<text x='"+(p.x+6)+"' y='"+(p.y+14)+"' font-size='11' fill='var(--sub)'>"+f(t.es)+" / "+f(t.ef)+"</text>"+
+    "<text x='"+(p.x+W/2)+"' y='"+(p.y+35)+"' font-size='13' font-weight='700' text-anchor='middle'>"+esc(t.id)+" "+esc(nm)+"</text>"+
+    "<text x='"+(p.x+W/2)+"' y='"+(p.y+50)+"' font-size='11' text-anchor='middle' fill='var(--sub)'>"+f(t.d)+"日</text>"+
+    "<text x='"+(p.x+6)+"' y='"+(p.y+H-4)+"' font-size='11' fill='var(--sub)'>"+f(t.ls)+" / "+f(t.lf)+"</text></g>"});
+  $("net").innerHTML="<svg viewBox='0 0 "+w+" "+h+"' style='display:block;margin:0 auto;width:100%;max-width:"+w+"px;height:auto' role='img' aria-label='ネットワーク図'>"+e+n+"</svg>"
+}
+function drawGantt(){
+  var T=R.T||1,H=400,tk=[0,T/2,T],
+  h="<div class='vg'><div class='vax'><div style='height:58px'></div><div style='position:relative;height:"+H+"px'>";
+  tk.forEach(function(v,i){h+="<span style='position:absolute;right:4px;top:"+v/T*100+"%;transform:translateY("+(i==0?0:i==1?-50:-100)+"%);font-size:.75rem;white-space:nowrap'>"+f(v)+(i==2?"日":"")+"</span>"});
+  h+="</div></div>";
+  R.list.slice().sort(function(a,b){return a.es-b.es||a.layer-b.layer}).forEach(function(t){
+    h+="<div class='vc'><div class='vh' title='"+esc(t.name)+"'><b>"+esc(t.id)+"</b>"+esc(t.name)+"</div><div class='vt'>"+
+    (t.fl>0.05?"<i class='f' style='top:"+t.es/T*100+"%;height:"+(t.lf-t.es)/T*100+"%'></i>":"")+
+    "<i class='b"+(t.cr?" c":"")+"' style='top:"+t.es/T*100+"%;height:"+Math.max(t.d/T*100,.8)+"%'></i></div></div>"});
+  $("gantt").innerHTML=h+"</div>"
+}
+
+/* ---- 操作 ---- */
+$("tbl").addEventListener("input",function(e){var el=e.target,i=el.dataset.i,k=el.dataset.k;if(i==null)return;
+  var v=el.value;if(k==="id")v=v.trim().toUpperCase();S.tasks[i][k]=(k==="o"||k==="m"||k==="p")?(v===""?0:+v):v;
+  if(S.mode==="s"){S.tasks[i].o=S.tasks[i].p=S.tasks[i].m}
+  save();drawResults()});
+$("tbl").addEventListener("click",function(e){var d=e.target.dataset.del;if(d==null)return;S.tasks.splice(+d,1);save();drawInput();drawResults()});
+$("add").onclick=function(){var last=S.tasks[S.tasks.length-1];S.tasks.push({id:nextId(),name:"",o:1,m:1,p:1,pre:last?last.id:""});save();drawInput();drawResults();var ins=$("tbl").querySelectorAll("input.nm");if(ins.length)ins[ins.length-1].focus()};
+$("mode").onchange=function(){S.mode=this.value;if(S.mode==="s")S.tasks.forEach(function(t){t.o=t.p=t.m});save();drawInput();drawResults()};
+$("sample").onclick=function(){if(S.tasks.length&&!confirm("今の入力をサンプルで置き換えますか？"))return;S.mode="p";loadSample();save();drawInput();drawResults()};
+$("clear").onclick=function(){if(S.tasks.length&&!confirm("入力したものを全部消しますか？"))return;S.tasks=[];save();drawInput();drawResults()};
+$("print").onclick=function(){window.print()};
+$("tabs").addEventListener("click",function(e){var p=e.target.dataset.p;if(!p)return;
+  [].forEach.call($("tabs").children,function(b){b.setAttribute("aria-selected",b.dataset.p===p)});
+  [].forEach.call(document.querySelectorAll(".pane"),function(s){s.classList.toggle("on",s.id===p)})});
+
+if(!load()){S.mode="p";loadSample()}
+drawInput();drawResults()
+})();
+</script>
+</body>
+</html>
